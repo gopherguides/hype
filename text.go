@@ -20,7 +20,7 @@ func (t Text) String() string {
 
 func (p *Parser) NewText(node *html.Node) (*Text, error) {
 	if node == nil {
-		return nil, fmt.Errorf("node can not be nil")
+		return nil, fmt.Errorf("text node can not be nil")
 	}
 
 	if node.Type != html.TextNode {

@@ -1,7 +1,6 @@
 package hype
 
 import (
-	"fmt"
 	"testing"
 	"testing/fstest"
 
@@ -64,7 +63,7 @@ func Test_Node_String(t *testing.T) {
 	r.NotEmpty(exp)
 
 	act := doc.String()
-	fmt.Println(act)
+	// fmt.Println(act)
 	// r.True(false)
 	r.Equal(node_string_exp, act)
 }

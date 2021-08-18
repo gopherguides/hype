@@ -4,6 +4,7 @@ import (
 	"encoding/json"
 	"fmt"
 	"strings"
+	"sync"
 
 	"golang.org/x/net/html"
 )
@@ -14,6 +15,7 @@ type Node struct {
 	*html.Node
 	Children Tags
 	attrs    Attributes
+	moot     *sync.RWMutex
 }
 
 func (n *Node) StartTag() string {
@@ -46,15 +48,32 @@ func (n *Node) DaNode() *Node {
 	return n
 }
 
+// Attrs returns a copy of the attributes, not the underlying attributes. Use Set to modify attributes.
 func (n *Node) Attrs() Attributes {
 	if n.attrs == nil {
 		return Attributes{}
 	}
-	return n.attrs
+	ats := Attributes{}
+	for k, v := range n.attrs {
+		ats[k] = v
+	}
+	return ats
+}
+
+func (n *Node) Set(key string, val string) {
+	n.moot.Lock()
+	defer n.moot.Unlock()
+	if n.attrs == nil {
+		n.attrs = Attributes{}
+	}
+	n.attrs[key] = val
 }
 
 // Get a key from the attributes. Will error if the key doesn't exist.
 func (n *Node) Get(key string) (string, error) {
+	n.moot.RLock()
+	defer n.moot.RUnlock()
+
 	if v, ok := n.Attrs()[key]; ok {
 		return v, nil
 	}
@@ -66,6 +85,7 @@ func NewNode(n *html.Node) *Node {
 	node := &Node{
 		Node:  n,
 		attrs: NewAttributes(n),
+		moot:  &sync.RWMutex{},
 	}
 
 	return node

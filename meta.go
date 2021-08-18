@@ -56,5 +56,9 @@ func (p *Parser) NewMeta(node *Node) (*Meta, error) {
 		Val:  val,
 	}
 
+	for k, v := range ats {
+		m.Set(k, v)
+	}
+
 	return m, nil
 }
