@@ -13,9 +13,9 @@ type Nodes []*Node
 
 type Node struct {
 	*html.Node
+	*sync.RWMutex
 	Children Tags
 	attrs    Attributes
-	moot     *sync.RWMutex
 }
 
 func (n *Node) StartTag() string {
@@ -61,8 +61,8 @@ func (n *Node) Attrs() Attributes {
 }
 
 func (n *Node) Set(key string, val string) {
-	n.moot.Lock()
-	defer n.moot.Unlock()
+	n.Lock()
+	defer n.Unlock()
 	if n.attrs == nil {
 		n.attrs = Attributes{}
 	}
@@ -71,8 +71,8 @@ func (n *Node) Set(key string, val string) {
 
 // Get a key from the attributes. Will error if the key doesn't exist.
 func (n *Node) Get(key string) (string, error) {
-	n.moot.RLock()
-	defer n.moot.RUnlock()
+	n.RLock()
+	defer n.RUnlock()
 
 	if v, ok := n.Attrs()[key]; ok {
 		return v, nil
@@ -83,9 +83,9 @@ func (n *Node) Get(key string) (string, error) {
 
 func NewNode(n *html.Node) *Node {
 	node := &Node{
-		Node:  n,
-		attrs: NewAttributes(n),
-		moot:  &sync.RWMutex{},
+		Node:    n,
+		RWMutex: &sync.RWMutex{},
+		attrs:   NewAttributes(n),
 	}
 
 	return node
