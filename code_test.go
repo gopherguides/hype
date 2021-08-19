@@ -1,6 +1,7 @@
 package hype
 
 import (
+	"fmt"
 	"testing"
 
 	"github.com/stretchr/testify/require"
@@ -29,7 +30,19 @@ func Test_NewCode(t *testing.T) {
 			name: "missing src file", node: AttrNode(t, "code", map[string]string{
 				"src": "404.go",
 			}),
-			lang: "go", err: true,
+			err: true,
+		},
+		{
+			name: "langauge attr", node: AttrNode(t, "code", map[string]string{
+				"language": "bash",
+			}),
+			lang: "bash",
+		},
+		{
+			name: "class lang-foo attr", node: AttrNode(t, "code", map[string]string{
+				"class": "language-bash",
+			}),
+			lang: "bash",
 		},
 	}
 
@@ -56,20 +69,95 @@ func Test_NewCode(t *testing.T) {
 
 func Test_Code_String(t *testing.T) {
 	t.Parallel()
-	r := require.New(t)
 
-	cn := ElementNode(t, "code")
+	const data = `package main`
+
+	table := []struct {
+		err  bool
+		exp  string
+		name string
+		node *html.Node
+	}{
+		{name: "nil", err: true},
+		{name: "not code node", node: ElementNode(t, "p"), err: true},
+		{
+			name: "md node",
+			exp:  `<pre><code class="language-go" language="go">package main</code></pre>`,
+			node: AttrNode(t, "code", Attributes{
+				"class": "language-go",
+			}),
+		},
+		{
+			name: "src node",
+			exp:  "<pre><code class=\"language-go\" language=\"go\" src=\"src/main.go\">package main\n\nfunc main() {\n\n}</code></pre>",
+			node: AttrNode(t, "code", Attributes{
+				"src": "src/main.go",
+			}),
+		},
+		{
+			name: "inline node",
+			exp:  `<code>package main</code>`,
+			node: ElementNode(t, "code"),
+		},
+	}
+
+	for _, tt := range table {
+		t.Run(tt.name, func(t *testing.T) {
+			r := require.New(t)
+
+			node := NewNode(tt.node)
+			if tt.node != nil {
+				node.Children = append(node.Children, &Text{
+					Node: NewNode(TextNode(t, data)),
+				})
+			}
+
+			p := testParser(t, testdata)
+
+			c, err := p.NewCode(node)
+			if tt.err {
+				r.Error(err)
+				return
+			}
+
+			r.NoError(err)
+			r.NotNil(c)
+
+			r.Equal(tt.exp, c.String())
+		})
+	}
+}
+
+func Test_Parse_Code(t *testing.T) {
+	t.Parallel()
+	r := require.New(t)
 
 	p := testParser(t, testdata)
 
-	c, err := p.NewCode(NewNode(cn))
+	doc, err := p.ParseFile("code.md")
 	r.NoError(err)
-	r.Equal("plain", c.Lang())
 
-	r.Equal("<pre>\n<code language=\"plain\">\n</code></pre>\n", c.String())
+	exp := `<html><head></head><body>
+<h1>Code Test</h1>
 
-	tn := TextNode(t, "hello")
-	c.Children = append(c.Children, &Text{Node: NewNode(tn)})
+<p>This is <code>inline</code> code.</p>
 
-	r.Equal("<pre>\n<code language=\"plain\">\nhello</code></pre>\n", c.String())
+<p>Fenced code block:</p>
+
+<pre><code class="language-sh" language="sh">$ echo hi</code></pre>
+
+<p>A src file:</p>
+
+<p><pre><code class="language-go" language="go" src="src/main.go">package main
+
+func main() {
+
+}</code></pre></p>
+
+</body>
+</html>`
+
+	fmt.Println(doc.String())
+	r.Equal(exp, doc.String())
+
 }

@@ -42,10 +42,10 @@ func ElementNode(t *testing.T, name string) *html.Node {
 	}
 }
 
-func AttrNode(t *testing.T, name string, ats map[string]string) *html.Node {
+func AttrNode(t *testing.T, name string, ats Attributes) *html.Node {
 	t.Helper()
 	node := ElementNode(t, name)
-	node.Attr = MapToAttr(t, ats)
+	node.Attr = ats.Attrs()
 	return node
 }
 
@@ -55,20 +55,6 @@ func TextNode(t *testing.T, text string) *html.Node {
 		Data: text,
 		Type: html.TextNode,
 	}
-}
-
-func MapToAttr(t *testing.T, m map[string]string) []html.Attribute {
-	t.Helper()
-
-	ats := make([]html.Attribute, 0, len(m))
-	for k, v := range m {
-		ats = append(ats, html.Attribute{
-			Key: k,
-			Val: v,
-		})
-	}
-
-	return ats
 }
 
 func CommentNode(t *testing.T, text string) *html.Node {

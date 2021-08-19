@@ -56,6 +56,8 @@ func (p *Parser) ElementNode(node *html.Node) (Tag, error) {
 		return p.NewImage(g)
 	case atom.Meta:
 		return p.NewMeta(g)
+	case atom.Code:
+		return p.NewCode(g)
 	case atom.Body:
 		b := &Body{
 			Node: g,

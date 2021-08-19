@@ -46,6 +46,18 @@ func (p *Parser) markdown(src []byte) io.ReadCloser {
 	return io.NopCloser(bytes.NewReader(src))
 }
 
+func (p *Parser) ParseMD(src []byte) (*Document, error) {
+	r := p.markdown(src)
+	defer r.Close()
+
+	doc, err := p.ParseReader(r)
+	if err != nil {
+		return nil, err
+	}
+
+	return doc, nil
+}
+
 // ParseFile will parse the requested file and return a Document.
 // The file MUST be present in the parser's FS.
 func (p *Parser) ParseFile(name string) (*Document, error) {
@@ -62,7 +74,7 @@ func (p *Parser) ParseFile(name string) (*Document, error) {
 			return nil, err
 		}
 
-		r = p.markdown(src)
+		return p.ParseMD(src)
 	}
 
 	doc, err := p.ParseReader(r)

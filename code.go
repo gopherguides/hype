@@ -6,6 +6,7 @@ import (
 	"strings"
 
 	"golang.org/x/net/html"
+	"golang.org/x/net/html/atom"
 )
 
 type Code struct {
@@ -21,11 +22,33 @@ func (c *Code) Lang() string {
 
 func (c *Code) String() string {
 	sb := &strings.Builder{}
-	fmt.Fprintln(sb, "<pre>")
-	fmt.Fprintln(sb, c.StartTag())
-	fmt.Fprint(sb, c.Children.String())
-	fmt.Fprintf(sb, c.EndTag())
-	fmt.Fprintln(sb, "</pre>")
+
+	text := strings.TrimSpace(c.Children.String())
+	if _, ok := c.Attrs()["language"]; !ok {
+		// This is `inline` code.
+		fmt.Fprint(sb, c.StartTag())
+		fmt.Fprint(sb, strings.TrimSpace(text))
+		fmt.Fprint(sb, c.EndTag())
+		return sb.String()
+	}
+
+	var inPre bool
+
+	if c.Node.Parent != nil {
+		inPre = c.Node.Parent.DataAtom == atom.Pre
+	}
+
+	if !inPre {
+		fmt.Fprint(sb, "<pre>")
+	}
+
+	fmt.Fprint(sb, c.StartTag())
+	fmt.Fprint(sb, text)
+	fmt.Fprint(sb, c.EndTag())
+
+	if !inPre {
+		fmt.Fprint(sb, "</pre>")
+	}
 	return sb.String()
 }
 
@@ -44,17 +67,23 @@ func (p *Parser) NewCode(node *Node) (*Code, error) {
 
 	ats := c.Attrs()
 
+	for _, v := range ats {
+		if !strings.HasPrefix(v, "language-") {
+			continue
+		}
+		ats["language"] = strings.TrimPrefix(v, "language-")
+	}
+
 	lang, ok := ats["language"]
 	if !ok {
 		lang = filepath.Ext(ats["src"])
 		lang = strings.TrimPrefix(lang, ".")
 	}
 
-	if len(lang) == 0 {
-		lang = "plain"
+	if len(lang) > 0 {
+		c.Set("language", lang)
+		c.Set("class", fmt.Sprintf("language-%s", lang))
 	}
-
-	c.Set("language", lang)
 
 	src, ok := ats["src"]
 	if !ok {
@@ -76,7 +105,7 @@ func (p *Parser) NewCode(node *Node) (*Code, error) {
 		return nil, err
 	}
 
-	c.Children = append(c.Children, text)
+	c.Children = Tags{text}
 
 	return c, nil
 }
