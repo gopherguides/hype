@@ -27,11 +27,20 @@ func (d *Document) MarshalJSON() ([]byte, error) {
 	return json.MarshalIndent(m, "", "  ")
 }
 
-func (doc *Document) MetaData() MetaData {
+func (doc *Document) Meta() []*Meta {
 	if doc == nil {
-		return MetaData{}
+		return nil
 	}
-	return doc.Children.MetaData()
+
+	meta := doc.Children.AllType(&Meta{})
+	res := make([]*Meta, 0, len(meta))
+	for _, m := range meta {
+		if md, ok := m.(*Meta); ok {
+			res = append(res, md)
+		}
+	}
+
+	return res
 }
 
 // NewDocument parses the node and returns a Document.

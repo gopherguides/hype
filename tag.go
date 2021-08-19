@@ -2,29 +2,11 @@ package hype
 
 import (
 	"fmt"
+	"reflect"
 	"strings"
 
 	"golang.org/x/net/html/atom"
 )
-
-type Tags []Tag
-
-func (tags Tags) MetaData() MetaData {
-	md := MetaData{}
-	for _, t := range tags {
-
-		if m, ok := t.(*Meta); ok {
-			md[m.Key] = m.Val
-		}
-
-		for _, c := range t.GetChildren() {
-			for k, v := range c.GetChildren().MetaData() {
-				md[k] = v
-			}
-		}
-	}
-	return md
-}
 
 type Tag interface {
 	Attrs() Attributes
@@ -32,6 +14,8 @@ type Tag interface {
 	GetChildren() Tags
 	fmt.Stringer
 }
+
+type Tags []Tag
 
 func (tags Tags) String() string {
 	s := make([]string, 0, len(tags))
@@ -41,10 +25,55 @@ func (tags Tags) String() string {
 	return strings.Join(s, "")
 }
 
+func (tags Tags) AllAtom(want atom.Atom) Tags {
+	var res Tags
+	for _, t := range tags {
+		if IsAtom(t, want) {
+			res = append(res, t)
+		}
+		res = append(res, t.GetChildren().AllAtom(want)...)
+	}
+	return res
+}
+
+func (tags Tags) AllData(want string) Tags {
+	var res Tags
+	for _, t := range tags {
+		node := t.DaNode()
+		if node.Data == want {
+			res = append(res, t)
+		}
+		res = append(res, t.GetChildren().AllData(want)...)
+	}
+	return res
+}
+
+func (tags Tags) AllType(want interface{}) Tags {
+	var res Tags
+
+	if want == nil {
+		return res
+	}
+
+	wt := reflect.TypeOf(want)
+
+	for _, t := range tags {
+		tt := reflect.TypeOf(t)
+		if tt.AssignableTo(wt) {
+			res = append(res, t)
+		}
+
+		res = append(res, t.GetChildren().AllType(want)...)
+	}
+
+	return res
+}
+
 func IsAtom(tag Tag, want atom.Atom) bool {
 	if tag == nil {
 		return false
 	}
+
 	n := tag.DaNode()
 	if n == nil {
 		return false

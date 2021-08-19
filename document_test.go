@@ -69,3 +69,17 @@ func Test_Document_Body(t *testing.T) {
 
 	r.Len(body.Children, 7)
 }
+
+func Test_Document_Meta(t *testing.T) {
+	t.Parallel()
+	r := require.New(t)
+
+	p := testParser(t, testdata)
+
+	doc, err := p.ParseFile("big.html")
+	r.NoError(err)
+	r.NotNil(doc)
+
+	data := doc.Meta()
+	r.Len(data, 19)
+}
