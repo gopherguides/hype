@@ -67,7 +67,7 @@ func Test_Document_Body(t *testing.T) {
 	r.NoError(err)
 	r.NotNil(body)
 
-	r.Len(body.Children, 7)
+	r.Len(body.Children, 13)
 }
 
 func Test_Document_Meta(t *testing.T) {

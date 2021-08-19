@@ -11,6 +11,7 @@ import (
 type SourceCode struct {
 	*Node
 	Snippets Snippets
+	Source   string // Full source of file
 	lang     string
 }
 
@@ -29,6 +30,8 @@ func (c *SourceCode) Lang() string {
 	return lang
 }
 
+// String returns a properly formatted <code> tag.
+// If a snippet is defined on the original <code snippet="foo"> tag, then that snippet's content is used, otherwise the the Source code is used.
 func (c *SourceCode) String() string {
 	sb := &strings.Builder{}
 
@@ -67,6 +70,21 @@ func (p *Parser) NewSourceCode(node *Node) (*SourceCode, error) {
 	b, err := p.ReadFile(src)
 	if err != nil {
 		return nil, err
+	}
+	c.Source = strings.TrimSpace(string(b))
+
+	snips, err := p.Snippets(src, b)
+	if err != nil {
+		return nil, err
+	}
+	c.Snippets = snips
+
+	if n, ok := c.attrs["snippet"]; ok {
+		snip, ok := c.Snippets[n]
+		if !ok {
+			return nil, fmt.Errorf("could not find snippet %q in %q", n, src)
+		}
+		b = []byte(snip.String())
 	}
 
 	tn := &html.Node{

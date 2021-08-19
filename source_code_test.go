@@ -29,7 +29,7 @@ func Test_Parser_NewSourceCode(t *testing.T) {
 			name: "valid",
 			lang: "go",
 			node: AttrNode(t, "code", Attributes{"src": "src/main.go"}),
-			exp:  "<pre><code class=\"language-go\" language=\"go\" src=\"src/main.go\">package main\n\nfunc main() {\n\n}</code></pre>",
+			exp:  "<pre><code class=\"language-go\" language=\"go\" src=\"src/main.go\">package main\n\n// snippet: main\nfunc main() {\n\t// snippet: main\n}</code></pre>",
 		},
 	}
 

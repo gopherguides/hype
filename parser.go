@@ -4,7 +4,9 @@ import (
 	"bytes"
 	"fmt"
 	"io"
+	"io/fs"
 	"path/filepath"
+	"sync"
 
 	"github.com/markbates/fsx"
 	"github.com/russross/blackfriday"
@@ -14,19 +16,22 @@ import (
 // Parser will convert HTML documents into, easy to use, nice types.
 type Parser struct {
 	*fsx.FS
-	Constructors
-	Decorators
+	*sync.RWMutex
+	snippetRules map[string]string
 }
 
-func NewParser(cab *fsx.FS) (*Parser, error) {
+func NewParser(cab fs.FS) (*Parser, error) {
 	if cab == nil {
 		return nil, fmt.Errorf("cab can not be nil")
 	}
 
 	p := &Parser{
-		Constructors: Constructors{},
-		Decorators:   Decorators{},
-		FS:           cab,
+		FS:      fsx.NewFS(cab),
+		RWMutex: &sync.RWMutex{},
+		snippetRules: map[string]string{
+			".html": "<!-- %s -->",
+			".go":   "// %s",
+		},
 	}
 
 	return p, nil
@@ -34,12 +39,12 @@ func NewParser(cab *fsx.FS) (*Parser, error) {
 
 func (p *Parser) markdown(src []byte) io.ReadCloser {
 	const extensions = blackfriday.EXTENSION_NO_INTRA_EMPHASIS |
-		blackfriday.EXTENSION_TABLES |
-		blackfriday.EXTENSION_FENCED_CODE |
 		blackfriday.EXTENSION_AUTOLINK |
-		blackfriday.EXTENSION_STRIKETHROUGH |
+		blackfriday.EXTENSION_FENCED_CODE |
+		blackfriday.EXTENSION_NO_EMPTY_LINE_BEFORE_BLOCK |
 		blackfriday.EXTENSION_SPACE_HEADERS |
-		blackfriday.EXTENSION_NO_EMPTY_LINE_BEFORE_BLOCK
+		blackfriday.EXTENSION_STRIKETHROUGH |
+		blackfriday.EXTENSION_TABLES
 
 	r := blackfriday.HtmlRenderer(0, "", "")
 	src = blackfriday.Markdown(src, r, extensions)

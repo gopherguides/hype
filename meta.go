@@ -6,8 +6,6 @@ import (
 
 var _ Tag = &Meta{}
 
-// type MetaData map[string]string
-
 type Meta struct {
 	*Node
 	Key string

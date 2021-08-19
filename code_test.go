@@ -83,8 +83,9 @@ func Test_Parse_Code(t *testing.T) {
 
 <p><pre><code class="language-go" language="go" src="src/main.go">package main
 
+// snippet: main
 func main() {
-
+	// snippet: main
 }</code></pre></p>
 
 </body>

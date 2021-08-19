@@ -64,7 +64,6 @@ func Test_Node_String(t *testing.T) {
 
 	act := doc.String()
 	// fmt.Println(act)
-	// r.True(false)
 	r.Equal(node_string_exp, act)
 }
 
@@ -102,6 +101,10 @@ const (
         <img src="assets/foo.png" width="100%" />
         <p>Hello World</p>
     </div>
+
+    <pre><code class="language-go" language="go" snippet="main" src="src/main.go">func main() {</code></pre>
+    <pre><code class="language-html" language="html" snippet="main" src="src/snip.html"><p>Hello World</p></code></pre>
+    <pre><code class="language-txt" language="txt" snippet="main" src="src/snip.txt">Line 2</code></pre>
 
 
 
