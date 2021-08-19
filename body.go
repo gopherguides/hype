@@ -3,6 +3,8 @@ package hype
 import (
 	"fmt"
 	"strings"
+
+	"golang.org/x/net/html"
 )
 
 var _ Tag = &Body{}
@@ -24,18 +26,18 @@ func (b Body) String() string {
 	return sb.String()
 }
 
-// func (p *Parser) NewBody(node *html.Node) (*Body, error) {
-// 	if node == nil {
-// 		return nil, fmt.Errorf("node can not be nil")
-// 	}
+func (p *Parser) NewBody(node *Node) (*Body, error) {
+	if node == nil || node.Node == nil {
+		return nil, fmt.Errorf("body node can not be nil")
+	}
 
-// 	if node.Type != html.ElementNode {
-// 		return nil, fmt.Errorf("node is not an element node %v", node)
-// 	}
+	if node.Type != html.ElementNode {
+		return nil, fmt.Errorf("node is not an element node %v", node)
+	}
 
-// 	b := &Body{
-// 		Node: NewNode(node),
-// 	}
+	b := &Body{
+		Node: node,
+	}
 
-// 	return b, nil
-// }
+	return b, nil
+}

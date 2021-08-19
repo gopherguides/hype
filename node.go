@@ -7,7 +7,12 @@ import (
 	"sync"
 
 	"golang.org/x/net/html"
+	"golang.org/x/net/html/atom"
 )
+
+type Nodeable interface {
+	DaNode() *Node
+}
 
 type Nodes []*Node
 
@@ -18,9 +23,22 @@ type Node struct {
 	attrs    Attributes
 }
 
+func (n *Node) Atom() atom.Atom {
+	if n.Node != nil {
+		return n.DataAtom
+	}
+	return atom.Atom(0)
+}
+
 func (n *Node) StartTag() string {
 	sb := &strings.Builder{}
-	fmt.Fprintf(sb, "<%s", n.DataAtom)
+
+	at := n.DataAtom.String()
+	if len(at) == 0 {
+		at = n.Data
+	}
+
+	fmt.Fprintf(sb, "<%s", at)
 	ats := n.Attrs().String()
 	if len(ats) > 0 {
 		fmt.Fprintf(sb, " %s", ats)
@@ -30,7 +48,11 @@ func (n *Node) StartTag() string {
 }
 
 func (n *Node) EndTag() string {
-	return fmt.Sprintf("</%s>", n.DataAtom)
+	at := n.DataAtom.String()
+	if len(at) == 0 {
+		at = n.Data
+	}
+	return fmt.Sprintf("</%s>", at)
 }
 
 func (n *Node) InlineTag() string {
@@ -90,15 +112,6 @@ func NewNode(n *html.Node) *Node {
 
 	return node
 }
-
-// func (node Node) Format(state fmt.State, verb rune) {
-// 	switch verb {
-// 	case 'v':
-// 		b, _ := node.MarshalJSON()
-// 		state.Write(b)
-// 	}
-// 	// state.Write(string(node.String()))
-// }
 
 func (g Node) MarshalJSON() ([]byte, error) {
 	return json.Marshal(NewNodeJSON(g.Node))

@@ -9,8 +9,8 @@ import (
 )
 
 type Tag interface {
+	Atomable
 	Attrs() Attributes
-	DaNode() *Node
 	GetChildren() Tags
 	fmt.Stringer
 }
@@ -39,8 +39,12 @@ func (tags Tags) AllAtom(want atom.Atom) Tags {
 func (tags Tags) AllData(want string) Tags {
 	var res Tags
 	for _, t := range tags {
-		node := t.DaNode()
-		if node.Data == want {
+		na, ok := t.(Nodeable)
+		if !ok {
+			continue
+		}
+
+		if na.DaNode().Data == want {
 			res = append(res, t)
 		}
 		res = append(res, t.GetChildren().AllData(want)...)
@@ -67,17 +71,4 @@ func (tags Tags) AllType(want interface{}) Tags {
 	}
 
 	return res
-}
-
-func IsAtom(tag Tag, want atom.Atom) bool {
-	if tag == nil {
-		return false
-	}
-
-	n := tag.DaNode()
-	if n == nil {
-		return false
-	}
-
-	return n.DataAtom == want
 }

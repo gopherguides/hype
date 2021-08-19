@@ -1,6 +1,7 @@
 package hype
 
 import (
+	"encoding/json"
 	"testing"
 
 	"github.com/stretchr/testify/require"
@@ -47,4 +48,24 @@ func Test_Parser_NewFencedCode(t *testing.T) {
 		})
 	}
 
+}
+
+func Test_FencedCode_JSON(t *testing.T) {
+	t.Parallel()
+	r := require.New(t)
+
+	valid := NewNode(AttrNode(t, "code", Attributes{"class": "language-go"}))
+	valid.Children = Tags{
+		&Text{
+			Node: NewNode(TextNode(t, "hello")),
+		},
+	}
+
+	fc := &FencedCode{Node: valid}
+
+	exp := `{"atom":"code","attributes":{"class":"language-go"},"data":"code","type":"element"}`
+
+	b, err := json.Marshal(fc)
+	r.NoError(err)
+	r.Equal(exp, string(b))
 }

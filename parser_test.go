@@ -31,7 +31,7 @@ func Test_Parser_ParseHTML(t *testing.T) {
 
 	head := html.Children[0]
 	r.NotNil(head)
-	r.Equal(atom.Head, head.DaNode().DataAtom)
+	r.Equal(atom.Head, head.Atom())
 
 	r.Len(head.GetChildren(), 29)
 
@@ -63,7 +63,7 @@ func Test_Parser_ParseMD(t *testing.T) {
 
 	head := html.Children[0]
 	r.NotNil(head)
-	r.Equal(atom.Head, head.DaNode().DataAtom)
+	r.Equal(atom.Head, head.Atom())
 
 	r.Len(head.GetChildren(), 0)
 

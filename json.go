@@ -6,6 +6,8 @@ import (
 	"golang.org/x/net/html"
 )
 
+type jmap map[string]interface{}
+
 type NodeJSON struct {
 	Atom       string     `json:"atom,omitempty"`
 	Attributes Attributes `json:"attributes,omitempty"`

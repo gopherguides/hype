@@ -9,7 +9,7 @@ type FencedCode struct {
 	*Node
 }
 
-func (c *FencedCode) String() string {
+func (c FencedCode) String() string {
 	sb := &strings.Builder{}
 
 	text := c.Children.String()

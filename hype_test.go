@@ -32,6 +32,14 @@ func DocNode(t *testing.T) *html.Node {
 	}
 }
 
+func DocTypeNode(t *testing.T, value string) *html.Node {
+	t.Helper()
+	return &html.Node{
+		Type: html.DoctypeNode,
+		Data: value,
+	}
+}
+
 func ElementNode(t *testing.T, name string) *html.Node {
 	t.Helper()
 

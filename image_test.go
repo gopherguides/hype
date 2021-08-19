@@ -1,6 +1,7 @@
 package hype
 
 import (
+	"encoding/json"
 	"io/fs"
 	"testing"
 
@@ -50,4 +51,20 @@ func Test_NewImage(t *testing.T) {
 		})
 	}
 
+}
+
+func Test_Image_JSON(t *testing.T) {
+	t.Parallel()
+	r := require.New(t)
+
+	validImg := AttrNode(t, "img", map[string]string{
+		"src": "assets/foo.png",
+	})
+
+	img := &Image{Node: NewNode(validImg)}
+
+	exp := `{"atom":"img","attributes":{"src":"assets/foo.png"},"data":"img","type":"element"}`
+	b, err := json.Marshal(img)
+	r.NoError(err)
+	r.Equal(exp, string(b))
 }

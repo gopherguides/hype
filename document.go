@@ -15,16 +15,25 @@ type Document struct {
 	FS *fsx.FS
 }
 
-func (d *Document) String() string {
+func (d Document) String() string {
 	return d.Children.String()
 }
 
-func (d *Document) MarshalJSON() ([]byte, error) {
-	m := map[string]interface{}{
-		"document": d.Node,
+// Overview returns the contents of the first <overview> tag in the document.
+func (d *Document) Overview() string {
+	tags := d.Children.AllData("overview")
+	if len(tags) == 0 {
+		return ""
+	}
+	return tags[0].GetChildren().String()
+}
+
+func (d Document) MarshalJSON() ([]byte, error) {
+	m := jmap{
+		"document": NewNodeJSON(d.Node.Node),
 		"fs":       d.FS,
 	}
-	return json.MarshalIndent(m, "", "  ")
+	return json.Marshal(m)
 }
 
 func (doc *Document) Meta() []*Meta {

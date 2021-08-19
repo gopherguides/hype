@@ -1,6 +1,7 @@
 package hype
 
 import (
+	"encoding/json"
 	"io/fs"
 	"testing"
 
@@ -11,7 +12,7 @@ import (
 func Test_NewInclude(t *testing.T) {
 	t.Parallel()
 
-	validImg := AttrNode(t, "include", map[string]string{
+	validInc := AttrNode(t, "include", map[string]string{
 		"src": "html5.html",
 	})
 	fileMissing := AttrNode(t, "include", map[string]string{
@@ -29,7 +30,7 @@ func Test_NewInclude(t *testing.T) {
 		{name: "missing src file", cab: testdata, node: fileMissing, err: true},
 		{name: "nil all the way", err: true},
 		{name: "non include tag", node: ElementNode(t, "p"), err: true},
-		{name: "valid include", cab: testdata, node: validImg},
+		{name: "valid include", cab: testdata, node: validInc},
 	}
 
 	for _, tt := range table {
@@ -49,4 +50,23 @@ func Test_NewInclude(t *testing.T) {
 		})
 	}
 
+}
+
+func Test_Include_JSON(t *testing.T) {
+	t.Parallel()
+	r := require.New(t)
+
+	validInc := AttrNode(t, "include", map[string]string{
+		"src": "html5.html",
+	})
+
+	inc := &Include{
+		Node: NewNode(validInc),
+	}
+
+	exp := `{"attributes":{"src":"html5.html"},"data":"include","type":"element"}`
+
+	b, err := json.Marshal(inc)
+	r.NoError(err)
+	r.Equal(exp, string(b))
 }

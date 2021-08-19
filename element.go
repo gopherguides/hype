@@ -59,10 +59,7 @@ func (p *Parser) ElementNode(node *html.Node) (Tag, error) {
 	case atom.Code:
 		return p.NewCode(g)
 	case atom.Body:
-		b := &Body{
-			Node: g,
-		}
-		return b, nil
+		return p.NewBody(g)
 	default:
 		switch node.Data {
 		case "include":
