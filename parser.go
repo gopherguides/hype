@@ -20,6 +20,27 @@ type Parser struct {
 	snippetRules map[string]string
 }
 
+func (p *Parser) SubParser(path string) (*Parser, error) {
+	p.Lock()
+	defer p.Unlock()
+
+	cab, err := p.Sub(path)
+	if err != nil {
+		return nil, err
+	}
+
+	p2, err := NewParser(cab)
+	if err != nil {
+		return nil, err
+	}
+
+	for k, v := range p.snippetRules {
+		p2.snippetRules[k] = v
+	}
+
+	return p2, nil
+}
+
 func NewParser(cab fs.FS) (*Parser, error) {
 	if cab == nil {
 		return nil, fmt.Errorf("cab can not be nil")

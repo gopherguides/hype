@@ -42,8 +42,10 @@ func (p *Parser) NewInclude(node *Node) (*Include, error) {
 	}
 
 	ext := filepath.Ext(src)
+
 	switch ext {
 	case ".html", ".md":
+		// let these fall through as we'll handle them properly below
 	default:
 		b, err := p.ReadFile(src)
 		if err != nil {
@@ -53,7 +55,15 @@ func (p *Parser) NewInclude(node *Node) (*Include, error) {
 		return i, nil
 	}
 
-	doc, err := p.ParseFile(src)
+	base := filepath.Base(src)
+	dir := filepath.Dir(src)
+
+	p2, err := p.SubParser(dir)
+	if err != nil {
+		return nil, err
+	}
+
+	doc, err := p2.ParseFile(base)
 	if err != nil {
 		return nil, err
 	}

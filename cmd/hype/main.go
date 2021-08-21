@@ -3,6 +3,7 @@ package main
 import (
 	"encoding/json"
 	"fmt"
+	"io"
 	"io/ioutil"
 	"log"
 	"os"
@@ -10,6 +11,7 @@ import (
 
 	"github.com/gopherguides/hype"
 	"github.com/markbates/fsx"
+	"golang.org/x/net/html/atom"
 )
 
 func main() {
@@ -29,34 +31,57 @@ func run(rt *Runtime) error {
 	if len(args) == 0 {
 		return stream(rt)
 	}
-
 	switch args[0] {
 	case "json":
 		rt.Args = args[1:]
 		return jsonCmd(rt)
+	case "toc":
+		rt.Args = args[1:]
+		return toc(rt)
 	}
 
-	return fmt.Errorf("unknown arguments %q", args)
-}
-
-func jsonCmd(rt *Runtime) error {
-	args := rt.Args
-
-	if len(args) == 0 {
-		return fmt.Errorf("missing file name")
-	}
-
-	fn := args[0]
-	base := filepath.Base(fn)
-	dir := filepath.Dir(fn)
-	rt.Cab = os.DirFS(dir)
-
-	p, err := hype.NewParser(rt.Cab)
+	doc, err := parseFile(rt)
 	if err != nil {
+		rt.Usage()
 		return err
 	}
 
-	doc, err := p.ParseFile(base)
+	fmt.Fprintln(rt.Stdout, doc.String())
+	return nil
+}
+
+func toc(rt *Runtime) error {
+	doc, err := parseFile(rt)
+	if err != nil {
+		rt.Usage()
+		return err
+	}
+
+	err = hype.Print(doc.Children, rt.Stdout, func(w io.Writer, t hype.Tag) error {
+		text := t.GetChildren().String()
+		switch t.Atom() {
+		case atom.H1:
+			fmt.Fprintln(w, text)
+			return nil
+		case atom.H2:
+			fmt.Fprintf(w, "  %s\n", text)
+		case atom.H3:
+			fmt.Fprintf(w, "    %s\n", text)
+		case atom.H4:
+			fmt.Fprintf(w, "      %s\n", text)
+		case atom.H5:
+			fmt.Fprintf(w, "        %s\n", text)
+		case atom.H6:
+			fmt.Fprintf(w, "          %s\n", text)
+		}
+		return nil
+	})
+
+	return err
+}
+
+func jsonCmd(rt *Runtime) error {
+	doc, err := parseFile(rt)
 	if err != nil {
 		rt.Usage()
 		return err
@@ -103,4 +128,24 @@ func stream(rt *Runtime) error {
 
 	fmt.Fprint(rt.Stdout, doc)
 	return nil
+}
+
+func parseFile(rt *Runtime) (*hype.Document, error) {
+	args := rt.Args
+
+	if len(args) == 0 {
+		return nil, fmt.Errorf("missing file name")
+	}
+
+	fn := args[0]
+	base := filepath.Base(fn)
+	dir := filepath.Dir(fn)
+	rt.Cab = os.DirFS(dir)
+
+	p, err := hype.NewParser(rt.Cab)
+	if err != nil {
+		return nil, err
+	}
+
+	return p.ParseFile(base)
 }
