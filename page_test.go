@@ -13,7 +13,7 @@ func Test_Parser_NewPage(t *testing.T) {
 	doc := ParseFile(t, testdata, "pages.md")
 	r.NotNil(doc)
 
-	pages := doc.Children.AllData("page")
+	pages := doc.Pages()
 	r.Len(pages, 3)
 
 	const exp = `<html><head></head><body>

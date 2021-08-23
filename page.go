@@ -2,6 +2,7 @@ package hype
 
 import (
 	"fmt"
+	"strconv"
 	"strings"
 
 	"golang.org/x/net/html"
@@ -9,8 +10,16 @@ import (
 
 var _ Tag = &Page{}
 
+type Pages []*Page
+
 type Page struct {
 	*Node
+}
+
+func (p Page) Number() int {
+	sn, _ := p.Get("number")
+	i, _ := strconv.Atoi(sn)
+	return i
 }
 
 func (p Page) String() string {

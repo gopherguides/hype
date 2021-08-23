@@ -87,25 +87,17 @@ func (doc *Document) Body() (*Body, error) {
 		return nil, fmt.Errorf("document can not be nil")
 	}
 
-	var html Tag
-	for _, tag := range doc.Children {
-		if IsAtom(tag, atom.Html) {
-			html = tag
-			break
-		}
+	bodies := doc.Children.AllAtom(atom.Body)
+	if len(bodies) == 0 {
+		return nil, fmt.Errorf("body not found")
 	}
 
-	if html == nil {
-		return nil, fmt.Errorf("no body found %v", doc)
+	body, ok := bodies[0].(*Body)
+	if !ok {
+		return nil, fmt.Errorf("node not a body %v", bodies[0])
 	}
 
-	for _, tag := range html.GetChildren() {
-		if b, ok := tag.(*Body); ok {
-			return b, nil
-		}
-	}
-
-	return nil, fmt.Errorf("no body found %v", doc)
+	return body, nil
 }
 
 // Title returns the <title> tag contents.
@@ -123,4 +115,32 @@ func (doc *Document) Title() string {
 	}
 
 	return "Untitled"
+}
+
+// Pages returns all of the <page> tags for the document.
+func (doc *Document) Pages() Pages {
+	if doc == nil {
+		return nil
+	}
+
+	pages := doc.Children.AllData("page")
+	res := make(Pages, 0, len(pages))
+
+	if len(pages) == 0 {
+		body, err := doc.Body()
+		if err != nil {
+			return nil
+		}
+		return append(res, &Page{
+			Node: body.Node,
+		})
+	}
+
+	for _, m := range pages {
+		if md, ok := m.(*Page); ok {
+			res = append(res, md)
+		}
+	}
+
+	return res
 }

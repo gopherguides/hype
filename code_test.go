@@ -1,7 +1,6 @@
 package hype
 
 import (
-	"fmt"
 	"testing"
 
 	"github.com/gopherguides/hype/htmltest"
@@ -99,7 +98,7 @@ func main() {
 </body>
 </html>`
 
-	fmt.Println(doc.String())
+	// fmt.Println(doc.String())
 	r.Equal(exp, doc.String())
 
 }

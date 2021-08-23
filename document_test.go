@@ -143,3 +143,27 @@ func Test_Document_Title(t *testing.T) {
 	}
 
 }
+
+func Test_Document_Pages(t *testing.T) {
+	t.Parallel()
+
+	table := []struct {
+		name string
+		exp  int
+	}{
+		{name: "pages.md", exp: 3},
+		{name: "html5.html", exp: 1},
+	}
+
+	for _, tt := range table {
+		t.Run(tt.name, func(t *testing.T) {
+			r := require.New(t)
+
+			doc := ParseFile(t, testdata, tt.name)
+			r.NotNil(doc)
+
+			r.Len(doc.Pages(), tt.exp)
+		})
+	}
+
+}
