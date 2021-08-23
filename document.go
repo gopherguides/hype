@@ -36,7 +36,8 @@ func (d Document) MarshalJSON() ([]byte, error) {
 	return json.Marshal(m)
 }
 
-func (doc *Document) Meta() []*Meta {
+// Meta returns all of the <meta> tags for the document.
+func (doc *Document) Meta() Metas {
 	if doc == nil {
 		return nil
 	}

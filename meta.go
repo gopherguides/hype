@@ -6,6 +6,18 @@ import (
 
 var _ Tag = &Meta{}
 
+type Metas []*Meta
+
+// Value returns the value for the key in the <meta> tags.
+func (ms Metas) Value(key string) (string, bool) {
+	for _, m := range ms {
+		if m.Key == key {
+			return m.Val, true
+		}
+	}
+	return "", false
+}
+
 type Meta struct {
 	*Node
 	Key string

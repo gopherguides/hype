@@ -56,3 +56,20 @@ func Test_Parser_NewMeta(t *testing.T) {
 	}
 
 }
+
+func Test_Metas_Value(t *testing.T) {
+	t.Parallel()
+	r := require.New(t)
+
+	ms := Metas{
+		{Key: "src", Val: "foo.png"},
+	}
+
+	v, ok := ms.Value("src")
+	r.True(ok)
+	r.Equal("foo.png", v)
+
+	v, ok = ms.Value("404")
+	r.False(ok)
+	r.Empty(v)
+}
