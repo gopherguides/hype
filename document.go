@@ -106,3 +106,20 @@ func (doc *Document) Body() (*Body, error) {
 
 	return nil, fmt.Errorf("no body found %v", doc)
 }
+
+// Title returns the <title> tag contents.
+// If there is no <title> then the first <h1> is used.
+// Default: Untitled
+func (doc *Document) Title() string {
+	titles := doc.Children.AllAtom(atom.Title)
+	if len(titles) > 0 {
+		return titles[0].GetChildren().String()
+	}
+
+	h1s := doc.Children.AllAtom(atom.H1)
+	if len(h1s) > 0 {
+		return h1s[0].GetChildren().String()
+	}
+
+	return "Untitled"
+}
