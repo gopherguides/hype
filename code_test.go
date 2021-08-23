@@ -3,24 +3,25 @@ package hype
 import (
 	"testing"
 
+	"github.com/gopherguides/hype/htmltest"
 	"github.com/stretchr/testify/require"
 )
 
 func Test_NewCode(t *testing.T) {
 	t.Parallel()
 
-	inline := NewNode(ElementNode(t, "code"))
+	inline := NewNode(htmltest.ElementNode(t, "code"))
 	inline.Children = Tags{
 		&Text{
-			Node: NewNode(TextNode(t, "hello")),
+			Node: NewNode(htmltest.TextNode(t, "hello")),
 		},
 	}
 
-	src := NewNode(AttrNode(t, "code", Attributes{
+	src := NewNode(htmltest.AttrNode(t, "code", Attributes{
 		"src": "src/main.go",
 	}))
 
-	fenced := NewNode(AttrNode(t, "code", Attributes{
+	fenced := NewNode(htmltest.AttrNode(t, "code", Attributes{
 		"class": "language-go",
 	}))
 
@@ -33,7 +34,7 @@ func Test_NewCode(t *testing.T) {
 		{name: "nil", err: true},
 
 		{name: "nil html node", node: &Node{}, err: true},
-		{name: "non code node", node: NewNode(ElementNode(t, "p")), err: true},
+		{name: "non code node", node: NewNode(htmltest.ElementNode(t, "p")), err: true},
 		{name: "valid inline", node: inline, lang: ""},
 		{name: "valid src", lang: "go", node: src},
 		{name: "valid fenced", lang: "go", node: fenced},

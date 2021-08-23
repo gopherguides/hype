@@ -5,6 +5,7 @@ import (
 	"strings"
 	"testing"
 
+	"github.com/gopherguides/hype/htmltest"
 	"github.com/stretchr/testify/require"
 	"golang.org/x/net/html"
 	"golang.org/x/net/html/atom"
@@ -20,7 +21,7 @@ func Test_Parser_NewDocument(t *testing.T) {
 	_, err := p.NewDocument(nil)
 	r.Error(err)
 
-	_, err = p.NewDocument(TextNode(t, ""))
+	_, err = p.NewDocument(htmltest.TextNode(t, ""))
 	r.Error(err)
 	// section: errors
 

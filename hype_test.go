@@ -1,14 +1,13 @@
 package hype
 
 import (
+	"io"
 	"io/fs"
 	"os"
 	"testing"
 
 	"github.com/markbates/fsx"
 	"github.com/stretchr/testify/require"
-	"golang.org/x/net/html"
-	"golang.org/x/net/html/atom"
 )
 
 var (
@@ -20,55 +19,44 @@ func testParser(t *testing.T, cab fs.FS) *Parser {
 	t.Helper()
 
 	r := require.New(t)
+
 	p, err := NewParser(fsx.NewFS(cab))
 	r.NoError(err)
 	return p
 }
 
-func DocNode(t *testing.T) *html.Node {
+func ParseFile(t *testing.T, cab fs.FS, name string) *Document {
 	t.Helper()
-	return &html.Node{
-		Type: html.DocumentNode,
-	}
+
+	r := require.New(t)
+
+	p := testParser(t, cab)
+
+	doc, err := p.ParseFile(name)
+	r.NoError(err)
+	return doc
 }
 
-func DocTypeNode(t *testing.T, value string) *html.Node {
+func ParseMD(t *testing.T, cab fs.FS, src []byte) *Document {
 	t.Helper()
-	return &html.Node{
-		Type: html.DoctypeNode,
-		Data: value,
-	}
+
+	r := require.New(t)
+
+	p := testParser(t, cab)
+
+	doc, err := p.ParseMD(src)
+	r.NoError(err)
+	return doc
 }
 
-func ElementNode(t *testing.T, name string) *html.Node {
+func ParseReader(t *testing.T, cab fs.FS, rc io.ReadCloser) *Document {
 	t.Helper()
 
-	return &html.Node{
-		Data:     name,
-		DataAtom: atom.Lookup([]byte(name)),
-		Type:     html.ElementNode,
-	}
-}
+	r := require.New(t)
 
-func AttrNode(t *testing.T, name string, ats Attributes) *html.Node {
-	t.Helper()
-	node := ElementNode(t, name)
-	node.Attr = ats.Attrs()
-	return node
-}
+	p := testParser(t, cab)
 
-func TextNode(t *testing.T, text string) *html.Node {
-	t.Helper()
-	return &html.Node{
-		Data: text,
-		Type: html.TextNode,
-	}
-}
-
-func CommentNode(t *testing.T, text string) *html.Node {
-	t.Helper()
-	return &html.Node{
-		Type: html.CommentNode,
-		Data: text,
-	}
+	doc, err := p.ParseReader(rc)
+	r.NoError(err)
+	return doc
 }

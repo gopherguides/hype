@@ -5,6 +5,7 @@ import (
 	"testing"
 	"testing/fstest"
 
+	"github.com/gopherguides/hype/htmltest"
 	"github.com/stretchr/testify/require"
 )
 
@@ -14,7 +15,7 @@ func Test_Parser_NewComment(t *testing.T) {
 
 	p := testParser(t, fstest.MapFS{})
 
-	node := CommentNode(t, "ssh")
+	node := htmltest.CommentNode(t, "ssh")
 
 	c, err := p.NewComment(node)
 	r.NoError(err)
@@ -23,7 +24,7 @@ func Test_Parser_NewComment(t *testing.T) {
 
 	_, err = p.NewComment(nil)
 	r.Error(err)
-	_, err = p.NewComment(TextNode(t, "hello"))
+	_, err = p.NewComment(htmltest.TextNode(t, "hello"))
 	r.Error(err)
 }
 
@@ -32,7 +33,7 @@ func Test_Comment_JSON(t *testing.T) {
 	r := require.New(t)
 
 	c := &Comment{
-		Node: NewNode(CommentNode(t, "ssh")),
+		Node: NewNode(htmltest.CommentNode(t, "ssh")),
 	}
 
 	b, err := json.Marshal(c)

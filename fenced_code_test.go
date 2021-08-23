@@ -4,16 +4,17 @@ import (
 	"encoding/json"
 	"testing"
 
+	"github.com/gopherguides/hype/htmltest"
 	"github.com/stretchr/testify/require"
 )
 
 func Test_Parser_NewFencedCode(t *testing.T) {
 	t.Parallel()
 
-	valid := NewNode(AttrNode(t, "code", Attributes{"class": "language-go"}))
+	valid := NewNode(htmltest.AttrNode(t, "code", Attributes{"class": "language-go"}))
 	valid.Children = Tags{
 		&Text{
-			Node: NewNode(TextNode(t, "hello")),
+			Node: NewNode(htmltest.TextNode(t, "hello")),
 		},
 	}
 
@@ -25,7 +26,7 @@ func Test_Parser_NewFencedCode(t *testing.T) {
 	}{
 		{name: "nil", err: true},
 		{name: "nil html node", node: &Node{}, err: true},
-		{name: "non code node", node: NewNode(ElementNode(t, "p")), err: true},
+		{name: "non code node", node: NewNode(htmltest.ElementNode(t, "p")), err: true},
 		{name: "valid", node: valid, exp: `<code class="language-go" language="go">hello</code>`},
 	}
 
@@ -54,10 +55,10 @@ func Test_FencedCode_JSON(t *testing.T) {
 	t.Parallel()
 	r := require.New(t)
 
-	valid := NewNode(AttrNode(t, "code", Attributes{"class": "language-go"}))
+	valid := NewNode(htmltest.AttrNode(t, "code", Attributes{"class": "language-go"}))
 	valid.Children = Tags{
 		&Text{
-			Node: NewNode(TextNode(t, "hello")),
+			Node: NewNode(htmltest.TextNode(t, "hello")),
 		},
 	}
 

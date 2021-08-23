@@ -4,6 +4,7 @@ import (
 	"encoding/json"
 	"testing"
 
+	"github.com/gopherguides/hype/htmltest"
 	"github.com/stretchr/testify/require"
 )
 
@@ -12,7 +13,7 @@ func Test_DocType_String(t *testing.T) {
 	r := require.New(t)
 
 	dt := &DocType{
-		Node: NewNode(DocTypeNode(t, "html8")),
+		Node: NewNode(htmltest.DocTypeNode(t, "html8")),
 	}
 
 	exp := "<!doctype html8>\n"
@@ -25,7 +26,7 @@ func Test_DocType_JSON(t *testing.T) {
 	r := require.New(t)
 
 	dt := &DocType{
-		Node: NewNode(DocTypeNode(t, "html8")),
+		Node: NewNode(htmltest.DocTypeNode(t, "html8")),
 	}
 
 	exp := `{"data":"html8","type":"doctype"}`

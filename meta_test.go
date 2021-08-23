@@ -4,6 +4,7 @@ import (
 	"testing"
 	"testing/fstest"
 
+	"github.com/gopherguides/hype/htmltest"
 	"github.com/stretchr/testify/require"
 )
 
@@ -37,7 +38,7 @@ func Test_Parser_NewMeta(t *testing.T) {
 		t.Run(tt.name, func(t *testing.T) {
 			r := require.New(t)
 
-			n := AttrNode(t, "meta", tt.ats)
+			n := htmltest.AttrNode(t, "meta", tt.ats)
 
 			node := NewNode(n)
 

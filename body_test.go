@@ -4,6 +4,7 @@ import (
 	"encoding/json"
 	"testing"
 
+	"github.com/gopherguides/hype/htmltest"
 	"github.com/stretchr/testify/require"
 )
 
@@ -11,10 +12,10 @@ func Test_Body_JSON(t *testing.T) {
 	t.Parallel()
 	r := require.New(t)
 
-	bd := AttrNode(t, "body", Attributes{
+	bd := htmltest.AttrNode(t, "body", Attributes{
 		"id": "main",
 	})
-	bd.FirstChild = TextNode(t, "hi")
+	bd.FirstChild = htmltest.TextNode(t, "hi")
 
 	body := &Body{
 		Node: NewNode(bd),

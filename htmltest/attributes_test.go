@@ -1,4 +1,4 @@
-package hype
+package htmltest
 
 import (
 	"testing"
