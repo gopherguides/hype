@@ -22,6 +22,10 @@ func (p Page) Number() int {
 	return i
 }
 
+func (p Page) Title() string {
+	return findTitle(p.Children)
+}
+
 func (p Page) String() string {
 	sb := &strings.Builder{}
 
