@@ -41,6 +41,11 @@ func (p *Parser) ElementNode(node *html.Node) (Tag, error) {
 
 	g := NewNode(node)
 
+	// switch node.Data {
+	// case "page":
+	// 	return p.NewPage(g)
+	// }
+
 	c := node.FirstChild
 	for c != nil {
 		tag, err := p.ParseNode(c)
@@ -64,6 +69,8 @@ func (p *Parser) ElementNode(node *html.Node) (Tag, error) {
 		switch node.Data {
 		case "include":
 			return p.NewInclude(g)
+		case "page":
+			return p.NewPage(g)
 		}
 	}
 

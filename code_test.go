@@ -1,6 +1,7 @@
 package hype
 
 import (
+	"fmt"
 	"testing"
 
 	"github.com/gopherguides/hype/htmltest"
@@ -72,6 +73,8 @@ func Test_Parse_Code(t *testing.T) {
 	r.NoError(err)
 
 	exp := `<html><head></head><body>
+<page number="1">
+
 <h1>Code Test</h1>
 
 <p>This is <code>inline</code> code.</p>
@@ -89,10 +92,14 @@ func main() {
 	// snippet: main
 }</code></pre></p>
 
+
+</page>
+
+
 </body>
 </html>`
 
-	// fmt.Println(doc.String())
+	fmt.Println(doc.String())
 	r.Equal(exp, doc.String())
 
 }

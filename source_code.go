@@ -8,6 +8,8 @@ import (
 	"golang.org/x/net/html"
 )
 
+var _ Tag = &SourceCode{}
+
 type SourceCode struct {
 	*Node
 	Snippets Snippets
@@ -16,6 +18,8 @@ type SourceCode struct {
 }
 
 func (c *SourceCode) Src() string {
+	c.RLock()
+	defer c.RUnlock()
 	return c.attrs["src"]
 }
 
@@ -26,7 +30,9 @@ func (c *SourceCode) Lang() string {
 
 	lang := filepath.Ext(c.Src())
 	lang = strings.TrimPrefix(lang, ".")
+	c.Lock()
 	c.lang = lang
+	c.Unlock()
 	return lang
 }
 

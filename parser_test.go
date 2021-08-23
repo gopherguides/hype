@@ -71,7 +71,7 @@ func Test_Parser_ParseMD(t *testing.T) {
 	r.NoError(err)
 	r.NotNil(body)
 
-	r.Len(body.Children, 54)
+	r.Len(body.Children, 20)
 
 	act := doc.String()
 	r.Contains(act, "Basics of Running a Go Program")
