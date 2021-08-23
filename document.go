@@ -131,9 +131,7 @@ func (doc *Document) Pages() Pages {
 		if err != nil {
 			return nil
 		}
-		return append(res, &Page{
-			Node: body.Node,
-		})
+		return append(res, body.AsPage())
 	}
 
 	for _, m := range pages {

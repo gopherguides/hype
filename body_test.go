@@ -30,3 +30,24 @@ func Test_Body_JSON(t *testing.T) {
 
 	r.Equal(exp, act)
 }
+
+func Test_Body_AsPage(t *testing.T) {
+	t.Parallel()
+	r := require.New(t)
+
+	doc := ParseFile(t, testdata, "html5.html")
+	pages := doc.Pages()
+	r.Len(pages, 1)
+
+	body, err := doc.Body()
+	r.NoError(err)
+
+	exp := body.Children.String()
+
+	page := body.AsPage()
+
+	// page := pages[0]
+	act := page.Children.String()
+	r.Equal(exp, act)
+
+}

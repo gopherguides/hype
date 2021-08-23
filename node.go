@@ -23,6 +23,33 @@ type Node struct {
 	attrs    Attributes
 }
 
+func cloneHTMLNode(n *html.Node) *html.Node {
+	if n == nil {
+		return nil
+	}
+	return &html.Node{
+		Attr:        n.Attr,
+		Data:        n.Data,
+		DataAtom:    n.DataAtom,
+		FirstChild:  cloneHTMLNode(n.FirstChild),
+		LastChild:   cloneHTMLNode(n.LastChild),
+		Namespace:   n.Namespace,
+		NextSibling: cloneHTMLNode(n.NextSibling),
+		Parent:      n.Parent,
+		PrevSibling: n.PrevSibling,
+	}
+}
+
+func (n *Node) Clone() *Node {
+	node := &Node{
+		Children: n.Children,
+		Node:     cloneHTMLNode(n.Node),
+		RWMutex:  &sync.RWMutex{},
+		attrs:    n.Attrs(),
+	}
+	return node
+}
+
 func (n *Node) Atom() atom.Atom {
 	if n.Node != nil {
 		return n.DataAtom

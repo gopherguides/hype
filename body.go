@@ -5,6 +5,7 @@ import (
 	"strings"
 
 	"golang.org/x/net/html"
+	"golang.org/x/net/html/atom"
 )
 
 var _ Tag = &Body{}
@@ -24,6 +25,17 @@ func (b Body) String() string {
 
 	sb.WriteString(b.EndTag() + "\n")
 	return sb.String()
+}
+
+func (b Body) AsPage() *Page {
+	p := &Page{
+		Node: b.Clone(),
+	}
+
+	p.Data = "page"
+	p.DataAtom = atom.Atom(0)
+
+	return p
 }
 
 func (p *Parser) NewBody(node *Node) (*Body, error) {

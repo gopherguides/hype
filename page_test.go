@@ -3,6 +3,7 @@ package hype
 import (
 	"testing"
 
+	"github.com/gopherguides/hype/htmltest"
 	"github.com/stretchr/testify/require"
 )
 
@@ -57,4 +58,17 @@ func Test_Parser_NewPage(t *testing.T) {
 </html>`
 
 	r.Equal(exp, doc.String())
+}
+
+func Test_Page_Number(t *testing.T) {
+	t.Parallel()
+	r := require.New(t)
+
+	p := &Page{
+		Node: NewNode(htmltest.ElementNode(t, "page")),
+	}
+	r.Equal(p.Number(), 0)
+
+	p.Set("number", "42")
+	r.Equal(p.Number(), 42)
 }
