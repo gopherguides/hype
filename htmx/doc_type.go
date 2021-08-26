@@ -1,14 +1,10 @@
 package htmx
 
 import (
-	"testing"
-
-	// . "github.com/gopherguides/hype"
 	"golang.org/x/net/html"
 )
 
-func DocTypeNode(t *testing.T, value string) *html.Node {
-	t.Helper()
+func DocTypeNode(value string) *html.Node {
 	return &html.Node{
 		Type: html.DoctypeNode,
 		Data: value,

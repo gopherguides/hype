@@ -13,13 +13,13 @@ import (
 func Test_NewInclude(t *testing.T) {
 	t.Parallel()
 
-	validInc := htmx.AttrNode(t, "include", map[string]string{
+	validInc := htmx.AttrNode("include", map[string]string{
 		"src": "html5.html",
 	})
-	fileMissing := htmx.AttrNode(t, "include", map[string]string{
+	fileMissing := htmx.AttrNode("include", map[string]string{
 		"src": "404.html",
 	})
-	srcMissing := htmx.ElementNode(t, "include")
+	srcMissing := htmx.ElementNode("include")
 
 	table := []struct {
 		name string
@@ -30,7 +30,7 @@ func Test_NewInclude(t *testing.T) {
 		{name: "missing src attr", cab: testdata, node: srcMissing, err: true},
 		{name: "missing src file", cab: testdata, node: fileMissing, err: true},
 		{name: "nil all the way", err: true},
-		{name: "non include tag", node: htmx.ElementNode(t, "p"), err: true},
+		{name: "non include tag", node: htmx.ElementNode("p"), err: true},
 		{name: "valid include", cab: testdata, node: validInc},
 	}
 
@@ -57,7 +57,7 @@ func Test_Include_JSON(t *testing.T) {
 	t.Parallel()
 	r := require.New(t)
 
-	validInc := htmx.AttrNode(t, "include", map[string]string{
+	validInc := htmx.AttrNode("include", map[string]string{
 		"src": "html5.html",
 	})
 

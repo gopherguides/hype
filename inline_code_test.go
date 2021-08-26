@@ -10,10 +10,10 @@ import (
 func Test_Parser_NewInlineCode(t *testing.T) {
 	t.Parallel()
 
-	valid := NewNode(htmx.ElementNode(t, "code"))
+	valid := NewNode(htmx.ElementNode("code"))
 	valid.Children = Tags{
 		&Text{
-			Node: NewNode(htmx.TextNode(t, "hello")),
+			Node: NewNode(htmx.TextNode("hello")),
 		},
 	}
 
@@ -25,7 +25,7 @@ func Test_Parser_NewInlineCode(t *testing.T) {
 	}{
 		{name: "nil", err: true},
 		{name: "nil html node", node: &Node{}, err: true},
-		{name: "non code node", node: NewNode(htmx.ElementNode(t, "p")), err: true},
+		{name: "non code node", node: NewNode(htmx.ElementNode("p")), err: true},
 		{name: "valid", node: valid, exp: `<code>hello</code>`},
 	}
 

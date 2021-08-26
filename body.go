@@ -39,6 +39,10 @@ func (b Body) AsPage() *Page {
 }
 
 func (p *Parser) NewBody(node *Node) (*Body, error) {
+	return NewBody(node)
+}
+
+func NewBody(node *Node) (*Body, error) {
 	if node == nil || node.Node == nil {
 		return nil, fmt.Errorf("body node can not be nil")
 	}
@@ -52,4 +56,5 @@ func (p *Parser) NewBody(node *Node) (*Body, error) {
 	}
 
 	return b, nil
+
 }

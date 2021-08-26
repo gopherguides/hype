@@ -40,6 +40,10 @@ func (c *FencedCode) Lang() string {
 }
 
 func (p *Parser) NewFencedCode(node *Node) (*FencedCode, error) {
+	return NewFencedCode(node)
+}
+
+func NewFencedCode(node *Node) (*FencedCode, error) {
 	if node == nil || node.Node == nil {
 		return nil, fmt.Errorf("fenced code node can not be nil")
 	}

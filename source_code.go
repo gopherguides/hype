@@ -2,6 +2,7 @@ package hype
 
 import (
 	"fmt"
+	"io/fs"
 	"path/filepath"
 	"strings"
 
@@ -99,6 +100,63 @@ func (p *Parser) NewSourceCode(node *Node) (*SourceCode, error) {
 	}
 
 	text, err := p.NewText(tn)
+	if err != nil {
+		return nil, err
+	}
+
+	c.Children = Tags{text}
+
+	return c, nil
+}
+
+func NewSourceCode(cab fs.ReadFileFS, node *Node, rules map[string]string) (*SourceCode, error) {
+	if node == nil || node.Node == nil {
+		return nil, fmt.Errorf("source code node can not be nil")
+	}
+
+	if node.Data != "code" {
+		return nil, fmt.Errorf("node is not code %v", node.Data)
+	}
+
+	c := &SourceCode{
+		Node: node,
+	}
+
+	src, err := c.Get("src")
+	if err != nil {
+		return nil, err
+	}
+
+	lang := c.Lang()
+	c.Set("language", lang)
+	c.Set("class", fmt.Sprintf("language-%s", lang))
+
+	b, err := cab.ReadFile(src)
+	if err != nil {
+		return nil, err
+	}
+	c.Source = strings.TrimSpace(string(b))
+
+	snips, err := ParseSnippets(src, b, rules)
+	if err != nil {
+		return nil, err
+	}
+	c.Snippets = snips
+
+	if n, ok := c.attrs["snippet"]; ok {
+		snip, ok := c.Snippets[n]
+		if !ok {
+			return nil, fmt.Errorf("could not find snippet %q in %q", n, src)
+		}
+		b = []byte(snip.String())
+	}
+
+	tn := &html.Node{
+		Data: string(b),
+		Type: html.TextNode,
+	}
+
+	text, err := NewText(tn)
 	if err != nil {
 		return nil, err
 	}

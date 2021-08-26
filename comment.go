@@ -17,6 +17,10 @@ func (c Comment) String() string {
 }
 
 func (p *Parser) NewComment(node *html.Node) (*Comment, error) {
+	return NewComment(node)
+}
+
+func NewComment(node *html.Node) (*Comment, error) {
 	if node == nil {
 		return nil, fmt.Errorf("node can not be nil")
 	}

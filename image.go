@@ -2,6 +2,7 @@ package hype
 
 import (
 	"fmt"
+	"io/fs"
 
 	"golang.org/x/net/html/atom"
 )
@@ -15,6 +16,10 @@ func (i Image) String() string {
 }
 
 func (p *Parser) NewImage(node *Node) (*Image, error) {
+	return NewImage(p.FS, node)
+}
+
+func NewImage(cab fs.StatFS, node *Node) (*Image, error) {
 	if node == nil || node.Node == nil {
 		return nil, fmt.Errorf("image node can not be nil")
 	}
@@ -32,7 +37,7 @@ func (p *Parser) NewImage(node *Node) (*Image, error) {
 		return nil, err
 	}
 
-	if _, err := p.Stat(src); err != nil {
+	if _, err := cab.Stat(src); err != nil {
 		return nil, err
 	}
 

@@ -65,7 +65,7 @@ func Test_Page_Number(t *testing.T) {
 	r := require.New(t)
 
 	p := &Page{
-		Node: NewNode(htmx.ElementNode(t, "page")),
+		Node: NewNode(htmx.ElementNode("page")),
 	}
 	r.Equal(p.Number(), 0)
 

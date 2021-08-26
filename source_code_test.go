@@ -19,17 +19,17 @@ func Test_Parser_NewSourceCode(t *testing.T) {
 		node *html.Node
 	}{
 		{name: "nil", err: true},
-		{name: "non code node", node: htmx.ElementNode(t, "p"), err: true},
-		{name: "no src attr", node: htmx.ElementNode(t, "code"), err: true},
+		{name: "non code node", node: htmx.ElementNode("p"), err: true},
+		{name: "no src attr", node: htmx.ElementNode("code"), err: true},
 		{
 			name: "src file missing",
-			node: htmx.AttrNode(t, "code", Attributes{"src": "404.go"}),
+			node: htmx.AttrNode("code", Attributes{"src": "404.go"}),
 			err:  true,
 		},
 		{
 			name: "valid",
 			lang: "go",
-			node: htmx.AttrNode(t, "code", Attributes{"src": "src/main.go"}),
+			node: htmx.AttrNode("code", Attributes{"src": "src/main.go"}),
 			exp:  "<pre><code class=\"language-go\" language=\"go\" src=\"src/main.go\">package main\n\n// snippet: main\nfunc main() {\n\t// snippet: main\n}</code></pre>",
 		},
 	}

@@ -25,10 +25,26 @@ type Snippets map[string]Snippet
 func (p *Parser) Snippets(src string, b []byte) (Snippets, error) {
 	p.RLock()
 	defer p.RUnlock()
+	return ParseSnippets(src, b, p.snippetRules)
+
+}
+
+// SnippetRule sets a Sprintf string for a file extension.
+// Example: SnippetRule(".html", "<!-- %s -->")
+func (p *Parser) SnippetRule(ext string, rule string) {
+	p.Lock()
+	defer p.Unlock()
+	p.snippetRules[ext] = rule
+}
+
+func ParseSnippets(src string, b []byte, rules map[string]string) (Snippets, error) {
+	if rules == nil {
+		rules = map[string]string{}
+	}
 	snips := Snippets{}
 
 	ext := filepath.Ext(src)
-	rule, ok := p.snippetRules[ext]
+	rule, ok := rules[ext]
 	if !ok {
 		rule = "// %s"
 	}
@@ -71,12 +87,4 @@ func (p *Parser) Snippets(src string, b []byte) (Snippets, error) {
 	}
 
 	return snips, nil
-}
-
-// SnippetRule sets a Sprintf string for a file extension.
-// Example: SnippetRule(".html", "<!-- %s -->")
-func (p *Parser) SnippetRule(ext string, rule string) {
-	p.Lock()
-	defer p.Unlock()
-	p.snippetRules[ext] = rule
 }

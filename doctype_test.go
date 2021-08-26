@@ -13,7 +13,7 @@ func Test_DocType_String(t *testing.T) {
 	r := require.New(t)
 
 	dt := &DocType{
-		Node: NewNode(htmx.DocTypeNode(t, "html8")),
+		Node: NewNode(htmx.DocTypeNode("html8")),
 	}
 
 	exp := "<!doctype html8>\n"
@@ -26,7 +26,7 @@ func Test_DocType_JSON(t *testing.T) {
 	r := require.New(t)
 
 	dt := &DocType{
-		Node: NewNode(htmx.DocTypeNode(t, "html8")),
+		Node: NewNode(htmx.DocTypeNode("html8")),
 	}
 
 	exp := `{"data":"html8","type":"doctype"}`

@@ -29,6 +29,10 @@ func (m Meta) String() string {
 }
 
 func (p *Parser) NewMeta(node *Node) (*Meta, error) {
+	return NewMeta(node)
+}
+
+func NewMeta(node *Node) (*Meta, error) {
 	if node == nil {
 		return nil, fmt.Errorf("node can not be nil")
 	}

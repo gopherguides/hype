@@ -11,10 +11,10 @@ import (
 func Test_Parser_NewFencedCode(t *testing.T) {
 	t.Parallel()
 
-	valid := NewNode(htmx.AttrNode(t, "code", Attributes{"class": "language-go"}))
+	valid := NewNode(htmx.AttrNode("code", Attributes{"class": "language-go"}))
 	valid.Children = Tags{
 		&Text{
-			Node: NewNode(htmx.TextNode(t, "hello")),
+			Node: NewNode(htmx.TextNode("hello")),
 		},
 	}
 
@@ -26,7 +26,7 @@ func Test_Parser_NewFencedCode(t *testing.T) {
 	}{
 		{name: "nil", err: true},
 		{name: "nil html node", node: &Node{}, err: true},
-		{name: "non code node", node: NewNode(htmx.ElementNode(t, "p")), err: true},
+		{name: "non code node", node: NewNode(htmx.ElementNode("p")), err: true},
 		{name: "valid", node: valid, exp: `<code class="language-go" language="go">hello</code>`},
 	}
 
@@ -55,10 +55,10 @@ func Test_FencedCode_JSON(t *testing.T) {
 	t.Parallel()
 	r := require.New(t)
 
-	valid := NewNode(htmx.AttrNode(t, "code", Attributes{"class": "language-go"}))
+	valid := NewNode(htmx.AttrNode("code", Attributes{"class": "language-go"}))
 	valid.Children = Tags{
 		&Text{
-			Node: NewNode(htmx.TextNode(t, "hello")),
+			Node: NewNode(htmx.TextNode("hello")),
 		},
 	}
 

@@ -12,10 +12,10 @@ func Test_Body_JSON(t *testing.T) {
 	t.Parallel()
 	r := require.New(t)
 
-	bd := htmx.AttrNode(t, "body", Attributes{
+	bd := htmx.AttrNode("body", Attributes{
 		"id": "main",
 	})
-	bd.FirstChild = htmx.TextNode(t, "hi")
+	bd.FirstChild = htmx.TextNode("hi")
 
 	body := &Body{
 		Node: NewNode(bd),

@@ -26,6 +26,10 @@ func (c *InlineCode) String() string {
 }
 
 func (p *Parser) NewInlineCode(node *Node) (*InlineCode, error) {
+	return NewInlineCode(node)
+}
+
+func NewInlineCode(node *Node) (*InlineCode, error) {
 	if node == nil || node.Node == nil {
 		return nil, fmt.Errorf("inline code node can not be nil")
 	}

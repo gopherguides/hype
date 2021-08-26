@@ -4,7 +4,6 @@ import (
 	"fmt"
 	"sort"
 	"strings"
-	"testing"
 
 	"golang.org/x/net/html"
 )
@@ -57,9 +56,8 @@ func (ats Attributes) String() string {
 	return strings.Join(lines, " ")
 }
 
-func AttrNode(t *testing.T, name string, ats Attributes) *html.Node {
-	t.Helper()
-	node := ElementNode(t, name)
+func AttrNode(name string, ats Attributes) *html.Node {
+	node := ElementNode(name)
 	node.Attr = ats.Attrs()
 	return node
 }

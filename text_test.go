@@ -17,14 +17,14 @@ func Test_Parser_NewText(t *testing.T) {
 
 	table := []*html.Node{
 		nil,
-		htmx.ElementNode(t, "div"),
+		htmx.ElementNode("div"),
 	}
 	for _, node := range table {
 		_, err := p.NewText(node)
 		r.Error(err)
 	}
 
-	node := htmx.TextNode(t, "hello")
+	node := htmx.TextNode("hello")
 
 	text, err := p.NewText(node)
 	r.NoError(err)

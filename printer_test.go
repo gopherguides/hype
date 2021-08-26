@@ -53,14 +53,14 @@ func main() {
 			return tag, nil
 		}
 
-		hn := htmx.ElementNode(t, "div")
+		hn := htmx.ElementNode("div")
 		el := &Element{
 			Node: NewNode(hn),
 		}
 
 		el.Children = Tags{
 			&Text{
-				Node: NewNode(htmx.TextNode(t, sc.String())),
+				Node: NewNode(htmx.TextNode(sc.String())),
 			},
 		}
 

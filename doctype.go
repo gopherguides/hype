@@ -17,6 +17,10 @@ func (dt DocType) String() string {
 }
 
 func (p *Parser) NewDocType(node *html.Node) (*DocType, error) {
+	return NewDocType(node)
+}
+
+func NewDocType(node *html.Node) (*DocType, error) {
 	if node == nil {
 		return nil, fmt.Errorf("node can not be nil")
 	}

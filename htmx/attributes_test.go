@@ -15,7 +15,7 @@ func Test_NewAttributes(t *testing.T) {
 		"src": "foo.png",
 	}
 
-	node := AttrNode(t, "img", exp)
+	node := AttrNode("img", exp)
 	act := NewAttributes(node)
 	r.Equal(exp, act)
 }

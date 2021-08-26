@@ -27,6 +27,10 @@ func (t Text) String() string {
 }
 
 func (p *Parser) NewText(node *html.Node) (*Text, error) {
+	return NewText(node)
+}
+
+func NewText(node *html.Node) (*Text, error) {
 	if node == nil {
 		return nil, fmt.Errorf("text node can not be nil")
 	}

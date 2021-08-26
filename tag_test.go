@@ -23,14 +23,14 @@ func Test_IsAtom(t *testing.T) {
 			want: atom.P,
 			exp:  true,
 			tag: &Element{
-				Node: NewNode(htmx.ElementNode(t, "p")),
+				Node: NewNode(htmx.ElementNode("p")),
 			},
 		},
 		{
 			name: "wrong atom",
 			want: atom.Div,
 			tag: &Element{
-				Node: NewNode(htmx.ElementNode(t, "p")),
+				Node: NewNode(htmx.ElementNode("p")),
 			},
 		},
 	}

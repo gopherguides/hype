@@ -21,7 +21,7 @@ func Test_Parser_NewDocument(t *testing.T) {
 	_, err := p.NewDocument(nil)
 	r.Error(err)
 
-	_, err = p.NewDocument(htmx.TextNode(t, ""))
+	_, err = p.NewDocument(htmx.TextNode(""))
 	r.Error(err)
 	// section: errors
 

@@ -38,7 +38,7 @@ func Test_Parser_NewMeta(t *testing.T) {
 		t.Run(tt.name, func(t *testing.T) {
 			r := require.New(t)
 
-			n := htmx.AttrNode(t, "meta", tt.ats)
+			n := htmx.AttrNode("meta", tt.ats)
 
 			node := NewNode(n)
 

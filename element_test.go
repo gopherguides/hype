@@ -12,7 +12,7 @@ func Test_Element_String(t *testing.T) {
 	t.Parallel()
 	r := require.New(t)
 
-	bd := htmx.AttrNode(t, "div", Attributes{
+	bd := htmx.AttrNode("div", Attributes{
 		"id": "main",
 	})
 
@@ -20,7 +20,7 @@ func Test_Element_String(t *testing.T) {
 		Node: NewNode(bd),
 	}
 	el.Children = append(el.Children, &Text{
-		Node: NewNode(htmx.TextNode(t, "hi")),
+		Node: NewNode(htmx.TextNode("hi")),
 	})
 
 	exp := `<div id="main">hi</div>`
@@ -33,10 +33,10 @@ func Test_Element_JSON(t *testing.T) {
 	t.Parallel()
 	r := require.New(t)
 
-	bd := htmx.AttrNode(t, "div", Attributes{
+	bd := htmx.AttrNode("div", Attributes{
 		"id": "main",
 	})
-	bd.FirstChild = htmx.TextNode(t, "hi")
+	bd.FirstChild = htmx.TextNode("hi")
 
 	el := &Element{
 		Node: NewNode(bd),

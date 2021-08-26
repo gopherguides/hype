@@ -41,6 +41,10 @@ func (p Page) String() string {
 }
 
 func (p *Parser) NewPage(node *Node) (*Page, error) {
+	return NewPage(node)
+}
+
+func NewPage(node *Node) (*Page, error) {
 	if node == nil || node.Node == nil {
 		return nil, fmt.Errorf("page node can not be nil")
 	}
