@@ -2,7 +2,6 @@ package hype
 
 import (
 	"bytes"
-	"fmt"
 	"testing"
 
 	"github.com/gopherguides/hype/htmx"
@@ -58,10 +57,11 @@ func main() {
 			Node: NewNode(hn),
 		}
 
+		tn, err := NewText(htmx.TextNode(sc.String()))
+		r.NoError(err)
+
 		el.Children = Tags{
-			&Text{
-				Node: NewNode(htmx.TextNode(sc.String())),
-			},
+			tn,
 		}
 
 		return el, nil
@@ -82,6 +82,6 @@ func main() {
 
 </page>
 </body></html>`
-	fmt.Println(act)
+	// fmt.Println(act)
 	r.Equal(exp, act)
 }
