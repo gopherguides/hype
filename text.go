@@ -10,6 +10,14 @@ type Text struct {
 	*Node
 }
 
+func (t Text) StartTag() string {
+	return t.String()
+}
+
+func (t Text) EndTag() string {
+	return ""
+}
+
 func (t Text) String() string {
 	if t.Node == nil {
 		return ""

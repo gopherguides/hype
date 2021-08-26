@@ -3,7 +3,6 @@ package main
 import (
 	"encoding/json"
 	"fmt"
-	"io"
 	"io/ioutil"
 	"log"
 	"os"
@@ -11,7 +10,6 @@ import (
 
 	"github.com/gopherguides/hype"
 	"github.com/markbates/fsx"
-	"golang.org/x/net/html/atom"
 )
 
 func main() {
@@ -51,33 +49,35 @@ func run(rt *Runtime) error {
 }
 
 func toc(rt *Runtime) error {
-	doc, err := parseFile(rt)
-	if err != nil {
-		rt.Usage()
-		return err
-	}
+	// doc, err := parseFile(rt)
+	// if err != nil {
+	// 	rt.Usage()
+	// 	return err
+	// }
 
-	err = hype.Print(doc.Children, rt.Stdout, func(w io.Writer, t hype.Tag) error {
-		text := t.GetChildren().String()
-		switch t.Atom() {
-		case atom.H1:
-			fmt.Fprintln(w, text)
-			return nil
-		case atom.H2:
-			fmt.Fprintf(w, "  %s\n", text)
-		case atom.H3:
-			fmt.Fprintf(w, "    %s\n", text)
-		case atom.H4:
-			fmt.Fprintf(w, "      %s\n", text)
-		case atom.H5:
-			fmt.Fprintf(w, "        %s\n", text)
-		case atom.H6:
-			fmt.Fprintf(w, "          %s\n", text)
-		}
-		return nil
-	})
+	// err = hype.Print(doc.Children, rt.Stdout, func(w io.Writer, t hype.Tag) error {
+	// 	text := t.GetChildren().String()
+	// 	switch t.Atom() {
+	// 	case atom.H1:
+	// 		fmt.Fprintln(w, text)
+	// 		return nil
+	// 	case atom.H2:
+	// 		fmt.Fprintf(w, "  %s\n", text)
+	// 	case atom.H3:
+	// 		fmt.Fprintf(w, "    %s\n", text)
+	// 	case atom.H4:
+	// 		fmt.Fprintf(w, "      %s\n", text)
+	// 	case atom.H5:
+	// 		fmt.Fprintf(w, "        %s\n", text)
+	// 	case atom.H6:
+	// 		fmt.Fprintf(w, "          %s\n", text)
+	// 	}
+	// 	return nil
+	// })
 
-	return err
+	// return err
+
+	return nil
 }
 
 func jsonCmd(rt *Runtime) error {

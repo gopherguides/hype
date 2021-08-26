@@ -3,7 +3,7 @@ package hype
 import (
 	"testing"
 
-	"github.com/gopherguides/hype/htmltest"
+	"github.com/gopherguides/hype/htmx"
 	"github.com/stretchr/testify/require"
 	"golang.org/x/net/html/atom"
 )
@@ -23,14 +23,14 @@ func Test_IsAtom(t *testing.T) {
 			want: atom.P,
 			exp:  true,
 			tag: &Element{
-				Node: NewNode(htmltest.ElementNode(t, "p")),
+				Node: NewNode(htmx.ElementNode(t, "p")),
 			},
 		},
 		{
 			name: "wrong atom",
 			want: atom.Div,
 			tag: &Element{
-				Node: NewNode(htmltest.ElementNode(t, "p")),
+				Node: NewNode(htmx.ElementNode(t, "p")),
 			},
 		},
 	}

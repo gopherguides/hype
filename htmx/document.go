@@ -1,4 +1,4 @@
-package htmltest
+package htmx
 
 import (
 	"testing"
@@ -7,10 +7,10 @@ import (
 	"golang.org/x/net/html"
 )
 
-func DocTypeNode(t *testing.T, value string) *html.Node {
+func DocumentNode(t *testing.T) *html.Node {
 	t.Helper()
+
 	return &html.Node{
-		Type: html.DoctypeNode,
-		Data: value,
+		Type: html.DocumentNode,
 	}
 }

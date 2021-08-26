@@ -3,7 +3,7 @@ package hype
 import (
 	"testing"
 
-	"github.com/gopherguides/hype/htmltest"
+	"github.com/gopherguides/hype/htmx"
 	"github.com/stretchr/testify/require"
 )
 
@@ -65,7 +65,7 @@ func Test_Page_Number(t *testing.T) {
 	r := require.New(t)
 
 	p := &Page{
-		Node: NewNode(htmltest.ElementNode(t, "page")),
+		Node: NewNode(htmx.ElementNode(t, "page")),
 	}
 	r.Equal(p.Number(), 0)
 

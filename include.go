@@ -3,6 +3,12 @@ package hype
 import (
 	"fmt"
 	"path/filepath"
+
+	"golang.org/x/net/html/atom"
+)
+
+const (
+	Include_Atom atom.Atom = 1818455657
 )
 
 type Include struct {
@@ -35,7 +41,7 @@ func (p *Parser) NewInclude(node *Node) (*Include, error) {
 	i := &Include{
 		Node: node,
 	}
-
+	node.DataAtom = Include_Atom
 	src, err := i.Get("src")
 	if err != nil {
 		return nil, err

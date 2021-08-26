@@ -4,7 +4,7 @@ import (
 	"encoding/json"
 	"testing"
 
-	"github.com/gopherguides/hype/htmltest"
+	"github.com/gopherguides/hype/htmx"
 	"github.com/stretchr/testify/require"
 )
 
@@ -12,7 +12,7 @@ func Test_Element_String(t *testing.T) {
 	t.Parallel()
 	r := require.New(t)
 
-	bd := htmltest.AttrNode(t, "div", Attributes{
+	bd := htmx.AttrNode(t, "div", Attributes{
 		"id": "main",
 	})
 
@@ -20,7 +20,7 @@ func Test_Element_String(t *testing.T) {
 		Node: NewNode(bd),
 	}
 	el.Children = append(el.Children, &Text{
-		Node: NewNode(htmltest.TextNode(t, "hi")),
+		Node: NewNode(htmx.TextNode(t, "hi")),
 	})
 
 	exp := `<div id="main">hi</div>`
@@ -33,10 +33,10 @@ func Test_Element_JSON(t *testing.T) {
 	t.Parallel()
 	r := require.New(t)
 
-	bd := htmltest.AttrNode(t, "div", Attributes{
+	bd := htmx.AttrNode(t, "div", Attributes{
 		"id": "main",
 	})
-	bd.FirstChild = htmltest.TextNode(t, "hi")
+	bd.FirstChild = htmx.TextNode(t, "hi")
 
 	el := &Element{
 		Node: NewNode(bd),

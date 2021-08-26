@@ -1,4 +1,4 @@
-package htmltest
+package htmx
 
 import (
 	"testing"

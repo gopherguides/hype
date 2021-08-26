@@ -1,9 +1,9 @@
 package hype
 
 import (
-	"github.com/gopherguides/hype/htmltest"
+	"github.com/gopherguides/hype/htmx"
 )
 
-type Attributes = htmltest.Attributes
+type Attributes = htmx.Attributes
 
-var NewAttributes = htmltest.NewAttributes
+var NewAttributes = htmx.NewAttributes

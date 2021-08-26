@@ -3,17 +3,17 @@ package hype
 import (
 	"testing"
 
-	"github.com/gopherguides/hype/htmltest"
+	"github.com/gopherguides/hype/htmx"
 	"github.com/stretchr/testify/require"
 )
 
 func Test_Parser_NewInlineCode(t *testing.T) {
 	t.Parallel()
 
-	valid := NewNode(htmltest.ElementNode(t, "code"))
+	valid := NewNode(htmx.ElementNode(t, "code"))
 	valid.Children = Tags{
 		&Text{
-			Node: NewNode(htmltest.TextNode(t, "hello")),
+			Node: NewNode(htmx.TextNode(t, "hello")),
 		},
 	}
 
@@ -25,7 +25,7 @@ func Test_Parser_NewInlineCode(t *testing.T) {
 	}{
 		{name: "nil", err: true},
 		{name: "nil html node", node: &Node{}, err: true},
-		{name: "non code node", node: NewNode(htmltest.ElementNode(t, "p")), err: true},
+		{name: "non code node", node: NewNode(htmx.ElementNode(t, "p")), err: true},
 		{name: "valid", node: valid, exp: `<code>hello</code>`},
 	}
 

@@ -5,7 +5,7 @@ import (
 	"io/fs"
 	"testing"
 
-	"github.com/gopherguides/hype/htmltest"
+	"github.com/gopherguides/hype/htmx"
 	"github.com/stretchr/testify/require"
 	"golang.org/x/net/html"
 )
@@ -13,14 +13,14 @@ import (
 func Test_NewImage(t *testing.T) {
 	t.Parallel()
 
-	validImg := htmltest.AttrNode(t, "img", map[string]string{
+	validImg := htmx.AttrNode(t, "img", map[string]string{
 		"src": "assets/foo.png",
 	})
 
-	fileMissing := htmltest.AttrNode(t, "img", map[string]string{
+	fileMissing := htmx.AttrNode(t, "img", map[string]string{
 		"src": "assets/404.png",
 	})
-	srcMissing := htmltest.ElementNode(t, "img")
+	srcMissing := htmx.ElementNode(t, "img")
 
 	table := []struct {
 		name string
@@ -31,7 +31,7 @@ func Test_NewImage(t *testing.T) {
 		{name: "missing src attr", cab: testdata, node: srcMissing, err: true},
 		{name: "missing src file", cab: testdata, node: fileMissing, err: true},
 		{name: "nil all the way", err: true},
-		{name: "non image tag", node: htmltest.ElementNode(t, "p"), err: true},
+		{name: "non image tag", node: htmx.ElementNode(t, "p"), err: true},
 		{name: "valid image", cab: testdata, node: validImg},
 	}
 
@@ -58,7 +58,7 @@ func Test_Image_JSON(t *testing.T) {
 	t.Parallel()
 	r := require.New(t)
 
-	validImg := htmltest.AttrNode(t, "img", map[string]string{
+	validImg := htmx.AttrNode(t, "img", map[string]string{
 		"src": "assets/foo.png",
 	})
 

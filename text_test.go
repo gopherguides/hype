@@ -4,7 +4,7 @@ import (
 	"testing"
 	"testing/fstest"
 
-	"github.com/gopherguides/hype/htmltest"
+	"github.com/gopherguides/hype/htmx"
 	"github.com/stretchr/testify/require"
 	"golang.org/x/net/html"
 )
@@ -17,14 +17,14 @@ func Test_Parser_NewText(t *testing.T) {
 
 	table := []*html.Node{
 		nil,
-		htmltest.ElementNode(t, "div"),
+		htmx.ElementNode(t, "div"),
 	}
 	for _, node := range table {
 		_, err := p.NewText(node)
 		r.Error(err)
 	}
 
-	node := htmltest.TextNode(t, "hello")
+	node := htmx.TextNode(t, "hello")
 
 	text, err := p.NewText(node)
 	r.NoError(err)
