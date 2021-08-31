@@ -86,6 +86,10 @@ func (p *Parser) NewSourceCode(node *Node) (*SourceCode, error) {
 	}
 	c.Snippets = snips
 
+	if n, ok := c.attrs["section"]; ok {
+		c.Set("snippet", n)
+	}
+
 	if n, ok := c.attrs["snippet"]; ok {
 		snip, ok := c.Snippets[n]
 		if !ok {

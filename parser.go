@@ -15,8 +15,9 @@ import (
 type Parser struct {
 	*fsx.FS
 	*sync.RWMutex
-	IgnoreMDPages bool // if true the parser will not create pages for MD documents. default: false
-	snippetRules  map[string]string
+	snippetRules map[string]string
+
+	// IgnoreMDPages bool // if true the parser will not create pages for MD documents. default: false
 }
 
 func (p *Parser) SubParser(path string) (*Parser, error) {

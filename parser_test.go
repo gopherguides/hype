@@ -71,9 +71,11 @@ func Test_Parser_ParseMD(t *testing.T) {
 	r.NoError(err)
 	r.NotNil(body)
 
+	act := doc.String()
+	// fmt.Println(act)
+
 	r.Len(body.Children, 20)
 
-	act := doc.String()
 	r.Contains(act, "Basics of Running a Go Program")
 	r.Contains(act, "// 9 characters (including the space and comma)")
 }

@@ -1,9 +1,9 @@
 package hype
 
 import (
+	"fmt"
 	"testing"
 
-	"github.com/gopherguides/hype/htmx"
 	"github.com/stretchr/testify/require"
 )
 
@@ -15,41 +15,55 @@ func Test_Parser_NewPage(t *testing.T) {
 	r.NotNil(doc)
 
 	pages := doc.Pages()
-	r.Len(pages, 3)
+	r.Len(pages, 4)
 
 	const exp = `<html><head></head><body>
-<page number="1">
+<page>
 
 <h1>First H1</h1>
 
-<p>Page 1</p>
-
+<p>page 1</p>
 
 </page>
 
-<page number="2">
+<page>
 
 <h1>Second H1</h1>
 
-<p>Page 2</p>
+<p>page 2</p>
 
 <h2>H2 under Second H1</h2>
 
-<p>Page 2.A</p>
+<p>page 2.A</p>
 
 <h3>H3!</h3>
 
-<p>Page 2.B</p>
-
+<p>page 2.B</p>
 
 </page>
 
-<page number="3">
+<page>
+
+<h1>Code Test</h1>
+
+<p>This is <code>inline</code> code.</p>
+
+<p>Fenced code block:</p>
+
+<pre><code class="language-sh" language="sh">$ echo hi</code></pre>
+
+<p>A src file:</p>
+
+<p><pre><code class="language-go" language="go" snippet="main" src="src/main.go">func main() {</code></pre></p>
+
+</page>
+
+
+<page>
 
 <h1>Last H1</h1>
 
 <p>Last page</p>
-
 
 </page>
 
@@ -57,18 +71,7 @@ func Test_Parser_NewPage(t *testing.T) {
 </body>
 </html>`
 
-	r.Equal(exp, doc.String())
-}
-
-func Test_Page_Number(t *testing.T) {
-	t.Parallel()
-	r := require.New(t)
-
-	p := &Page{
-		Node: NewNode(htmx.ElementNode("page")),
-	}
-	r.Equal(p.Number(), 0)
-
-	p.Set("number", "42")
-	r.Equal(p.Number(), 42)
+	act := doc.String()
+	fmt.Println(act)
+	r.Equal(exp, act)
 }

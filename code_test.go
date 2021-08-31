@@ -72,7 +72,7 @@ func Test_Parse_Code(t *testing.T) {
 	r.NoError(err)
 
 	exp := `<html><head></head><body>
-<page number="1">
+<page>
 
 <h1>Code Test</h1>
 
@@ -84,13 +84,7 @@ func Test_Parse_Code(t *testing.T) {
 
 <p>A src file:</p>
 
-<p><pre><code class="language-go" language="go" src="src/main.go">package main
-
-// snippet: main
-func main() {
-	// snippet: main
-}</code></pre></p>
-
+<p><pre><code class="language-go" language="go" snippet="main" src="src/main.go">func main() {</code></pre></p>
 
 </page>
 

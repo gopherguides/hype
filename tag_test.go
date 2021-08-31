@@ -75,6 +75,9 @@ func Test_Tags_AllData(t *testing.T) {
 	act := doc.Children.AllData("p")
 	r.Len(act, 41)
 
+	act = doc.Children.AllData("title")
+	r.Len(act, 1)
+
 	act = doc.Children.AllData("figure")
 	r.Len(act, 23)
 

@@ -10,4 +10,4 @@ $ echo hi
 
 A src file:
 
-<code src="src/main.go"></code>
+<code src="src/main.go" snippet="main"></code>

@@ -17,13 +17,13 @@ func Test_Parser_NewDocument(t *testing.T) {
 
 	p := testParser(t, testdata)
 
-	// section: errors
+	// snippet: errors
 	_, err := p.NewDocument(nil)
 	r.Error(err)
 
 	_, err = p.NewDocument(htmx.TextNode(""))
 	r.Error(err)
-	// section: errors
+	// snippet: errors
 
 	f, err := testdata.Open("html5.html")
 	r.NoError(err)
@@ -151,7 +151,7 @@ func Test_Document_Pages(t *testing.T) {
 		name string
 		exp  int
 	}{
-		{name: "pages.md", exp: 3},
+		{name: "pages.md", exp: 4},
 		{name: "html5.html", exp: 1},
 	}
 

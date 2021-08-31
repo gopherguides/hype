@@ -26,7 +26,7 @@ func Test_Printer_Doc(t *testing.T) {
 	r.NoError(err)
 
 	act := bb.String()
-	exp := `<html><head></head><body><page number="1">
+	exp := `<html><head></head><body><page>
 <h1>Hello</h1>
 
 <p><code class="language-go" language="go" src="src/main.go">package main
@@ -36,7 +36,6 @@ func main() {
 	// snippet: main
 }
 </code></p>
-
 </page>
 </body></html>`
 
@@ -70,7 +69,7 @@ func main() {
 	r.NoError(p.Print(doc.Children...))
 
 	act = bb.String()
-	exp = `<html><head></head><body><page number="1">
+	exp = `<html><head></head><body><page>
 <h1>Hello</h1>
 
 <p><div><pre><code class="language-go" language="go" src="src/main.go">package main
@@ -79,7 +78,6 @@ func main() {
 func main() {
 	// snippet: main
 }</code></pre></div></p>
-
 </page>
 </body></html>`
 	// fmt.Println(act)
