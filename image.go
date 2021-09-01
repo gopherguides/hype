@@ -3,12 +3,19 @@ package hype
 import (
 	"fmt"
 	"io/fs"
+	"strings"
 
 	"golang.org/x/net/html/atom"
 )
 
 type Image struct {
 	*Node
+}
+
+func (c *Image) Src() string {
+	c.RLock()
+	defer c.RUnlock()
+	return c.attrs["src"]
 }
 
 func (i Image) String() string {
@@ -35,6 +42,10 @@ func NewImage(cab fs.StatFS, node *Node) (*Image, error) {
 	src, err := i.Get("src")
 	if err != nil {
 		return nil, err
+	}
+
+	if strings.HasPrefix(src, "http") {
+		return i, nil
 	}
 
 	if _, err := cab.Stat(src); err != nil {
