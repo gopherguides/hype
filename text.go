@@ -3,6 +3,7 @@ package hype
 import (
 	"fmt"
 
+	"github.com/gopherguides/hype/htmx"
 	"golang.org/x/net/html"
 )
 
@@ -42,4 +43,12 @@ func NewText(node *html.Node) (*Text, error) {
 	return &Text{
 		Node: NewNode(node),
 	}, nil
+}
+
+func QuickText(s string) *Text {
+	n := htmx.TextNode(s)
+	nn := NewNode(n)
+	return &Text{
+		Node: nn,
+	}
 }
