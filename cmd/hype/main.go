@@ -52,6 +52,7 @@ func run(rt *Runtime) error {
 func print(w io.Writer, doc *hype.Document) error {
 	p := hype.NewPrinter(w)
 	p.SetTransformer(func(tag hype.Tag) (hype.Tag, error) {
+
 		inc, ok := tag.(*hype.Include)
 		if !ok {
 			return tag, nil

@@ -2,7 +2,6 @@ package hype
 
 import (
 	"fmt"
-	"strconv"
 	"strings"
 
 	"golang.org/x/net/html"
@@ -16,10 +15,10 @@ type Page struct {
 	*Node
 }
 
-func (p Page) Number() int {
-	sn, _ := p.Get("number")
-	i, _ := strconv.Atoi(sn)
-	return i
+func (c *Page) Src() string {
+	c.RLock()
+	defer c.RUnlock()
+	return c.attrs["src"]
 }
 
 func (p Page) Title() string {
