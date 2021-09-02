@@ -3,7 +3,6 @@ package hype
 import (
 	"fmt"
 	"path/filepath"
-	"strings"
 
 	"golang.org/x/net/html/atom"
 )
@@ -14,6 +13,12 @@ const (
 
 type Include struct {
 	*Node
+}
+
+func (c *Include) Src() string {
+	c.RLock()
+	defer c.RUnlock()
+	return c.attrs["src"]
 }
 
 func (i Include) String() string {
@@ -86,19 +91,6 @@ func (p *Parser) NewInclude(node *Node) (*Include, error) {
 			continue
 		}
 		x := sc.Src()
-		x = filepath.Join(dir, x)
-		sc.Set("src", x)
-	}
-
-	for _, code := range body.Children.AllType(&Image{}) {
-		sc, ok := code.(*Image)
-		if !ok {
-			continue
-		}
-		x := sc.Src()
-		if strings.HasPrefix(x, "http") {
-			continue
-		}
 		x = filepath.Join(dir, x)
 		sc.Set("src", x)
 	}
