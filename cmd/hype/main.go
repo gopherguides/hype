@@ -8,7 +8,6 @@ import (
 	"log"
 	"os"
 	"path/filepath"
-	"strings"
 
 	"github.com/gopherguides/hype"
 	"github.com/markbates/fsx"
@@ -51,33 +50,32 @@ func run(rt *Runtime) error {
 
 func print(w io.Writer, doc *hype.Document) error {
 	p := hype.NewPrinter(w)
-	p.SetTransformer(func(tag hype.Tag) (hype.Tag, error) {
+	// p.SetTransformer(func(tag hype.Tag) (hype.Tag, error) {
+	// 	inc, ok := tag.(*hype.Include)
+	// 	if !ok {
+	// 		return tag, nil
+	// 	}
 
-		inc, ok := tag.(*hype.Include)
-		if !ok {
-			return tag, nil
-		}
+	// 	src := inc.Src()
+	// 	// base := filepath.Base(src)
+	// 	dir := filepath.Dir(src)
 
-		src := inc.Src()
-		// base := filepath.Base(src)
-		dir := filepath.Dir(src)
+	// 	for _, code := range inc.Children.AllType(&hype.Image{}) {
+	// 		sc, ok := code.(*hype.Image)
+	// 		if !ok {
+	// 			continue
+	// 		}
+	// 		x := sc.Src()
+	// 		if strings.HasPrefix(x, "http") {
+	// 			continue
+	// 		}
+	// 		x = filepath.Join(dir, x)
+	// 		sc.Set("src", x)
+	// 	}
 
-		for _, code := range inc.Children.AllType(&hype.Image{}) {
-			sc, ok := code.(*hype.Image)
-			if !ok {
-				continue
-			}
-			x := sc.Src()
-			if strings.HasPrefix(x, "http") {
-				continue
-			}
-			x = filepath.Join(dir, x)
-			sc.Set("src", x)
-		}
+	// 	return inc, nil
 
-		return inc, nil
-
-	})
+	// })
 
 	return p.Print(doc.Children...)
 }
@@ -160,7 +158,9 @@ func stream(rt *Runtime) error {
 		return err
 	}
 
-	return print(rt.Stdout, doc)
+	fmt.Fprintln(rt.Stdout, doc.String())
+	return nil
+	// return print(rt.Stdout, doc)
 }
 
 func parseFile(rt *Runtime) (*hype.Document, error) {

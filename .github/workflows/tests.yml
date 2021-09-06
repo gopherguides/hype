@@ -1,0 +1,31 @@
+name: Tests
+on: [push]
+jobs:
+  tests-on:
+    name: ${{matrix.go-version}} ${{matrix.os}}
+    runs-on: ${{ matrix.os }}
+    strategy:
+      matrix:
+        go-version: [1.17.x]
+        os: [macos-latest, ubuntu-latest, windows-latest]
+    steps:
+      - name: Set up Go
+        uses: actions/setup-go@v2
+        with:
+          go-version: 1.17.x
+      - name: Configure git for private modules
+        env:
+          GOPRIVATE: "github.com"
+          REPO_TOKEN: ${{ secrets.REPO_TOKEN }}
+        run: git config --global url."https://markbates:${REPO_TOKEN}@github.com".insteadOf "https://github.com"
+      - name: Checkout Code
+        uses: actions/checkout@v1
+        with:
+          fetch-depth: 1
+      - name: Test
+        env:
+          GOPRIVATE: "github.com/gopherguides"
+          REPO_TOKEN: ${{ secrets.REPO_TOKEN }}
+        run: |
+          git config --global url."https://markbates:${REPO_TOKEN}@github.com".insteadOf "https://github.com"
+          make test
