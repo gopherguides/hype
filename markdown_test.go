@@ -1,7 +1,6 @@
 package hype
 
 import (
-	"fmt"
 	"testing"
 
 	"github.com/stretchr/testify/require"
@@ -18,9 +17,9 @@ func Test_Parser_ParseMD_TagBug(t *testing.T) {
 	r.NoError(err)
 
 	act := doc.String()
-	exp := `TODO`
+	exp := `<li>In the terminal type <code>git config --global user.name "<your name>"</code> and press “enter”.</li>`
 
-	fmt.Println(act)
-	r.Equal(exp, act)
+	// fmt.Println(act)
+	r.Contains(act, exp)
 
 }
