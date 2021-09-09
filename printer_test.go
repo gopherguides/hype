@@ -77,7 +77,8 @@ func main() {
 // snippet: main
 func main() {
 	// snippet: main
-}</code></pre></div></p>
+}
+</code></pre></div></p>
 </page>
 </body></html>`
 	// fmt.Println(act)

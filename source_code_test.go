@@ -30,7 +30,13 @@ func Test_Parser_NewSourceCode(t *testing.T) {
 			name: "valid",
 			lang: "go",
 			node: htmx.AttrNode("code", Attributes{"src": "src/main.go"}),
-			exp:  "<pre><code class=\"language-go\" language=\"go\" src=\"src/main.go\">package main\n\n// snippet: main\nfunc main() {\n\t// snippet: main\n}</code></pre>",
+			exp:  "<pre><code class=\"language-go\" language=\"go\" src=\"src/main.go\">package main\n\n// snippet: main\nfunc main() {\n\t// snippet: main\n}\n</code></pre>",
+		},
+		{
+			name: "valid snippet",
+			lang: "go",
+			node: htmx.AttrNode("code", Attributes{"src": "src/snippets.go", "snippet": "entertainer-funcs"}),
+			exp:  "<pre><code class=\"language-go\" language=\"go\" snippet=\"entertainer-funcs\" src=\"src/snippets.go\">\tName() string\n\tPerform(v Venue) error</code></pre>",
 		},
 	}
 

@@ -1,6 +1,7 @@
 package hype
 
 import (
+	"bytes"
 	"fmt"
 	"io/fs"
 	"path/filepath"
@@ -43,7 +44,8 @@ func (c *SourceCode) String() string {
 	sb := &strings.Builder{}
 
 	text := c.Children.String()
-	text = strings.TrimSpace(text)
+	text = strings.TrimPrefix(text, "\n")
+	// text = strings.TrimSuffix(text, "\n")
 	fmt.Fprint(sb, "<pre>")
 	fmt.Fprint(sb, c.StartTag())
 	fmt.Fprint(sb, text)
@@ -53,64 +55,7 @@ func (c *SourceCode) String() string {
 }
 
 func (p *Parser) NewSourceCode(node *Node) (*SourceCode, error) {
-	if node == nil || node.Node == nil {
-		return nil, fmt.Errorf("source code node can not be nil")
-	}
-
-	if node.Data != "code" {
-		return nil, fmt.Errorf("node is not code %v", node.Data)
-	}
-
-	c := &SourceCode{
-		Node: node,
-	}
-
-	src, err := c.Get("src")
-	if err != nil {
-		return nil, err
-	}
-
-	lang := c.Lang()
-	c.Set("language", lang)
-	c.Set("class", fmt.Sprintf("language-%s", lang))
-
-	b, err := p.ReadFile(src)
-	if err != nil {
-		return nil, err
-	}
-	c.Source = strings.TrimSpace(string(b))
-
-	snips, err := p.Snippets(src, b)
-	if err != nil {
-		return nil, err
-	}
-	c.Snippets = snips
-
-	if n, ok := c.attrs["section"]; ok {
-		c.Set("snippet", n)
-	}
-
-	if n, ok := c.attrs["snippet"]; ok {
-		snip, ok := c.Snippets[n]
-		if !ok {
-			return nil, fmt.Errorf("could not find snippet %q in %q", n, src)
-		}
-		b = []byte(snip.String())
-	}
-
-	tn := &html.Node{
-		Data: string(b),
-		Type: html.TextNode,
-	}
-
-	text, err := p.NewText(tn)
-	if err != nil {
-		return nil, err
-	}
-
-	c.Children = Tags{text}
-
-	return c, nil
+	return NewSourceCode(p.FS, node, p.snippetRules)
 }
 
 func NewSourceCode(cab fs.ReadFileFS, node *Node, rules map[string]string) (*SourceCode, error) {
@@ -139,7 +84,7 @@ func NewSourceCode(cab fs.ReadFileFS, node *Node, rules map[string]string) (*Sou
 	if err != nil {
 		return nil, err
 	}
-	c.Source = strings.TrimSpace(string(b))
+	c.Source = string(bytes.TrimSpace(b))
 
 	snips, err := ParseSnippets(src, b, rules)
 	if err != nil {

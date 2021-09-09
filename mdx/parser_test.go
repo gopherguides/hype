@@ -1,7 +1,6 @@
 package mdx
 
 import (
-	"fmt"
 	"io/fs"
 	"os"
 	"strings"
@@ -67,6 +66,6 @@ func Test_Parser_Parse(t *testing.T) {
 <p>Write a short essay describing your history in technology and how you feel that Go fits into your plans for your future. Additionally, write a short essay discussing any surprises you found when researching the <code>fmt</code> package. Include how does printing in Go differ from other languages you may have used before. Please be specific and cite examples. (500 words minimum)</p>
 </page>`
 
-	fmt.Println(act)
+	// fmt.Println(act)
 	r.Equal(exp, act)
 }

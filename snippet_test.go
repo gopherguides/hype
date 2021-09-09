@@ -1,22 +1,32 @@
 package hype
 
 import (
+	"io/fs"
 	"testing"
 
 	"github.com/stretchr/testify/require"
 )
 
-func Test_Parser_Snippets(t *testing.T) {
+func Test_ParseSnippets(t *testing.T) {
 	t.Parallel()
 	r := require.New(t)
 
-	p := testParser(t, testdata)
-
-	doc, err := p.ParseFile("html5.html")
+	b, err := fs.ReadFile(testdata, "src/snippets.go")
 	r.NoError(err)
-	r.NotNil(doc)
 
-	exp := node_string_exp
-	// fmt.Println(doc.String())
-	r.Equal(exp, doc.String())
+	snips, err := ParseSnippets("foo.go", b, nil)
+	r.NoError(err)
+	r.NotEmpty(snips)
+	r.Len(snips, 4)
+
+	snip := snips["entertainer-funcs"]
+	r.Equal("entertainer-funcs", snip.Name)
+	r.Equal("foo.go", snip.File)
+	r.Equal("go", snip.Language)
+	r.Equal(7, snip.Start)
+	r.Equal(10, snip.End)
+
+	exp := "\n\tName() string\n\tPerform(v Venue) error"
+	act := snip.Content
+	r.Equal(exp, act)
 }

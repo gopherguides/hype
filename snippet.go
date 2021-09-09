@@ -37,19 +37,19 @@ func (p *Parser) SnippetRule(ext string, rule string) {
 	p.snippetRules[ext] = rule
 }
 
-func ParseSnippets(src string, b []byte, rules map[string]string) (Snippets, error) {
+func ParseSnippets(path string, src []byte, rules map[string]string) (Snippets, error) {
 	if rules == nil {
 		rules = map[string]string{}
 	}
 	snips := Snippets{}
 
-	ext := filepath.Ext(src)
+	ext := filepath.Ext(path)
 	rule, ok := rules[ext]
 	if !ok {
 		rule = "// %s"
 	}
 	open := map[string]Snippet{}
-	for i, line := range strings.Split(string(b), "\n") {
+	for i, line := range strings.Split(string(src), "\n") {
 		sl := strings.TrimSpace(line)
 
 		pre := fmt.Sprintf(rule, "snippet:(.+)")
@@ -68,7 +68,7 @@ func ParseSnippets(src string, b []byte, rules map[string]string) (Snippets, err
 				delete(open, name)
 			}
 			if !ok {
-				snip.File = src
+				snip.File = path
 				snip.Language = strings.TrimPrefix(ext, ".")
 				snip.Name = name
 				snip.Start = i + 1

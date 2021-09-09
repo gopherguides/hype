@@ -1,7 +1,6 @@
 package hype
 
 import (
-	"fmt"
 	"testing"
 
 	"github.com/stretchr/testify/require"
@@ -72,6 +71,6 @@ func Test_Parser_NewPage(t *testing.T) {
 </html>`
 
 	act := doc.String()
-	fmt.Println(act)
+	// fmt.Println(act)
 	r.Equal(exp, act)
 }
