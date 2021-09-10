@@ -76,6 +76,10 @@ func NewSourceCode(cab fs.ReadFileFS, node *Node, rules map[string]string) (*Sou
 		return nil, err
 	}
 
+	if n, ok := c.attrs["section"]; ok {
+		return nil, fmt.Errorf("section is no longer supported, use snippet instead %s", n)
+	}
+
 	lang := c.Lang()
 	c.Set("language", lang)
 	c.Set("class", fmt.Sprintf("language-%s", lang))
