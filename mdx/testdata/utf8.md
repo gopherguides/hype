@@ -12,7 +12,7 @@ A rune is a special type in go that represents special characters.
 
 You can define a rune using the single quote (`'`) character:
 
-<code src="src/utf8/utf8-rune/main.go" section="main"></code>
+<code src="src/utf8/utf8-rune/main.go" snippet="main"></code>
 
 If you run the program, it prints out the value of `65`.
 
@@ -24,7 +24,7 @@ A `rune` is an alias for `int32`. A rune can be made up of `1` to `3` int32 valu
 
 In many languages, the correct way to iterate over a string would look very much like the following code sample...
 
-<code src="src/utf8/utf8-loop/main.go" section="main"></code>
+<code src="src/utf8/utf8-loop/main.go" snippet="main"></code>
 
 But, this will not have the output you would expect:
 
@@ -50,7 +50,7 @@ Notice the unexpected characters that were printed out for index 7-12? This is b
 
 If you intend to walk through each character in a string, the proper way is to use the `range` keyword in the loop.
 
-<code src="src/utf8/utf8-range/main.go" section="main"></code>
+<code src="src/utf8/utf8-range/main.go" snippet="main"></code>
 
 ```text
 0: H

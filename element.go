@@ -40,12 +40,6 @@ func (p *Parser) ElementNode(node *html.Node) (Tag, error) {
 	}
 
 	g := NewNode(node)
-
-	// switch node.Data {
-	// case "page":
-	// 	return p.NewPage(g)
-	// }
-
 	c := node.FirstChild
 	for c != nil {
 		tag, err := p.ParseNode(c)
@@ -55,6 +49,15 @@ func (p *Parser) ElementNode(node *html.Node) (Tag, error) {
 		g.Children = append(g.Children, tag)
 		c = c.NextSibling
 	}
+
+	p.RLock()
+	if ct := p.customTags; ct != nil {
+		if fn, ok := ct[node.Data]; ok {
+			p.RUnlock()
+			return fn(g)
+		}
+	}
+	p.RUnlock()
 
 	switch node.DataAtom {
 	case atom.Img, atom.Image:

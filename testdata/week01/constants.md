@@ -16,10 +16,10 @@ Gopher
 
 If you try to modify a constant after it was declared, you will get a compile time error:
 
-<code src="src/constants/const-err/main.go" section="main"></code>
+<code src="src/constants/const-err/main.go" snippet="main"></code>
 Output:
 
-<code src="src/constants/const-err/main.go" section="output"></code>
+<code src="src/constants/const-err/main.go" snippet="output"></code>
 
 ## Untyped
 
@@ -39,9 +39,9 @@ If you try to use a `typed` constant with anything other than it's type, Go will
 
 Remember that the `untyped` `const` or `var` will be converted to the `type` it is combined with for any mathematical operation:
 
-<code src="src/constants/const-infer/main.go" section="main"></code>
+<code src="src/constants/const-infer/main.go" snippet="main"></code>
 
 Output:
 
-<code src="src/constants/const-infer/main.go" section="output"></code>
+<code src="src/constants/const-infer/main.go" snippet="output"></code>
 

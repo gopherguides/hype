@@ -72,7 +72,7 @@ At compile time, if the compiler can determine a value will be too large to hold
 
 If we take the following example:
 
-<code src="src/numbers/maxuint8/main.go" section="main"></code>
+<code src="src/numbers/maxuint8/main.go" snippet="main"></code>
 
 It will compile and run with the following result:
 
@@ -82,7 +82,7 @@ It will compile and run with the following result:
 
 If we add `1` to the value at runtime, it will wraparound to `0`:
 
-<code src="src/numbers/maxuint8/main.go" section="plus"></code>
+<code src="src/numbers/maxuint8/main.go" snippet="plus"></code>
 
 Output:
 
@@ -92,7 +92,7 @@ Output:
 
 If we change the program to add `1` to the variable when we assign it, it will not compile:
 
-<code src="src/numbers/maxuint8-overflow/main.go" section="main">></code>
+<code src="src/numbers/maxuint8-overflow/main.go" snippet="main">></code>
 
 Because the compiler can determine it will overflow the value it will now throw an error:
 
@@ -108,8 +108,8 @@ Go does not [saturate](https://en.wikipedia.org/wiki/Saturation_arithmetic) vari
 
 In go, however, it will always wrap around.  There is no saturation in Go.
 
-<code src="src/numbers/maxuint8-saturation/main.go" section="main"></code>
+<code src="src/numbers/maxuint8-saturation/main.go" snippet="main"></code>
 
 Output:
 
-<code src="src/numbers/maxuint8-saturation/main.go" section="output"></code>
+<code src="src/numbers/maxuint8-saturation/main.go" snippet="output"></code>

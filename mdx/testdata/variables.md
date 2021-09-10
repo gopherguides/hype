@@ -137,7 +137,7 @@ The most important thing about style is to be consistent, and that the team you 
 
 Go also allows you to assign several values to several variables within the same line. Each of these values can be of a different data type:
 
-<code src="src/variables/multiple/main.go" section="main">TODO</code>
+<code src="src/variables/multiple/main.go" snippet="main">TODO</code>
 
 In the example above, the variable `j` was assigned to the string "gopher", the variable `k` was assigned to the float 2.05, and the variable `l` was assigned to the integer `15`.
 

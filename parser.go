@@ -11,13 +11,23 @@ import (
 	"golang.org/x/net/html"
 )
 
+type CustomTagFn func(node *Node) (Tag, error)
+
 // Parser will convert HTML documents into, easy to use, nice types.
 type Parser struct {
 	*fsx.FS
 	*sync.RWMutex
+	customTags   map[string]CustomTagFn
 	snippetRules map[string]string
+}
 
-	// IgnoreMDPages bool // if true the parser will not create pages for MD documents. default: false
+func (p *Parser) SetCustomTag(name string, fn CustomTagFn) {
+	p.Lock()
+	if p.customTags == nil {
+		p.customTags = map[string]CustomTagFn{}
+	}
+	p.customTags[name] = fn
+	p.Unlock()
 }
 
 func (p *Parser) SubParser(path string) (*Parser, error) {
@@ -47,8 +57,9 @@ func NewParser(cab fs.FS) (*Parser, error) {
 	}
 
 	p := &Parser{
-		FS:      fsx.NewFS(cab),
-		RWMutex: &sync.RWMutex{},
+		FS:         fsx.NewFS(cab),
+		RWMutex:    &sync.RWMutex{},
+		customTags: map[string]CustomTagFn{},
 		snippetRules: map[string]string{
 			".html": "<!-- %s -->",
 			".go":   "// %s",
