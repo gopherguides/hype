@@ -2,8 +2,7 @@ package hype
 
 import (
 	"encoding/json"
-	"io"
-	"strings"
+	"fmt"
 	"testing"
 
 	"github.com/gopherguides/hype/htmx"
@@ -60,8 +59,8 @@ type customTag struct {
 	*Node
 }
 
-func (customTag) String() string {
-	return "FOO!"
+func (c customTag) String() string {
+	return fmt.Sprintf("before\n%s\nafter", c.Children.String())
 }
 
 func Test_Parser_ElementNode_Custom(t *testing.T) {
@@ -73,16 +72,12 @@ func Test_Parser_ElementNode_Custom(t *testing.T) {
 		return customTag{Node: node}, nil
 	})
 
-	in := strings.NewReader(`
-# Hi
-
-<foo></foo>`)
-
-	doc, err := p.ParseReader(io.NopCloser(in))
+	doc, err := p.ParseFile("assignment.md")
 	r.NoError(err)
 
 	act := doc.String()
-	exp := "<html><head></head><body>\n# Hi\n\nFOO!\n</body>\n</html>"
+	fmt.Println(act)
+	exp := "<html><head></head><body>\n<page>\n\n<h1>Hi</h1>\n\n<p>before\n\nhello\n\nafter</p>\n\n</page>\n\n\n</body>\n</html>"
 
 	r.Equal(exp, act)
 }

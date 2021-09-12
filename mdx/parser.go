@@ -4,13 +4,14 @@ import (
 	"bytes"
 	"fmt"
 	"io"
+	"regexp"
 	"strings"
 	"sync"
 
 	"github.com/russross/blackfriday/v2"
 )
 
-const extensions = blackfriday.CommonExtensions
+const extensions = blackfriday.CommonExtensions | blackfriday.LaxHTMLBlocks
 
 type Parser struct {
 	*sync.RWMutex
@@ -19,7 +20,8 @@ type Parser struct {
 }
 
 func (p *Parser) render(src []byte) []byte {
-	return blackfriday.Run(src, blackfriday.WithExtensions(extensions))
+	act := blackfriday.Run(src, blackfriday.WithExtensions(extensions))
+	return act
 }
 
 func (p *Parser) start(w io.Writer) {
@@ -54,6 +56,7 @@ func (p *Parser) parse(lines []string) ([]byte, error) {
 		if strings.HasPrefix(line, "---") {
 			break
 		}
+
 		chunk = append(chunk, line)
 	}
 
@@ -78,7 +81,22 @@ func (p *Parser) parse(lines []string) ([]byte, error) {
 		bb.Write(b)
 	}
 
-	return bb.Bytes(), nil
+	rx, err := regexp.Compile("<p>(</?.+>)</p>")
+	if err != nil {
+		return nil, err
+	}
+
+	lines = []string{}
+	for _, line := range strings.Split(bb.String(), "\n") {
+		if m := rx.FindStringSubmatch(line); len(m) > 1 {
+			lines = append(lines, m[1])
+			continue
+		}
+		lines = append(lines, line)
+	}
+
+	act := []byte(strings.Join(lines, "\n"))
+	return act, nil
 }
 
 func (p *Parser) Parse(src []byte) ([]byte, error) {

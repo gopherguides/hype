@@ -11,6 +11,25 @@ import (
 
 var testdata = os.DirFS("testdata")
 
+func Test_Parser_ElementNode_Custom(t *testing.T) {
+	t.Parallel()
+	r := require.New(t)
+
+	src, err := fs.ReadFile(testdata, "assignment.md")
+	r.NoError(err)
+
+	// act := blackfriday.Run(src, blackfriday.WithRenderer(&Renderer{}))
+
+	p := New()
+	act, err := p.Parse(src)
+	r.NoError(err)
+
+	exp := "<page>\n<h1>Assignment 42</h1>\n\n<assignment number=\"42\">\n\n<p>Instructions!</p>\n\n</assignment>\n</page>\n"
+
+	// fmt.Println(string(act))
+	r.Equal(exp, string(act))
+}
+
 func Test_Parser_Parse(t *testing.T) {
 	t.Parallel()
 	r := require.New(t)
