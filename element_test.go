@@ -76,8 +76,8 @@ func Test_Parser_ElementNode_Custom(t *testing.T) {
 	r.NoError(err)
 
 	act := doc.String()
-	fmt.Println(act)
-	exp := "<html><head></head><body>\n<page>\n\n<h1>Hi</h1>\n\n<p>before\n\nhello\n\nafter</p>\n\n</page>\n\n\n</body>\n</html>"
+	// fmt.Println(act)
+	exp := "<html><head></head><body>\n<page>\n\n<h1>Assignment 42</h1>\n\n<assignment number=\"42\">\n\n<p>Instructions!</p>\n\n</assignment>\n\n</page>\n\n\n</body>\n</html>"
 
 	r.Equal(exp, act)
 }

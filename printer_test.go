@@ -29,13 +29,13 @@ func Test_Printer_Doc(t *testing.T) {
 	exp := `<html><head></head><body><page>
 <h1>Hello</h1>
 
-<p><code class="language-go" language="go" src="src/main.go">package main
+<p><pre><code class="language-go" language="go" src="src/main.go">package main
 
 // snippet: main
 func main() {
 	// snippet: main
 }
-</code></p>
+</code></pre></p>
 </page>
 </body></html>`
 
@@ -56,7 +56,7 @@ func main() {
 			Node: NewNode(hn),
 		}
 
-		tn, err := NewText(htmx.TextNode(sc.String()))
+		tn, err := NewText(htmx.TextNode(sc.Children.String()))
 		r.NoError(err)
 
 		el.Children = Tags{
@@ -72,13 +72,13 @@ func main() {
 	exp = `<html><head></head><body><page>
 <h1>Hello</h1>
 
-<p><div><pre><code class="language-go" language="go" src="src/main.go">package main
+<div>package main
 
 // snippet: main
 func main() {
 	// snippet: main
 }
-</code></pre></div></p>
+</div>
 </page>
 </body></html>`
 	// fmt.Println(act)

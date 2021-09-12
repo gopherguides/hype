@@ -38,6 +38,18 @@ func (c *SourceCode) Lang() string {
 	return lang
 }
 
+func (c *SourceCode) StartTag() string {
+	t := c.Node.StartTag()
+
+	return fmt.Sprintf("<p><pre>%s", t)
+}
+
+func (c *SourceCode) EndTag() string {
+	t := c.Node.EndTag()
+
+	return fmt.Sprintf("%s</pre></p>", t)
+}
+
 // String returns a properly formatted <code> tag.
 // If a snippet is defined on the original <code snippet="foo"> tag, then that snippet's content is used, otherwise the the Source code is used.
 func (c *SourceCode) String() string {
@@ -46,11 +58,9 @@ func (c *SourceCode) String() string {
 	text := c.Children.String()
 	text = strings.TrimPrefix(text, "\n")
 	// text = strings.TrimSuffix(text, "\n")
-	fmt.Fprint(sb, "<pre>")
 	fmt.Fprint(sb, c.StartTag())
 	fmt.Fprint(sb, text)
 	fmt.Fprint(sb, c.EndTag())
-	fmt.Fprint(sb, "</pre>")
 	return sb.String()
 }
 

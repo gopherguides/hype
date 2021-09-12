@@ -48,6 +48,10 @@ func (p *Parser) SubParser(path string) (*Parser, error) {
 		p2.snippetRules[k] = v
 	}
 
+	for k, v := range p.customTags {
+		p2.customTags[k] = v
+	}
+
 	return p2, nil
 }
 
