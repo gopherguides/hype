@@ -7,6 +7,7 @@ import (
 	"path/filepath"
 	"strings"
 
+	"github.com/markbates/sweets"
 	"golang.org/x/net/html"
 )
 
@@ -56,8 +57,18 @@ func (c *SourceCode) String() string {
 	sb := &strings.Builder{}
 
 	text := c.Children.String()
+	var lines []string
+	for _, line := range strings.Split(text, "\n") {
+		sl := strings.TrimSpace(line)
+		if strings.HasPrefix(sl, "// snippet:") {
+			continue
+		}
+		lines = append(lines, line)
+	}
+	text = strings.Join(lines, "\n")
+	text = sweets.TrimLeftSpace(text)
 	text = strings.TrimPrefix(text, "\n")
-	// text = strings.TrimSuffix(text, "\n")
+
 	fmt.Fprint(sb, c.StartTag())
 	fmt.Fprint(sb, text)
 	fmt.Fprint(sb, c.EndTag())

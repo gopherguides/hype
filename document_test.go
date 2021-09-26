@@ -62,6 +62,10 @@ func Test_Document_Body(t *testing.T) {
 
 	p := testParser(t, testdata)
 
+	var d *Document
+	_, err := d.Body()
+	r.Error(err)
+
 	doc, err := p.ParseFile("html5.html")
 	r.NoError(err)
 	r.NotNil(doc)
