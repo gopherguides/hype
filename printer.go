@@ -19,6 +19,17 @@ type Printer struct {
 	output io.Writer
 }
 
+func (p *Printer) Transformer() TransformerFn {
+	p.Lock()
+	if p.former == nil {
+		p.former = defaultTransformer
+	}
+	fn := p.former
+	p.Unlock()
+
+	return fn
+}
+
 func (p *Printer) Print(tags ...Tag) error {
 
 	type taggable interface {
@@ -49,13 +60,7 @@ func (p *Printer) Print(tags ...Tag) error {
 }
 
 func (p *Printer) Transform(tag Tag) (Tag, error) {
-	p.Lock()
-	if p.former == nil {
-		p.former = defaultTransformer
-	}
-	fn := p.former
-	p.Unlock()
-	return fn(tag)
+	return p.Transformer()(tag)
 }
 
 func (p *Printer) SetTransformer(fn TransformerFn) {

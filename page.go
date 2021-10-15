@@ -5,9 +5,17 @@ import (
 	"strings"
 
 	"golang.org/x/net/html"
+	"golang.org/x/net/html/atom"
 )
 
-var _ Tag = &Page{}
+const (
+	Page_Atom atom.Atom = 1818488942
+)
+
+var (
+	_     Tag = &Page{}
+	BREAK     = QuickText("<!--BREAK-->")
+)
 
 type Pages []*Page
 
@@ -35,7 +43,7 @@ func (p Page) String() string {
 		fmt.Fprintf(sb, "\n%s\n", kids)
 	}
 
-	sb.WriteString(p.EndTag() + "\n")
+	fmt.Fprintln(sb, p.EndTag())
 	return sb.String()
 }
 
@@ -52,9 +60,10 @@ func NewPage(node *Node) (*Page, error) {
 		return nil, fmt.Errorf("node is not an element node %v", node)
 	}
 
-	b := &Page{
+	node.DataAtom = Page_Atom
+	p := &Page{
 		Node: node,
 	}
 
-	return b, nil
+	return p, nil
 }
