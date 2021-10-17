@@ -102,9 +102,9 @@ const (
         <p>Hello World</p>
     </div>
 
-    <p><pre><code class="language-go" language="go" snippet="main" src="src/main.go">func main() {</code></pre></p>
-    <p><pre><code class="language-html" language="html" snippet="main" src="src/snip.html"><p>Hello World</p></code></pre></p>
-    <p><pre><code class="language-txt" language="txt" snippet="main" src="src/snip.txt">Line 2</code></pre></p>
+    <p><pre class="code-block"><code class="language-go" language="go" snippet="main" src="src/main.go">func main() {</code></pre></p>
+    <p><pre class="code-block"><code class="language-html" language="html" snippet="main" src="src/snip.html"><p>Hello World</p></code></pre></p>
+    <p><pre class="code-block"><code class="language-txt" language="txt" snippet="main" src="src/snip.txt">Line 2</code></pre></p>
 
 
 

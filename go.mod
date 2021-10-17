@@ -7,10 +7,10 @@ go 1.17
 require (
 	github.com/markbates/cleo v0.0.0-20210908183044-d564be950acc
 	github.com/markbates/fsx v1.0.0
-	github.com/markbates/sweets v0.0.0-20210926030727-80e5df946d77
+	github.com/markbates/sweets v0.0.0-20210926032915-062eb9bcc0e5
 	github.com/russross/blackfriday/v2 v2.1.0
 	github.com/stretchr/testify v1.7.0
-	golang.org/x/net v0.0.0-20210924151903-3ad01bbaa167
+	golang.org/x/net v0.0.0-20211015210444-4f30a5c0130f
 )
 
 require (
