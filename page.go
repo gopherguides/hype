@@ -47,6 +47,10 @@ func (p Page) String() string {
 	return sb.String()
 }
 
+func (p *Page) EndTag() string {
+	return fmt.Sprintf("%s%s", p.Node.EndTag(), BREAK)
+}
+
 func (p *Parser) NewPage(node *Node) (*Page, error) {
 	return NewPage(node)
 }

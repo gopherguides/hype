@@ -15,6 +15,19 @@ type Tag interface {
 	fmt.Stringer
 }
 
+type StartTagger interface {
+	StartTag() string
+}
+
+type EndTagger interface {
+	EndTag() string
+}
+
+type Tagger interface {
+	StartTagger
+	EndTagger
+}
+
 type Tags []Tag
 
 func (tags Tags) String() string {
