@@ -23,7 +23,7 @@ func Test_Parser_NewPage(t *testing.T) {
 
 <p>page 1</p>
 
-</page>
+</page><!--BREAK-->
 
 <page>
 
@@ -39,7 +39,7 @@ func Test_Parser_NewPage(t *testing.T) {
 
 <p>page 2.B</p>
 
-</page>
+</page><!--BREAK-->
 
 <page>
 
@@ -55,7 +55,7 @@ func Test_Parser_NewPage(t *testing.T) {
 
 <p><pre class="code-block"><code class="language-go" language="go" snippet="main" src="src/main.go">func main() {</code></pre></p>
 
-</page>
+</page><!--BREAK-->
 
 
 <page>
@@ -64,7 +64,7 @@ func Test_Parser_NewPage(t *testing.T) {
 
 <p>Last page</p>
 
-</page>
+</page><!--BREAK-->
 
 
 </body>

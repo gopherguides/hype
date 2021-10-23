@@ -27,7 +27,7 @@ func Test_Parser_NewSourceCode(t *testing.T) {
 			err:  true,
 		},
 		{
-			name: "valid",
+			name: "valid Go",
 			lang: "go",
 			node: htmx.AttrNode("code", Attributes{"src": "src/main.go"}),
 			exp:  "<p><pre class=\"code-block\"><code class=\"language-go\" language=\"go\" src=\"src/main.go\">package main\n\nfunc main() {\n}\n</code></pre></p>",
@@ -37,6 +37,12 @@ func Test_Parser_NewSourceCode(t *testing.T) {
 			lang: "go",
 			node: htmx.AttrNode("code", Attributes{"src": "src/snippets.go", "snippet": "entertainer-funcs"}),
 			exp:  "<p><pre class=\"code-block\"><code class=\"language-go\" language=\"go\" snippet=\"entertainer-funcs\" src=\"src/snippets.go\">Name() string\nPerform(v Venue) error</code></pre></p>",
+		},
+		{
+			name: "valid HTML",
+			lang: "html",
+			node: htmx.AttrNode("code", Attributes{"src": "src/snip.html"}),
+			exp:  "<p><pre class=\"code-block\"><code class=\"language-html\" language=\"html\" src=\"src/snip.html\">&lt;!doctype html5&gt;\n&lt;html lang=&#34;en&#34;&gt;\n\n&lt;head&gt;&lt;/head&gt;\n\n&lt;body&gt;\n\n  &lt;!-- your content here... --&gt;\n  &lt;script src=&#34;js/scripts.js&#34;&gt;&lt;/script&gt;\n\n  &lt;div class=&#34;text&#34;&gt;\n    &lt;img src=&#34;assets/foo.png&#34; width=&#34;100%&#34;&gt;\n    &lt;!-- snippet: main --&gt;\n    &lt;p&gt;Hello World&lt;/p&gt;\n    &lt;!-- snippet: main --&gt;\n  &lt;/div&gt;\n\n&lt;/body&gt;\n\n&lt;/html&gt;</code></pre></p>",
 		},
 	}
 

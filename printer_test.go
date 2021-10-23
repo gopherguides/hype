@@ -36,7 +36,7 @@ func main() {
 	// snippet: main
 }
 </code></pre></p>
-</page>
+</page><!--BREAK-->
 </body></html>`
 
 	// fmt.Println(act)
@@ -79,7 +79,7 @@ func main() {
 	// snippet: main
 }
 </div>
-</page>
+</page><!--BREAK-->
 </body></html>`
 	// fmt.Println(act)
 	r.Equal(exp, act)

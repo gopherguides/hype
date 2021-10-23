@@ -125,8 +125,10 @@ func NewSourceCode(cab fs.ReadFileFS, node *Node, rules map[string]string) (*Sou
 		b = []byte(snip.String())
 	}
 
+	esc := html.EscapeString(string(b))
+
 	tn := &html.Node{
-		Data: string(b),
+		Data: esc,
 		Type: html.TextNode,
 	}
 
