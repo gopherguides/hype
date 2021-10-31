@@ -100,3 +100,42 @@ func Test_Tags_AllType(t *testing.T) {
 	act = doc.Children.AllType(&InlineCode{})
 	r.Len(act, 0)
 }
+
+func Test_Tags_ByAttrs(t *testing.T) {
+	t.Parallel()
+	r := require.New(t)
+
+	p := testParser(t, testdata)
+
+	doc, err := p.ParseFile("big.html")
+
+	// rel="icon" type="image/png"
+
+	r.NoError(err)
+	r.NotNil(doc)
+
+	table := []struct {
+		name  string
+		query Attributes
+		exp   int
+	}{
+		{name: "hit", query: Attributes{
+			"rel":  "icon",
+			"type": "image/png",
+		}, exp: 2},
+		{name: "miss", query: Attributes{
+			"rel":  "icon",
+			"type": "image/jpeg",
+		}, exp: 0},
+	}
+
+	for _, tt := range table {
+		t.Run(tt.name, func(t *testing.T) {
+			r := require.New(t)
+
+			act := doc.Children.ByAttrs(tt.query)
+			r.Len(act, tt.exp)
+		})
+	}
+
+}

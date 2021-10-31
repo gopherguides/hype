@@ -85,3 +85,17 @@ func (tags Tags) AllType(want interface{}) Tags {
 
 	return res
 }
+
+func (tags Tags) ByAttrs(query Attributes) Tags {
+	var res Tags
+	for _, t := range tags {
+		ta := t.Attrs()
+
+		if ta.Matches(query) {
+			res = append(res, t)
+		}
+
+		res = append(res, t.GetChildren().ByAttrs(query)...)
+	}
+	return res
+}

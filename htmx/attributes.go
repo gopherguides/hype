@@ -27,6 +27,24 @@ func NewAttributes(node *html.Node) Attributes {
 	return ats
 }
 
+func (ats Attributes) HasKeys(keys ...string) bool {
+	for _, key := range keys {
+		if _, ok := ats[key]; !ok {
+			return false
+		}
+	}
+	return true
+}
+
+func (ats Attributes) Matches(query map[string]string) bool {
+	for k, v := range query {
+		if ats[k] != v {
+			return false
+		}
+	}
+	return true
+}
+
 func (ats Attributes) Attrs() []html.Attribute {
 	if ats == nil {
 		return nil

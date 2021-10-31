@@ -70,6 +70,10 @@ func (p *Parser) ElementNode(node *html.Node) (Tag, error) {
 		return p.NewBody(g)
 	default:
 		switch node.Data {
+		case "file":
+			return p.NewFile(g)
+		case "filegroup":
+			return p.NewFileGroup(g)
 		case "include":
 			return p.NewInclude(g)
 		case "page":
