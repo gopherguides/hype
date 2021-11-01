@@ -53,13 +53,13 @@ func Test_Tags_AllAtoms(t *testing.T) {
 	doc, err := p.ParseFile("big.html")
 	r.NoError(err)
 
-	act := doc.Children.AllAtom(atom.P)
+	act := doc.Children.ByAtom(atom.P)
 	r.Len(act, 41)
 
-	act = doc.Children.AllAtom(atom.Figure)
+	act = doc.Children.ByAtom(atom.Figure)
 	r.Len(act, 23)
 
-	act = doc.Children.AllAtom(atom.Textarea)
+	act = doc.Children.ByAtom(atom.Textarea)
 	r.Len(act, 0)
 }
 
@@ -72,16 +72,16 @@ func Test_Tags_AllData(t *testing.T) {
 	doc, err := p.ParseFile("big.html")
 	r.NoError(err)
 
-	act := doc.Children.AllData("p")
+	act := doc.Children.ByData("p")
 	r.Len(act, 41)
 
-	act = doc.Children.AllData("title")
+	act = doc.Children.ByData("title")
 	r.Len(act, 1)
 
-	act = doc.Children.AllData("figure")
+	act = doc.Children.ByData("figure")
 	r.Len(act, 23)
 
-	act = doc.Children.AllData("textarea")
+	act = doc.Children.ByData("textarea")
 	r.Len(act, 0)
 }
 
@@ -94,10 +94,10 @@ func Test_Tags_AllType(t *testing.T) {
 	doc, err := p.ParseFile("big.html")
 	r.NoError(err)
 
-	act := doc.Children.AllType(&Meta{})
+	act := doc.Children.ByType(&Meta{})
 	r.Len(act, 19)
 
-	act = doc.Children.AllType(&InlineCode{})
+	act = doc.Children.ByType(&InlineCode{})
 	r.Len(act, 0)
 }
 

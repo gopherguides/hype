@@ -18,7 +18,7 @@ func Test_FileGroup(t *testing.T) {
 	r.NoError(err)
 	r.NotNil(doc)
 
-	groups := doc.Children.AllAtom(FileGroup_Atom)
+	groups := doc.Children.ByAtom(FileGroup_Atom)
 	r.Len(groups, 1)
 
 	fg, ok := groups[0].(*FileGroup)
@@ -27,9 +27,9 @@ func Test_FileGroup(t *testing.T) {
 	r.Equal("snippets", fg.Name())
 
 	exp := `<filegroup name="snippets">
-  <file src="src/snip.html"><a href="src/snip.html" target="_blank">src/snip.html</a></file>
-  <file src="src/snip.txt"><a href="src/snip.txt" target="_blank">src/snip.txt</a></file>
-  <file src="src/snippets.go"><a href="src/snippets.go" target="_blank">src/snippets.go</a></file>
+  <file src="src/snip.html"></file>
+  <file src="src/snip.txt"></file>
+  <file src="src/snippets.go"></file>
 </filegroup>`
 
 	act := fg.String()

@@ -38,18 +38,18 @@ func (tags Tags) String() string {
 	return strings.Join(s, "")
 }
 
-func (tags Tags) AllAtom(want atom.Atom) Tags {
+func (tags Tags) ByAtom(want atom.Atom) Tags {
 	var res Tags
 	for _, t := range tags {
 		if IsAtom(t, want) {
 			res = append(res, t)
 		}
-		res = append(res, t.GetChildren().AllAtom(want)...)
+		res = append(res, t.GetChildren().ByAtom(want)...)
 	}
 	return res
 }
 
-func (tags Tags) AllData(want string) Tags {
+func (tags Tags) ByData(want string) Tags {
 	var res Tags
 	for _, t := range tags {
 		na, ok := t.(Nodeable)
@@ -60,12 +60,12 @@ func (tags Tags) AllData(want string) Tags {
 		if na.DaNode().Data == want {
 			res = append(res, t)
 		}
-		res = append(res, t.GetChildren().AllData(want)...)
+		res = append(res, t.GetChildren().ByData(want)...)
 	}
 	return res
 }
 
-func (tags Tags) AllType(want interface{}) Tags {
+func (tags Tags) ByType(want interface{}) Tags {
 	var res Tags
 
 	if want == nil {
@@ -80,7 +80,7 @@ func (tags Tags) AllType(want interface{}) Tags {
 			res = append(res, t)
 		}
 
-		res = append(res, t.GetChildren().AllType(want)...)
+		res = append(res, t.GetChildren().ByType(want)...)
 	}
 
 	return res

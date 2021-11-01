@@ -18,7 +18,7 @@ func Test_File(t *testing.T) {
 	r.NoError(err)
 	r.NotNil(doc)
 
-	files := doc.Children.AllAtom(File_Atom)
+	files := doc.Children.ByAtom(File_Atom)
 	r.Len(files, 2)
 
 	f, ok := files[0].(*File)
@@ -26,7 +26,7 @@ func Test_File(t *testing.T) {
 
 	r.Equal("src/main.go", f.Src())
 
-	exp := `<file src="src/main.go"><a href="src/main.go" target="_blank">src/main.go</a></file>`
+	exp := `<file src="src/main.go"></file>`
 	act := f.String()
 
 	// fmt.Println(act)

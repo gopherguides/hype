@@ -85,7 +85,7 @@ func (p *Parser) NewInclude(node *Node) (*Include, error) {
 		return nil, err
 	}
 
-	for _, code := range body.Children.AllType(&SourceCode{}) {
+	for _, code := range body.Children.ByType(&SourceCode{}) {
 		sc, ok := code.(*SourceCode)
 		if !ok {
 			continue
@@ -95,7 +95,7 @@ func (p *Parser) NewInclude(node *Node) (*Include, error) {
 		sc.Set("src", x)
 	}
 
-	for _, code := range body.Children.AllType(&Image{}) {
+	for _, code := range body.Children.ByType(&Image{}) {
 		sc, ok := code.(*Image)
 		if !ok {
 			continue
@@ -105,7 +105,7 @@ func (p *Parser) NewInclude(node *Node) (*Include, error) {
 		sc.Set("src", x)
 	}
 
-	for _, code := range body.Children.AllType(&File{}) {
+	for _, code := range body.Children.ByType(&File{}) {
 		sc, ok := code.(*File)
 		if !ok {
 			continue
