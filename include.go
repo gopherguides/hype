@@ -105,6 +105,16 @@ func (p *Parser) NewInclude(node *Node) (*Include, error) {
 		sc.Set("src", x)
 	}
 
+	for _, code := range body.Children.AllType(&File{}) {
+		sc, ok := code.(*File)
+		if !ok {
+			continue
+		}
+		x := sc.Src()
+		x = filepath.Join(dir, x)
+		sc.SetSrc(x)
+	}
+
 	i.Children = body.Children
 
 	return i, nil

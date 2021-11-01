@@ -6,7 +6,6 @@ import (
 	"io/fs"
 	"strings"
 
-	"github.com/gopherguides/hype/htmx"
 	"golang.org/x/net/html/atom"
 )
 
@@ -22,6 +21,13 @@ func (c *File) Src() string {
 	c.RLock()
 	defer c.RUnlock()
 	return c.attrs["src"]
+}
+
+func (c *File) SetSrc(src string) {
+	c.Lock()
+	defer c.Unlock()
+
+	c.attrs["src"] = src
 }
 
 func (f File) String() string {
@@ -67,23 +73,6 @@ func NewFile(cab fs.StatFS, node *Node) (*File, error) {
 	if _, err := cab.Stat(src); err != nil {
 		return nil, err
 	}
-
-	if len(fg.Children) > 0 {
-		return fg, nil
-	}
-
-	an := htmx.AttrNode("a", Attributes{
-		"href":   src,
-		"target": "_blank",
-	})
-
-	href := &Element{
-		Node: NewNode(an),
-	}
-
-	href.Children = append(href.Children, QuickText(src))
-
-	fg.Children = append(fg.Children, href)
 
 	return fg, nil
 }
