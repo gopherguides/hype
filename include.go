@@ -85,12 +85,6 @@ func (p *Parser) NewInclude(node *Node) (*Include, error) {
 		return nil, err
 	}
 
-	for _, code := range body.Children.ByType(&SourceCode{}) {
-		sc, ok := code.(*SourceCode)
-		if !ok {
-			continue
-		}
-		x := sc.Src()
 	srcs := []interface{}{
 		&SourceCode{},
 		&Image{},
