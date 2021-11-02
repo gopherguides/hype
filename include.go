@@ -91,28 +91,36 @@ func (p *Parser) NewInclude(node *Node) (*Include, error) {
 			continue
 		}
 		x := sc.Src()
-		x = filepath.Join(dir, x)
-		sc.Set("src", x)
+	srcs := []interface{}{
+		&SourceCode{},
+		&Image{},
+		&File{},
 	}
 
-	for _, code := range body.Children.ByType(&Image{}) {
-		sc, ok := code.(*Image)
-		if !ok {
-			continue
-		}
-		x := sc.Src()
-		x = filepath.Join(dir, x)
-		sc.Set("src", x)
+	type sourceable interface {
+		Src() string
+		Set(string, string)
 	}
 
-	for _, code := range body.Children.ByType(&File{}) {
-		sc, ok := code.(*File)
-		if !ok {
-			continue
+	type setsourceable interface {
+		SetSrc(string)
+	}
+
+	var xyz sourceable
+	for _, st := range srcs {
+		for _, tag := range body.Children.ByType(xyz) {
+			sc, ok := tag.(sourceable)
+			if !ok {
+				continue
+			}
+			x := sc.Src()
+			x = filepath.Join(dir, x)
+			sc.Set("src", x)
+
+			if s, ok := st.(setsourceable); ok {
+				s.SetSrc(x)
+			}
 		}
-		x := sc.Src()
-		x = filepath.Join(dir, x)
-		sc.SetSrc(x)
 	}
 
 	i.Children = body.Children
