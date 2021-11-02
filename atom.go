@@ -2,6 +2,11 @@ package hype
 
 import "golang.org/x/net/html/atom"
 
+const (
+	FileGroup_Atom atom.Atom = 452184562
+	Include_Atom   atom.Atom = 1818455657
+)
+
 type Atomable interface {
 	Atom() atom.Atom
 }

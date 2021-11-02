@@ -24,7 +24,9 @@ func Test_File(t *testing.T) {
 	f, ok := files[0].(*File)
 	r.True(ok)
 
-	r.Equal("src/main.go", f.Src())
+	src, ok := f.Source()
+	r.True(ok)
+	r.Equal("src/main.go", src.String())
 
 	exp := `<file src="src/main.go"></file>`
 	act := f.String()

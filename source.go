@@ -13,10 +13,28 @@ import (
 	"time"
 )
 
+type Sourceable interface {
+	Tag
+	Source() (Source, bool)
+}
+
+type SetSourceable interface {
+	Sourceable
+	SetSource(s string)
+}
+
 type Source string
 
 func (s Source) Ext() string {
 	return filepath.Ext(string(s))
+}
+
+func (s Source) Base() string {
+	return filepath.Base(string(s))
+}
+
+func (s Source) Dir() string {
+	return filepath.Dir(string(s))
 }
 
 func (s Source) String() string {
@@ -133,4 +151,20 @@ func (s Source) StatHTTP(client *http.Client) (fs.FileInfo, error) {
 	}
 
 	return cab.Stat(s.Schemeless())
+}
+
+// SetTag will set the "src" attribute
+// of the tag.
+// If the tag implements the SetSourceable
+// that will be used.
+// Otherwise the tags attributes will be set
+// directly.
+func (s Source) SetTag(tag Tag) {
+	if sc, ok := tag.(SetSourceable); ok {
+		sc.SetSource(string(s))
+		return
+	}
+
+	node := tag.DaNode()
+	node.Set("src", string(s))
 }

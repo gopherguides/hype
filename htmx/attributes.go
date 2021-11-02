@@ -38,7 +38,16 @@ func (ats Attributes) HasKeys(keys ...string) bool {
 
 func (ats Attributes) Matches(query map[string]string) bool {
 	for k, v := range query {
-		if ats[k] != v {
+		av, ok := ats[k]
+		if !ok {
+			return false
+		}
+
+		if v == "*" {
+			continue
+		}
+
+		if av != v {
 			return false
 		}
 	}

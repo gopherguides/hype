@@ -16,3 +16,11 @@ func SrcAttr(at Attributes) (Source, bool) {
 	s, ok := at["src"]
 	return Source(s), ok
 }
+
+func TagSource(tag Tag) (Source, bool) {
+	if sc, ok := tag.(Sourceable); ok {
+		return sc.Source()
+	}
+
+	return SrcAttr(tag.Attrs())
+}

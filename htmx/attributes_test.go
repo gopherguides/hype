@@ -96,6 +96,7 @@ func Test_Atributes_Matches(t *testing.T) {
 	}{
 		{name: "hit", query: query{"id": "1", "src": "foo.png"}},
 		{name: "miss", query: query{"id": "2", "src": "foo.png"}, err: true},
+		{name: "wild card", query: query{"id": "*"}},
 		{name: "empty"},
 	}
 

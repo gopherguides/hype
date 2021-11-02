@@ -12,6 +12,7 @@ type Tag interface {
 	Atomable
 	Attrs() Attributes
 	GetChildren() Tags
+	Nodeable
 	fmt.Stringer
 }
 
@@ -52,12 +53,7 @@ func (tags Tags) ByAtom(want atom.Atom) Tags {
 func (tags Tags) ByData(want string) Tags {
 	var res Tags
 	for _, t := range tags {
-		na, ok := t.(Nodeable)
-		if !ok {
-			continue
-		}
-
-		if na.DaNode().Data == want {
+		if t.DaNode().Data == want {
 			res = append(res, t)
 		}
 		res = append(res, t.GetChildren().ByData(want)...)

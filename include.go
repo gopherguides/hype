@@ -7,21 +7,25 @@ import (
 	"golang.org/x/net/html/atom"
 )
 
-const (
-	Include_Atom atom.Atom = 1818455657
-)
-
 type Include struct {
 	*Node
 }
 
-func (c *Include) Src() string {
+func (i *Include) Atom() atom.Atom {
+	return Include_Atom
+}
+
+func (c *Include) Source() (Source, bool) {
 	c.RLock()
 	defer c.RUnlock()
-	return c.attrs["src"]
+	return SrcAttr(c.attrs)
 }
 
 func (i Include) String() string {
+	if i.Node == nil {
+		return "<include />"
+	}
+
 	kids := i.Children
 	if len(kids) > 0 {
 		return i.Children.String()
@@ -47,13 +51,16 @@ func (p *Parser) NewInclude(node *Node) (*Include, error) {
 	i := &Include{
 		Node: node,
 	}
-	node.DataAtom = Include_Atom
-	src, err := i.Get("src")
-	if err != nil {
-		return nil, err
+
+	node.DataAtom = i.Atom()
+
+	source, ok := i.Source()
+	if !ok {
+		return nil, fmt.Errorf("include node has no source")
 	}
 
-	ext := filepath.Ext(src)
+	ext := source.Ext()
+	src := source.String()
 
 	switch ext {
 	case ".html", ".md":
@@ -67,8 +74,8 @@ func (p *Parser) NewInclude(node *Node) (*Include, error) {
 		return i, nil
 	}
 
-	base := filepath.Base(src)
-	dir := filepath.Dir(src)
+	base := source.Base()
+	dir := source.Dir()
 
 	p2, err := p.SubParser(dir)
 	if err != nil {
@@ -85,39 +92,28 @@ func (p *Parser) NewInclude(node *Node) (*Include, error) {
 		return nil, err
 	}
 
-	srcs := []interface{}{
-		&SourceCode{},
-		&Image{},
-		&File{},
-	}
-
-	type sourceable interface {
-		Src() string
-		Set(string, string)
-	}
-
-	type setsourceable interface {
-		SetSrc(string)
-	}
-
-	var xyz sourceable
-	for _, st := range srcs {
-		for _, tag := range body.Children.ByType(xyz) {
-			sc, ok := tag.(sourceable)
-			if !ok {
-				continue
-			}
-			x := sc.Src()
-			x = filepath.Join(dir, x)
-			sc.Set("src", x)
-
-			if s, ok := st.(setsourceable); ok {
-				s.SetSrc(x)
-			}
-		}
-	}
-
+	i.setSources(dir, body.Children)
 	i.Children = body.Children
 
 	return i, nil
+}
+
+func (i *Include) setSources(dir string, tags Tags) {
+	for _, tag := range tags {
+		i.setSources(dir, tag.GetChildren())
+
+		st, ok := tag.(SetSourceable)
+		if !ok {
+			continue
+		}
+
+		source, ok := st.Source()
+		if !ok {
+			continue
+		}
+
+		xs := filepath.Join(dir, source.String())
+
+		st.SetSource(xs)
+	}
 }

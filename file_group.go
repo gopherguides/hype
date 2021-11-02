@@ -7,18 +7,24 @@ import (
 	"golang.org/x/net/html/atom"
 )
 
-const (
-	FileGroup_Atom atom.Atom = 452184562
-)
-
 type FileGroup struct {
 	*Node
+	name string
+}
+
+func (FileGroup) Atom() atom.Atom {
+	return FileGroup_Atom
 }
 
 func (fg *FileGroup) Name() string {
-	fg.RLock()
-	defer fg.RUnlock()
-	return fg.attrs["name"]
+	fg.Lock()
+	name := fg.name
+	if len(name) == 0 {
+		name = fg.attrs["name"]
+		fg.name = name
+	}
+	fg.Unlock()
+	return name
 }
 
 func (fg *FileGroup) String() string {
@@ -43,15 +49,17 @@ func (p *Parser) NewFileGroup(node *Node) (*FileGroup, error) {
 		return nil, fmt.Errorf("node is not a filegroup %q", node.Data)
 	}
 
-	node.DataAtom = FileGroup_Atom
-
 	fg := &FileGroup{
 		Node: node,
 	}
+	fg.Node.DataAtom = fg.Atom()
 
-	if _, err := fg.Get("name"); err != nil {
+	name, err := fg.Get("name")
+	if err != nil {
 		return nil, err
 	}
+
+	fg.name = name
 
 	return fg, nil
 }

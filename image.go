@@ -3,22 +3,32 @@ package hype
 import (
 	"fmt"
 	"io/fs"
-	"strings"
 
 	"golang.org/x/net/html/atom"
 )
+
+var _ SetSourceable = &Image{}
 
 type Image struct {
 	*Node
 }
 
-func (c *Image) Src() string {
+func (c *Image) Source() (Source, bool) {
 	c.RLock()
 	defer c.RUnlock()
-	return c.attrs["src"]
+	return SrcAttr(c.attrs)
+}
+
+func (c *Image) SetSource(s string) {
+	c.Lock()
+	defer c.Unlock()
+	c.attrs["src"] = s
 }
 
 func (i Image) String() string {
+	if i.Node == nil {
+		return "<img />"
+	}
 	return i.InlineTag()
 }
 
@@ -31,24 +41,20 @@ func NewImage(cab fs.StatFS, node *Node) (*Image, error) {
 		return nil, fmt.Errorf("image node can not be nil")
 	}
 
-	if node.DataAtom != atom.Img {
-		return nil, fmt.Errorf("node is not an image %q", node.DataAtom.String())
+	if !IsAtom(node, atom.Img) {
+		return nil, fmt.Errorf("node is not an image %q", node.DataAtom)
 	}
 
 	i := &Image{
 		Node: node,
 	}
 
-	src, err := i.Get("src")
-	if err != nil {
-		return nil, err
+	source, ok := i.Source()
+	if !ok {
+		return nil, fmt.Errorf("image node has no src attribute")
 	}
 
-	if strings.HasPrefix(src, "http") {
-		return i, nil
-	}
-
-	if _, err := cab.Stat(src); err != nil {
+	if _, err := source.StatFile(cab); err != nil {
 		return nil, err
 	}
 
