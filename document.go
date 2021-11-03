@@ -12,7 +12,7 @@ import (
 // Document represents an HTML document
 type Document struct {
 	*Node
-	FS fsx.FS
+	FS *fsx.FS
 }
 
 func (d Document) String() string {
