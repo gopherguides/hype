@@ -46,7 +46,7 @@ func Test_Node_Nil(t *testing.T) {
 			},
 			nt: html.ElementNode,
 			funs: []ValidatorFn{
-				AdamValidator("p"),
+				AtomValidator("p"),
 			},
 		},
 	}

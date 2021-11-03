@@ -10,7 +10,7 @@ type Code interface {
 }
 
 func (p *Parser) NewCode(node *Node) (Code, error) {
-	err := node.Validate(html.ElementNode, AdamValidator("code"))
+	err := node.Validate(html.ElementNode, AtomValidator("code"))
 
 	if err != nil {
 		return nil, err

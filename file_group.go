@@ -39,7 +39,7 @@ func (fg *FileGroup) String() string {
 
 func (fg FileGroup) Validate(checks ...ValidatorFn) error {
 	checks = append(checks,
-		AdamValidator(atomx.Filegroup),
+		AtomValidator(atomx.Filegroup),
 		AttrValidator(Attributes{
 			"name": "*",
 		},

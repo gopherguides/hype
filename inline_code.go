@@ -29,7 +29,7 @@ func (c *InlineCode) String() string {
 }
 
 func (inc InlineCode) Validate(checks ...ValidatorFn) error {
-	checks = append(checks, AdamValidator(atomx.Code))
+	checks = append(checks, AtomValidator(atomx.Code))
 	return inc.Node.Validate(html.ElementNode, checks...)
 }
 

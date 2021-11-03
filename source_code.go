@@ -101,7 +101,7 @@ func (sc SourceCode) Validate(checks ...ValidatorFn) error {
 		return nil
 	}
 
-	checks = append(checks, AdamValidator(atomx.Code), fn)
+	checks = append(checks, AtomValidator(atomx.Code), fn)
 
 	return sc.Node.Validate(html.ElementNode, checks...)
 }

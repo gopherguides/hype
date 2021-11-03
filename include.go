@@ -34,7 +34,7 @@ func (i Include) String() string {
 }
 
 func (i Include) Validate(checks ...ValidatorFn) error {
-	checks = append(checks, AdamValidator(atomx.Include))
+	checks = append(checks, AtomValidator(atomx.Include))
 	return i.Node.Validate(html.ElementNode, checks...)
 }
 

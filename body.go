@@ -38,7 +38,7 @@ func (b Body) AsPage() *Page {
 }
 
 func (b Body) Validate(checks ...ValidatorFn) error {
-	checks = append(checks, AdamValidator("body"))
+	checks = append(checks, AtomValidator("body"))
 	return b.Node.Validate(html.ElementNode, checks...)
 }
 

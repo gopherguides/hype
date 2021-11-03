@@ -44,7 +44,7 @@ func (f *File) String() string {
 }
 
 func (f File) Validate(checks ...ValidatorFn) error {
-	checks = append(checks, AdamValidator(atomx.File))
+	checks = append(checks, AtomValidator(atomx.File))
 
 	return f.Node.Validate(html.ElementNode, checks...)
 }

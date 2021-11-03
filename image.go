@@ -32,7 +32,7 @@ func (i Image) String() string {
 }
 
 func (i Image) Validate(checks ...ValidatorFn) error {
-	checks = append(checks, AdamValidator("img", "image"))
+	checks = append(checks, AtomValidator("img", "image"))
 	return i.Node.Validate(html.ElementNode, checks...)
 }
 
