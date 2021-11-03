@@ -21,7 +21,7 @@ func Test_Source_MimeType(t *testing.T) {
 		src  string
 		exp  string
 	}{
-		{name: "known ext mime", src: "example.md", exp: "text/markdown; charset=utf-8"},
+		{name: "known ext mime", src: "example.go", exp: "text/x-go; charset=utf-8"},
 		{name: "missing ext", src: "example", exp: "text/plain"},
 		{name: "unknown ext mime", src: "example.unknown", exp: "text/plain"},
 	}
