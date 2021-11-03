@@ -80,3 +80,38 @@ func Test_Parser_ParseMD(t *testing.T) {
 	r.Contains(act, "Basics of Running a Go Program")
 	r.Contains(act, "// 9 characters (including the space and comma)")
 }
+
+func Test_Parser_CustomTag(t *testing.T) {
+	t.Parallel()
+	r := require.New(t)
+
+	p := testParser(t, testdata)
+	p.SetCustomTag("newman", func(node *Node) (Tag, error) {
+		el := &Element{
+			Node: node,
+		}
+		return el, el.Validate()
+	})
+
+	p.SetCustomTag("leo:uncle", func(node *Node) (Tag, error) {
+		el := &Element{
+			Node: node,
+		}
+		return el, el.Validate()
+	})
+
+	doc, err := p.ParseFile("custom_tags.md")
+	r.NoError(err)
+	r.NotNil(doc)
+
+	newmans := doc.Children.ByAdam("newman")
+	r.Len(newmans, 1)
+	r.Equal(Adam("newman"), newmans[0].Adam())
+
+	leos := doc.Children.ByAdam("leo:uncle")
+	r.Len(leos, 1)
+	r.Equal(Adam("leo:uncle"), leos[0].Adam())
+
+	leos = doc.Children.ByAdam("leo")
+	r.Len(leos, 0)
+}

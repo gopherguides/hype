@@ -12,7 +12,7 @@ import (
 // Document represents an HTML document
 type Document struct {
 	*Node
-	FS *fsx.FS
+	FS fsx.FS
 }
 
 func (d Document) String() string {
@@ -55,10 +55,6 @@ func (doc *Document) Meta() Metas {
 
 func (d Document) Validate(checks ...ValidatorFn) error {
 	fn := func(n *Node) error {
-
-		if d.FS == nil {
-			return fmt.Errorf("document fs can not be nil: %v", d)
-		}
 
 		return nil
 	}
