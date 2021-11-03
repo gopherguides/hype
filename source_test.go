@@ -5,6 +5,7 @@ import (
 	"fmt"
 	"io"
 	"io/fs"
+	"mime"
 	"net/http"
 	"testing"
 	"testing/fstest"
@@ -16,12 +17,17 @@ import (
 func Test_Source_MimeType(t *testing.T) {
 	t.Parallel()
 
+	r := require.New(t)
+
+	err := mime.AddExtensionType(".xyz", "text/zipper")
+	r.NoError(err)
+
 	table := []struct {
 		name string
 		src  string
 		exp  string
 	}{
-		{name: "known ext mime", src: "example.go", exp: "text/x-go; charset=utf-8"},
+		{name: "known ext mime", src: "example.xyz", exp: "text/zipper; charset=utf-8"},
 		{name: "missing ext", src: "example", exp: "text/plain"},
 		{name: "unknown ext mime", src: "example.unknown", exp: "text/plain"},
 	}
