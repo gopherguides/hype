@@ -4,6 +4,7 @@ import (
 	"bytes"
 	"fmt"
 
+	"github.com/gopherguides/hype/atomx"
 	"golang.org/x/net/html"
 )
 
@@ -38,7 +39,7 @@ func (fg *FileGroup) String() string {
 
 func (fg FileGroup) Validate(checks ...ValidatorFn) error {
 	checks = append(checks,
-		AdamValidator(File_Group_Adam),
+		AdamValidator(atomx.Filegroup),
 		AttrValidator(Attributes{
 			"name": "*",
 		},

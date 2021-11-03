@@ -4,6 +4,7 @@ import (
 	"fmt"
 	"strings"
 
+	"github.com/gopherguides/hype/atomx"
 	"golang.org/x/net/html"
 )
 
@@ -28,7 +29,7 @@ func (c *InlineCode) String() string {
 }
 
 func (inc InlineCode) Validate(checks ...ValidatorFn) error {
-	checks = append(checks, AdamValidator(Code_Adam))
+	checks = append(checks, AdamValidator(atomx.Code))
 	return inc.Node.Validate(html.ElementNode, checks...)
 }
 

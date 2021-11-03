@@ -20,19 +20,19 @@ func Test_Parser_ParseHTML(t *testing.T) {
 
 	dt, ok := doc.Children[0].(*DocType)
 	r.True(ok)
-	r.True(IsAdam(dt, "html5"))
+	r.True(IsAtom(dt, "html5"))
 
 	html, ok := doc.Children[1].(*Element)
 	r.True(ok)
 
-	r.True(IsAdam(html, "html"))
+	r.True(IsAtom(html, "html"))
 
 	r.Len(html.Children, 3)
 
 	head := html.Children[0]
 	r.NotNil(head)
 
-	r.True(IsAdam(head, "head"))
+	r.True(IsAtom(head, "head"))
 
 	r.Len(head.GetChildren(), 29)
 
@@ -58,13 +58,13 @@ func Test_Parser_ParseMD(t *testing.T) {
 
 	html, ok := doc.Children[0].(*Element)
 	r.True(ok)
-	r.True(IsAdam(html, "html"))
+	r.True(IsAtom(html, "html"))
 
 	r.Len(html.Children, 2)
 
 	head := html.Children[0]
 	r.NotNil(head)
-	r.True(IsAdam(head, "head"))
+	r.True(IsAtom(head, "head"))
 
 	r.Len(head.GetChildren(), 0)
 
@@ -104,14 +104,14 @@ func Test_Parser_CustomTag(t *testing.T) {
 	r.NoError(err)
 	r.NotNil(doc)
 
-	newmans := doc.Children.ByAdam("newman")
+	newmans := doc.Children.ByAtom("newman")
 	r.Len(newmans, 1)
-	r.Equal(Adam("newman"), newmans[0].Adam())
+	r.Equal(Atom("newman"), newmans[0].Atom())
 
-	leos := doc.Children.ByAdam("leo:uncle")
+	leos := doc.Children.ByAtom("leo:uncle")
 	r.Len(leos, 1)
-	r.Equal(Adam("leo:uncle"), leos[0].Adam())
+	r.Equal(Atom("leo:uncle"), leos[0].Atom())
 
-	leos = doc.Children.ByAdam("leo")
+	leos = doc.Children.ByAtom("leo")
 	r.Len(leos, 0)
 }

@@ -4,6 +4,7 @@ import (
 	"fmt"
 	"strings"
 
+	"github.com/gopherguides/hype/atomx"
 	"golang.org/x/net/html"
 )
 
@@ -12,8 +13,9 @@ type Element struct {
 }
 
 func (e Element) String() string {
-	switch e.Adam() {
-	case "a", "img", "image", "link":
+	at := e.Atom()
+
+	if at.Is(atomx.Inlines()...) {
 		return e.InlineTag()
 	}
 
@@ -60,22 +62,22 @@ func (p *Parser) ElementNode(n *html.Node) (Tag, error) {
 	}
 	p.RUnlock()
 
-	switch node.Adam() {
-	case "img", "image":
+	switch node.Atom() {
+	case atomx.Img, atomx.Image:
 		return p.NewImage(node)
-	case "meta":
+	case atomx.Meta:
 		return p.NewMeta(node)
-	case Code_Adam:
+	case atomx.Code:
 		return p.NewCode(node)
-	case "body":
+	case atomx.Body:
 		return p.NewBody(node)
-	case File_Adam:
+	case atomx.File:
 		return p.NewFile(node)
-	case File_Group_Adam:
+	case atomx.Filegroup:
 		return p.NewFileGroup(node)
-	case Include_Adam:
+	case atomx.Include:
 		return p.NewInclude(node)
-	case Page_Adam:
+	case atomx.Page:
 		return p.NewPage(node)
 	}
 

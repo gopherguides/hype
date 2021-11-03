@@ -4,10 +4,12 @@ import (
 	"fmt"
 	"reflect"
 	"strings"
+
+	"github.com/gopherguides/hype/atomx"
 )
 
 type Tag interface {
-	Adamable
+	atomx.Atomable
 	Attrs() Attributes
 	GetChildren() Tags
 	Nodeable
@@ -52,24 +54,13 @@ func (tags Tags) String() string {
 	return strings.Join(s, "")
 }
 
-// func (tags Tags) ByAtom(want atom.Atom) Tags {
-// 	var res Tags
-// 	for _, t := range tags {
-// 		if IsAtom(t, want) {
-// 			res = append(res, t)
-// 		}
-// 		res = append(res, t.GetChildren().ByAtom(want)...)
-// 	}
-// 	return res
-// }
-
-func (tags Tags) ByAdam(want Adam) Tags {
+func (tags Tags) ByAtom(want Atom) Tags {
 	var res Tags
 	for _, t := range tags {
-		if t.Adam() == want {
+		if t.Atom() == want {
 			res = append(res, t)
 		}
-		res = append(res, t.GetChildren().ByAdam(want)...)
+		res = append(res, t.GetChildren().ByAtom(want)...)
 	}
 	return res
 }

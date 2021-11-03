@@ -40,18 +40,18 @@ func Test_Parser_NewDocument(t *testing.T) {
 	dt, ok := doc.Children[0].(*DocType)
 	r.True(ok)
 
-	r.True(IsAdam(dt, "html5"))
+	r.True(IsAtom(dt, "html5"))
 
 	html, ok := doc.Children[1].(*Element)
 	r.True(ok)
 
-	r.True(IsAdam(html, "html"))
+	r.True(IsAtom(html, "html"))
 
 	r.Len(html.Children, 3)
 
 	head := html.Children[0]
 	r.NotNil(head)
-	r.True(IsAdam(head, "head"))
+	r.True(IsAtom(head, "head"))
 
 	r.Len(head.GetChildren(), 29)
 

@@ -6,6 +6,7 @@ import (
 	"io/fs"
 	"strings"
 
+	"github.com/gopherguides/hype/atomx"
 	"github.com/markbates/sweets"
 	"golang.org/x/net/html"
 )
@@ -100,7 +101,7 @@ func (sc SourceCode) Validate(checks ...ValidatorFn) error {
 		return nil
 	}
 
-	checks = append(checks, AdamValidator(Code_Adam), fn)
+	checks = append(checks, AdamValidator(atomx.Code), fn)
 
 	return sc.Node.Validate(html.ElementNode, checks...)
 }

@@ -5,6 +5,7 @@ import (
 	"io/fs"
 	"path/filepath"
 
+	"github.com/gopherguides/hype/atomx"
 	"golang.org/x/net/html"
 )
 
@@ -33,7 +34,7 @@ func (i Include) String() string {
 }
 
 func (i Include) Validate(checks ...ValidatorFn) error {
-	checks = append(checks, AdamValidator(Include_Adam))
+	checks = append(checks, AdamValidator(atomx.Include))
 	return i.Node.Validate(html.ElementNode, checks...)
 }
 

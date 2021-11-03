@@ -20,11 +20,11 @@ type ValidatableHTTP interface {
 	ValidateHTTP(client *http.Client) error
 }
 
-func AdamValidator(adams ...Adam) ValidatorFn {
+func AdamValidator(atoms ...Atom) ValidatorFn {
 	return func(n *Node) error {
 
-		if !IsAdam(n, adams...) {
-			return fmt.Errorf("expected adam(s) %q, got %q", adams, n.Adam())
+		if !IsAtom(n, atoms...) {
+			return fmt.Errorf("expected adam(s) %q, got %q", atoms, n.Atom())
 		}
 
 		return nil

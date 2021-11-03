@@ -14,7 +14,7 @@ func Test_IsAtom(t *testing.T) {
 		name string
 		tag  Tag
 		exp  bool
-		want string
+		want Atom
 	}{
 		{name: "nil"},
 		{
@@ -38,7 +38,7 @@ func Test_IsAtom(t *testing.T) {
 		t.Run(tt.name, func(t *testing.T) {
 			r := require.New(t)
 
-			r.Equal(tt.exp, IsAdam(tt.tag, Adam(tt.want)))
+			r.Equal(tt.exp, IsAtom(tt.tag, Atom(tt.want)))
 		})
 	}
 }
@@ -52,16 +52,16 @@ func Test_Tags_AllAdam(t *testing.T) {
 	doc, err := p.ParseFile("big.html")
 	r.NoError(err)
 
-	act := doc.Children.ByAdam("p")
+	act := doc.Children.ByAtom("p")
 	r.Len(act, 41)
 
-	act = doc.Children.ByAdam("title")
+	act = doc.Children.ByAtom("title")
 	r.Len(act, 1)
 
-	act = doc.Children.ByAdam("figure")
+	act = doc.Children.ByAtom("figure")
 	r.Len(act, 23)
 
-	act = doc.Children.ByAdam("textarea")
+	act = doc.Children.ByAtom("textarea")
 	r.Len(act, 0)
 }
 

@@ -13,7 +13,7 @@ type Comment struct {
 }
 
 func (c Comment) String() string {
-	return fmt.Sprintf("<!-- %s -->", c.Adam())
+	return fmt.Sprintf("<!-- %s -->", c.Atom())
 }
 
 func (c Comment) Validate(checks ...ValidatorFn) error {

@@ -4,6 +4,7 @@ import (
 	"fmt"
 	"strings"
 
+	"github.com/gopherguides/hype/atomx"
 	"golang.org/x/net/html"
 )
 
@@ -31,7 +32,7 @@ func (b Body) AsPage() *Page {
 		Node: b.Clone(),
 	}
 
-	p.DataAdam = Page_Adam
+	p.DataAtom = atomx.Page
 
 	return p
 }

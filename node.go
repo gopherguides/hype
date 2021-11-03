@@ -5,6 +5,7 @@ import (
 	"strings"
 	"sync"
 
+	"github.com/gopherguides/hype/atomx"
 	"github.com/gopherguides/hype/htmx"
 	"golang.org/x/net/html"
 )
@@ -15,9 +16,11 @@ type Nodeable interface {
 
 type Nodes []*Node
 
+var _ Atomable = &Node{}
+
 type Node struct {
 	Children Tags
-	DataAdam Adam
+	DataAtom Atom
 	attrs    Attributes
 	html     *html.Node
 	sync.RWMutex
@@ -66,17 +69,17 @@ func (n *Node) Clone() *Node {
 	return node
 }
 
-func (n *Node) Adam() Adam {
+func (n *Node) Atom() Atom {
 	n.RLock()
 	defer n.RUnlock()
 
-	return n.DataAdam
+	return n.DataAtom
 }
 
 func (n *Node) StartTag() string {
 	sb := &strings.Builder{}
 
-	at := n.Adam()
+	at := n.Atom()
 
 	fmt.Fprintf(sb, "<%s", at)
 	ats := n.Attrs().String()
@@ -88,7 +91,7 @@ func (n *Node) StartTag() string {
 }
 
 func (n *Node) EndTag() string {
-	return fmt.Sprintf("</%s>", n.Adam())
+	return fmt.Sprintf("</%s>", n.Atom())
 }
 
 func (n *Node) InlineTag() string {
@@ -149,11 +152,11 @@ func NewNode(n *html.Node) *Node {
 	node := &Node{
 		html:     n,
 		attrs:    NewAttributes(n),
-		DataAdam: ERROR_ADAM,
+		DataAtom: atomx.UNKNOWN,
 	}
 
 	if n != nil {
-		node.DataAdam = Adam(n.Data)
+		node.DataAtom = Atom(n.Data)
 	}
 
 	return node

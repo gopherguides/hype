@@ -21,7 +21,7 @@ func (d Document) String() string {
 
 // Overview returns the contents of the first <overview> tag in the document.
 func (d *Document) Overview() string {
-	tags := d.Children.ByAdam("overview")
+	tags := d.Children.ByAtom("overview")
 	if len(tags) == 0 {
 		return ""
 	}
@@ -97,7 +97,7 @@ func (doc *Document) Body() (*Body, error) {
 		return nil, fmt.Errorf("document can not be nil")
 	}
 
-	bodies := doc.Children.ByAdam("body")
+	bodies := doc.Children.ByAtom("body")
 	if len(bodies) == 0 {
 		return nil, fmt.Errorf("body not found")
 	}
@@ -123,7 +123,7 @@ func (doc *Document) Pages() Pages {
 		return nil
 	}
 
-	pages := doc.Children.ByAdam("page")
+	pages := doc.Children.ByAtom("page")
 	res := make(Pages, 0, len(pages))
 
 	if len(pages) == 0 {
