@@ -68,10 +68,7 @@ func (n *Node) Atom() atom.Atom {
 func (n *Node) StartTag() string {
 	sb := &strings.Builder{}
 
-	at := n.DataAtom.String()
-	if len(at) == 0 {
-		at = n.Data
-	}
+	at := n.Data
 
 	fmt.Fprintf(sb, "<%s", at)
 	ats := n.Attrs().String()
@@ -83,11 +80,7 @@ func (n *Node) StartTag() string {
 }
 
 func (n *Node) EndTag() string {
-	at := n.DataAtom.String()
-	if len(at) == 0 {
-		at = n.Data
-	}
-	return fmt.Sprintf("</%s>", at)
+	return fmt.Sprintf("</%s>", n.Data)
 }
 
 func (n *Node) InlineTag() string {

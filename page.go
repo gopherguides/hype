@@ -5,7 +5,6 @@ import (
 	"strings"
 
 	"golang.org/x/net/html"
-	"golang.org/x/net/html/atom"
 )
 
 var (
@@ -37,17 +36,6 @@ func (p Page) String() string {
 	return sb.String()
 }
 
-func (p *Page) Atom() atom.Atom {
-	p.Lock()
-	defer p.Unlock()
-
-	if p.Node.DataAtom != Page_Atom {
-		p.Node.DataAtom = Page_Atom
-	}
-
-	return Page_Atom
-}
-
 func (p *Page) EndTag() string {
 	return fmt.Sprintf("%s%s", p.Node.EndTag(), BREAK)
 }
@@ -66,8 +54,6 @@ func NewPage(node *Node) (*Page, error) {
 	if err != nil {
 		return nil, err
 	}
-
-	node.DataAtom = Page_Atom
 
 	return p, p.Validate()
 }

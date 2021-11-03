@@ -5,6 +5,7 @@ import (
 	"io/fs"
 	"path/filepath"
 
+	"github.com/gopherguides/hype/atomx"
 	"golang.org/x/net/html"
 	"golang.org/x/net/html/atom"
 )
@@ -14,7 +15,7 @@ type Include struct {
 }
 
 func (i *Include) Atom() atom.Atom {
-	return Include_Atom
+	return atomx.Include
 }
 
 func (c *Include) Source() (Source, bool) {

@@ -5,6 +5,7 @@ import (
 	"fmt"
 	"io/fs"
 
+	"github.com/gopherguides/hype/atomx"
 	"golang.org/x/net/html"
 	"golang.org/x/net/html/atom"
 )
@@ -14,7 +15,7 @@ type File struct {
 }
 
 func (File) Atom() atom.Atom {
-	return File_Atom
+	return atomx.File
 }
 
 func (c *File) Source() (Source, bool) {

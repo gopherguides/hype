@@ -4,6 +4,7 @@ import (
 	"bytes"
 	"fmt"
 
+	"github.com/gopherguides/hype/atomx"
 	"golang.org/x/net/html"
 	"golang.org/x/net/html/atom"
 )
@@ -14,7 +15,7 @@ type FileGroup struct {
 }
 
 func (FileGroup) Atom() atom.Atom {
-	return FileGroup_Atom
+	return atomx.FileGroup
 }
 
 func (fg *FileGroup) Name() string {
