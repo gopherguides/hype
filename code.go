@@ -1,7 +1,7 @@
 package hype
 
 import (
-	"fmt"
+	"golang.org/x/net/html"
 )
 
 type Code interface {
@@ -10,12 +10,10 @@ type Code interface {
 }
 
 func (p *Parser) NewCode(node *Node) (Code, error) {
-	if node == nil || node.Node == nil {
-		return nil, fmt.Errorf("code node can not be nil")
-	}
+	err := node.Validate(html.ElementNode, DataValidator("code"))
 
-	if node.Data != "code" {
-		return nil, fmt.Errorf("node is not code %v", node.Data)
+	if err != nil {
+		return nil, err
 	}
 
 	ats := node.Attrs()

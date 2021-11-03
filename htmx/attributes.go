@@ -27,6 +27,18 @@ func NewAttributes(node *html.Node) Attributes {
 	return ats
 }
 
+func (ats Attributes) Get(key string) (string, error) {
+	if ats == nil {
+		return "", fmt.Errorf("no attributes")
+	}
+
+	v, ok := ats[key]
+	if !ok {
+		return "", fmt.Errorf("no attribute %q", key)
+	}
+	return v, nil
+}
+
 func (ats Attributes) HasKeys(keys ...string) bool {
 	for _, key := range keys {
 		if _, ok := ats[key]; !ok {

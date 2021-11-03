@@ -3,6 +3,8 @@ package hype
 import (
 	"fmt"
 	"strings"
+
+	"golang.org/x/net/html"
 )
 
 type InlineCode struct {
@@ -25,22 +27,19 @@ func (c *InlineCode) String() string {
 	return sb.String()
 }
 
-func (p *Parser) NewInlineCode(node *Node) (*InlineCode, error) {
-	return NewInlineCode(node)
+func (inc InlineCode) Validate(checks ...ValidatorFn) error {
+	checks = append(checks, DataValidator("code"))
+	return inc.Node.Validate(html.ElementNode, checks...)
 }
 
 func NewInlineCode(node *Node) (*InlineCode, error) {
-	if node == nil || node.Node == nil {
-		return nil, fmt.Errorf("inline code node can not be nil")
-	}
-
-	if node.Data != "code" {
-		return nil, fmt.Errorf("node is not code %v", node.Data)
-	}
-
 	c := &InlineCode{
 		Node: node,
 	}
 
-	return c, nil
+	return c, c.Validate()
+}
+
+func (p *Parser) NewInlineCode(node *Node) (*InlineCode, error) {
+	return NewInlineCode(node)
 }

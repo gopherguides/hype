@@ -1,9 +1,9 @@
 package hype
 
 import (
-	"fmt"
 	"io/fs"
 
+	"golang.org/x/net/html"
 	"golang.org/x/net/html/atom"
 )
 
@@ -32,31 +32,26 @@ func (i Image) String() string {
 	return i.InlineTag()
 }
 
-func (p *Parser) NewImage(node *Node) (*Image, error) {
-	return NewImage(p.FS, node)
+func (i Image) Validate(checks ...ValidatorFn) error {
+	checks = append(checks, AtomValidator(atom.Img))
+	return i.Node.Validate(html.ElementNode, checks...)
 }
 
-func NewImage(cab fs.StatFS, node *Node) (*Image, error) {
-	if node == nil || node.Node == nil {
-		return nil, fmt.Errorf("image node can not be nil")
-	}
+func (i Image) ValidateFS(cab fs.FS, checks ...ValidatorFn) error {
+	checks = append(checks, SourceValidator(cab, &i))
 
-	if !IsAtom(node, atom.Img) {
-		return nil, fmt.Errorf("node is not an image %q", node.DataAtom)
-	}
+	return i.Validate(checks...)
+}
+
+func NewImage(cab fs.FS, node *Node) (*Image, error) {
 
 	i := &Image{
 		Node: node,
 	}
 
-	source, ok := i.Source()
-	if !ok {
-		return nil, fmt.Errorf("image node has no src attribute")
-	}
+	return i, i.ValidateFS(cab)
+}
 
-	if _, err := source.StatFile(cab); err != nil {
-		return nil, err
-	}
-
-	return i, nil
+func (p *Parser) NewImage(node *Node) (*Image, error) {
+	return NewImage(p.FS, node)
 }

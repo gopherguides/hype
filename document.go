@@ -4,6 +4,7 @@ import (
 	"encoding/json"
 	"fmt"
 
+	"github.com/gopherguides/hype/htmx"
 	"github.com/markbates/fsx"
 	"golang.org/x/net/html"
 	"golang.org/x/net/html/atom"
@@ -29,8 +30,8 @@ func (d *Document) Overview() string {
 }
 
 func (d Document) MarshalJSON() ([]byte, error) {
-	m := jmap{
-		"document": NewNodeJSON(d.Node.Node),
+	m := map[string]interface{}{
+		"document": htmx.NewNodeJSON(d.Node.Node),
 		"fs":       d.FS,
 	}
 	return json.Marshal(m)
@@ -53,20 +54,34 @@ func (doc *Document) Meta() Metas {
 	return res
 }
 
-// NewDocument parses the node and returns a Document.
-// The node must be of type html.DocumentNode.
-func (p *Parser) NewDocument(node *html.Node) (*Document, error) {
-	if node == nil {
-		return nil, fmt.Errorf("node can not be nil")
+func (d Document) Validate(checks ...ValidatorFn) error {
+	fn := func(n *Node) error {
+
+		if d.FS == nil {
+			return fmt.Errorf("document fs can not be nil: %v", d)
+		}
+
+		return nil
 	}
 
-	if node.Type != html.DocumentNode {
-		return nil, fmt.Errorf("node is not a document %v", node)
-	}
+	chocks := ChildrenValidators(d, checks...)
+	chocks = append(chocks, fn)
+	err := d.Node.Validate(html.DocumentNode, chocks...)
+
+	return err
+}
+
+// NewDocument parses the node and returns a Document.
+// The node must be of type html.DocumentNode.
+func (p *Parser) NewDocument(n *html.Node) (*Document, error) {
 
 	doc := &Document{
 		FS:   p.FS,
-		Node: NewNode(node),
+		Node: NewNode(n),
+	}
+
+	if err := doc.Validate(); err != nil {
+		return nil, err
 	}
 
 	c := doc.Node.FirstChild
@@ -79,7 +94,7 @@ func (p *Parser) NewDocument(node *html.Node) (*Document, error) {
 		c = c.NextSibling
 	}
 
-	return doc, nil
+	return doc, doc.Validate()
 }
 
 func (doc *Document) Body() (*Body, error) {

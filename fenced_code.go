@@ -3,6 +3,8 @@ package hype
 import (
 	"fmt"
 	"strings"
+
+	"golang.org/x/net/html"
 )
 
 type FencedCode struct {
@@ -39,26 +41,27 @@ func (c *FencedCode) Lang() string {
 	return "plain"
 }
 
+func (fc FencedCode) Validate(checks ...ValidatorFn) error {
+	checks = append(checks, DataValidator("code"))
+	return fc.Node.Validate(html.ElementNode, checks...)
+}
+
 func (p *Parser) NewFencedCode(node *Node) (*FencedCode, error) {
 	return NewFencedCode(node)
 }
 
 func NewFencedCode(node *Node) (*FencedCode, error) {
-	if node == nil || node.Node == nil {
-		return nil, fmt.Errorf("fenced code node can not be nil")
-	}
-
-	if node.Data != "code" {
-		return nil, fmt.Errorf("node is not code %v", node.Data)
-	}
-
 	c := &FencedCode{
 		Node: node,
+	}
+
+	if err := c.Validate(); err != nil {
+		return nil, err
 	}
 
 	lang := c.Lang()
 	c.Set("language", lang)
 	c.Set("class", fmt.Sprintf("language-%s", lang))
 
-	return c, nil
+	return c, c.Validate()
 }

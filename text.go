@@ -1,8 +1,6 @@
 package hype
 
 import (
-	"fmt"
-
 	"github.com/gopherguides/hype/htmx"
 	"golang.org/x/net/html"
 )
@@ -24,25 +22,18 @@ func (t Text) String() string {
 		return ""
 	}
 	return t.Node.Data
-	// return fmt.Sprintf("%q", t.Node.Data)
 }
 
-func (p *Parser) NewText(node *html.Node) (*Text, error) {
-	return NewText(node)
+func (t Text) Validate(checks ...ValidatorFn) error {
+	return t.Node.Validate(html.TextNode, checks...)
 }
 
 func NewText(node *html.Node) (*Text, error) {
-	if node == nil {
-		return nil, fmt.Errorf("text node can not be nil")
-	}
-
-	if node.Type != html.TextNode {
-		return nil, fmt.Errorf("node is not a text node %v", node)
-	}
-
-	return &Text{
+	t := &Text{
 		Node: NewNode(node),
-	}, nil
+	}
+
+	return t, t.Validate()
 }
 
 func QuickText(s string) *Text {
@@ -51,4 +42,8 @@ func QuickText(s string) *Text {
 	return &Text{
 		Node: nn,
 	}
+}
+
+func (p *Parser) NewText(node *html.Node) (*Text, error) {
+	return NewText(node)
 }

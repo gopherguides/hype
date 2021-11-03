@@ -30,58 +30,62 @@ func (e Element) String() string {
 	return sb.String()
 }
 
-func (p *Parser) ElementNode(node *html.Node) (Tag, error) {
-	if node == nil {
-		return nil, fmt.Errorf("node can not be nil")
+func (e Element) Validate(checks ...ValidatorFn) error {
+	return e.Node.Validate(html.ElementNode, checks...)
+}
+
+func (p *Parser) ElementNode(n *html.Node) (Tag, error) {
+	node := NewNode(n)
+
+	err := node.Validate(html.ElementNode)
+	if err != nil {
+		return nil, err
 	}
 
-	if node.Type != html.ElementNode {
-		return nil, fmt.Errorf("node is not an element node %v", node)
-	}
-
-	g := NewNode(node)
-	c := node.FirstChild
+	c := n.FirstChild
 	for c != nil {
 		tag, err := p.ParseNode(c)
 		if err != nil {
 			return nil, err
 		}
-		g.Children = append(g.Children, tag)
+		node.Children = append(node.Children, tag)
 		c = c.NextSibling
 	}
 
 	p.RLock()
 	if ct := p.customTags; ct != nil {
-		if fn, ok := ct[node.Data]; ok {
+		if fn, ok := ct[n.Data]; ok {
 			p.RUnlock()
-			return fn(g)
+			return fn(node)
 		}
 	}
 	p.RUnlock()
 
-	switch node.DataAtom {
+	switch n.DataAtom {
 	case atom.Img, atom.Image:
-		return p.NewImage(g)
+		return p.NewImage(node)
 	case atom.Meta:
-		return p.NewMeta(g)
+		return p.NewMeta(node)
 	case atom.Code:
-		return p.NewCode(g)
+		return p.NewCode(node)
 	case atom.Body:
-		return p.NewBody(g)
+		return p.NewBody(node)
 	default:
-		switch node.Data {
+		switch n.Data {
 		case "file":
-			return p.NewFile(g)
+			return p.NewFile(node)
 		case "filegroup":
-			return p.NewFileGroup(g)
+			return p.NewFileGroup(node)
 		case "include":
-			return p.NewInclude(g)
+			return p.NewInclude(node)
 		case "page":
-			return p.NewPage(g)
+			return p.NewPage(node)
 		}
 	}
 
-	return &Element{
-		Node: g,
-	}, nil
+	el := &Element{
+		Node: node,
+	}
+
+	return el, el.Validate()
 }

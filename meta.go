@@ -2,6 +2,8 @@ package hype
 
 import (
 	"fmt"
+
+	"golang.org/x/net/html"
 )
 
 var _ Tag = &Meta{}
@@ -28,51 +30,63 @@ func (m Meta) String() string {
 	return m.InlineTag()
 }
 
-func (p *Parser) NewMeta(node *Node) (*Meta, error) {
-	return NewMeta(node)
+func (m *Meta) Validate(checks ...ValidatorFn) error {
+	if m == nil {
+		return fmt.Errorf("nil Meta")
+	}
+
+	fn := func(node *Node) error {
+		ats := node.Attrs()
+
+		if ch, ok := ats["charset"]; ok {
+			ats["property"] = "charset"
+			ats["content"] = ch
+		}
+
+		if len(m.Key) > 0 && len(m.Val) > 0 {
+			return nil
+		}
+
+		prop, pok := ats["property"]
+		name, nok := ats["name"]
+
+		if pok && nok {
+			return fmt.Errorf("both property and name defined, pick one %v", node)
+		}
+
+		if !pok && !nok {
+			return fmt.Errorf("missing property/name %v", node)
+		}
+
+		if len(prop) == 0 {
+			prop = name
+		}
+
+		val, ok := ats["content"]
+		if !ok {
+			return fmt.Errorf("missing content %v", node)
+		}
+		m.Key = prop
+		m.Val = val
+		return nil
+	}
+
+	checks = append(checks, fn)
+	return m.Node.Validate(html.ElementNode, checks...)
 }
 
 func NewMeta(node *Node) (*Meta, error) {
-	if node == nil {
-		return nil, fmt.Errorf("node can not be nil")
-	}
-
-	ats := node.Attrs()
-
-	if ch, ok := ats["charset"]; ok {
-		ats["property"] = "charset"
-		ats["content"] = ch
-	}
-
-	prop, pok := ats["property"]
-	name, nok := ats["name"]
-
-	if pok && nok {
-		return nil, fmt.Errorf("both property and name defined, pick one %v", node)
-	}
-
-	if !pok && !nok {
-		return nil, fmt.Errorf("missing property/name %v", node)
-	}
-
-	if len(prop) == 0 {
-		prop = name
-	}
-
-	val, ok := ats["content"]
-	if !ok {
-		return nil, fmt.Errorf("missing content %v", node)
-	}
-
 	m := &Meta{
 		Node: node,
-		Key:  prop,
-		Val:  val,
 	}
 
-	for k, v := range ats {
-		m.Set(k, v)
+	if err := m.Validate(); err != nil {
+		return nil, err
 	}
 
-	return m, nil
+	return m, m.Validate()
+}
+
+func (p *Parser) NewMeta(node *Node) (*Meta, error) {
+	return NewMeta(node)
 }

@@ -5,15 +5,16 @@ import (
 	"fmt"
 	"io/fs"
 
+	"golang.org/x/net/html"
 	"golang.org/x/net/html/atom"
-)
-
-const (
-	File_Atom atom.Atom = 1421757657
 )
 
 type File struct {
 	*Node
+}
+
+func (File) Atom() atom.Atom {
+	return File_Atom
 }
 
 func (c *File) Source() (Source, bool) {
@@ -46,33 +47,34 @@ func (f *File) String() string {
 	return bb.String()
 }
 
-func (p *Parser) NewFile(node *Node) (*File, error) {
-	return NewFile(p.FS, node)
+func (f File) Validate(checks ...ValidatorFn) error {
+	checks = append(checks, DataValidator("file"))
+
+	return f.Node.Validate(html.ElementNode, checks...)
 }
 
-func NewFile(cab fs.StatFS, node *Node) (*File, error) {
-	if node == nil || node.Node == nil {
-		return nil, fmt.Errorf("file node can not be nil")
-	}
+func (f File) ValidateFS(cab fs.FS, checks ...ValidatorFn) error {
+	checks = append(checks, SourceValidator(cab, &f))
 
-	if node.Data != "file" {
-		return nil, fmt.Errorf("node is not a file %q", node.Data)
-	}
+	return f.Validate(checks...)
+}
 
-	node.DataAtom = File_Atom
-
+func NewFile(cab fs.FS, node *Node) (*File, error) {
 	fg := &File{
 		Node: node,
 	}
 
-	source, ok := fg.Source()
-	if !ok {
-		return nil, fmt.Errorf("file node has no src attribute")
-	}
+	err := fg.ValidateFS(cab)
 
-	if _, err := source.StatFile(cab); err != nil {
+	if err != nil {
 		return nil, err
 	}
 
-	return fg, nil
+	fg.Node.DataAtom = fg.Atom()
+
+	return fg, fg.ValidateFS(cab)
+}
+
+func (p *Parser) NewFile(node *Node) (*File, error) {
+	return NewFile(p.FS, node)
 }

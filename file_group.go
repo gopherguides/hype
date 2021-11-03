@@ -4,6 +4,7 @@ import (
 	"bytes"
 	"fmt"
 
+	"golang.org/x/net/html"
 	"golang.org/x/net/html/atom"
 )
 
@@ -40,26 +41,30 @@ func (fg *FileGroup) String() string {
 	return bb.String()
 }
 
-func (p *Parser) NewFileGroup(node *Node) (*FileGroup, error) {
-	if node == nil || node.Node == nil {
-		return nil, fmt.Errorf("file node can not be nil")
-	}
+func (fg FileGroup) Validate(checks ...ValidatorFn) error {
+	checks = append(checks,
+		DataValidator("filegroup"),
+		AttrValidator(Attributes{
+			"name": "*",
+		},
+		),
+	)
+	return fg.Node.Validate(html.ElementNode, checks...)
+}
 
-	if node.Data != "filegroup" {
-		return nil, fmt.Errorf("node is not a filegroup %q", node.Data)
-	}
+func (p *Parser) NewFileGroup(node *Node) (*FileGroup, error) {
 
 	fg := &FileGroup{
 		Node: node,
 	}
-	fg.Node.DataAtom = fg.Atom()
 
-	name, err := fg.Get("name")
+	err := fg.Validate()
+
 	if err != nil {
 		return nil, err
 	}
 
-	fg.name = name
+	fg.Node.DataAtom = fg.Atom()
 
-	return fg, nil
+	return fg, fg.Validate()
 }

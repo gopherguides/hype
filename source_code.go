@@ -86,30 +86,42 @@ func (c *SourceCode) String() string {
 	return sb.String()
 }
 
-func (p *Parser) NewSourceCode(node *Node) (*SourceCode, error) {
-	return NewSourceCode(p.FS, node, p.snippetRules)
+func (sc SourceCode) Validate(checks ...ValidatorFn) error {
+	fn := func(n *Node) error {
+
+		if _, ok := sc.Source(); !ok {
+			return fmt.Errorf("missing source: %v", sc)
+		}
+
+		if n, ok := sc.attrs["section"]; ok {
+			return fmt.Errorf("section is no longer supported, use snippet instead %s", n)
+		}
+
+		return nil
+	}
+
+	checks = append(checks, DataValidator("code"), fn)
+
+	return sc.Node.Validate(html.ElementNode, checks...)
+}
+
+func (sc SourceCode) ValidateFS(cab fs.FS, checks ...ValidatorFn) error {
+	checks = append(checks, SourceValidator(cab, &sc))
+	return sc.Validate(checks...)
 }
 
 func NewSourceCode(cab fs.ReadFileFS, node *Node, rules map[string]string) (*SourceCode, error) {
-	if node == nil || node.Node == nil {
-		return nil, fmt.Errorf("source code node can not be nil")
-	}
-
-	if node.Data != "code" {
-		return nil, fmt.Errorf("node is not code %v", node.Data)
-	}
-
 	c := &SourceCode{
 		Node: node,
+	}
+
+	if err := c.Validate(); err != nil {
+		return nil, err
 	}
 
 	src, err := c.Get("src")
 	if err != nil {
 		return nil, err
-	}
-
-	if n, ok := c.attrs["section"]; ok {
-		return nil, fmt.Errorf("section is no longer supported, use snippet instead %s", n)
 	}
 
 	if lang, ok := c.attrs["lang"]; ok {
@@ -154,5 +166,9 @@ func NewSourceCode(cab fs.ReadFileFS, node *Node, rules map[string]string) (*Sou
 
 	c.Children = Tags{text}
 
-	return c, nil
+	return c, c.ValidateFS(cab)
+}
+
+func (p *Parser) NewSourceCode(node *Node) (*SourceCode, error) {
+	return NewSourceCode(p.FS, node, p.snippetRules)
 }

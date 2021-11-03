@@ -31,6 +31,21 @@ type Tagger interface {
 
 type Tags []Tag
 
+func (tags Tags) Validate(checks ...ValidatorFn) error {
+	for _, t := range tags {
+		if v, ok := t.(Validatable); ok {
+			if err := v.Validate(checks...); err != nil {
+				return err
+			}
+		}
+
+		if err := t.GetChildren().Validate(checks...); err != nil {
+			return err
+		}
+	}
+	return nil
+}
+
 func (tags Tags) String() string {
 	s := make([]string, 0, len(tags))
 	for _, t := range tags {

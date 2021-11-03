@@ -1,11 +1,11 @@
 package hype
 
 import (
-	"encoding/json"
 	"fmt"
 	"strings"
 	"sync"
 
+	"github.com/gopherguides/hype/htmx"
 	"golang.org/x/net/html"
 	"golang.org/x/net/html/atom"
 )
@@ -23,10 +23,37 @@ type Node struct {
 	attrs    Attributes
 }
 
+func (n *Node) Validate(nt html.NodeType, validators ...ValidatorFn) error {
+	if n == nil {
+		return fmt.Errorf("nil node")
+	}
+
+	if n.Node == nil {
+		return fmt.Errorf("html node is nil: %v", n)
+	}
+
+	if nt == 0 {
+		return fmt.Errorf("invalid NodeType provided: %v", nt)
+	}
+
+	if n.Type != nt {
+		return fmt.Errorf("node type mismatch: %v != %v", n.Type, nt)
+	}
+
+	for _, v := range validators {
+		if err := v(n); err != nil {
+			return err
+		}
+	}
+
+	return nil
+}
+
 func cloneHTMLNode(n *html.Node) *html.Node {
 	if n == nil {
 		return nil
 	}
+
 	return &html.Node{
 		Attr:        n.Attr,
 		Data:        n.Data,
@@ -99,13 +126,18 @@ func (n *Node) DaNode() *Node {
 
 // Attrs returns a copy of the attributes, not the underlying attributes. Use Set to modify attributes.
 func (n *Node) Attrs() Attributes {
+	n.RLock()
+	defer n.RUnlock()
+
 	if n.attrs == nil {
 		return Attributes{}
 	}
+
 	ats := Attributes{}
 	for k, v := range n.attrs {
 		ats[k] = v
 	}
+
 	return ats
 }
 
@@ -120,14 +152,15 @@ func (n *Node) Set(key string, val string) {
 
 // Get a key from the attributes. Will error if the key doesn't exist.
 func (n *Node) Get(key string) (string, error) {
+	n.Lock()
+	if n.attrs == nil {
+		n.attrs = Attributes{}
+	}
+	n.Unlock()
+
 	n.RLock()
 	defer n.RUnlock()
-
-	if v, ok := n.Attrs()[key]; ok {
-		return v, nil
-	}
-
-	return "", fmt.Errorf("no attribute found %q", key)
+	return n.attrs.Get(key)
 }
 
 func NewNode(n *html.Node) *Node {
@@ -141,7 +174,7 @@ func NewNode(n *html.Node) *Node {
 }
 
 func (g Node) MarshalJSON() ([]byte, error) {
-	return json.Marshal(NewNodeJSON(g.Node))
+	return htmx.MarshalNode(g.Node)
 }
 
 func (p *Parser) ParseNode(node *html.Node) (Tag, error) {

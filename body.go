@@ -38,23 +38,19 @@ func (b Body) AsPage() *Page {
 	return p
 }
 
+func (b Body) Validate(checks ...ValidatorFn) error {
+	checks = append(checks, AtomValidator(atom.Body))
+	return b.Node.Validate(html.ElementNode, checks...)
+}
+
 func (p *Parser) NewBody(node *Node) (*Body, error) {
 	return NewBody(node)
 }
 
 func NewBody(node *Node) (*Body, error) {
-	if node == nil || node.Node == nil {
-		return nil, fmt.Errorf("body node can not be nil")
-	}
-
-	if node.Type != html.ElementNode {
-		return nil, fmt.Errorf("node is not an element node %v", node)
-	}
-
 	b := &Body{
 		Node: node,
 	}
 
-	return b, nil
-
+	return b, b.Validate()
 }

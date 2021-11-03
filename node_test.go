@@ -1,13 +1,74 @@
 package hype
 
 import (
+	"fmt"
 	"testing"
 	"testing/fstest"
 
+	"github.com/gopherguides/hype/htmx"
 	"github.com/markbates/fsx"
 	"github.com/stretchr/testify/require"
 	"golang.org/x/net/html"
+	"golang.org/x/net/html/atom"
 )
+
+func Test_Node_Nil(t *testing.T) {
+	t.Parallel()
+
+	table := []struct {
+		name  string
+		node  *Node
+		nt    html.NodeType
+		funs  []ValidatorFn
+		valid bool
+	}{
+		{name: "nil node", nt: html.ElementNode},
+		{
+			name: "nil html node",
+			node: &Node{},
+			nt:   html.ElementNode,
+		},
+		{
+			name: "incorrect node type",
+			node: &Node{
+				Node: htmx.TextNode("hi"),
+			},
+			nt: html.ElementNode,
+		},
+		{
+			name: "empty node type",
+			node: &Node{
+				Node: htmx.TextNode("hi"),
+			},
+		},
+		{
+			name: "atom validator",
+			node: &Node{
+				Node: htmx.ElementNode("div"),
+			},
+			nt: html.ElementNode,
+			funs: []ValidatorFn{
+				AtomValidator(atom.P),
+			},
+		},
+	}
+
+	for _, tt := range table {
+		t.Run(tt.name, func(t *testing.T) {
+			r := require.New(t)
+
+			err := tt.node.Validate(tt.nt, tt.funs...)
+
+			if tt.valid {
+				r.NoError(err)
+				return
+			}
+
+			r.Error(err)
+		})
+	}
+
+}
 
 func Test_Parser_ParseNode(t *testing.T) {
 	t.Parallel()
@@ -63,14 +124,14 @@ func Test_Node_String(t *testing.T) {
 	r.NotEmpty(exp)
 
 	act := doc.String()
-	// fmt.Println(act)
+	fmt.Println(act)
 	r.Equal(node_string_exp, act)
 }
 
 const (
 	node_string_exp = `<!doctype html5>
 <html lang="en"><head>
-    <meta charset="utf-8" content="utf-8" property="charset" />
+    <meta charset="utf-8" />
     <meta content="width=device-width, initial-scale=1" name="viewport" />
 
     <title>A Basic HTML5 Template</title>

@@ -2,8 +2,10 @@ package hype
 
 import (
 	"fmt"
+	"io/fs"
 	"path/filepath"
 
+	"golang.org/x/net/html"
 	"golang.org/x/net/html/atom"
 )
 
@@ -36,20 +38,26 @@ func (i Include) String() string {
 	}
 
 	return fmt.Sprintf("<include %s />", i.Attrs())
+}
 
+func (i Include) Validate(checks ...ValidatorFn) error {
+	checks = append(checks, DataValidator("include"))
+	return i.Node.Validate(html.ElementNode, checks...)
+}
+
+func (i Include) ValidateFS(fs fs.FS, checks ...ValidatorFn) error {
+	checks = append(checks, SourceValidator(fs, &i))
+	return i.Validate(checks...)
 }
 
 func (p *Parser) NewInclude(node *Node) (*Include, error) {
-	if node == nil || node.Node == nil {
-		return nil, fmt.Errorf("include node can not be nil")
-	}
-
-	if node.Data != "include" {
-		return nil, fmt.Errorf("node is not an include %q", node.Data)
-	}
 
 	i := &Include{
 		Node: node,
+	}
+
+	if err := i.ValidateFS(p.FS); err != nil {
+		return nil, err
 	}
 
 	node.DataAtom = i.Atom()
