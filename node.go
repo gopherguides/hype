@@ -18,7 +18,7 @@ type Nodes []*Node
 
 type Node struct {
 	*html.Node
-	*sync.RWMutex
+	sync.RWMutex
 	Children Tags
 	attrs    Attributes
 }
@@ -49,29 +49,10 @@ func (n *Node) Validate(nt html.NodeType, validators ...ValidatorFn) error {
 	return nil
 }
 
-func cloneHTMLNode(n *html.Node) *html.Node {
-	if n == nil {
-		return nil
-	}
-
-	return &html.Node{
-		Attr:        n.Attr,
-		Data:        n.Data,
-		DataAtom:    n.DataAtom,
-		FirstChild:  cloneHTMLNode(n.FirstChild),
-		LastChild:   cloneHTMLNode(n.LastChild),
-		Namespace:   n.Namespace,
-		NextSibling: cloneHTMLNode(n.NextSibling),
-		Parent:      n.Parent,
-		PrevSibling: n.PrevSibling,
-	}
-}
-
 func (n *Node) Clone() *Node {
 	node := &Node{
 		Children: n.Children,
-		Node:     cloneHTMLNode(n.Node),
-		RWMutex:  &sync.RWMutex{},
+		Node:     htmx.CloneNode(n.Node),
 		attrs:    n.Attrs(),
 	}
 	return node
@@ -165,15 +146,14 @@ func (n *Node) Get(key string) (string, error) {
 
 func NewNode(n *html.Node) *Node {
 	node := &Node{
-		Node:    n,
-		RWMutex: &sync.RWMutex{},
-		attrs:   NewAttributes(n),
+		Node:  n,
+		attrs: NewAttributes(n),
 	}
 
 	return node
 }
 
-func (g Node) MarshalJSON() ([]byte, error) {
+func (g *Node) MarshalJSON() ([]byte, error) {
 	return htmx.MarshalNode(g.Node)
 }
 
