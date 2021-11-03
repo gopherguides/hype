@@ -8,7 +8,6 @@ import (
 	"github.com/gopherguides/hype/htmx"
 	"github.com/stretchr/testify/require"
 	"golang.org/x/net/html"
-	"golang.org/x/net/html/atom"
 )
 
 func Test_Parser_NewDocument(t *testing.T) {
@@ -40,17 +39,19 @@ func Test_Parser_NewDocument(t *testing.T) {
 
 	dt, ok := doc.Children[0].(*DocType)
 	r.True(ok)
-	r.Equal("html5", dt.Data)
+
+	r.True(IsAtom(dt, "html5"))
 
 	html, ok := doc.Children[1].(*Element)
 	r.True(ok)
-	r.Equal("html", html.DataAtom.String())
+
+	r.True(IsAtom(html, "html"))
 
 	r.Len(html.Children, 3)
 
 	head := html.Children[0]
 	r.NotNil(head)
-	r.Equal(atom.Head, head.Atom())
+	r.True(IsAtom(head, "head"))
 
 	r.Len(head.GetChildren(), 29)
 

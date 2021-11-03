@@ -1,13 +1,13 @@
 package hype
 
 import (
-	"encoding/json"
 	"fmt"
 	"strings"
 	"sync"
 
+	"github.com/gopherguides/hype/atomx"
+	"github.com/gopherguides/hype/htmx"
 	"golang.org/x/net/html"
-	"golang.org/x/net/html/atom"
 )
 
 type Nodeable interface {
@@ -16,54 +16,70 @@ type Nodeable interface {
 
 type Nodes []*Node
 
+var _ Atomable = &Node{}
+
 type Node struct {
-	*html.Node
-	*sync.RWMutex
 	Children Tags
+	DataAtom Atom
 	attrs    Attributes
+	html     *html.Node
+	sync.RWMutex
 }
 
-func cloneHTMLNode(n *html.Node) *html.Node {
+func (n *Node) Type() html.NodeType {
+	if n == nil || n.html == nil {
+		return html.ErrorNode
+	}
+
+	return n.html.Type
+}
+
+func (n *Node) Validate(nt html.NodeType, validators ...ValidatorFn) error {
 	if n == nil {
-		return nil
+		return fmt.Errorf("nil node")
 	}
-	return &html.Node{
-		Attr:        n.Attr,
-		Data:        n.Data,
-		DataAtom:    n.DataAtom,
-		FirstChild:  cloneHTMLNode(n.FirstChild),
-		LastChild:   cloneHTMLNode(n.LastChild),
-		Namespace:   n.Namespace,
-		NextSibling: cloneHTMLNode(n.NextSibling),
-		Parent:      n.Parent,
-		PrevSibling: n.PrevSibling,
+
+	if n.html == nil {
+		return fmt.Errorf("html node is nil: %v", n)
 	}
+
+	if nt == 0 {
+		return fmt.Errorf("invalid NodeType provided: %v", nt)
+	}
+
+	if n.Type() != nt {
+		return fmt.Errorf("node type mismatch: %v != %v", n.Type(), nt)
+	}
+
+	for _, v := range validators {
+		if err := v(n); err != nil {
+			return err
+		}
+	}
+
+	return nil
 }
 
 func (n *Node) Clone() *Node {
 	node := &Node{
 		Children: n.Children,
-		Node:     cloneHTMLNode(n.Node),
-		RWMutex:  &sync.RWMutex{},
+		html:     htmx.CloneNode(n.html),
 		attrs:    n.Attrs(),
 	}
 	return node
 }
 
-func (n *Node) Atom() atom.Atom {
-	if n.Node != nil {
-		return n.DataAtom
-	}
-	return atom.Atom(0)
+func (n *Node) Atom() Atom {
+	n.RLock()
+	defer n.RUnlock()
+
+	return n.DataAtom
 }
 
 func (n *Node) StartTag() string {
 	sb := &strings.Builder{}
 
-	at := n.DataAtom.String()
-	if len(at) == 0 {
-		at = n.Data
-	}
+	at := n.Atom()
 
 	fmt.Fprintf(sb, "<%s", at)
 	ats := n.Attrs().String()
@@ -75,11 +91,7 @@ func (n *Node) StartTag() string {
 }
 
 func (n *Node) EndTag() string {
-	at := n.DataAtom.String()
-	if len(at) == 0 {
-		at = n.Data
-	}
-	return fmt.Sprintf("</%s>", at)
+	return fmt.Sprintf("</%s>", n.Atom())
 }
 
 func (n *Node) InlineTag() string {
@@ -99,13 +111,18 @@ func (n *Node) DaNode() *Node {
 
 // Attrs returns a copy of the attributes, not the underlying attributes. Use Set to modify attributes.
 func (n *Node) Attrs() Attributes {
+	n.RLock()
+	defer n.RUnlock()
+
 	if n.attrs == nil {
 		return Attributes{}
 	}
+
 	ats := Attributes{}
 	for k, v := range n.attrs {
 		ats[k] = v
 	}
+
 	return ats
 }
 
@@ -120,28 +137,33 @@ func (n *Node) Set(key string, val string) {
 
 // Get a key from the attributes. Will error if the key doesn't exist.
 func (n *Node) Get(key string) (string, error) {
+	n.Lock()
+	if n.attrs == nil {
+		n.attrs = Attributes{}
+	}
+	n.Unlock()
+
 	n.RLock()
 	defer n.RUnlock()
-
-	if v, ok := n.Attrs()[key]; ok {
-		return v, nil
-	}
-
-	return "", fmt.Errorf("no attribute found %q", key)
+	return n.attrs.Get(key)
 }
 
 func NewNode(n *html.Node) *Node {
 	node := &Node{
-		Node:    n,
-		RWMutex: &sync.RWMutex{},
-		attrs:   NewAttributes(n),
+		html:     n,
+		attrs:    NewAttributes(n),
+		DataAtom: atomx.UNKNOWN,
+	}
+
+	if n != nil {
+		node.DataAtom = Atom(n.Data)
 	}
 
 	return node
 }
 
-func (g Node) MarshalJSON() ([]byte, error) {
-	return json.Marshal(NewNodeJSON(g.Node))
+func (g *Node) MarshalJSON() ([]byte, error) {
+	return htmx.MarshalNode(g.html)
 }
 
 func (p *Parser) ParseNode(node *html.Node) (Tag, error) {

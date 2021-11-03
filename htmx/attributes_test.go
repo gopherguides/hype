@@ -96,6 +96,7 @@ func Test_Atributes_Matches(t *testing.T) {
 	}{
 		{name: "hit", query: query{"id": "1", "src": "foo.png"}},
 		{name: "miss", query: query{"id": "2", "src": "foo.png"}, err: true},
+		{name: "wild card", query: query{"id": "*"}},
 		{name: "empty"},
 	}
 
@@ -104,6 +105,43 @@ func Test_Atributes_Matches(t *testing.T) {
 			r := require.New(t)
 			b := ats.Matches(tt.query)
 			r.Equal(!tt.err, b)
+		})
+	}
+
+}
+
+func Test_Attributes_Get(t *testing.T) {
+	t.Parallel()
+
+	full := Attributes{
+		"id":  "1",
+		"src": "foo.png",
+	}
+
+	table := []struct {
+		name  string
+		attrs Attributes
+		exp   string
+		err   bool
+	}{
+		{name: "all good", attrs: full, exp: "1"},
+		{name: "nil attributes", err: true},
+		{name: "empty attributes", attrs: Attributes{}, err: true},
+	}
+
+	for _, tt := range table {
+		t.Run(tt.name, func(t *testing.T) {
+			r := require.New(t)
+
+			act, err := tt.attrs.Get("id")
+			if tt.err {
+				r.Error(err)
+				return
+			}
+
+			r.NoError(err)
+			r.Equal(tt.exp, act)
+
 		})
 	}
 

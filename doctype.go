@@ -13,23 +13,22 @@ type DocType struct {
 }
 
 func (dt DocType) String() string {
-	return fmt.Sprintf("<!doctype %s>\n", dt.Data)
+	return fmt.Sprintf("<!doctype %s>\n", dt.Atom())
+}
+
+func (dt DocType) Validate(checks ...ValidatorFn) error {
+	return dt.Node.Validate(html.DoctypeNode, checks...)
 }
 
 func (p *Parser) NewDocType(node *html.Node) (*DocType, error) {
 	return NewDocType(node)
 }
 
-func NewDocType(node *html.Node) (*DocType, error) {
-	if node == nil {
-		return nil, fmt.Errorf("node can not be nil")
+func NewDocType(n *html.Node) (*DocType, error) {
+
+	dt := &DocType{
+		Node: NewNode(n),
 	}
 
-	if node.Type != html.DoctypeNode {
-		return nil, fmt.Errorf("node is not a doctype node %v", node)
-	}
-
-	return &DocType{
-		Node: NewNode(node),
-	}, nil
+	return dt, dt.Validate()
 }

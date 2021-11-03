@@ -4,8 +4,8 @@ import (
 	"fmt"
 	"strings"
 
+	"github.com/gopherguides/hype/atomx"
 	"golang.org/x/net/html"
-	"golang.org/x/net/html/atom"
 )
 
 type Element struct {
@@ -13,8 +13,9 @@ type Element struct {
 }
 
 func (e Element) String() string {
-	switch e.DataAtom {
-	case atom.Link, atom.Img:
+	at := e.Atom()
+
+	if at.Is(atomx.Inlines()...) {
 		return e.InlineTag()
 	}
 
@@ -30,58 +31,59 @@ func (e Element) String() string {
 	return sb.String()
 }
 
-func (p *Parser) ElementNode(node *html.Node) (Tag, error) {
-	if node == nil {
-		return nil, fmt.Errorf("node can not be nil")
+func (e Element) Validate(checks ...ValidatorFn) error {
+	return e.Node.Validate(html.ElementNode, checks...)
+}
+
+func (p *Parser) ElementNode(n *html.Node) (Tag, error) {
+	node := NewNode(n)
+
+	err := node.Validate(html.ElementNode)
+	if err != nil {
+		return nil, err
 	}
 
-	if node.Type != html.ElementNode {
-		return nil, fmt.Errorf("node is not an element node %v", node)
-	}
-
-	g := NewNode(node)
-	c := node.FirstChild
+	c := n.FirstChild
 	for c != nil {
 		tag, err := p.ParseNode(c)
 		if err != nil {
 			return nil, err
 		}
-		g.Children = append(g.Children, tag)
+		node.Children = append(node.Children, tag)
 		c = c.NextSibling
 	}
 
 	p.RLock()
 	if ct := p.customTags; ct != nil {
-		if fn, ok := ct[node.Data]; ok {
+		if fn, ok := ct[n.Data]; ok {
 			p.RUnlock()
-			return fn(g)
+			return fn(node)
 		}
 	}
 	p.RUnlock()
 
-	switch node.DataAtom {
-	case atom.Img, atom.Image:
-		return p.NewImage(g)
-	case atom.Meta:
-		return p.NewMeta(g)
-	case atom.Code:
-		return p.NewCode(g)
-	case atom.Body:
-		return p.NewBody(g)
-	default:
-		switch node.Data {
-		case "file":
-			return p.NewFile(g)
-		case "filegroup":
-			return p.NewFileGroup(g)
-		case "include":
-			return p.NewInclude(g)
-		case "page":
-			return p.NewPage(g)
-		}
+	switch node.Atom() {
+	case atomx.Img, atomx.Image:
+		return p.NewImage(node)
+	case atomx.Meta:
+		return p.NewMeta(node)
+	case atomx.Code:
+		return p.NewCode(node)
+	case atomx.Body:
+		return p.NewBody(node)
+	case atomx.File:
+		return p.NewFile(node)
+	case atomx.Filegroup:
+		return p.NewFileGroup(node)
+	case atomx.Include:
+		return p.NewInclude(node)
+	case atomx.Page:
+		return p.NewPage(node)
 	}
 
-	return &Element{
-		Node: g,
-	}, nil
+	el := &Element{
+		Node: node,
+	}
+
+	return el, el.Validate()
 }

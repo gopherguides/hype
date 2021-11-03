@@ -71,3 +71,50 @@ func Test_Include_JSON(t *testing.T) {
 	r.NoError(err)
 	r.Equal(exp, string(b))
 }
+
+func Test_Include_Source(t *testing.T) {
+	t.Parallel()
+	r := require.New(t)
+
+	p := testParser(t, testdata)
+	doc, err := p.ParseFile("includes.md")
+	r.NoError(err)
+	r.NotNil(doc)
+
+	images := []string{
+		"includes/assets/paul.png",
+		"assets/foo.png",
+	}
+
+	files := []string{"includes/src/snippets.go"}
+	codes := []string{"includes/src/snippets.go"}
+
+	table := []struct {
+		name string
+		t    interface{}
+		exp  []string
+	}{
+		{name: "images", t: &Image{}, exp: images},
+		{name: "files", t: &File{}, exp: files},
+		{name: "codes", t: &SourceCode{}, exp: codes},
+	}
+
+	for _, tt := range table {
+		t.Run(tt.name, func(t *testing.T) {
+			r := require.New(t)
+
+			tags := doc.Children.ByType(tt.t)
+			r.Len(tags, len(tt.exp))
+
+			for i, exp := range tt.exp {
+
+				tag := tags[i]
+
+				act := tag.Attrs()["src"]
+				r.Equal(exp, act)
+			}
+
+		})
+	}
+
+}

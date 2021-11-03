@@ -5,7 +5,6 @@ import (
 
 	"github.com/gopherguides/hype/htmx"
 	"github.com/stretchr/testify/require"
-	"golang.org/x/net/html/atom"
 )
 
 func Test_IsAtom(t *testing.T) {
@@ -15,12 +14,12 @@ func Test_IsAtom(t *testing.T) {
 		name string
 		tag  Tag
 		exp  bool
-		want atom.Atom
+		want Atom
 	}{
 		{name: "nil"},
 		{
 			name: "valid",
-			want: atom.P,
+			want: "p",
 			exp:  true,
 			tag: &Element{
 				Node: NewNode(htmx.ElementNode("p")),
@@ -28,7 +27,7 @@ func Test_IsAtom(t *testing.T) {
 		},
 		{
 			name: "wrong atom",
-			want: atom.Div,
+			want: "div",
 			tag: &Element{
 				Node: NewNode(htmx.ElementNode("p")),
 			},
@@ -39,12 +38,12 @@ func Test_IsAtom(t *testing.T) {
 		t.Run(tt.name, func(t *testing.T) {
 			r := require.New(t)
 
-			r.Equal(tt.exp, IsAtom(tt.tag, tt.want))
+			r.Equal(tt.exp, IsAtom(tt.tag, Atom(tt.want)))
 		})
 	}
 }
 
-func Test_Tags_AllAtoms(t *testing.T) {
+func Test_Tags_AllAdam(t *testing.T) {
 	t.Parallel()
 	r := require.New(t)
 
@@ -53,35 +52,16 @@ func Test_Tags_AllAtoms(t *testing.T) {
 	doc, err := p.ParseFile("big.html")
 	r.NoError(err)
 
-	act := doc.Children.ByAtom(atom.P)
+	act := doc.Children.ByAtom("p")
 	r.Len(act, 41)
 
-	act = doc.Children.ByAtom(atom.Figure)
-	r.Len(act, 23)
-
-	act = doc.Children.ByAtom(atom.Textarea)
-	r.Len(act, 0)
-}
-
-func Test_Tags_AllData(t *testing.T) {
-	t.Parallel()
-	r := require.New(t)
-
-	p := testParser(t, testdata)
-
-	doc, err := p.ParseFile("big.html")
-	r.NoError(err)
-
-	act := doc.Children.ByData("p")
-	r.Len(act, 41)
-
-	act = doc.Children.ByData("title")
+	act = doc.Children.ByAtom("title")
 	r.Len(act, 1)
 
-	act = doc.Children.ByData("figure")
+	act = doc.Children.ByAtom("figure")
 	r.Len(act, 23)
 
-	act = doc.Children.ByData("textarea")
+	act = doc.Children.ByAtom("textarea")
 	r.Len(act, 0)
 }
 

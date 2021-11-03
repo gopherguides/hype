@@ -1,56 +1,56 @@
 package hype
 
 import (
-	"fmt"
 	"io/fs"
-	"strings"
 
-	"golang.org/x/net/html/atom"
+	"golang.org/x/net/html"
 )
+
+var _ SetSourceable = &Image{}
 
 type Image struct {
 	*Node
 }
 
-func (c *Image) Src() string {
+func (c *Image) Source() (Source, bool) {
 	c.RLock()
 	defer c.RUnlock()
-	return c.attrs["src"]
+	return SrcAttr(c.attrs)
+}
+
+func (c *Image) SetSource(s string) {
+	c.Lock()
+	defer c.Unlock()
+	c.attrs["src"] = s
 }
 
 func (i Image) String() string {
+	if i.Node == nil {
+		return "<img />"
+	}
 	return i.InlineTag()
 }
 
-func (p *Parser) NewImage(node *Node) (*Image, error) {
-	return NewImage(p.FS, node)
+func (i Image) Validate(checks ...ValidatorFn) error {
+	checks = append(checks, AdamValidator("img", "image"))
+	return i.Node.Validate(html.ElementNode, checks...)
 }
 
-func NewImage(cab fs.StatFS, node *Node) (*Image, error) {
-	if node == nil || node.Node == nil {
-		return nil, fmt.Errorf("image node can not be nil")
-	}
+func (i Image) ValidateFS(cab fs.FS, checks ...ValidatorFn) error {
+	checks = append(checks, SourceValidator(cab, &i))
 
-	if node.DataAtom != atom.Img {
-		return nil, fmt.Errorf("node is not an image %q", node.DataAtom.String())
-	}
+	return i.Validate(checks...)
+}
+
+func NewImage(cab fs.FS, node *Node) (*Image, error) {
 
 	i := &Image{
 		Node: node,
 	}
 
-	src, err := i.Get("src")
-	if err != nil {
-		return nil, err
-	}
+	return i, i.ValidateFS(cab)
+}
 
-	if strings.HasPrefix(src, "http") {
-		return i, nil
-	}
-
-	if _, err := cab.Stat(src); err != nil {
-		return nil, err
-	}
-
-	return i, nil
+func (p *Parser) NewImage(node *Node) (*Image, error) {
+	return NewImage(p.FS, node)
 }

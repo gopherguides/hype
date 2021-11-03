@@ -5,13 +5,14 @@ import (
 	"reflect"
 	"strings"
 
-	"golang.org/x/net/html/atom"
+	"github.com/gopherguides/hype/atomx"
 )
 
 type Tag interface {
-	Atomable
+	atomx.Atomable
 	Attrs() Attributes
 	GetChildren() Tags
+	Nodeable
 	fmt.Stringer
 }
 
@@ -30,6 +31,21 @@ type Tagger interface {
 
 type Tags []Tag
 
+func (tags Tags) Validate(checks ...ValidatorFn) error {
+	for _, t := range tags {
+		if v, ok := t.(Validatable); ok {
+			if err := v.Validate(checks...); err != nil {
+				return err
+			}
+		}
+
+		if err := t.GetChildren().Validate(checks...); err != nil {
+			return err
+		}
+	}
+	return nil
+}
+
 func (tags Tags) String() string {
 	s := make([]string, 0, len(tags))
 	for _, t := range tags {
@@ -38,29 +54,13 @@ func (tags Tags) String() string {
 	return strings.Join(s, "")
 }
 
-func (tags Tags) ByAtom(want atom.Atom) Tags {
+func (tags Tags) ByAtom(want Atom) Tags {
 	var res Tags
 	for _, t := range tags {
-		if IsAtom(t, want) {
+		if t.Atom() == want {
 			res = append(res, t)
 		}
 		res = append(res, t.GetChildren().ByAtom(want)...)
-	}
-	return res
-}
-
-func (tags Tags) ByData(want string) Tags {
-	var res Tags
-	for _, t := range tags {
-		na, ok := t.(Nodeable)
-		if !ok {
-			continue
-		}
-
-		if na.DaNode().Data == want {
-			res = append(res, t)
-		}
-		res = append(res, t.GetChildren().ByData(want)...)
 	}
 	return res
 }

@@ -1,14 +1,13 @@
 package hype
 
-import "golang.org/x/net/html/atom"
+import "github.com/gopherguides/hype/atomx"
 
-type Atomable interface {
-	Atom() atom.Atom
-}
+type (
+	Atom     = atomx.Atom
+	Atomable = atomx.Atomable
+	Atoms    = atomx.Atoms
+)
 
-func IsAtom(a Atomable, want atom.Atom) bool {
-	if a == nil {
-		return false
-	}
-	return a.Atom() == want
+func IsAtom(a Atomable, wants ...Atom) bool {
+	return atomx.IsAtom(a, wants...)
 }

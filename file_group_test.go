@@ -3,6 +3,7 @@ package hype
 import (
 	"testing"
 
+	"github.com/gopherguides/hype/atomx"
 	"github.com/stretchr/testify/require"
 )
 
@@ -18,7 +19,7 @@ func Test_FileGroup(t *testing.T) {
 	r.NoError(err)
 	r.NotNil(doc)
 
-	groups := doc.Children.ByAtom(FileGroup_Atom)
+	groups := doc.Children.ByAtom(atomx.Filegroup)
 	r.Len(groups, 1)
 
 	fg, ok := groups[0].(*FileGroup)

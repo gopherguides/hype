@@ -13,23 +13,21 @@ type Comment struct {
 }
 
 func (c Comment) String() string {
-	return fmt.Sprintf("<!-- %s -->", c.Data)
+	return fmt.Sprintf("<!-- %s -->", c.Atom())
+}
+
+func (c Comment) Validate(checks ...ValidatorFn) error {
+	return c.Node.Validate(html.CommentNode, checks...)
 }
 
 func (p *Parser) NewComment(node *html.Node) (*Comment, error) {
 	return NewComment(node)
 }
 
-func NewComment(node *html.Node) (*Comment, error) {
-	if node == nil {
-		return nil, fmt.Errorf("node can not be nil")
+func NewComment(n *html.Node) (*Comment, error) {
+	c := &Comment{
+		Node: NewNode(n),
 	}
 
-	if node.Type != html.CommentNode {
-		return nil, fmt.Errorf("node is not a comment node %v", node)
-	}
-
-	return &Comment{
-		Node: NewNode(node),
-	}, nil
+	return c, c.Validate()
 }

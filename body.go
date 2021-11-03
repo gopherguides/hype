@@ -4,8 +4,8 @@ import (
 	"fmt"
 	"strings"
 
+	"github.com/gopherguides/hype/atomx"
 	"golang.org/x/net/html"
-	"golang.org/x/net/html/atom"
 )
 
 var _ Tag = &Body{}
@@ -32,10 +32,14 @@ func (b Body) AsPage() *Page {
 		Node: b.Clone(),
 	}
 
-	p.Data = "page"
-	p.DataAtom = atom.Atom(0)
+	p.DataAtom = atomx.Page
 
 	return p
+}
+
+func (b Body) Validate(checks ...ValidatorFn) error {
+	checks = append(checks, AdamValidator("body"))
+	return b.Node.Validate(html.ElementNode, checks...)
 }
 
 func (p *Parser) NewBody(node *Node) (*Body, error) {
@@ -43,18 +47,9 @@ func (p *Parser) NewBody(node *Node) (*Body, error) {
 }
 
 func NewBody(node *Node) (*Body, error) {
-	if node == nil || node.Node == nil {
-		return nil, fmt.Errorf("body node can not be nil")
-	}
-
-	if node.Type != html.ElementNode {
-		return nil, fmt.Errorf("node is not an element node %v", node)
-	}
-
 	b := &Body{
 		Node: node,
 	}
 
-	return b, nil
-
+	return b, b.Validate()
 }

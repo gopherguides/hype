@@ -4,33 +4,33 @@ import (
 	"bytes"
 	"fmt"
 	"io/fs"
-	"strings"
 
-	"golang.org/x/net/html/atom"
-)
-
-const (
-	File_Atom atom.Atom = 1421757657
+	"github.com/gopherguides/hype/atomx"
+	"golang.org/x/net/html"
 )
 
 type File struct {
 	*Node
 }
 
-func (c *File) Src() string {
+func (c *File) Source() (Source, bool) {
 	c.RLock()
 	defer c.RUnlock()
-	return c.attrs["src"]
+	return SrcAttr(c.attrs)
 }
 
-func (c *File) SetSrc(src string) {
+func (c *File) SetSource(src string) {
 	c.Lock()
 	defer c.Unlock()
 
 	c.attrs["src"] = src
 }
 
-func (f File) String() string {
+func (f *File) String() string {
+	if f.Node == nil {
+		return "<file />"
+	}
+
 	bb := &bytes.Buffer{}
 
 	fmt.Fprint(bb, f.StartTag())
@@ -38,41 +38,31 @@ func (f File) String() string {
 	body := f.Children.String()
 
 	fmt.Fprint(bb, body)
+
 	fmt.Fprint(bb, f.EndTag())
 	return bb.String()
 }
 
-func (p *Parser) NewFile(node *Node) (*File, error) {
-	return NewFile(p.FS, node)
+func (f File) Validate(checks ...ValidatorFn) error {
+	checks = append(checks, AdamValidator(atomx.File))
+
+	return f.Node.Validate(html.ElementNode, checks...)
 }
 
-func NewFile(cab fs.StatFS, node *Node) (*File, error) {
-	if node == nil || node.Node == nil {
-		return nil, fmt.Errorf("file node can not be nil")
-	}
+func (f File) ValidateFS(cab fs.FS, checks ...ValidatorFn) error {
+	checks = append(checks, SourceValidator(cab, &f))
 
-	if node.Data != "file" {
-		return nil, fmt.Errorf("node is not a file %q", node.Data)
-	}
+	return f.Validate(checks...)
+}
 
-	node.DataAtom = File_Atom
-
+func NewFile(cab fs.FS, node *Node) (*File, error) {
 	fg := &File{
 		Node: node,
 	}
 
-	src, err := fg.Get("src")
-	if err != nil {
-		return nil, err
-	}
+	return fg, fg.ValidateFS(cab)
+}
 
-	if strings.HasPrefix(src, "http") {
-		return fg, nil
-	}
-
-	if _, err := cab.Stat(src); err != nil {
-		return nil, err
-	}
-
-	return fg, nil
+func (p *Parser) NewFile(node *Node) (*File, error) {
+	return NewFile(p.FS, node)
 }

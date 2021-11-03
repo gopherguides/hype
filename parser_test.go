@@ -4,7 +4,6 @@ import (
 	"testing"
 
 	"github.com/stretchr/testify/require"
-	"golang.org/x/net/html/atom"
 )
 
 func Test_Parser_ParseHTML(t *testing.T) {
@@ -21,17 +20,19 @@ func Test_Parser_ParseHTML(t *testing.T) {
 
 	dt, ok := doc.Children[0].(*DocType)
 	r.True(ok)
-	r.Equal("html5", dt.Data)
+	r.True(IsAtom(dt, "html5"))
 
 	html, ok := doc.Children[1].(*Element)
 	r.True(ok)
-	r.Equal(atom.Html, html.DataAtom)
+
+	r.True(IsAtom(html, "html"))
 
 	r.Len(html.Children, 3)
 
 	head := html.Children[0]
 	r.NotNil(head)
-	r.Equal(atom.Head, head.Atom())
+
+	r.True(IsAtom(head, "head"))
 
 	r.Len(head.GetChildren(), 29)
 
@@ -57,13 +58,13 @@ func Test_Parser_ParseMD(t *testing.T) {
 
 	html, ok := doc.Children[0].(*Element)
 	r.True(ok)
-	r.Equal(atom.Html, html.DataAtom)
+	r.True(IsAtom(html, "html"))
 
 	r.Len(html.Children, 2)
 
 	head := html.Children[0]
 	r.NotNil(head)
-	r.Equal(atom.Head, head.Atom())
+	r.True(IsAtom(head, "head"))
 
 	r.Len(head.GetChildren(), 0)
 
@@ -78,4 +79,39 @@ func Test_Parser_ParseMD(t *testing.T) {
 
 	r.Contains(act, "Basics of Running a Go Program")
 	r.Contains(act, "// 9 characters (including the space and comma)")
+}
+
+func Test_Parser_CustomTag(t *testing.T) {
+	t.Parallel()
+	r := require.New(t)
+
+	p := testParser(t, testdata)
+	p.SetCustomTag("newman", func(node *Node) (Tag, error) {
+		el := &Element{
+			Node: node,
+		}
+		return el, el.Validate()
+	})
+
+	p.SetCustomTag("leo:uncle", func(node *Node) (Tag, error) {
+		el := &Element{
+			Node: node,
+		}
+		return el, el.Validate()
+	})
+
+	doc, err := p.ParseFile("custom_tags.md")
+	r.NoError(err)
+	r.NotNil(doc)
+
+	newmans := doc.Children.ByAtom("newman")
+	r.Len(newmans, 1)
+	r.Equal(Atom("newman"), newmans[0].Atom())
+
+	leos := doc.Children.ByAtom("leo:uncle")
+	r.Len(leos, 1)
+	r.Equal(Atom("leo:uncle"), leos[0].Atom())
+
+	leos = doc.Children.ByAtom("leo")
+	r.Len(leos, 0)
 }

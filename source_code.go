@@ -4,9 +4,9 @@ import (
 	"bytes"
 	"fmt"
 	"io/fs"
-	"path/filepath"
 	"strings"
 
+	"github.com/gopherguides/hype/atomx"
 	"github.com/markbates/sweets"
 	"golang.org/x/net/html"
 )
@@ -16,14 +16,20 @@ var _ Tag = &SourceCode{}
 type SourceCode struct {
 	*Node
 	Snippets Snippets
-	Source   string // Full source of file
+	Body     string // Full source of file
 	lang     string
 }
 
-func (c *SourceCode) Src() string {
+func (c *SourceCode) Source() (Source, bool) {
 	c.RLock()
 	defer c.RUnlock()
-	return c.attrs["src"]
+	return SrcAttr(c.attrs)
+}
+
+func (c *SourceCode) SetSource(s string) {
+	c.Lock()
+	defer c.Unlock()
+	c.attrs["src"] = s
 }
 
 func (c *SourceCode) Lang() string {
@@ -31,11 +37,13 @@ func (c *SourceCode) Lang() string {
 		return c.lang
 	}
 
-	lang := filepath.Ext(c.Src())
-	lang = strings.TrimPrefix(lang, ".")
+	source, _ := c.Source()
+	lang := source.Lang()
+
 	c.Lock()
 	c.lang = lang
 	c.Unlock()
+
 	return lang
 }
 
@@ -54,6 +62,10 @@ func (c *SourceCode) EndTag() string {
 // String returns a properly formatted <code> tag.
 // If a snippet is defined on the original <code snippet="foo"> tag, then that snippet's content is used, otherwise the the Source code is used.
 func (c *SourceCode) String() string {
+	if c.Node == nil {
+		return "<code />"
+	}
+
 	sb := &strings.Builder{}
 
 	text := c.Children.String()
@@ -75,30 +87,42 @@ func (c *SourceCode) String() string {
 	return sb.String()
 }
 
-func (p *Parser) NewSourceCode(node *Node) (*SourceCode, error) {
-	return NewSourceCode(p.FS, node, p.snippetRules)
+func (sc SourceCode) Validate(checks ...ValidatorFn) error {
+	fn := func(n *Node) error {
+
+		if _, ok := sc.Source(); !ok {
+			return fmt.Errorf("missing source: %v", sc)
+		}
+
+		if n, ok := sc.attrs["section"]; ok {
+			return fmt.Errorf("section is no longer supported, use snippet instead %s", n)
+		}
+
+		return nil
+	}
+
+	checks = append(checks, AdamValidator(atomx.Code), fn)
+
+	return sc.Node.Validate(html.ElementNode, checks...)
+}
+
+func (sc SourceCode) ValidateFS(cab fs.FS, checks ...ValidatorFn) error {
+	checks = append(checks, SourceValidator(cab, &sc))
+	return sc.Validate(checks...)
 }
 
 func NewSourceCode(cab fs.ReadFileFS, node *Node, rules map[string]string) (*SourceCode, error) {
-	if node == nil || node.Node == nil {
-		return nil, fmt.Errorf("source code node can not be nil")
-	}
-
-	if node.Data != "code" {
-		return nil, fmt.Errorf("node is not code %v", node.Data)
-	}
-
 	c := &SourceCode{
 		Node: node,
+	}
+
+	if err := c.Validate(); err != nil {
+		return nil, err
 	}
 
 	src, err := c.Get("src")
 	if err != nil {
 		return nil, err
-	}
-
-	if n, ok := c.attrs["section"]; ok {
-		return nil, fmt.Errorf("section is no longer supported, use snippet instead %s", n)
 	}
 
 	if lang, ok := c.attrs["lang"]; ok {
@@ -113,7 +137,7 @@ func NewSourceCode(cab fs.ReadFileFS, node *Node, rules map[string]string) (*Sou
 	if err != nil {
 		return nil, err
 	}
-	c.Source = string(bytes.TrimSpace(b))
+	c.Body = string(bytes.TrimSpace(b))
 
 	snips, err := ParseSnippets(src, b, rules)
 	if err != nil {
@@ -143,5 +167,9 @@ func NewSourceCode(cab fs.ReadFileFS, node *Node, rules map[string]string) (*Sou
 
 	c.Children = Tags{text}
 
-	return c, nil
+	return c, c.ValidateFS(cab)
+}
+
+func (p *Parser) NewSourceCode(node *Node) (*SourceCode, error) {
+	return NewSourceCode(p.FS, node, p.snippetRules)
 }

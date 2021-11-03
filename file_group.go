@@ -4,21 +4,24 @@ import (
 	"bytes"
 	"fmt"
 
-	"golang.org/x/net/html/atom"
-)
-
-const (
-	FileGroup_Atom atom.Atom = 452184562
+	"github.com/gopherguides/hype/atomx"
+	"golang.org/x/net/html"
 )
 
 type FileGroup struct {
 	*Node
+	name string
 }
 
 func (fg *FileGroup) Name() string {
-	fg.RLock()
-	defer fg.RUnlock()
-	return fg.attrs["name"]
+	fg.Lock()
+	name := fg.name
+	if len(name) == 0 {
+		name = fg.attrs["name"]
+		fg.name = name
+	}
+	fg.Unlock()
+	return name
 }
 
 func (fg *FileGroup) String() string {
@@ -34,24 +37,22 @@ func (fg *FileGroup) String() string {
 	return bb.String()
 }
 
+func (fg FileGroup) Validate(checks ...ValidatorFn) error {
+	checks = append(checks,
+		AdamValidator(atomx.Filegroup),
+		AttrValidator(Attributes{
+			"name": "*",
+		},
+		),
+	)
+	return fg.Node.Validate(html.ElementNode, checks...)
+}
+
 func (p *Parser) NewFileGroup(node *Node) (*FileGroup, error) {
-	if node == nil || node.Node == nil {
-		return nil, fmt.Errorf("file node can not be nil")
-	}
-
-	if node.Data != "filegroup" {
-		return nil, fmt.Errorf("node is not a filegroup %q", node.Data)
-	}
-
-	node.DataAtom = FileGroup_Atom
 
 	fg := &FileGroup{
 		Node: node,
 	}
 
-	if _, err := fg.Get("name"); err != nil {
-		return nil, err
-	}
-
-	return fg, nil
+	return fg, fg.Validate()
 }

@@ -2,58 +2,64 @@ package hype
 
 import (
 	"fmt"
+	"io/fs"
 	"path/filepath"
 
-	"golang.org/x/net/html/atom"
-)
-
-const (
-	Include_Atom atom.Atom = 1818455657
+	"github.com/gopherguides/hype/atomx"
+	"golang.org/x/net/html"
 )
 
 type Include struct {
 	*Node
+	Data string
 }
 
-func (c *Include) Src() string {
+func (c *Include) Source() (Source, bool) {
 	c.RLock()
 	defer c.RUnlock()
-	return c.attrs["src"]
+	return SrcAttr(c.attrs)
 }
 
 func (i Include) String() string {
+	if i.Node == nil {
+		return "<include />"
+	}
+
 	kids := i.Children
 	if len(kids) > 0 {
 		return i.Children.String()
 	}
 
-	if len(i.Data) > 0 {
-		return i.Data
-	}
-
 	return fmt.Sprintf("<include %s />", i.Attrs())
+}
 
+func (i Include) Validate(checks ...ValidatorFn) error {
+	checks = append(checks, AdamValidator(atomx.Include))
+	return i.Node.Validate(html.ElementNode, checks...)
+}
+
+func (i Include) ValidateFS(fs fs.FS, checks ...ValidatorFn) error {
+	checks = append(checks, SourceValidator(fs, &i))
+	return i.Validate(checks...)
 }
 
 func (p *Parser) NewInclude(node *Node) (*Include, error) {
-	if node == nil || node.Node == nil {
-		return nil, fmt.Errorf("include node can not be nil")
-	}
-
-	if node.Data != "include" {
-		return nil, fmt.Errorf("node is not an include %q", node.Data)
-	}
 
 	i := &Include{
 		Node: node,
 	}
-	node.DataAtom = Include_Atom
-	src, err := i.Get("src")
-	if err != nil {
+
+	if err := i.ValidateFS(p.FS); err != nil {
 		return nil, err
 	}
 
-	ext := filepath.Ext(src)
+	source, ok := i.Source()
+	if !ok {
+		return nil, fmt.Errorf("include node has no source")
+	}
+
+	ext := source.Ext()
+	src := source.String()
 
 	switch ext {
 	case ".html", ".md":
@@ -67,8 +73,8 @@ func (p *Parser) NewInclude(node *Node) (*Include, error) {
 		return i, nil
 	}
 
-	base := filepath.Base(src)
-	dir := filepath.Dir(src)
+	base := source.Base()
+	dir := source.Dir()
 
 	p2, err := p.SubParser(dir)
 	if err != nil {
@@ -85,37 +91,28 @@ func (p *Parser) NewInclude(node *Node) (*Include, error) {
 		return nil, err
 	}
 
-	for _, code := range body.Children.ByType(&SourceCode{}) {
-		sc, ok := code.(*SourceCode)
-		if !ok {
-			continue
-		}
-		x := sc.Src()
-		x = filepath.Join(dir, x)
-		sc.Set("src", x)
-	}
-
-	for _, code := range body.Children.ByType(&Image{}) {
-		sc, ok := code.(*Image)
-		if !ok {
-			continue
-		}
-		x := sc.Src()
-		x = filepath.Join(dir, x)
-		sc.Set("src", x)
-	}
-
-	for _, code := range body.Children.ByType(&File{}) {
-		sc, ok := code.(*File)
-		if !ok {
-			continue
-		}
-		x := sc.Src()
-		x = filepath.Join(dir, x)
-		sc.SetSrc(x)
-	}
-
+	i.setSources(dir, body.Children)
 	i.Children = body.Children
 
 	return i, nil
+}
+
+func (i *Include) setSources(dir string, tags Tags) {
+	for _, tag := range tags {
+		i.setSources(dir, tag.GetChildren())
+
+		st, ok := tag.(SetSourceable)
+		if !ok {
+			continue
+		}
+
+		source, ok := st.Source()
+		if !ok {
+			continue
+		}
+
+		xs := filepath.Join(dir, source.String())
+
+		st.SetSource(xs)
+	}
 }

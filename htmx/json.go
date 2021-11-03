@@ -1,12 +1,10 @@
-package hype
+package htmx
 
 import (
 	"encoding/json"
 
 	"golang.org/x/net/html"
 )
-
-type jmap map[string]interface{}
 
 type NodeJSON struct {
 	Atom       string     `json:"atom,omitempty"`
@@ -20,6 +18,10 @@ type NodeJSON struct {
 func (node NodeJSON) String() string {
 	b, _ := json.Marshal(node)
 	return string(b)
+}
+
+func MarshalNode(node *html.Node) ([]byte, error) {
+	return json.Marshal(NewNodeJSON(node))
 }
 
 func NewNodeJSON(node *html.Node) NodeJSON {

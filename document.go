@@ -4,9 +4,9 @@ import (
 	"encoding/json"
 	"fmt"
 
+	"github.com/gopherguides/hype/htmx"
 	"github.com/markbates/fsx"
 	"golang.org/x/net/html"
-	"golang.org/x/net/html/atom"
 )
 
 // Document represents an HTML document
@@ -21,7 +21,7 @@ func (d Document) String() string {
 
 // Overview returns the contents of the first <overview> tag in the document.
 func (d *Document) Overview() string {
-	tags := d.Children.ByData("overview")
+	tags := d.Children.ByAtom("overview")
 	if len(tags) == 0 {
 		return ""
 	}
@@ -29,8 +29,8 @@ func (d *Document) Overview() string {
 }
 
 func (d Document) MarshalJSON() ([]byte, error) {
-	m := jmap{
-		"document": NewNodeJSON(d.Node.Node),
+	m := map[string]interface{}{
+		"document": htmx.NewNodeJSON(d.Node.html),
 		"fs":       d.FS,
 	}
 	return json.Marshal(m)
@@ -53,23 +53,33 @@ func (doc *Document) Meta() Metas {
 	return res
 }
 
-// NewDocument parses the node and returns a Document.
-// The node must be of type html.DocumentNode.
-func (p *Parser) NewDocument(node *html.Node) (*Document, error) {
-	if node == nil {
-		return nil, fmt.Errorf("node can not be nil")
+func (d Document) Validate(checks ...ValidatorFn) error {
+	fn := func(n *Node) error {
+
+		return nil
 	}
 
-	if node.Type != html.DocumentNode {
-		return nil, fmt.Errorf("node is not a document %v", node)
-	}
+	chocks := ChildrenValidators(d, checks...)
+	chocks = append(chocks, fn)
+	err := d.Node.Validate(html.DocumentNode, chocks...)
+
+	return err
+}
+
+// NewDocument parses the node and returns a Document.
+// The node must be of type html.DocumentNode.
+func (p *Parser) NewDocument(n *html.Node) (*Document, error) {
 
 	doc := &Document{
 		FS:   p.FS,
-		Node: NewNode(node),
+		Node: NewNode(n),
 	}
 
-	c := doc.Node.FirstChild
+	if err := doc.Validate(); err != nil {
+		return nil, err
+	}
+
+	c := doc.Node.html.FirstChild
 	for c != nil {
 		tag, err := p.ParseNode(c)
 		if err != nil {
@@ -79,7 +89,7 @@ func (p *Parser) NewDocument(node *html.Node) (*Document, error) {
 		c = c.NextSibling
 	}
 
-	return doc, nil
+	return doc, doc.Validate()
 }
 
 func (doc *Document) Body() (*Body, error) {
@@ -87,7 +97,7 @@ func (doc *Document) Body() (*Body, error) {
 		return nil, fmt.Errorf("document can not be nil")
 	}
 
-	bodies := doc.Children.ByAtom(atom.Body)
+	bodies := doc.Children.ByAtom("body")
 	if len(bodies) == 0 {
 		return nil, fmt.Errorf("body not found")
 	}
@@ -113,7 +123,7 @@ func (doc *Document) Pages() Pages {
 		return nil
 	}
 
-	pages := doc.Children.ByData("page")
+	pages := doc.Children.ByAtom("page")
 	res := make(Pages, 0, len(pages))
 
 	if len(pages) == 0 {
