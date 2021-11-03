@@ -5,7 +5,6 @@ import (
 	"strings"
 
 	"golang.org/x/net/html"
-	"golang.org/x/net/html/atom"
 )
 
 type Element struct {
@@ -13,8 +12,8 @@ type Element struct {
 }
 
 func (e Element) String() string {
-	switch e.DataAtom {
-	case atom.Link, atom.Img:
+	switch e.Adam() {
+	case "a", "img", "image", "link":
 		return e.InlineTag()
 	}
 
@@ -61,26 +60,23 @@ func (p *Parser) ElementNode(n *html.Node) (Tag, error) {
 	}
 	p.RUnlock()
 
-	switch n.DataAtom {
-	case atom.Img, atom.Image:
+	switch node.Adam() {
+	case "img", "image":
 		return p.NewImage(node)
-	case atom.Meta:
+	case "meta":
 		return p.NewMeta(node)
-	case atom.Code:
+	case Code_Adam:
 		return p.NewCode(node)
-	case atom.Body:
+	case "body":
 		return p.NewBody(node)
-	default:
-		switch n.Data {
-		case "file":
-			return p.NewFile(node)
-		case "filegroup":
-			return p.NewFileGroup(node)
-		case "include":
-			return p.NewInclude(node)
-		case "page":
-			return p.NewPage(node)
-		}
+	case File_Adam:
+		return p.NewFile(node)
+	case File_Group_Adam:
+		return p.NewFileGroup(node)
+	case Include_Adam:
+		return p.NewInclude(node)
+	case Page_Adam:
+		return p.NewPage(node)
 	}
 
 	el := &Element{

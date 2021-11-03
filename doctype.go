@@ -13,7 +13,7 @@ type DocType struct {
 }
 
 func (dt DocType) String() string {
-	return fmt.Sprintf("<!doctype %s>\n", dt.Data)
+	return fmt.Sprintf("<!doctype %s>\n", dt.Adam())
 }
 
 func (dt DocType) Validate(checks ...ValidatorFn) error {

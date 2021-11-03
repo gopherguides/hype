@@ -4,12 +4,10 @@ import (
 	"fmt"
 	"reflect"
 	"strings"
-
-	"golang.org/x/net/html/atom"
 )
 
 type Tag interface {
-	Atomable
+	Adamable
 	Attrs() Attributes
 	GetChildren() Tags
 	Nodeable
@@ -54,24 +52,24 @@ func (tags Tags) String() string {
 	return strings.Join(s, "")
 }
 
-func (tags Tags) ByAtom(want atom.Atom) Tags {
-	var res Tags
-	for _, t := range tags {
-		if IsAtom(t, want) {
-			res = append(res, t)
-		}
-		res = append(res, t.GetChildren().ByAtom(want)...)
-	}
-	return res
-}
+// func (tags Tags) ByAtom(want atom.Atom) Tags {
+// 	var res Tags
+// 	for _, t := range tags {
+// 		if IsAtom(t, want) {
+// 			res = append(res, t)
+// 		}
+// 		res = append(res, t.GetChildren().ByAtom(want)...)
+// 	}
+// 	return res
+// }
 
-func (tags Tags) ByData(want string) Tags {
+func (tags Tags) ByAdam(want Adam) Tags {
 	var res Tags
 	for _, t := range tags {
-		if t.DaNode().Data == want {
+		if t.Adam() == want {
 			res = append(res, t)
 		}
-		res = append(res, t.GetChildren().ByData(want)...)
+		res = append(res, t.GetChildren().ByAdam(want)...)
 	}
 	return res
 }

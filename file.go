@@ -5,17 +5,11 @@ import (
 	"fmt"
 	"io/fs"
 
-	"github.com/gopherguides/hype/atomx"
 	"golang.org/x/net/html"
-	"golang.org/x/net/html/atom"
 )
 
 type File struct {
 	*Node
-}
-
-func (File) Atom() atom.Atom {
-	return atomx.File
 }
 
 func (c *File) Source() (Source, bool) {
@@ -49,7 +43,7 @@ func (f *File) String() string {
 }
 
 func (f File) Validate(checks ...ValidatorFn) error {
-	checks = append(checks, DataValidator("file"))
+	checks = append(checks, AdamValidator(File_Adam))
 
 	return f.Node.Validate(html.ElementNode, checks...)
 }
@@ -64,14 +58,6 @@ func NewFile(cab fs.FS, node *Node) (*File, error) {
 	fg := &File{
 		Node: node,
 	}
-
-	err := fg.ValidateFS(cab)
-
-	if err != nil {
-		return nil, err
-	}
-
-	fg.Node.DataAtom = fg.Atom()
 
 	return fg, fg.ValidateFS(cab)
 }

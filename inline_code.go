@@ -28,7 +28,7 @@ func (c *InlineCode) String() string {
 }
 
 func (inc InlineCode) Validate(checks ...ValidatorFn) error {
-	checks = append(checks, DataValidator("code"))
+	checks = append(checks, AdamValidator(Code_Adam))
 	return inc.Node.Validate(html.ElementNode, checks...)
 }
 

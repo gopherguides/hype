@@ -5,17 +5,12 @@ import (
 	"io/fs"
 	"path/filepath"
 
-	"github.com/gopherguides/hype/atomx"
 	"golang.org/x/net/html"
-	"golang.org/x/net/html/atom"
 )
 
 type Include struct {
 	*Node
-}
-
-func (i *Include) Atom() atom.Atom {
-	return atomx.Include
+	Data string
 }
 
 func (c *Include) Source() (Source, bool) {
@@ -34,15 +29,11 @@ func (i Include) String() string {
 		return i.Children.String()
 	}
 
-	if len(i.Data) > 0 {
-		return i.Data
-	}
-
 	return fmt.Sprintf("<include %s />", i.Attrs())
 }
 
 func (i Include) Validate(checks ...ValidatorFn) error {
-	checks = append(checks, DataValidator("include"))
+	checks = append(checks, AdamValidator(Include_Adam))
 	return i.Node.Validate(html.ElementNode, checks...)
 }
 
@@ -60,8 +51,6 @@ func (p *Parser) NewInclude(node *Node) (*Include, error) {
 	if err := i.ValidateFS(p.FS); err != nil {
 		return nil, err
 	}
-
-	node.DataAtom = i.Atom()
 
 	source, ok := i.Source()
 	if !ok {

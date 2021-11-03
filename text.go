@@ -21,7 +21,7 @@ func (t Text) String() string {
 	if t.Node == nil {
 		return ""
 	}
-	return t.Node.Data
+	return t.html.Data
 }
 
 func (t Text) Validate(checks ...ValidatorFn) error {

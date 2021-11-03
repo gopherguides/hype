@@ -4,7 +4,6 @@ import (
 	"testing"
 
 	"github.com/stretchr/testify/require"
-	"golang.org/x/net/html/atom"
 )
 
 func Test_Parser_ParseHTML(t *testing.T) {
@@ -21,17 +20,19 @@ func Test_Parser_ParseHTML(t *testing.T) {
 
 	dt, ok := doc.Children[0].(*DocType)
 	r.True(ok)
-	r.Equal("html5", dt.Data)
+	r.True(IsAdam(dt, "html5"))
 
 	html, ok := doc.Children[1].(*Element)
 	r.True(ok)
-	r.Equal(atom.Html, html.DataAtom)
+
+	r.True(IsAdam(html, "html"))
 
 	r.Len(html.Children, 3)
 
 	head := html.Children[0]
 	r.NotNil(head)
-	r.Equal(atom.Head, head.Atom())
+
+	r.True(IsAdam(head, "head"))
 
 	r.Len(head.GetChildren(), 29)
 
@@ -57,13 +58,13 @@ func Test_Parser_ParseMD(t *testing.T) {
 
 	html, ok := doc.Children[0].(*Element)
 	r.True(ok)
-	r.Equal(atom.Html, html.DataAtom)
+	r.True(IsAdam(html, "html"))
 
 	r.Len(html.Children, 2)
 
 	head := html.Children[0]
 	r.NotNil(head)
-	r.Equal(atom.Head, head.Atom())
+	r.True(IsAdam(head, "head"))
 
 	r.Len(head.GetChildren(), 0)
 

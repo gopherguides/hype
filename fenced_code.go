@@ -42,7 +42,7 @@ func (c *FencedCode) Lang() string {
 }
 
 func (fc FencedCode) Validate(checks ...ValidatorFn) error {
-	checks = append(checks, DataValidator("code"))
+	checks = append(checks, AdamValidator("code"))
 	return fc.Node.Validate(html.ElementNode, checks...)
 }
 

@@ -3,7 +3,6 @@ package hype
 import (
 	"testing"
 
-	"github.com/gopherguides/hype/atomx"
 	"github.com/stretchr/testify/require"
 )
 
@@ -19,7 +18,7 @@ func Test_File(t *testing.T) {
 	r.NoError(err)
 	r.NotNil(doc)
 
-	files := doc.Children.ByAtom(atomx.File)
+	files := doc.Children.ByAdam(File_Adam)
 	r.Len(files, 2)
 
 	f, ok := files[0].(*File)

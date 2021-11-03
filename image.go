@@ -4,7 +4,6 @@ import (
 	"io/fs"
 
 	"golang.org/x/net/html"
-	"golang.org/x/net/html/atom"
 )
 
 var _ SetSourceable = &Image{}
@@ -33,7 +32,7 @@ func (i Image) String() string {
 }
 
 func (i Image) Validate(checks ...ValidatorFn) error {
-	checks = append(checks, AtomValidator(atom.Img))
+	checks = append(checks, AdamValidator("img", "image"))
 	return i.Node.Validate(html.ElementNode, checks...)
 }
 

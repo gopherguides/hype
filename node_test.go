@@ -1,7 +1,6 @@
 package hype
 
 import (
-	"fmt"
 	"testing"
 	"testing/fstest"
 
@@ -9,7 +8,6 @@ import (
 	"github.com/markbates/fsx"
 	"github.com/stretchr/testify/require"
 	"golang.org/x/net/html"
-	"golang.org/x/net/html/atom"
 )
 
 func Test_Node_Nil(t *testing.T) {
@@ -31,24 +29,24 @@ func Test_Node_Nil(t *testing.T) {
 		{
 			name: "incorrect node type",
 			node: &Node{
-				Node: htmx.TextNode("hi"),
+				html: htmx.TextNode("hi"),
 			},
 			nt: html.ElementNode,
 		},
 		{
 			name: "empty node type",
 			node: &Node{
-				Node: htmx.TextNode("hi"),
+				html: htmx.TextNode("hi"),
 			},
 		},
 		{
 			name: "atom validator",
 			node: &Node{
-				Node: htmx.ElementNode("div"),
+				html: htmx.ElementNode("div"),
 			},
 			nt: html.ElementNode,
 			funs: []ValidatorFn{
-				AtomValidator(atom.P),
+				AdamValidator("p"),
 			},
 		},
 	}
@@ -124,7 +122,7 @@ func Test_Node_String(t *testing.T) {
 	r.NotEmpty(exp)
 
 	act := doc.String()
-	fmt.Println(act)
+	// fmt.Println(act)
 	r.Equal(node_string_exp, act)
 }
 

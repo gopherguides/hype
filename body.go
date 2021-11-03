@@ -5,7 +5,6 @@ import (
 	"strings"
 
 	"golang.org/x/net/html"
-	"golang.org/x/net/html/atom"
 )
 
 var _ Tag = &Body{}
@@ -32,14 +31,13 @@ func (b Body) AsPage() *Page {
 		Node: b.Clone(),
 	}
 
-	p.Data = "page"
-	p.DataAtom = atom.Atom(0)
+	p.DataAdam = Page_Adam
 
 	return p
 }
 
 func (b Body) Validate(checks ...ValidatorFn) error {
-	checks = append(checks, AtomValidator(atom.Body))
+	checks = append(checks, AdamValidator("body"))
 	return b.Node.Validate(html.ElementNode, checks...)
 }
 

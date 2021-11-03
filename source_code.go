@@ -100,7 +100,7 @@ func (sc SourceCode) Validate(checks ...ValidatorFn) error {
 		return nil
 	}
 
-	checks = append(checks, DataValidator("code"), fn)
+	checks = append(checks, AdamValidator(Code_Adam), fn)
 
 	return sc.Node.Validate(html.ElementNode, checks...)
 }

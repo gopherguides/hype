@@ -7,7 +7,6 @@ import (
 	"github.com/gopherguides/hype/htmx"
 	"github.com/markbates/fsx"
 	"golang.org/x/net/html"
-	"golang.org/x/net/html/atom"
 )
 
 // Document represents an HTML document
@@ -22,7 +21,7 @@ func (d Document) String() string {
 
 // Overview returns the contents of the first <overview> tag in the document.
 func (d *Document) Overview() string {
-	tags := d.Children.ByData("overview")
+	tags := d.Children.ByAdam("overview")
 	if len(tags) == 0 {
 		return ""
 	}
@@ -31,7 +30,7 @@ func (d *Document) Overview() string {
 
 func (d Document) MarshalJSON() ([]byte, error) {
 	m := map[string]interface{}{
-		"document": htmx.NewNodeJSON(d.Node.Node),
+		"document": htmx.NewNodeJSON(d.Node.html),
 		"fs":       d.FS,
 	}
 	return json.Marshal(m)
@@ -84,7 +83,7 @@ func (p *Parser) NewDocument(n *html.Node) (*Document, error) {
 		return nil, err
 	}
 
-	c := doc.Node.FirstChild
+	c := doc.Node.html.FirstChild
 	for c != nil {
 		tag, err := p.ParseNode(c)
 		if err != nil {
@@ -102,7 +101,7 @@ func (doc *Document) Body() (*Body, error) {
 		return nil, fmt.Errorf("document can not be nil")
 	}
 
-	bodies := doc.Children.ByAtom(atom.Body)
+	bodies := doc.Children.ByAdam("body")
 	if len(bodies) == 0 {
 		return nil, fmt.Errorf("body not found")
 	}
@@ -128,7 +127,7 @@ func (doc *Document) Pages() Pages {
 		return nil
 	}
 
-	pages := doc.Children.ByData("page")
+	pages := doc.Children.ByAdam("page")
 	res := make(Pages, 0, len(pages))
 
 	if len(pages) == 0 {

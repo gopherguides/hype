@@ -4,18 +4,12 @@ import (
 	"bytes"
 	"fmt"
 
-	"github.com/gopherguides/hype/atomx"
 	"golang.org/x/net/html"
-	"golang.org/x/net/html/atom"
 )
 
 type FileGroup struct {
 	*Node
 	name string
-}
-
-func (FileGroup) Atom() atom.Atom {
-	return atomx.FileGroup
 }
 
 func (fg *FileGroup) Name() string {
@@ -44,7 +38,7 @@ func (fg *FileGroup) String() string {
 
 func (fg FileGroup) Validate(checks ...ValidatorFn) error {
 	checks = append(checks,
-		DataValidator("filegroup"),
+		AdamValidator(File_Group_Adam),
 		AttrValidator(Attributes{
 			"name": "*",
 		},
@@ -58,14 +52,6 @@ func (p *Parser) NewFileGroup(node *Node) (*FileGroup, error) {
 	fg := &FileGroup{
 		Node: node,
 	}
-
-	err := fg.Validate()
-
-	if err != nil {
-		return nil, err
-	}
-
-	fg.Node.DataAtom = fg.Atom()
 
 	return fg, fg.Validate()
 }

@@ -4,8 +4,6 @@ import (
 	"fmt"
 	"io/fs"
 	"net/http"
-
-	"golang.org/x/net/html/atom"
 )
 
 type ValidatorFn func(n *Node) error
@@ -22,22 +20,11 @@ type ValidatableHTTP interface {
 	ValidateHTTP(client *http.Client) error
 }
 
-func AtomValidator(a atom.Atom) ValidatorFn {
+func AdamValidator(adams ...Adam) ValidatorFn {
 	return func(n *Node) error {
 
-		if !IsAtom(n, a) {
-			return fmt.Errorf("expected atom %q, got %q", a.String(), n.Atom().String())
-		}
-
-		return nil
-	}
-}
-
-func DataValidator(data string) ValidatorFn {
-	return func(n *Node) error {
-
-		if n.Data != data {
-			return fmt.Errorf("expected data %q, got %q", data, n.Data)
+		if !IsAdam(n, adams...) {
+			return fmt.Errorf("expected adam(s) %q, got %q", adams, n.Adam())
 		}
 
 		return nil

@@ -7,7 +7,6 @@ import (
 
 	"github.com/gopherguides/hype/htmx"
 	"golang.org/x/net/html"
-	"golang.org/x/net/html/atom"
 )
 
 type Nodeable interface {
@@ -17,10 +16,19 @@ type Nodeable interface {
 type Nodes []*Node
 
 type Node struct {
-	*html.Node
-	sync.RWMutex
 	Children Tags
+	DataAdam Adam
 	attrs    Attributes
+	html     *html.Node
+	sync.RWMutex
+}
+
+func (n *Node) Type() html.NodeType {
+	if n == nil || n.html == nil {
+		return html.ErrorNode
+	}
+
+	return n.html.Type
 }
 
 func (n *Node) Validate(nt html.NodeType, validators ...ValidatorFn) error {
@@ -28,7 +36,7 @@ func (n *Node) Validate(nt html.NodeType, validators ...ValidatorFn) error {
 		return fmt.Errorf("nil node")
 	}
 
-	if n.Node == nil {
+	if n.html == nil {
 		return fmt.Errorf("html node is nil: %v", n)
 	}
 
@@ -36,8 +44,8 @@ func (n *Node) Validate(nt html.NodeType, validators ...ValidatorFn) error {
 		return fmt.Errorf("invalid NodeType provided: %v", nt)
 	}
 
-	if n.Type != nt {
-		return fmt.Errorf("node type mismatch: %v != %v", n.Type, nt)
+	if n.Type() != nt {
+		return fmt.Errorf("node type mismatch: %v != %v", n.Type(), nt)
 	}
 
 	for _, v := range validators {
@@ -52,23 +60,23 @@ func (n *Node) Validate(nt html.NodeType, validators ...ValidatorFn) error {
 func (n *Node) Clone() *Node {
 	node := &Node{
 		Children: n.Children,
-		Node:     htmx.CloneNode(n.Node),
+		html:     htmx.CloneNode(n.html),
 		attrs:    n.Attrs(),
 	}
 	return node
 }
 
-func (n *Node) Atom() atom.Atom {
-	if n.Node != nil {
-		return n.DataAtom
-	}
-	return atom.Atom(0)
+func (n *Node) Adam() Adam {
+	n.RLock()
+	defer n.RUnlock()
+
+	return n.DataAdam
 }
 
 func (n *Node) StartTag() string {
 	sb := &strings.Builder{}
 
-	at := n.Data
+	at := n.Adam()
 
 	fmt.Fprintf(sb, "<%s", at)
 	ats := n.Attrs().String()
@@ -80,7 +88,7 @@ func (n *Node) StartTag() string {
 }
 
 func (n *Node) EndTag() string {
-	return fmt.Sprintf("</%s>", n.Data)
+	return fmt.Sprintf("</%s>", n.Adam())
 }
 
 func (n *Node) InlineTag() string {
@@ -139,15 +147,20 @@ func (n *Node) Get(key string) (string, error) {
 
 func NewNode(n *html.Node) *Node {
 	node := &Node{
-		Node:  n,
-		attrs: NewAttributes(n),
+		html:     n,
+		attrs:    NewAttributes(n),
+		DataAdam: ERROR_ADAM,
+	}
+
+	if n != nil {
+		node.DataAdam = Adam(n.Data)
 	}
 
 	return node
 }
 
 func (g *Node) MarshalJSON() ([]byte, error) {
-	return htmx.MarshalNode(g.Node)
+	return htmx.MarshalNode(g.html)
 }
 
 func (p *Parser) ParseNode(node *html.Node) (Tag, error) {
