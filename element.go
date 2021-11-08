@@ -59,9 +59,6 @@ func (p *Parser) ElementNode(n *html.Node) (Tag, error) {
 	}
 
 	switch node.Atom() {
-
-	case atomx.File:
-		return p.NewFile(node)
 	case atomx.Filegroup:
 		return p.NewFileGroup(node)
 	case atomx.Include:
