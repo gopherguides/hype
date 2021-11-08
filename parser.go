@@ -62,6 +62,10 @@ func (p *Parser) init() {
 		p.customTags[atomx.Include] = func(node *Node) (Tag, error) {
 			return NewInclude(node, p)
 		}
+
+		p.customTags[atomx.Page] = func(node *Node) (Tag, error) {
+			return NewPage(node)
+		}
 	})
 }
 

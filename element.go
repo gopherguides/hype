@@ -53,14 +53,8 @@ func (p *Parser) ElementNode(n *html.Node) (Tag, error) {
 		c = c.NextSibling
 	}
 
-	fn, ok := p.CustomTag(atomx.Atom(n.Data))
-	if ok {
+	if fn, ok := p.CustomTag(atomx.Atom(n.Data)); ok {
 		return fn(node)
-	}
-
-	switch node.Atom() {
-	case atomx.Page:
-		return p.NewPage(node)
 	}
 
 	el := &Element{
