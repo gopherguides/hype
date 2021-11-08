@@ -111,7 +111,7 @@ func (sc SourceCode) ValidateFS(cab fs.FS, checks ...ValidatorFn) error {
 	return sc.Validate(checks...)
 }
 
-func NewSourceCode(cab fs.ReadFileFS, node *Node, rules map[string]string) (*SourceCode, error) {
+func NewSourceCode(cab fs.FS, node *Node, rules map[string]string) (*SourceCode, error) {
 	c := &SourceCode{
 		Node: node,
 	}
@@ -133,7 +133,7 @@ func NewSourceCode(cab fs.ReadFileFS, node *Node, rules map[string]string) (*Sou
 	c.Set("language", lang)
 	c.Set("class", fmt.Sprintf("language-%s", lang))
 
-	b, err := cab.ReadFile(src)
+	b, err := fs.ReadFile(cab, src)
 	if err != nil {
 		return nil, err
 	}
@@ -168,8 +168,4 @@ func NewSourceCode(cab fs.ReadFileFS, node *Node, rules map[string]string) (*Sou
 	c.Children = Tags{text}
 
 	return c, c.ValidateFS(cab)
-}
-
-func (p *Parser) NewSourceCode(node *Node) (*SourceCode, error) {
-	return NewSourceCode(p.FS, node, p.snippetRules)
 }

@@ -45,7 +45,7 @@ func Test_NewCode(t *testing.T) {
 			r := require.New(t)
 
 			p := testParser(t, testdata)
-			c, err := p.NewCode(tt.node)
+			c, err := NewCode(tt.node, p)
 
 			if tt.err {
 				r.Error(err)

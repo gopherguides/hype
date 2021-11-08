@@ -34,9 +34,7 @@ func Test_Parser_NewFencedCode(t *testing.T) {
 		t.Run(tt.name, func(t *testing.T) {
 			r := require.New(t)
 
-			p := testParser(t, testdata)
-
-			sc, err := p.NewFencedCode(tt.node)
+			sc, err := NewFencedCode(tt.node)
 			if tt.err {
 				r.Error(err)
 				return

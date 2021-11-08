@@ -46,10 +46,6 @@ func (fc FencedCode) Validate(checks ...ValidatorFn) error {
 	return fc.Node.Validate(html.ElementNode, checks...)
 }
 
-func (p *Parser) NewFencedCode(node *Node) (*FencedCode, error) {
-	return NewFencedCode(node)
-}
-
 func NewFencedCode(node *Node) (*FencedCode, error) {
 	c := &FencedCode{
 		Node: node,

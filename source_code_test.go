@@ -50,9 +50,7 @@ func Test_Parser_NewSourceCode(t *testing.T) {
 		t.Run(tt.name, func(t *testing.T) {
 			r := require.New(t)
 
-			p := testParser(t, testdata)
-
-			sc, err := p.NewSourceCode(NewNode(tt.node))
+			sc, err := NewSourceCode(testdata, NewNode(tt.node), nil)
 			if tt.err {
 				r.Error(err)
 				return

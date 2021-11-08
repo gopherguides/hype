@@ -33,9 +33,7 @@ func Test_Parser_NewInlineCode(t *testing.T) {
 		t.Run(tt.name, func(t *testing.T) {
 			r := require.New(t)
 
-			p := testParser(t, testdata)
-
-			sc, err := p.NewInlineCode(tt.node)
+			sc, err := NewInlineCode(tt.node)
 			if tt.err {
 				r.Error(err)
 				return
