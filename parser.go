@@ -54,6 +54,10 @@ func (p *Parser) init() {
 		p.customTags[atomx.File] = func(node *Node) (Tag, error) {
 			return NewFile(p.FS, node)
 		}
+
+		p.customTags[atomx.Filegroup] = func(node *Node) (Tag, error) {
+			return NewFileGroup(node)
+		}
 	})
 }
 
