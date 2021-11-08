@@ -59,10 +59,6 @@ func (p *Parser) ElementNode(n *html.Node) (Tag, error) {
 	}
 
 	switch node.Atom() {
-	case atomx.Img, atomx.Image:
-		return p.NewImage(node)
-	// case atomx.Meta:
-	// 	return p.NewMeta(node)
 	case atomx.Code:
 		return p.NewCode(node)
 	case atomx.Body:

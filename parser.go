@@ -35,6 +35,12 @@ func (p *Parser) init() {
 		p.customTags[atomx.Meta] = func(node *Node) (Tag, error) {
 			return NewMeta(node)
 		}
+		img := func(node *Node) (Tag, error) {
+			return NewImage(p.FS, node)
+		}
+
+		p.customTags[atomx.Img] = img
+		p.customTags[atomx.Image] = img
 
 	})
 }
