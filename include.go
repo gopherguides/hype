@@ -43,7 +43,7 @@ func (i Include) ValidateFS(fs fs.FS, checks ...ValidatorFn) error {
 	return i.Validate(checks...)
 }
 
-func (p *Parser) NewInclude(node *Node) (*Include, error) {
+func NewInclude(node *Node, p *Parser) (*Include, error) {
 
 	i := &Include{
 		Node: node,

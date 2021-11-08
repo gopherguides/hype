@@ -58,6 +58,10 @@ func (p *Parser) init() {
 		p.customTags[atomx.Filegroup] = func(node *Node) (Tag, error) {
 			return NewFileGroup(node)
 		}
+
+		p.customTags[atomx.Include] = func(node *Node) (Tag, error) {
+			return NewInclude(node, p)
+		}
 	})
 }
 
