@@ -46,6 +46,10 @@ func (p *Parser) init() {
 		p.customTags[atomx.Code] = func(node *Node) (Tag, error) {
 			return NewCode(node, p)
 		}
+
+		p.customTags[atomx.Body] = func(node *Node) (Tag, error) {
+			return NewBody(node)
+		}
 	})
 }
 

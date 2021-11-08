@@ -42,10 +42,6 @@ func (b Body) Validate(checks ...ValidatorFn) error {
 	return b.Node.Validate(html.ElementNode, checks...)
 }
 
-func (p *Parser) NewBody(node *Node) (*Body, error) {
-	return NewBody(node)
-}
-
 func NewBody(node *Node) (*Body, error) {
 	b := &Body{
 		Node: node,

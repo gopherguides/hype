@@ -60,8 +60,6 @@ func (p *Parser) ElementNode(n *html.Node) (Tag, error) {
 
 	switch node.Atom() {
 
-	case atomx.Body:
-		return p.NewBody(node)
 	case atomx.File:
 		return p.NewFile(node)
 	case atomx.Filegroup:
