@@ -53,20 +53,16 @@ func (p *Parser) ElementNode(n *html.Node) (Tag, error) {
 		c = c.NextSibling
 	}
 
-	p.RLock()
-	if ct := p.customTags; ct != nil {
-		if fn, ok := ct[n.Data]; ok {
-			p.RUnlock()
-			return fn(node)
-		}
+	fn, ok := p.CustomTag(atomx.Atom(n.Data))
+	if ok {
+		return fn(node)
 	}
-	p.RUnlock()
 
 	switch node.Atom() {
 	case atomx.Img, atomx.Image:
 		return p.NewImage(node)
-	case atomx.Meta:
-		return p.NewMeta(node)
+	// case atomx.Meta:
+	// 	return p.NewMeta(node)
 	case atomx.Code:
 		return p.NewCode(node)
 	case atomx.Body:

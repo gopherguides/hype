@@ -7,26 +7,43 @@ import (
 	"path/filepath"
 	"sync"
 
+	"github.com/gopherguides/hype/atomx"
 	"github.com/markbates/fsx"
 	"golang.org/x/net/html"
 )
 
-type CustomTagFn func(node *Node) (Tag, error)
-
 // Parser will convert HTML documents into, easy to use, nice types.
 type Parser struct {
 	*fsx.FS
-	*sync.RWMutex
-	customTags   map[string]CustomTagFn
+	sync.RWMutex
+	customTags   TagMap
 	snippetRules map[string]string
+	once         sync.Once
 }
 
-func (p *Parser) SetCustomTag(name string, fn CustomTagFn) {
+func (p *Parser) init() {
+	p.once.Do(func() {
+
+		if p.snippetRules == nil {
+			p.snippetRules = map[string]string{}
+		}
+
+		if p.customTags == nil {
+			p.customTags = TagMap{}
+		}
+
+		p.customTags[atomx.Meta] = func(node *Node) (Tag, error) {
+			return NewMeta(node)
+		}
+
+	})
+}
+
+func (p *Parser) SetCustomTag(atom atomx.Atom, fn CustomTagFn) {
+	p.init()
+
 	p.Lock()
-	if p.customTags == nil {
-		p.customTags = map[string]CustomTagFn{}
-	}
-	p.customTags[name] = fn
+	p.customTags[atom] = fn
 	p.Unlock()
 }
 
@@ -62,8 +79,7 @@ func NewParser(cab fs.FS) (*Parser, error) {
 
 	p := &Parser{
 		FS:         fsx.NewFS(cab),
-		RWMutex:    &sync.RWMutex{},
-		customTags: map[string]CustomTagFn{},
+		customTags: TagMap{},
 		snippetRules: map[string]string{
 			".html": "<!-- %s -->",
 			".go":   "// %s",
@@ -101,10 +117,21 @@ func (p *Parser) ParseFile(name string) (*Document, error) {
 }
 
 func (p *Parser) ParseReader(r io.ReadCloser) (*Document, error) {
+	p.init()
 	node, err := html.Parse(r)
 	if err != nil {
 		return nil, err
 	}
 
 	return p.NewDocument(node)
+}
+
+func (p *Parser) CustomTag(atom atomx.Atom) (CustomTagFn, bool) {
+	p.init()
+
+	p.Lock()
+	defer p.Unlock()
+
+	fn, ok := p.customTags[atom]
+	return fn, ok
 }
