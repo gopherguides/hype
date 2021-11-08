@@ -10,7 +10,7 @@ require (
 	github.com/markbates/sweets v0.0.0-20210926032915-062eb9bcc0e5
 	github.com/russross/blackfriday/v2 v2.1.0
 	github.com/stretchr/testify v1.7.0
-	golang.org/x/net v0.0.0-20211015210444-4f30a5c0130f
+	golang.org/x/net v0.0.0-20211108170745-6635138e15ea
 )
 
 require (
