@@ -118,7 +118,7 @@ func Test_Parser_Godoc(t *testing.T) {
 	exp := expOutput
 	act := doc.String()
 
-	// fmt.Println(act)
+	fmt.Println(act)
 	r.Equal(exp, act)
 
 }
@@ -133,9 +133,9 @@ Some text
 // Go Version:		1.17.3
 // Documentation:	<a href="https://pkg.go.dev/io#EOF" target="_blank">https://pkg.go.dev/io#EOF</a>
 
-package io // import &#34;io&#34;
+package io // import "io"
 
-var EOF = errors.New(&#34;EOF&#34;)
+var EOF = errors.New("EOF")
     EOF is the error returned by Read when no more input is available. (Read
     must return EOF itself, not an error wrapping EOF, because callers will test
     for EOF using ==.) Functions should return EOF only to signal a graceful end

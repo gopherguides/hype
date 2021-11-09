@@ -1,15 +1,8 @@
 package golang
 
 import (
-	"bytes"
-	"context"
-	"fmt"
-	"html"
 	"io"
 	"os"
-	"os/exec"
-	"strings"
-	"time"
 )
 
 type StdIO struct {
@@ -61,29 +54,4 @@ func WithErr(i *StdIO, w io.Writer) *StdIO {
 	}
 	i.err = w
 	return i
-}
-
-func execute(ctx context.Context, std *StdIO, args ...string) error {
-	ctx, cancel := context.WithTimeout(ctx, 5*time.Minute)
-	defer cancel()
-
-	c := exec.CommandContext(ctx, "go", args...)
-
-	bb := &bytes.Buffer{}
-
-	c.Stdout = bb
-	c.Stderr = std.Err()
-	c.Stdin = std.In()
-
-	err := c.Run()
-
-	if err != nil {
-		cargs := strings.Join(c.Args, " ")
-		return fmt.Errorf("$ %s: %w", cargs, err)
-	}
-
-	s := html.EscapeString(bb.String())
-	io.Copy(std.Out(), strings.NewReader(s))
-
-	return nil
 }

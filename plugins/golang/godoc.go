@@ -133,10 +133,6 @@ func NewGodoc(n *hype.Node) (*Godoc, error) {
 
 	if b, err := os.ReadFile(fp); err == nil {
 
-		// gd.Children = hype.Tags{
-		// 	hype.QuickText(string(b)),
-		// }
-
 		qt := hype.QuickText(string(b))
 
 		gd.Children = append(gd.Children, qt)
@@ -199,7 +195,10 @@ func (d *Godoc) Doc(ctx context.Context, src string, flags ...string) (string, e
 	args = append(args, pk)
 
 	bb := &bytes.Buffer{}
-	fmt.Fprintf(bb, "$ go %s\n\n", strings.Join(args, " "))
+
+	r := NewRunner(args...)
+
+	fmt.Fprintf(bb, "$ %s\n\n", r)
 
 	v := strings.TrimPrefix(runtime.Version(), "go")
 	fmt.Fprintf(bb, "// Go Version:\t\t%s\n", v)
@@ -207,9 +206,9 @@ func (d *Godoc) Doc(ctx context.Context, src string, flags ...string) (string, e
 	u := fmt.Sprintf("https://pkg.go.dev/%s", src)
 	fmt.Fprintf(bb, "// Documentation:\t<a href=%[1]q target=\"_blank\">%[1]s</a>\n\n", u)
 
-	std := WithOut(&StdIO{}, bb)
+	r.IO = WithOut(r.IO, bb)
 
-	if err := execute(ctx, std, args...); err != nil {
+	if err := r.Run(ctx); err != nil {
 		return "", err
 	}
 

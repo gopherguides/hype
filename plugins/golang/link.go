@@ -78,7 +78,6 @@ func NewLink(node *hype.Node) (*Link, error) {
 	a.Children = hype.Tags{code}
 
 	link.Children = hype.Tags{a}
-	// link.Children = append(link.Children, a)
 
 	return link, link.Validate()
 }
