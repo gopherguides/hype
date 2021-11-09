@@ -10,8 +10,6 @@ import (
 	"golang.org/x/net/html"
 )
 
-const LINK hype.Atom = "godoc#a"
-
 var _ hype.Tag = &Link{}
 
 type Link struct {

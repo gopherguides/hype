@@ -17,8 +17,6 @@ import (
 var _ hype.Tag = &Godoc{}
 var _ hype.Sourceable = &Godoc{}
 
-const GODOC hype.Atom = "godoc"
-
 const cacheDir = ".godoc-cache"
 
 func CachePath() (string, error) {
