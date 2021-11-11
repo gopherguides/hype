@@ -35,9 +35,7 @@ func Test_Godoc_CleanFlags(t *testing.T) {
 		t.Run(tt.name, func(t *testing.T) {
 			r := require.New(t)
 
-			g := &Godoc{}
-
-			act := g.CleanFlags(tt.flags...)
+			act := CleanFlags(tt.flags...)
 
 			r.Equal(tt.exp, act)
 		})
@@ -47,14 +45,12 @@ func Test_Godoc_CleanFlags(t *testing.T) {
 
 func Test_Godoc(t *testing.T) {
 	t.Parallel()
-
+	t.Skip()
 	r := require.New(t)
 
 	root, err := CachePath()
 	r.NoError(err)
-
-	// cleanup existing cache
-	os.RemoveAll(root)
+	// os.RemoveAll(root)
 
 	table := []struct {
 		root  string
@@ -94,14 +90,14 @@ func Test_Godoc(t *testing.T) {
 
 func Test_Parser_Godoc(t *testing.T) {
 	t.Parallel()
+	t.Skip()
 	r := require.New(t)
 
 	var root = filepath.Join("testdata", "godoc.parser.test")
 
 	cab := os.DirFS(root)
 
-	p, err := hype.NewParser(cab)
-	r.NoError(err)
+	p := testParser(t, cab, root)
 
 	p.SetCustomTag("godoc", func(node *hype.Node) (hype.Tag, error) {
 		return NewGodoc(node)
@@ -118,7 +114,7 @@ func Test_Parser_Godoc(t *testing.T) {
 	exp := expOutput
 	act := doc.String()
 
-	fmt.Println(act)
+	// fmt.Println(act)
 	r.Equal(exp, act)
 
 }

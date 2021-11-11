@@ -1,0 +1,91 @@
+<html><head></head><body>
+<page>
+
+<h1>Testing Go Run!</h1>
+
+<ul>
+<li>exec: command to run - required</li>
+<li>dir: directory to run the command in, defaults to current directory</li>
+<li>hide-stdout: hide stdout output, defaults to false</li>
+<li>hide-stderr: hide stderr output, defaults to false</li>
+<li>hide-cmd: hide the command used to run the command, defaults to false</li>
+</ul>
+
+<cmd dir="./cmd" exec="go run main.go print.go" hide-cmd="">CACHE!
+<cmd dir="./cmd" exec="go run main.go print.go" hide-cmd="">
+
+<p>As we can see from the output, the command was executed successfully.</p>
+
+<pre><code class="language-plain" language="plain">-------
+STDOUT:
+
+stdout-> Hello, World!
+
+-------
+STDERR:
+
+stderr-> Hello, Error!</code></pre></cmd></cmd>
+
+<p>more text</p>
+
+<cmd dir="./cmd" exec="go run -tags sad .">CACHE!
+<cmd dir="./cmd" exec="go run -tags sad .">
+
+<p>As we can see from the output, the command failed.</p>
+
+<pre><code class="language-plain" language="plain">$ go run -tags sad .
+
+-------
+STDERR:
+
+boom!
+exit status 255</code></pre></cmd></cmd>
+
+<p>even more output!</p>
+
+<cmd dir="./cmd" exec="tree">CACHE!
+<cmd dir="./cmd" exec="tree"><pre><code class="language-plain" language="plain">$ tree
+
+-------
+STDOUT:
+
+.
+|-- go.mod
+|-- main.go
+|-- print.go
+`-- print_error.go
+
+0 directories, 4 files</code></pre></cmd></cmd>
+
+<p>clean the pwd</p>
+
+<cmd dir="./cmd" exec="pwd">CACHE!
+<cmd dir="./cmd" exec="pwd"><pre><code class="language-plain" language="plain">$ pwd
+
+-------
+STDOUT:
+
+cmd</code></pre></cmd></cmd>
+
+<p>skip stderr</p>
+
+<cmd dir="./cmd" exec="go run main.go print.go" hide-stdout="">CACHE!
+<cmd dir="./cmd" exec="go run main.go print.go" hide-cmd="">
+
+<p>As we can see from the output, the command was executed successfully.</p>
+
+<pre><code class="language-plain" language="plain">-------
+STDOUT:
+
+stdout-> Hello, World!
+
+-------
+STDERR:
+
+stderr-> Hello, Error!</code></pre></cmd></cmd>
+
+</page><!--BREAK-->
+
+
+</body>
+</html>

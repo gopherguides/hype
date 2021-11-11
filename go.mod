@@ -5,17 +5,21 @@ go 1.17
 // replace github.com/markbates/sweets => ../sweets
 
 require (
+	github.com/gobuffalo/flect v0.2.4
 	github.com/markbates/cleo v0.0.0-20210908183044-d564be950acc
 	github.com/markbates/fsx v1.0.0
 	github.com/markbates/sweets v0.0.0-20210926032915-062eb9bcc0e5
 	github.com/russross/blackfriday/v2 v2.1.0
 	github.com/stretchr/testify v1.7.0
-	golang.org/x/net v0.0.0-20211108170745-6635138e15ea
+	golang.org/x/mod v0.5.1
+	golang.org/x/net v0.0.0-20211109214657-ef0fda0de508
 )
 
 require (
 	github.com/davecgh/go-spew v1.1.1 // indirect
+	github.com/gosimple/hashdir v1.0.1 // indirect
 	github.com/kr/pretty v0.3.0 // indirect
+	github.com/mattn/go-shellwords v1.0.12 // indirect
 	github.com/pmezard/go-difflib v1.0.0 // indirect
 	github.com/rogpeppe/go-internal v1.8.0 // indirect
 	gopkg.in/check.v1 v1.0.0-20201130134442-10cb98267c6c // indirect

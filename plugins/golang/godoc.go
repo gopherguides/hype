@@ -6,7 +6,6 @@ import (
 	"fmt"
 	"os"
 	"path/filepath"
-	"runtime"
 	"strings"
 	"time"
 
@@ -17,20 +16,10 @@ import (
 var _ hype.Tag = &Godoc{}
 var _ hype.Sourceable = &Godoc{}
 
-const cacheDir = ".godoc-cache"
-
-func CachePath() (string, error) {
-	root, err := os.UserHomeDir()
-	if err != nil {
-		return "", err
-	}
-	fp := filepath.Join(root, cacheDir, runtime.Version())
-	return fp, nil
-}
-
 type Godoc struct {
 	*hype.Node
 	cache string
+	flags []string
 }
 
 func (gd Godoc) Source() (hype.Source, bool) {
@@ -59,33 +48,22 @@ func (gd Godoc) String() string {
 	return bb.String()
 }
 
-func (g *Godoc) Validate(checks ...hype.ValidatorFn) error {
-	if g == nil {
-		return fmt.Errorf("Godoc is nil")
+func (gd *Godoc) Validate(checks ...hype.ValidatorFn) error {
+	if gd == nil {
+		return fmt.Errorf("godoc is nil")
 	}
 
-	_, ok := hype.TagSource(g)
+	_, ok := hype.TagSource(gd)
 	if !ok {
-		return fmt.Errorf("godoc is not a tag source %v", g)
+		return fmt.Errorf("%s is not a tag source %v", gd.Atom(), gd)
 	}
 
 	checks = append(checks, hype.AtomValidator(GODOC))
-	return g.Node.Validate(html.ElementNode, checks...)
-}
-
-func (d Godoc) CleanFlags(flags ...string) []string {
-	res := make([]string, 0, len(flags))
-	for _, s := range flags {
-		s = strings.TrimSpace(s)
-		if len(s) > 0 {
-			res = append(res, s)
-		}
-	}
-	return res
+	return gd.Node.Validate(html.ElementNode, checks...)
 }
 
 // github.com/gobuffalo/buffalo.App/Name.short.all.godoc
-func (d Godoc) key(pkg string, flags ...string) string {
+func (gd Godoc) key(pkg string, flags ...string) string {
 	var sep string = string(filepath.Separator)
 
 	fp := strings.ReplaceAll(pkg, "#", sep)
@@ -117,15 +95,14 @@ func NewGodoc(n *hype.Node) (*Godoc, error) {
 
 	source, ok := gd.Source()
 	if !ok {
-		return nil, fmt.Errorf("godoc is not a sourceable %v", gd)
+		return nil, fmt.Errorf("%s is not a sourceable %v", gd.Atom(), gd)
 	}
 
-	var flags []string
 	if f, err := gd.Get("flags"); err == nil {
-		flags = gd.CleanFlags(strings.Split(f, ",")...)
+		gd.flags = CleanFlags(strings.Split(f, ",")...)
 	}
 
-	key := gd.key(source.String(), flags...)
+	key := gd.key(source.String(), gd.flags...)
 
 	fp := filepath.Join(root, key)
 
@@ -150,7 +127,7 @@ func NewGodoc(n *hype.Node) (*Godoc, error) {
 		return nil, err
 	}
 
-	s, err := gd.Doc(ctx, string(source), flags...)
+	s, err := gd.Doc(ctx, string(source), gd.flags...)
 	if err != nil {
 		return nil, err
 	}
@@ -171,22 +148,21 @@ func NewGodoc(n *hype.Node) (*Godoc, error) {
 	return gd, gd.Validate()
 }
 
-func (d *Godoc) Doc(ctx context.Context, src string, flags ...string) (string, error) {
-	if d == nil {
+func (gd *Godoc) Doc(ctx context.Context, src string, flags ...string) (string, error) {
+	if gd == nil {
 		return "", fmt.Errorf("doctor is nil")
 	}
 
 	ctx, cancel := context.WithTimeout(ctx, 30*time.Second)
 	defer cancel()
 
-	defer d.tidy(ctx)
+	defer gd.tidy(ctx)
 
-	if err := d.goGet(ctx, src); err != nil {
+	if err := gd.goGet(ctx, src); err != nil {
 		return "", err
 	}
 
-	args := []string{"doc"}
-	args = append(args, d.CleanFlags(flags...)...)
+	args := CleanFlags(flags...)
 
 	pk := strings.ReplaceAll(src, "#", ".")
 	pk = strings.TrimSpace(pk)
@@ -194,24 +170,30 @@ func (d *Godoc) Doc(ctx context.Context, src string, flags ...string) (string, e
 
 	bb := &bytes.Buffer{}
 
-	r := NewRunner(args...)
+	r := NewCommander("doc", args...)
 
-	fmt.Fprintf(bb, "$ %s\n\n", r)
+	// fmt.Fprintf(bb, "$ %s\n\n", r)
 
-	v := strings.TrimPrefix(runtime.Version(), "go")
-	fmt.Fprintf(bb, "// Go Version:\t\t%s\n", v)
+	// v := strings.TrimPrefix(runtime.Version(), "go")
+	// fmt.Fprintf(bb, "// Go Version:\t\t%s\n", v)
 
-	u := fmt.Sprintf("https://pkg.go.dev/%s", src)
-	fmt.Fprintf(bb, "// Documentation:\t<a href=%[1]q target=\"_blank\">%[1]s</a>\n\n", u)
+	// u := fmt.Sprintf("https://pkg.go.dev/%s", src)
+	// fmt.Fprintf(bb, "// Documentation:\t<a href=%[1]q target=\"_blank\">%[1]s</a>\n\n", u)
 
 	r.IO = WithOut(r.IO, bb)
 
-	if err := r.Run(ctx); err != nil {
+	if err := r.Run(ctx, cacheDir); err != nil {
 		return "", err
 	}
 
 	val := bb.String()
-	return val, nil
+	e := Envelope{
+		Body: val,
+		Cmd:  r.Cmd(ctx),
+		Doc:  src,
+	}
+
+	return e.String(), nil
 }
 
 // /*

@@ -36,6 +36,7 @@ func WithIn(i *StdIO, r io.Reader) *StdIO {
 	if i == nil {
 		i = &StdIO{}
 	}
+
 	i.in = r
 	return i
 }
@@ -44,6 +45,11 @@ func WithOut(i *StdIO, w io.Writer) *StdIO {
 	if i == nil {
 		i = &StdIO{}
 	}
+
+	if i.out != nil {
+		w = io.MultiWriter(w, i.out)
+	}
+
 	i.out = w
 	return i
 }
@@ -52,6 +58,11 @@ func WithErr(i *StdIO, w io.Writer) *StdIO {
 	if i == nil {
 		i = &StdIO{}
 	}
+
+	if i.err != nil {
+		w = io.MultiWriter(w, i.err)
+	}
+
 	i.err = w
 	return i
 }
