@@ -10,7 +10,7 @@ import (
 
 func Test_Cmd_Tag(t *testing.T) {
 	t.Parallel()
-	// t.Skip()
+	t.Skip()
 	r := require.New(t)
 
 	os.RemoveAll("~/.hype")
