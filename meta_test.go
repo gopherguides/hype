@@ -2,20 +2,17 @@ package hype
 
 import (
 	"testing"
-	"testing/fstest"
 
 	"github.com/gopherguides/hype/htmx"
 	"github.com/stretchr/testify/require"
 )
 
-func Test_Parser_NewMeta(t *testing.T) {
+func Test_NewMeta(t *testing.T) {
 	t.Parallel()
 
 	r := require.New(t)
 
-	p := testParser(t, fstest.MapFS{})
-
-	_, err := p.NewMeta(nil)
+	_, err := NewMeta(nil)
 	r.Error(err)
 
 	const key = `props`
@@ -42,7 +39,7 @@ func Test_Parser_NewMeta(t *testing.T) {
 
 			node := NewNode(n)
 
-			m, err := p.NewMeta(node)
+			m, err := NewMeta(node)
 			if tt.err {
 				r.Error(err)
 				return

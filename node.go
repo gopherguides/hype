@@ -126,6 +126,15 @@ func (n *Node) Attrs() Attributes {
 	return ats
 }
 
+func (n *Node) Delete(key string) {
+	n.Lock()
+	defer n.Unlock()
+	if n.attrs == nil {
+		n.attrs = Attributes{}
+	}
+	delete(n.attrs, key)
+}
+
 func (n *Node) Set(key string, val string) {
 	n.Lock()
 	defer n.Unlock()

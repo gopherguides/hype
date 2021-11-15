@@ -9,7 +9,7 @@ type Code interface {
 	Lang() string
 }
 
-func (p *Parser) NewCode(node *Node) (Code, error) {
+func NewCode(node *Node, p *Parser) (Code, error) {
 	err := node.Validate(html.ElementNode, AtomValidator("code"))
 
 	if err != nil {
@@ -19,12 +19,12 @@ func (p *Parser) NewCode(node *Node) (Code, error) {
 	ats := node.Attrs()
 
 	if len(ats) == 0 {
-		return p.NewInlineCode(node)
+		return NewInlineCode(node)
 	}
 
 	if _, ok := ats["src"]; ok {
-		return p.NewSourceCode(node)
+		return NewSourceCode(p.FS, node, p.snippetRules)
 	}
 
-	return p.NewFencedCode(node)
+	return NewFencedCode(node)
 }

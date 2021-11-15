@@ -57,7 +57,3 @@ func NewPage(node *Node) (*Page, error) {
 
 	return p, p.Validate()
 }
-
-func (p *Parser) NewPage(node *Node) (*Page, error) {
-	return NewPage(node)
-}

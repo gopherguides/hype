@@ -40,7 +40,3 @@ func NewInlineCode(node *Node) (*InlineCode, error) {
 
 	return c, c.Validate()
 }
-
-func (p *Parser) NewInlineCode(node *Node) (*InlineCode, error) {
-	return NewInlineCode(node)
-}

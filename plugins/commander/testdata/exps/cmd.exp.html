@@ -1,0 +1,120 @@
+<html><head></head><body>
+<page>
+
+<h1>Testing Go Run!</h1>
+
+<ul>
+<li>exec: command to run - required</li>
+<li>dir: directory to run the command in, defaults to current directory</li>
+<li>hide-stdout: hide stdout output, defaults to false</li>
+<li>hide-stderr: hide stderr output, defaults to false</li>
+<li>hide-cmd: hide the command used to run the command, defaults to false</li>
+</ul>
+
+<p>more text</p>
+
+<cmd exec="go run -tags sad ." src="./cmd">
+
+<p>As we can see from the output, the command failed.</p>
+
+<pre><code class="language-plain" language="plain">$ go run -tags sad .
+
+-------
+STDERR:
+
+boom!
+exit status 255
+
+-------
+duration: 470.932264ms
+go:       go1.17.3</code></pre></cmd>
+
+<p>even more output!</p>
+
+<cmd exec="tree" src="./cmd"><pre><code class="language-plain" language="plain">$ tree
+
+.
+|-- go.mod
+|-- main.go
+|-- print.go
+`-- print_error.go
+
+0 directories, 4 files
+
+-------
+duration: 4.976271ms</code></pre></cmd>
+
+<p>clean the pwd</p>
+
+<cmd exec="echo hello" src="./cmd"><pre><code class="language-plain" language="plain">$ echo hello
+
+hello
+
+-------
+duration: 3.097656ms</code></pre></cmd>
+
+<p>skip stderr</p>
+
+<cmd exec="go run main.go print.go" hide-stdout="" src="./cmd"><pre><code class="language-plain" language="plain">$ go run main.go print.go
+
+-------
+STDERR:
+
+stderr-> Hello, Error!
+
+-------
+duration: 487.308985ms
+go:       go1.17.3</code></pre></cmd>
+
+<cmd exec="go run main.go print.go" hide-cmd="" src="./cmd">
+
+<p>As we can see from the output, the command was executed successfully.</p>
+
+<pre><code class="language-plain" language="plain">stdout-> Hello, World!
+
+-------
+STDERR:
+
+stderr-> Hello, Error!
+
+-------
+duration: 511.612859ms
+go:       go1.17.3</code></pre></cmd>
+
+</page><!--BREAK-->
+
+<page>
+
+<h1>Sub MD</h1>
+
+<p>run a command</p>
+
+<cmd exec="go run ." src="sub/src/widget"><pre><code class="language-plain" language="plain">$ go run .
+
+!Hi!
+
+-------
+duration: 494.973338ms
+go:       go1.17.3</code></pre></cmd>
+
+<p>print the directory</p>
+
+<cmd exec="tree" src="sub/src"><pre><code class="language-plain" language="plain">$ tree
+
+.
+`-- widget
+    |-- go.mod
+    |-- main.go
+    `-- print.go
+
+1 directory, 3 files
+
+-------
+duration: 5.076779ms</code></pre></cmd>
+
+</page><!--BREAK-->
+
+
+
+</body>
+</html>

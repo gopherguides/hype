@@ -86,7 +86,3 @@ func NewMeta(node *Node) (*Meta, error) {
 
 	return m, m.Validate()
 }
-
-func (p *Parser) NewMeta(node *Node) (*Meta, error) {
-	return NewMeta(node)
-}

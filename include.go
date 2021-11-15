@@ -43,7 +43,7 @@ func (i Include) ValidateFS(fs fs.FS, checks ...ValidatorFn) error {
 	return i.Validate(checks...)
 }
 
-func (p *Parser) NewInclude(node *Node) (*Include, error) {
+func NewInclude(node *Node, p *Parser) (*Include, error) {
 
 	i := &Include{
 		Node: node,
@@ -101,18 +101,24 @@ func (i *Include) setSources(dir string, tags Tags) {
 	for _, tag := range tags {
 		i.setSources(dir, tag.GetChildren())
 
-		st, ok := tag.(SetSourceable)
-		if !ok {
-			continue
+		srcs := tag.GetChildren().ByAttrs(Attributes{
+			"src": "*",
+		})
+
+		for _, src := range srcs {
+			st, ok := src.(SetSourceable)
+			if !ok {
+				continue
+			}
+
+			source, ok := st.Source()
+			if !ok {
+				continue
+			}
+
+			xs := filepath.Join(dir, source.String())
+
+			st.SetSource(xs)
 		}
-
-		source, ok := st.Source()
-		if !ok {
-			continue
-		}
-
-		xs := filepath.Join(dir, source.String())
-
-		st.SetSource(xs)
 	}
 }

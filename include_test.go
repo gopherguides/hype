@@ -39,7 +39,7 @@ func Test_NewInclude(t *testing.T) {
 			r := require.New(t)
 
 			p := testParser(t, tt.cab)
-			i, err := p.NewInclude(NewNode(tt.node))
+			i, err := NewInclude(NewNode(tt.node), p)
 
 			if tt.err {
 				r.Error(err)

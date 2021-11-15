@@ -62,7 +62,3 @@ func NewFile(cab fs.FS, node *Node) (*File, error) {
 
 	return fg, fg.ValidateFS(cab)
 }
-
-func (p *Parser) NewFile(node *Node) (*File, error) {
-	return NewFile(p.FS, node)
-}

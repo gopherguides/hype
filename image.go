@@ -50,7 +50,3 @@ func NewImage(cab fs.FS, node *Node) (*Image, error) {
 
 	return i, i.ValidateFS(cab)
 }
-
-func (p *Parser) NewImage(node *Node) (*Image, error) {
-	return NewImage(p.FS, node)
-}

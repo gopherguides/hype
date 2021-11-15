@@ -48,7 +48,7 @@ func (fg FileGroup) Validate(checks ...ValidatorFn) error {
 	return fg.Node.Validate(html.ElementNode, checks...)
 }
 
-func (p *Parser) NewFileGroup(node *Node) (*FileGroup, error) {
+func NewFileGroup(node *Node) (*FileGroup, error) {
 
 	fg := &FileGroup{
 		Node: node,

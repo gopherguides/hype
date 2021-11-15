@@ -39,8 +39,7 @@ func Test_NewImage(t *testing.T) {
 		t.Run(tt.name, func(t *testing.T) {
 			r := require.New(t)
 
-			p := testParser(t, tt.cab)
-			i, err := p.NewImage(NewNode(tt.node))
+			i, err := NewImage(tt.cab, NewNode(tt.node))
 
 			if tt.err {
 				r.Error(err)

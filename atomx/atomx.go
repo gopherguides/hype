@@ -1,5 +1,7 @@
 package atomx
 
+import "strings"
+
 const (
 	ERROR   Atom = "error"
 	UNKNOWN Atom = "unknown"
@@ -10,7 +12,6 @@ type Atomable interface {
 }
 
 type Atom string
-type Atoms []Atom
 
 func (a Atom) String() string {
 	return string(a)
@@ -21,12 +22,7 @@ func (a Atom) Atom() Atom {
 }
 
 func (a Atom) Is(wants ...Atom) bool {
-	for _, want := range wants {
-		if a == want {
-			return true
-		}
-	}
-	return false
+	return Atoms(wants).Has(a)
 }
 
 func IsAtom(a Atomable, wants ...Atom) bool {
@@ -35,5 +31,24 @@ func IsAtom(a Atomable, wants ...Atom) bool {
 	}
 
 	at := a.Atom()
-	return at.Is(wants...)
+	return Atoms(wants).Has(at)
+}
+
+type Atoms []Atom
+
+func (atoms Atoms) String() string {
+	ats := make([]string, 0, len(atoms))
+	for _, at := range atoms {
+		ats = append(ats, at.String())
+	}
+	return strings.Join(ats, ", ")
+}
+
+func (atoms Atoms) Has(a Atom) bool {
+	for _, at := range atoms {
+		if at == a {
+			return true
+		}
+	}
+	return false
 }
