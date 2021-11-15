@@ -17,11 +17,22 @@ import (
 )
 
 var _ hype.Tag = &Cmd{}
+var _ hype.SetSourceable = &Cmd{}
 
 type Cmd struct {
 	*hype.Node
 	Root string
 	Args []string
+}
+
+func (c *Cmd) Source() (hype.Source, bool) {
+	return hype.SrcAttr(c.Attrs())
+}
+
+func (c *Cmd) SetSource(src string) {
+	c.Set("src", src)
+	// panic(src)
+	c.work(c.Root, src)
 }
 
 func (c *Cmd) String() string {
@@ -46,31 +57,36 @@ func NewCmd(node *hype.Node, root string) (*Cmd, error) {
 		return nil, err
 	}
 
+	ats := cmd.Attrs()
+	cmd.work(root, ats["src"])
+	return cmd, cmd.Validate()
+}
+
+func (cmd *Cmd) work(root string, src string) error {
 	ex, err := cmd.Get("exec")
 	if err != nil {
-		return nil, err
+		return err
 	}
 
 	args, err := shellwords.Parse(ex)
 	if err != nil {
-		return nil, err
+		return err
 	}
 
 	if len(args) == 0 {
-		return nil, fmt.Errorf("exec is empty")
+		return fmt.Errorf("exec is empty")
 	}
 	cmd.Args = args
 
 	u, err := os.UserHomeDir()
 	if err != nil {
-		return nil, err
+		return err
 	}
 
 	cache := filepath.Join(u, ".hype", runtime.Version(), "commander")
 	os.MkdirAll(cache, 0755)
 
-	dir, _ := cmd.Get("dir")
-	runDir := filepath.Join(root, dir)
+	runDir := filepath.Join(root, src)
 	h, _ := hash(runDir)
 
 	cargs := flect.Underscore(cmd.StartTag())
@@ -80,7 +96,10 @@ func NewCmd(node *hype.Node, root string) (*Cmd, error) {
 
 	ats := cmd.Attrs()
 
-	data := Data{}
+	data := Data{
+		// "src": src,
+		// "pwd": runDir,
+	}
 	n := cmd.Args[0]
 
 	if ats.HasKeys("data-go") || n == "go" {
@@ -88,8 +107,14 @@ func NewCmd(node *hype.Node, root string) (*Cmd, error) {
 	}
 
 	if !ats.HasKeys("no-cache") {
+
 		if _, err := os.Stat(cfp); err == nil {
-			return fromCache(cmd, cfp, data)
+			x, err := fromCache(cmd, cfp, data)
+			if err != nil {
+				return err
+			}
+			(*cmd) = *x
+			return nil
 		}
 	}
 
@@ -102,8 +127,9 @@ func NewCmd(node *hype.Node, root string) (*Cmd, error) {
 
 	res, err := Run(ctx, runDir, n, ag...)
 	if err != nil {
-		return nil, err
+		return err
 	}
+
 	data["duration"] = res.Duration.String()
 
 	tag := res.Tag(ats, data)
@@ -111,7 +137,7 @@ func NewCmd(node *hype.Node, root string) (*Cmd, error) {
 
 	f, err := os.Create(cfp)
 	if err != nil {
-		return nil, fmt.Errorf("could not create %s: %w", cfp, err)
+		return fmt.Errorf("could not create %s: %w", cfp, err)
 	}
 	defer f.Close()
 
@@ -121,7 +147,6 @@ func NewCmd(node *hype.Node, root string) (*Cmd, error) {
 	}
 
 	w := io.MultiWriter(f)
-	// w := f
 
 	enc := json.NewEncoder(w)
 	enc.SetIndent("", "  ")
@@ -129,8 +154,8 @@ func NewCmd(node *hype.Node, root string) (*Cmd, error) {
 	err = enc.Encode(cf)
 
 	if err != nil {
-		return nil, fmt.Errorf("could not encode %s: %w", cfp, err)
+		return fmt.Errorf("could not encode %s: %w", cfp, err)
 	}
 
-	return cmd, cmd.Validate()
+	return nil
 }

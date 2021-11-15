@@ -16,13 +16,16 @@ var testdata = os.DirFS("testdata")
 func testParser(t testing.TB, cab fs.FS, root string) *hype.Parser {
 	t.Helper()
 
+	pwd, _ := os.Getwd()
+
+	root = filepath.Join(pwd, root)
 	r := require.New(t)
 
 	p, err := hype.NewParser(cab)
 	p.Root = root
 	r.NoError(err)
 
-	Register(p)
+	Register(p, root)
 	return p
 }
 

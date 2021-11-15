@@ -6,15 +6,9 @@
 - hide-stderr: hide stderr output, defaults to false
 - hide-cmd: hide the command used to run the command, defaults to false
 
-<cmd exec="go run main.go print.go" dir="./cmd" hide-cmd>
-
-As we can see from the output, the command was executed successfully.
-
-</cmd>
-
 more text
 
-<cmd exec="go run -tags sad ." dir="./cmd">
+<cmd exec="go run -tags sad ." src="./cmd">
 
 As we can see from the output, the command failed.
 
@@ -22,12 +16,20 @@ As we can see from the output, the command failed.
 
 even more output!
 
-<cmd exec="tree" dir="./cmd"></cmd>
+<cmd exec="tree" src="./cmd"></cmd>
 
 clean the pwd
 
-<cmd exec="echo hello" dir="./cmd"></cmd>
+<cmd exec="echo hello" src="./cmd"></cmd>
 
 skip stderr
 
-<cmd exec="go run main.go print.go" dir="./cmd" hide-stdout></cmd>
+<cmd exec="go run main.go print.go" src="./cmd" hide-stdout></cmd>
+
+<cmd exec="go run main.go print.go" src="./cmd" hide-cmd>
+
+As we can see from the output, the command was executed successfully.
+
+</cmd>
+
+<include src="sub/sub.md"></include>

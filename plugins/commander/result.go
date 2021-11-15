@@ -12,6 +12,8 @@ import (
 
 	"github.com/gopherguides/hype"
 	"github.com/gopherguides/hype/htmx"
+	"github.com/markbates/hepa"
+	"github.com/markbates/hepa/filters"
 	"github.com/mattn/go-shellwords"
 )
 
@@ -20,6 +22,7 @@ type Result struct {
 	Err      error  // error from running command
 	ExitCode int    // exit code
 	Root     string // directory where the command was run
+	Pwd      string // where it was actually run
 	args     []string
 	stderr   []byte
 	stdout   []byte
@@ -122,7 +125,7 @@ func (r Result) Tag(ats Attributes, data Data) hype.Tag {
 		fmt.Fprint(bb, line)
 	}
 
-	if len(data) > 0 {
+	if len(data) > 0 && !ats.HasKeys("hide-data") {
 		fmt.Fprintf(bb, "-------\n")
 
 		keys := make([]string, 0, len(data))
@@ -142,7 +145,18 @@ func (r Result) Tag(ats Attributes, data Data) hype.Tag {
 		w.Flush()
 	}
 
-	s := strings.TrimSpace(bb.String())
+	pure := &hepa.Purifier{}
+	pure = hepa.With(pure, filters.PWD())
+	pure = hepa.With(pure, filters.Secrets())
+	pure = hepa.With(pure, filters.Golang())
+
+	b, err := pure.Clean(bb)
+	if err != nil {
+		panic(err)
+	}
+
+	// b := bb.Bytes()
+	s := strings.TrimSpace(string(b))
 
 	body := hype.QuickText(s)
 

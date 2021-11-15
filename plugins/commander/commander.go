@@ -13,10 +13,10 @@ const (
 type Attributes = hype.Attributes
 type Data map[string]string
 
-func Register(p *hype.Parser) {
+func Register(p *hype.Parser, root string) {
 
 	fn := func(node *hype.Node) (hype.Tag, error) {
-		return NewCmd(node, p.Root)
+		return NewCmd(node, root)
 	}
 
 	p.SetCustomTag(CMD, fn)

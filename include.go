@@ -101,18 +101,24 @@ func (i *Include) setSources(dir string, tags Tags) {
 	for _, tag := range tags {
 		i.setSources(dir, tag.GetChildren())
 
-		st, ok := tag.(SetSourceable)
-		if !ok {
-			continue
+		srcs := tag.GetChildren().ByAttrs(Attributes{
+			"src": "*",
+		})
+
+		for _, src := range srcs {
+			st, ok := src.(SetSourceable)
+			if !ok {
+				continue
+			}
+
+			source, ok := st.Source()
+			if !ok {
+				continue
+			}
+
+			xs := filepath.Join(dir, source.String())
+
+			st.SetSource(xs)
 		}
-
-		source, ok := st.Source()
-		if !ok {
-			continue
-		}
-
-		xs := filepath.Join(dir, source.String())
-
-		st.SetSource(xs)
 	}
 }

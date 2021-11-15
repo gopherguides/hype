@@ -11,25 +11,9 @@
 <li>hide-cmd: hide the command used to run the command, defaults to false</li>
 </ul>
 
-<cmd dir="./cmd" exec="go run main.go print.go" hide-cmd="">CACHE!
-<cmd dir="./cmd" exec="go run main.go print.go" hide-cmd="">
-
-<p>As we can see from the output, the command was executed successfully.</p>
-
-<pre><code class="language-plain" language="plain">-------
-STDOUT:
-
-stdout-> Hello, World!
-
--------
-STDERR:
-
-stderr-> Hello, Error!</code></pre></cmd></cmd>
-
 <p>more text</p>
 
-<cmd dir="./cmd" exec="go run -tags sad .">CACHE!
-<cmd dir="./cmd" exec="go run -tags sad .">
+<cmd exec="go run -tags sad ." src="./cmd">
 
 <p>As we can see from the output, the command failed.</p>
 
@@ -39,15 +23,15 @@ stderr-> Hello, Error!</code></pre></cmd></cmd>
 STDERR:
 
 boom!
-exit status 255</code></pre></cmd></cmd>
+exit status 255
+
+-------
+duration: 470.932264ms
+go:       go1.17.3</code></pre></cmd>
 
 <p>even more output!</p>
 
-<cmd dir="./cmd" exec="tree">CACHE!
-<cmd dir="./cmd" exec="tree"><pre><code class="language-plain" language="plain">$ tree
-
--------
-STDOUT:
+<cmd exec="tree" src="./cmd"><pre><code class="language-plain" language="plain">$ tree
 
 .
 |-- go.mod
@@ -55,36 +39,81 @@ STDOUT:
 |-- print.go
 `-- print_error.go
 
-0 directories, 4 files</code></pre></cmd></cmd>
+0 directories, 4 files
+
+-------
+duration: 4.976271ms</code></pre></cmd>
 
 <p>clean the pwd</p>
 
-<cmd dir="./cmd" exec="pwd">CACHE!
-<cmd dir="./cmd" exec="pwd"><pre><code class="language-plain" language="plain">$ pwd
+<cmd exec="echo hello" src="./cmd"><pre><code class="language-plain" language="plain">$ echo hello
+
+hello
 
 -------
-STDOUT:
-
-cmd</code></pre></cmd></cmd>
+duration: 3.097656ms</code></pre></cmd>
 
 <p>skip stderr</p>
 
-<cmd dir="./cmd" exec="go run main.go print.go" hide-stdout="">CACHE!
-<cmd dir="./cmd" exec="go run main.go print.go" hide-cmd="">
-
-<p>As we can see from the output, the command was executed successfully.</p>
-
-<pre><code class="language-plain" language="plain">-------
-STDOUT:
-
-stdout-> Hello, World!
+<cmd exec="go run main.go print.go" hide-stdout="" src="./cmd"><pre><code class="language-plain" language="plain">$ go run main.go print.go
 
 -------
 STDERR:
 
-stderr-> Hello, Error!</code></pre></cmd></cmd>
+stderr-> Hello, Error!
+
+-------
+duration: 487.308985ms
+go:       go1.17.3</code></pre></cmd>
+
+<cmd exec="go run main.go print.go" hide-cmd="" src="./cmd">
+
+<p>As we can see from the output, the command was executed successfully.</p>
+
+<pre><code class="language-plain" language="plain">stdout-> Hello, World!
+
+-------
+STDERR:
+
+stderr-> Hello, Error!
+
+-------
+duration: 511.612859ms
+go:       go1.17.3</code></pre></cmd>
 
 </page><!--BREAK-->
+
+<page>
+
+<h1>Sub MD</h1>
+
+<p>run a command</p>
+
+<cmd exec="go run ." src="sub/src/widget"><pre><code class="language-plain" language="plain">$ go run .
+
+!Hi!
+
+-------
+duration: 494.973338ms
+go:       go1.17.3</code></pre></cmd>
+
+<p>print the directory</p>
+
+<cmd exec="tree" src="sub/src"><pre><code class="language-plain" language="plain">$ tree
+
+.
+`-- widget
+    |-- go.mod
+    |-- main.go
+    `-- print.go
+
+1 directory, 3 files
+
+-------
+duration: 5.076779ms</code></pre></cmd>
+
+</page><!--BREAK-->
+
 
 
 </body>

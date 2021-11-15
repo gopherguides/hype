@@ -6,28 +6,43 @@ import (
 	"os"
 	"os/exec"
 	"path/filepath"
+	"sync"
 	"time"
 )
 
+var moot sync.Mutex
+
 func Run(ctx context.Context, root string, name string, args ...string) (Result, error) {
+	moot.Lock()
+	defer moot.Unlock()
+	var err error
 	// fmt.Println("root:", root)
 	// fmt.Println("name:", name)
 	// fmt.Printf("args:%q\n", args)
-	owd, _ := os.Getwd()
+	owd, err := os.Getwd()
+	if err != nil {
+		return Result{}, err
+	}
+
+	owd, err = filepath.Abs(owd)
+	if err != nil {
+		return Result{}, err
+	}
 	defer os.Chdir(owd)
 
 	nwd := root
 	if ext := filepath.Ext(root); len(ext) > 0 {
 		nwd = filepath.Dir(root)
 	}
-	// fmt.Println("nwd:", nwd)
-	os.Chdir(nwd)
+
+	if err := os.Chdir(nwd); err != nil {
+		return Result{}, err
+	}
 
 	stdout := &bytes.Buffer{}
 	stderr := &bytes.Buffer{}
 
 	c := exec.CommandContext(ctx, name, args...)
-	// fmt.Printf("TODO >> run.go:28 c.Args %[1]T %[1]v\n", c.Args)
 	c.Stdout = stdout
 	c.Stderr = stderr
 
@@ -37,7 +52,7 @@ func Run(ctx context.Context, root string, name string, args ...string) (Result,
 	}
 
 	start := time.Now()
-	err := c.Run()
+	err = c.Run()
 	r.Duration = time.Since(start)
 
 	r.Err = err
@@ -45,8 +60,11 @@ func Run(ctx context.Context, root string, name string, args ...string) (Result,
 	r.stderr = stderr.Bytes()
 	r.stdout = stdout.Bytes()
 
-	pwd, _ := os.Getwd()
-	// fmt.Printf("TODO >> run.go:44 pwd %[1]T %[1]v\n", pwd)
+	pwd, err := os.Getwd()
+	if err != nil {
+		return Result{}, err
+	}
+	r.Pwd = pwd
 	base := filepath.Base(pwd)
 
 	r.stderr = bytes.ReplaceAll(r.stderr, []byte(pwd), []byte(base))

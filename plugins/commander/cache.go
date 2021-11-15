@@ -3,6 +3,7 @@ package commander
 import (
 	"encoding/json"
 	"fmt"
+	"io"
 	"os"
 
 	"github.com/gopherguides/hype"
@@ -18,7 +19,7 @@ func fromCache(cmd *Cmd, cfp string, data Data) (*Cmd, error) {
 
 	dec := json.NewDecoder(f)
 	err = dec.Decode(&cf)
-	if err != nil {
+	if err != nil && err != io.EOF {
 		return nil, fmt.Errorf("could not decode %s: %w", cfp, err)
 	}
 
