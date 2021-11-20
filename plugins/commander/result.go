@@ -19,10 +19,11 @@ import (
 
 type Result struct {
 	Duration time.Duration
-	Err      error  // error from running command
-	ExitCode int    // exit code
-	Root     string // directory where the command was run
-	Pwd      string // where it was actually run
+	Err      error    // error from running command
+	ExitCode int      // exit code
+	Root     string   // directory where the command was run
+	Pwd      string   // where it was actually run
+	Env      []string // additional environment variables
 	args     []string
 	stderr   []byte
 	stdout   []byte
@@ -102,6 +103,14 @@ func (r Result) Tag(ats Attributes, data Data) hype.Tag {
 			"class":    "language-plain",
 			"language": "plain",
 		})),
+	}
+
+	if data == nil {
+		data = Data{}
+	}
+
+	if len(r.Env) > 0 {
+		data["env"] = strings.Join(r.Env, ",")
 	}
 
 	bb := &bytes.Buffer{}

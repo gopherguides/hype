@@ -9,6 +9,7 @@ import (
 	"os"
 	"path/filepath"
 	"runtime"
+	"strings"
 
 	"github.com/gobuffalo/flect"
 	"github.com/gopherguides/hype"
@@ -23,6 +24,7 @@ type Cmd struct {
 	*hype.Node
 	Root string
 	Args []string
+	Env  []string
 }
 
 func (c *Cmd) Source() (hype.Source, bool) {
@@ -31,7 +33,6 @@ func (c *Cmd) Source() (hype.Source, bool) {
 
 func (c *Cmd) SetSource(src string) {
 	c.Set("src", src)
-	// panic(src)
 	c.work(c.Root, src)
 }
 
@@ -96,13 +97,11 @@ func (cmd *Cmd) work(root string, src string) error {
 
 	ats := cmd.Attrs()
 
-	data := Data{
-		// "src": src,
-		// "pwd": runDir,
-	}
-	n := cmd.Args[0]
+	data := Data{}
 
-	if ats.HasKeys("data-go") || n == "go" {
+	cmdName := cmd.Args[0]
+
+	if ats.HasKeys("data-go") || cmdName == "go" {
 		data["go"] = runtime.Version()
 	}
 
@@ -125,12 +124,32 @@ func (cmd *Cmd) work(root string, src string) error {
 		ag = cmd.Args[1:]
 	}
 
-	res, err := Run(ctx, runDir, n, ag...)
+	var addEnv []string
+	if env, err := ats.Get("env"); err == nil {
+		spl := strings.Split(env, ",")
+		for _, e := range spl {
+			e = strings.TrimSpace(e)
+			if e != "" {
+				addEnv = append(addEnv, e)
+			}
+		}
+	}
+
+	run := &Runner{
+		Name: cmdName,
+		Args: ag,
+		Root: runDir,
+		Env:  addEnv,
+	}
+
+	res, err := run.Run(ctx)
 	if err != nil {
 		return err
 	}
 
-	data["duration"] = res.Duration.String()
+	if cmdName != "tree" {
+		data["duration"] = res.Duration.String()
+	}
 
 	tag := res.Tag(ats, data)
 	cmd.Children = append(cmd.Children, tag)

@@ -52,7 +52,12 @@ func Test_Run(t *testing.T) {
 		t.Run(tt.name, func(t *testing.T) {
 			r := require.New(t)
 
-			res, err := Run(ctx, tt.dir, tt.cmd, tt.args...)
+			run := &Runner{
+				Root: tt.dir,
+				Name: tt.cmd,
+				Args: tt.args,
+			}
+			res, err := run.Run(ctx)
 
 			// fmt.Println(res)
 

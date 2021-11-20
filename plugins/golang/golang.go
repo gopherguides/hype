@@ -5,6 +5,7 @@ import (
 	"os"
 	"path/filepath"
 	"runtime"
+	"strings"
 
 	"github.com/gopherguides/hype"
 	"github.com/gopherguides/hype/plugins/commander"
@@ -49,6 +50,25 @@ func NewGo(node *hype.Node, root string) (hype.Tag, error) {
 	node.DataAtom = commander.CMD
 	ats := node.Attrs()
 
+	var env []string
+	if e, err := ats.Get("environ"); err == nil {
+		env = append(env, e)
+	}
+
+	if goos, err := ats.Get("goos"); err == nil {
+		if len(goos) > 0 {
+			env = append(env, "GOOS="+goos)
+		}
+	}
+
+	if goarch, err := ats.Get("goarch"); err == nil {
+		if len(goarch) > 0 {
+			env = append(env, "GOARCH="+goarch)
+		}
+	}
+
+	node.Set("env", strings.Join(env, ","))
+
 	for k, gats := range goCmds {
 		ex, ok := ats[k]
 		if !ok {
@@ -68,33 +88,33 @@ func NewGo(node *hype.Node, root string) (hype.Tag, error) {
 }
 
 var goCmds = map[string]hype.Attributes{
-	"bug":   hype.Attributes{},
-	"build": hype.Attributes{},
-	"clean": hype.Attributes{},
+	"bug":   nil,
+	"build": nil,
+	"clean": nil,
 	"doc": hype.Attributes{
 		"hide-duration": "true",
 	},
 	"env": hype.Attributes{
 		"hide-duration": "true",
 	},
-	"fix": hype.Attributes{},
+	"fix": nil,
 	"fmt": hype.Attributes{
 		"hide-duration": "true",
 	},
-	"generate": hype.Attributes{},
-	"get":      hype.Attributes{},
-	"install":  hype.Attributes{},
-	"list":     hype.Attributes{},
-	"mod":      hype.Attributes{},
-	"run":      hype.Attributes{},
+	"generate": nil,
+	"get":      nil,
+	"install":  nil,
+	"list":     nil,
+	"mod":      nil,
+	"run":      nil,
 	"test": hype.Attributes{
 		"hide-duration": "true",
 	},
-	"tool": hype.Attributes{},
+	"tool": nil,
 	"version": hype.Attributes{
 		"hide-data": "true",
 	},
-	"vet": hype.Attributes{},
+	"vet": nil,
 	"help": hype.Attributes{
 		"hide-duration": "true",
 	},

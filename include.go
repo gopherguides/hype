@@ -99,7 +99,7 @@ func NewInclude(node *Node, p *Parser) (*Include, error) {
 
 func (i *Include) setSources(dir string, tags Tags) {
 	for _, tag := range tags {
-		i.setSources(dir, tag.GetChildren())
+		// i.setSources(dir, tag.GetChildren())
 
 		srcs := tag.GetChildren().ByAttrs(Attributes{
 			"src": "*",

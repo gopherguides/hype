@@ -21,6 +21,7 @@ func (c *Image) Source() (Source, bool) {
 func (c *Image) SetSource(s string) {
 	c.Lock()
 	defer c.Unlock()
+
 	c.attrs["src"] = s
 }
 
