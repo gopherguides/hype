@@ -53,6 +53,14 @@ func (p *Parser) ElementNode(n *html.Node) (Tag, error) {
 		c = c.NextSibling
 	}
 
+	// if src, ok := node.attrs["src"]; ok {
+	// 	fmt.Printf("TODO >> element.go:56 p.Root %[1]T %[1]v\n", p.Root)
+	// 	fmt.Printf("TODO >> element.go:57 src %[1]T %[1]v\n", src)
+	// 	src = filepath.Join(p.Root, src)
+	// 	fmt.Printf("TODO >> element.go:59 src %[1]T %[1]v\n", src)
+	// 	node.attrs["src"] = src
+	// }
+
 	if fn, ok := p.CustomTag(atomx.Atom(n.Data)); ok {
 		return fn(node)
 	}

@@ -20,7 +20,7 @@ func testParser(t testing.TB, cab fs.FS, root string) *hype.Parser {
 		t.Fatal(err)
 	}
 
-	Register(p, root)
+	Register(p)
 	return p
 }
 
@@ -57,7 +57,7 @@ func Test_NewGo(t *testing.T) {
 
 			node := hype.NewNode(htmx.AttrNode("go", tt.ats))
 
-			tag, err := NewGo(node, "")
+			tag, err := NewGo(node)
 			if tt.err {
 				r.Error(err)
 				return

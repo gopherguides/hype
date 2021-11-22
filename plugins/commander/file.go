@@ -8,7 +8,7 @@ import (
 
 type CacheFile struct {
 	Result Result `json:"result,omitempty"`
-	HTML   []byte `json:"html,omitempty"`
+	HTML   string `json:"html,omitempty"`
 }
 
 type fileInfo struct {

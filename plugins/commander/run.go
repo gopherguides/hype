@@ -12,7 +12,7 @@ import (
 
 var moot sync.Mutex
 
-func Run(ctx context.Context, root string, name string, args ...string) (Result, error) {
+func Run(ctx context.Context, root string, env []string, name string, args ...string) (Result, error) {
 	moot.Lock()
 	defer moot.Unlock()
 	var err error
@@ -35,6 +35,8 @@ func Run(ctx context.Context, root string, name string, args ...string) (Result,
 		nwd = filepath.Dir(root)
 	}
 
+	nwd, _ = filepath.Abs(nwd)
+
 	if err := os.Chdir(nwd); err != nil {
 		return Result{}, err
 	}
@@ -45,6 +47,8 @@ func Run(ctx context.Context, root string, name string, args ...string) (Result,
 	c := exec.CommandContext(ctx, name, args...)
 	c.Stdout = stdout
 	c.Stderr = stderr
+	c.Env = append(os.Environ(), env...)
+	// c.Dir = root
 
 	r := Result{
 		Root: root,
@@ -52,6 +56,7 @@ func Run(ctx context.Context, root string, name string, args ...string) (Result,
 	}
 
 	start := time.Now()
+	// fmt.Println(">", c.Args)
 	err = c.Run()
 	r.Duration = time.Since(start)
 
@@ -64,6 +69,7 @@ func Run(ctx context.Context, root string, name string, args ...string) (Result,
 	if err != nil {
 		return Result{}, err
 	}
+
 	r.Pwd = pwd
 	base := filepath.Base(pwd)
 

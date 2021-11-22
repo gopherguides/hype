@@ -90,6 +90,7 @@ func (p *Parser) SubParser(path string) (*Parser, error) {
 	if err != nil {
 		return nil, err
 	}
+	p2.Root = filepath.Join(p.Root, path)
 
 	for k, v := range p.snippetRules {
 		p2.snippetRules[k] = v

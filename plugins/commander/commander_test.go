@@ -25,7 +25,7 @@ func testParser(t testing.TB, cab fs.FS, root string) *hype.Parser {
 	p.Root = root
 	r.NoError(err)
 
-	Register(p, root)
+	Register(p)
 	return p
 }
 

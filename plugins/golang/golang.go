@@ -5,6 +5,7 @@ import (
 	"os"
 	"path/filepath"
 	"runtime"
+	"strings"
 
 	"github.com/gopherguides/hype"
 	"github.com/gopherguides/hype/plugins/commander"
@@ -21,7 +22,7 @@ func CachePath() (string, error) {
 	return fp, nil
 }
 
-func Register(p *hype.Parser, root string) {
+func Register(p *hype.Parser) {
 	p.SetCustomTag(GODOC, func(node *hype.Node) (hype.Tag, error) {
 		ats := node.Attrs()
 
@@ -29,7 +30,7 @@ func Register(p *hype.Parser, root string) {
 		node.Set("exec", ex)
 		node.Set("hide-duration", "true")
 
-		return commander.NewCmd(node, root)
+		return commander.NewCmd(node)
 	})
 
 	p.SetCustomTag(LINK, func(node *hype.Node) (hype.Tag, error) {
@@ -37,17 +38,32 @@ func Register(p *hype.Parser, root string) {
 	})
 
 	p.SetCustomTag(GO, func(node *hype.Node) (hype.Tag, error) {
-		return NewGo(node, root)
+		return NewGo(node)
 	})
 }
 
-func NewGo(node *hype.Node, root string) (hype.Tag, error) {
+func NewGo(node *hype.Node) (hype.Tag, error) {
 	if node == nil {
 		return nil, fmt.Errorf("node is nil")
 	}
 
 	node.DataAtom = commander.CMD
 	ats := node.Attrs()
+
+	var env []string
+	if e, ok := ats["environ"]; ok {
+		e = strings.TrimSpace(e)
+		env = append(env, e)
+	}
+
+	for _, k := range []string{"GOOS", "GOARCH"} {
+		if v, ok := ats[strings.ToLower(k)]; ok {
+			v = strings.TrimSpace(v)
+			env = append(env, fmt.Sprintf("%s=%s", k, v))
+		}
+	}
+
+	node.Set("environ", strings.Join(env, ","))
 
 	for k, gats := range goCmds {
 		ex, ok := ats[k]
@@ -64,7 +80,7 @@ func NewGo(node *hype.Node, root string) (hype.Tag, error) {
 		node.Delete(k)
 	}
 
-	return commander.NewCmd(node, root)
+	return commander.NewCmd(node)
 }
 
 var goCmds = map[string]hype.Attributes{

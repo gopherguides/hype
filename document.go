@@ -89,7 +89,38 @@ func (p *Parser) NewDocument(n *html.Node) (*Document, error) {
 		c = c.NextSibling
 	}
 
-	return doc, doc.Validate()
+	err := doc.Validate()
+	if err != nil {
+		return nil, err
+	}
+
+	err = p.finalize(doc.Children...)
+	if err != nil {
+		return nil, err
+	}
+
+	return doc, nil
+}
+
+type Finalizer interface {
+	Finalize(p *Parser) error
+}
+
+func (p *Parser) finalize(tags ...Tag) error {
+	for _, tag := range tags {
+		if f, ok := tag.(Finalizer); ok {
+			if err := f.Finalize(p); err != nil {
+				return err
+			}
+		}
+
+		err := p.finalize(tag.GetChildren()...)
+		if err != nil {
+			return err
+		}
+	}
+
+	return nil
 }
 
 func (doc *Document) Body() (*Body, error) {

@@ -3,14 +3,11 @@ package commander
 import (
 	"bytes"
 	"context"
-	"encoding/json"
 	"fmt"
-	"io"
-	"os"
 	"path/filepath"
 	"runtime"
+	"strings"
 
-	"github.com/gobuffalo/flect"
 	"github.com/gopherguides/hype"
 	"github.com/mattn/go-shellwords"
 	"golang.org/x/net/html"
@@ -21,8 +18,8 @@ var _ hype.SetSourceable = &Cmd{}
 
 type Cmd struct {
 	*hype.Node
-	Root string
 	Args []string
+	Env  []string
 }
 
 func (c *Cmd) Source() (hype.Source, bool) {
@@ -31,8 +28,18 @@ func (c *Cmd) Source() (hype.Source, bool) {
 
 func (c *Cmd) SetSource(src string) {
 	c.Set("src", src)
-	// panic(src)
-	c.work(c.Root, src)
+}
+
+func (c *Cmd) Finalize(p *hype.Parser) error {
+	return c.work(p.Root, c.Attrs()["src"])
+}
+
+func (c *Cmd) StartTag() string {
+	return `<pre><code class="language-plain" language="plain">`
+}
+
+func (c *Cmd) EndTag() string {
+	return "</code></pre>"
 }
 
 func (c *Cmd) String() string {
@@ -47,10 +54,9 @@ func (c *Cmd) Validate(checks ...hype.ValidatorFn) error {
 	return c.Node.Validate(html.ElementNode, checks...)
 }
 
-func NewCmd(node *hype.Node, root string) (*Cmd, error) {
+func NewCmd(node *hype.Node) (*Cmd, error) {
 	cmd := &Cmd{
 		Node: node,
-		Root: root,
 	}
 
 	if err := cmd.Validate(); err != nil {
@@ -58,7 +64,11 @@ func NewCmd(node *hype.Node, root string) (*Cmd, error) {
 	}
 
 	ats := cmd.Attrs()
-	cmd.work(root, ats["src"])
+
+	if env, ok := ats["environ"]; ok {
+		cmd.Env = strings.Split(env, ",")
+	}
+
 	return cmd, cmd.Validate()
 }
 
@@ -78,28 +88,16 @@ func (cmd *Cmd) work(root string, src string) error {
 	}
 	cmd.Args = args
 
-	u, err := os.UserHomeDir()
-	if err != nil {
-		return err
-	}
-
-	cache := filepath.Join(u, ".hype", runtime.Version(), "commander")
-	os.MkdirAll(cache, 0755)
-
-	runDir := filepath.Join(root, src)
-	h, _ := hash(runDir)
-
-	cargs := flect.Underscore(cmd.StartTag())
-
-	cfp := filepath.Join(cache, h, cargs) + ".json"
-	os.MkdirAll(filepath.Dir(cfp), 0755)
-
 	ats := cmd.Attrs()
 
-	data := Data{
-		// "src": src,
-		// "pwd": runDir,
+	data := Data{}
+
+	e := strings.Join(cmd.Env, ",")
+	e = strings.TrimSpace(e)
+	if len(e) > 0 {
+		data["env"] = e
 	}
+
 	n := cmd.Args[0]
 
 	if ats.HasKeys("data-go") || n == "go" {
@@ -108,14 +106,10 @@ func (cmd *Cmd) work(root string, src string) error {
 
 	if !ats.HasKeys("no-cache") {
 
-		if _, err := os.Stat(cfp); err == nil {
-			x, err := fromCache(cmd, cfp, data)
-			if err != nil {
-				return err
-			}
-			(*cmd) = *x
+		if err := cache.Retrieve(cmd, data); err == nil {
 			return nil
 		}
+
 	}
 
 	ctx := context.Background()
@@ -125,36 +119,28 @@ func (cmd *Cmd) work(root string, src string) error {
 		ag = cmd.Args[1:]
 	}
 
-	res, err := Run(ctx, runDir, n, ag...)
+	runDir := filepath.Join(root, src)
+	res, err := Run(ctx, runDir, cmd.Env, n, ag...)
+
 	if err != nil {
 		return err
 	}
 
 	data["duration"] = res.Duration.String()
 
-	tag := res.Tag(ats, data)
-	cmd.Children = append(cmd.Children, tag)
-
-	f, err := os.Create(cfp)
+	s, err := res.Out(ats, data)
 	if err != nil {
-		return fmt.Errorf("could not create %s: %w", cfp, err)
-	}
-	defer f.Close()
-
-	cf := CacheFile{
-		Result: res,
-		HTML:   []byte(tag.String()),
+		return err
 	}
 
-	w := io.MultiWriter(f)
+	cmd.Children = hype.Tags{hype.QuickText(s)}
 
-	enc := json.NewEncoder(w)
-	enc.SetIndent("", "  ")
+	// if res.Err != nil {
+	// 	return nil
+	// }
 
-	err = enc.Encode(cf)
-
-	if err != nil {
-		return fmt.Errorf("could not encode %s: %w", cfp, err)
+	if err := cache.Store(cmd, data, res); err != nil {
+		return err
 	}
 
 	return nil

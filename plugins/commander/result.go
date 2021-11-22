@@ -10,8 +10,6 @@ import (
 	"text/tabwriter"
 	"time"
 
-	"github.com/gopherguides/hype"
-	"github.com/gopherguides/hype/htmx"
 	"github.com/markbates/hepa"
 	"github.com/markbates/hepa/filters"
 	"github.com/mattn/go-shellwords"
@@ -92,18 +90,7 @@ func (r Result) String() string {
 	return string(b)
 }
 
-func (r Result) Tag(ats Attributes, data Data) hype.Tag {
-	pre := &hype.Element{
-		Node: hype.NewNode(htmx.ElementNode("pre")),
-	}
-
-	code := &hype.Element{
-		Node: hype.NewNode(htmx.AttrNode("code", Attributes{
-			"class":    "language-plain",
-			"language": "plain",
-		})),
-	}
-
+func (r Result) Out(ats Attributes, data Data) (string, error) {
 	bb := &bytes.Buffer{}
 
 	args := r.Args()
@@ -152,18 +139,13 @@ func (r Result) Tag(ats Attributes, data Data) hype.Tag {
 
 	b, err := pure.Clean(bb)
 	if err != nil {
-		panic(err)
+		return "", err
 	}
 
 	// b := bb.Bytes()
 	s := strings.TrimSpace(string(b))
 
-	body := hype.QuickText(s)
-
-	code.Children = append(code.Children, body)
-
-	pre.Children = append(pre.Children, code)
-	return pre
+	return s, nil
 }
 
 type resultJSON struct {
