@@ -133,6 +133,7 @@ func (r Result) Out(ats Attributes, data Data) (string, error) {
 	}
 
 	pure := &hepa.Purifier{}
+	pure = hepa.With(pure, filters.Replace(r.Root, "$ROOT"))
 	pure = hepa.With(pure, filters.PWD())
 	pure = hepa.With(pure, filters.Secrets())
 	pure = hepa.With(pure, filters.Golang())

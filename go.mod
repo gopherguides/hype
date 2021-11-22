@@ -9,12 +9,12 @@ require (
 	github.com/gobuffalo/flect v0.2.4
 	github.com/markbates/cleo v0.0.0-20210908183044-d564be950acc
 	github.com/markbates/fsx v1.0.0
-	github.com/markbates/hepa v0.0.0-20211113053509-18811efd1b53
+	github.com/markbates/hepa v0.0.0-20211122212111-e3bf9cc57f37
 	github.com/markbates/sweets v0.0.0-20210926032915-062eb9bcc0e5
 	github.com/mattn/go-shellwords v1.0.12
 	github.com/russross/blackfriday/v2 v2.1.0
 	github.com/stretchr/testify v1.7.0
-	golang.org/x/net v0.0.0-20211112202133-69e39bad7dc2
+	golang.org/x/net v0.0.0-20211118161319-6a13c67c3ce4
 )
 
 require (

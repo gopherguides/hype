@@ -19,16 +19,6 @@ func Run(ctx context.Context, root string, env []string, name string, args ...st
 	// fmt.Println("root:", root)
 	// fmt.Println("name:", name)
 	// fmt.Printf("args:%q\n", args)
-	owd, err := os.Getwd()
-	if err != nil {
-		return Result{}, err
-	}
-
-	owd, err = filepath.Abs(owd)
-	if err != nil {
-		return Result{}, err
-	}
-	defer os.Chdir(owd)
 
 	nwd := root
 	if ext := filepath.Ext(root); len(ext) > 0 {
@@ -37,10 +27,6 @@ func Run(ctx context.Context, root string, env []string, name string, args ...st
 
 	nwd, _ = filepath.Abs(nwd)
 
-	if err := os.Chdir(nwd); err != nil {
-		return Result{}, err
-	}
-
 	stdout := &bytes.Buffer{}
 	stderr := &bytes.Buffer{}
 
@@ -48,7 +34,7 @@ func Run(ctx context.Context, root string, env []string, name string, args ...st
 	c.Stdout = stdout
 	c.Stderr = stderr
 	c.Env = append(os.Environ(), env...)
-	// c.Dir = root
+	c.Dir = nwd
 
 	r := Result{
 		Root: root,
