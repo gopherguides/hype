@@ -63,6 +63,7 @@ func (r Result) MarshalJSON() ([]byte, error) {
 	if r.Err != nil {
 		x.Error = r.Err.Error()
 	}
+
 	return json.MarshalIndent(x, "", "  ")
 }
 
@@ -75,10 +76,10 @@ func (r *Result) UnmarshalJSON(data []byte) error {
 
 	args, _ := shellwords.Parse(x.Args)
 
+	r.args = args
 	r.Err = fmt.Errorf(x.Error)
 	r.ExitCode = x.Exit
 	r.Root = x.Root
-	r.args = args
 	r.stderr = x.Stderr
 	r.stdout = x.Stdout
 	r.Duration = time.Duration(x.Duration)
@@ -101,8 +102,6 @@ func (r Result) Out(ats Attributes, data Data) (string, error) {
 	}
 
 	if len(r.stdout) > 0 && !ats.HasKeys("hide-stdout") {
-		// fmt.Fprintf(bb, "-------\n")
-		// line := fmt.Sprintf("STDOUT:\n\n%s\n", r.stdout)
 		line := fmt.Sprintf("%s\n", r.stdout)
 		fmt.Fprint(bb, line)
 	}
@@ -150,7 +149,6 @@ func (r Result) Out(ats Attributes, data Data) (string, error) {
 		return "", err
 	}
 
-	// b := bb.Bytes()
 	s := strings.TrimSpace(string(b))
 
 	return s, nil

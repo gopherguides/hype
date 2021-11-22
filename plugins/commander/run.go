@@ -15,43 +15,46 @@ var moot sync.Mutex
 func Run(ctx context.Context, root string, env []string, name string, args ...string) (Result, error) {
 	moot.Lock()
 	defer moot.Unlock()
-	var err error
-	// fmt.Println("root:", root)
-	// fmt.Println("name:", name)
-	// fmt.Printf("args:%q\n", args)
 
-	nwd := root
+	var err error
+
+	runDir := root
 	if ext := filepath.Ext(root); len(ext) > 0 {
-		nwd = filepath.Dir(root)
+		runDir = filepath.Dir(root)
 	}
 
-	nwd, _ = filepath.Abs(nwd)
+	runDir, _ = filepath.Abs(runDir)
+
+	c := exec.CommandContext(ctx, name, args...)
+	c.Dir = runDir
+	c.Env = append(os.Environ(), env...)
 
 	stdout := &bytes.Buffer{}
 	stderr := &bytes.Buffer{}
 
-	c := exec.CommandContext(ctx, name, args...)
 	c.Stdout = stdout
 	c.Stderr = stderr
-	c.Env = append(os.Environ(), env...)
-	c.Dir = nwd
 
 	r := Result{
+		Pwd:  runDir,
 		Root: root,
 		args: c.Args,
 	}
 
 	start := time.Now()
-	// fmt.Println(">", c.Args)
+
 	err = c.Run()
+
 	r.Duration = time.Since(start)
 
 	r.Err = err
-	r.ExitCode = c.ProcessState.ExitCode()
+
+	if c.ProcessState != nil {
+		r.ExitCode = c.ProcessState.ExitCode()
+	}
+
 	r.stderr = stderr.Bytes()
 	r.stdout = stdout.Bytes()
-
-	r.Pwd = nwd
 
 	sch := []byte(r.Pwd)
 	rpl := []byte(".")

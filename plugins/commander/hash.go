@@ -7,12 +7,13 @@ import (
 )
 
 func hash(dir string) (string, error) {
-	// fmt.Println("hashing >", dir)
 	base := filepath.Base(dir)
 	dir = filepath.Dir(dir)
+
 	cab := os.DirFS(dir)
 
 	var infos fileInfos
+
 	err := fs.WalkDir(cab, base, func(path string, d fs.DirEntry, err error) error {
 		if err != nil {
 			return err

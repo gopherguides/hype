@@ -24,6 +24,8 @@ func CachePath() (string, error) {
 
 func Register(p *hype.Parser) {
 	p.SetCustomTag(GODOC, func(node *hype.Node) (hype.Tag, error) {
+		fmt.Printf("%s is deprecated\n", node.StartTag())
+
 		ats := node.Attrs()
 
 		ex := fmt.Sprintf("go doc %s", ats["exec"])

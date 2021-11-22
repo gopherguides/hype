@@ -86,6 +86,7 @@ func (cmd *Cmd) work(root string, src string) error {
 	if len(args) == 0 {
 		return fmt.Errorf("exec is empty")
 	}
+
 	cmd.Args = args
 
 	ats := cmd.Attrs()
