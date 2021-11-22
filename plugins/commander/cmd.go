@@ -35,11 +35,11 @@ func (c *Cmd) Finalize(p *hype.Parser) error {
 }
 
 func (c *Cmd) StartTag() string {
-	return `<pre><code class="language-plain" language="plain">`
+	return c.Node.StartTag() + `<pre class="code-block"><code class="language-plain" language="plain">`
 }
 
 func (c *Cmd) EndTag() string {
-	return "</code></pre>"
+	return "</code></pre>" + c.Node.EndTag()
 }
 
 func (c *Cmd) String() string {

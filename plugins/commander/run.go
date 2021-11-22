@@ -51,16 +51,13 @@ func Run(ctx context.Context, root string, env []string, name string, args ...st
 	r.stderr = stderr.Bytes()
 	r.stdout = stdout.Bytes()
 
-	pwd, err := os.Getwd()
-	if err != nil {
-		return Result{}, err
-	}
+	r.Pwd = nwd
 
-	r.Pwd = pwd
-	base := filepath.Base(pwd)
+	sch := []byte(r.Pwd)
+	rpl := []byte(".")
 
-	r.stderr = bytes.ReplaceAll(r.stderr, []byte(pwd), []byte(base))
-	r.stdout = bytes.ReplaceAll(r.stdout, []byte(pwd), []byte(base))
+	r.stderr = bytes.ReplaceAll(r.stderr, sch, rpl)
+	r.stdout = bytes.ReplaceAll(r.stdout, sch, rpl)
 
 	return r, nil
 }

@@ -5,6 +5,7 @@ import (
 	"encoding/json"
 	"fmt"
 	"io"
+	"path/filepath"
 	"sort"
 	"strings"
 	"text/tabwriter"
@@ -132,11 +133,17 @@ func (r Result) Out(ats Attributes, data Data) (string, error) {
 		w.Flush()
 	}
 
+	root := r.Root
+	if root, err := filepath.Abs(root); err == nil {
+		r.Root = root
+	}
+
 	pure := &hepa.Purifier{}
-	pure = hepa.With(pure, filters.Replace(r.Root, "$ROOT"))
+	pure = hepa.With(pure, filters.Replace(r.Root, "."))
 	pure = hepa.With(pure, filters.PWD())
 	pure = hepa.With(pure, filters.Secrets())
 	pure = hepa.With(pure, filters.Golang())
+	pure = hepa.With(pure, filters.Replace("willmark/", ""))
 
 	b, err := pure.Clean(bb)
 	if err != nil {
