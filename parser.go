@@ -66,6 +66,12 @@ func (p *Parser) init() {
 		p.customTags[atomx.Page] = func(node *Node) (Tag, error) {
 			return NewPage(node)
 		}
+
+		for _, h := range atomx.Headings() {
+			p.customTags[h] = func(node *Node) (Tag, error) {
+				return NewHeading(node)
+			}
+		}
 	})
 }
 

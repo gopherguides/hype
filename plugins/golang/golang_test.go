@@ -35,7 +35,7 @@ func Test_NewGo(t *testing.T) {
 	}{
 		{
 			name: "go run",
-			exp:  `<cmd exec="go run main.go" src="demo"></cmd>`,
+			exp:  "<cmd exec=\"go run main.go\" src=\"demo\"><pre class=\"code-block\"><code class=\"language-plain\" language=\"plain\"></code></pre></cmd>",
 			ats: hype.Attributes{
 				"run": "main.go",
 				"src": "demo",
@@ -43,7 +43,7 @@ func Test_NewGo(t *testing.T) {
 		},
 		{
 			name: "go test",
-			exp:  `<cmd exec="go test ./..." hide-duration="true" src="demo"></cmd>`,
+			exp:  "<cmd exec=\"go test ./...\" hide-duration=\"true\" src=\"demo\"><pre class=\"code-block\"><code class=\"language-plain\" language=\"plain\"></code></pre></cmd>",
 			ats: hype.Attributes{
 				"test": "./...",
 				"src":  "demo",

@@ -54,13 +54,16 @@ func (tags Tags) String() string {
 	return strings.Join(s, "")
 }
 
-func (tags Tags) ByAtom(want Atom) Tags {
+func (tags Tags) ByAtom(want ...Atom) Tags {
 	var res Tags
 	for _, t := range tags {
-		if t.Atom() == want {
-			res = append(res, t)
+		for _, w := range want {
+			if t.Atom() == w {
+				res = append(res, t)
+				break
+			}
 		}
-		res = append(res, t.GetChildren().ByAtom(want)...)
+		res = append(res, t.GetChildren().ByAtom(want...)...)
 	}
 	return res
 }

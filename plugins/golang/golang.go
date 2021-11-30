@@ -65,7 +65,10 @@ func NewGo(node *hype.Node) (hype.Tag, error) {
 		}
 	}
 
-	node.Set("environ", strings.Join(env, ","))
+	ev := strings.Join(env, " ")
+	if len(ev) > 0 {
+		node.Set("environ", ev)
+	}
 
 	for k, gats := range goCmds {
 		ex, ok := ats[k]
