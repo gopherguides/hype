@@ -102,10 +102,6 @@ func (p *Parser) NewDocument(n *html.Node) (*Document, error) {
 	return doc, nil
 }
 
-type Finalizer interface {
-	Finalize(p *Parser) error
-}
-
 func (p *Parser) finalize(tags ...Tag) error {
 	for _, tag := range tags {
 		if f, ok := tag.(Finalizer); ok {

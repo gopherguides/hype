@@ -6,6 +6,7 @@ import (
 	"fmt"
 	"path/filepath"
 	"runtime"
+	"strconv"
 	"strings"
 
 	"github.com/gopherguides/hype"
@@ -18,8 +19,9 @@ var _ hype.SetSourceable = &Cmd{}
 
 type Cmd struct {
 	*hype.Node
-	Args []string
-	Env  []string
+	ExpectedExit int
+	Args         []string
+	Env          []string
 }
 
 func (c *Cmd) Source() (hype.Source, bool) {
@@ -67,6 +69,14 @@ func NewCmd(node *hype.Node) (*Cmd, error) {
 
 	if env, ok := ats["environ"]; ok {
 		cmd.Env = strings.Split(env, ",")
+	}
+
+	if ex, ok := ats["exit"]; ok {
+		i, err := strconv.Atoi(ex)
+		if err != nil {
+			return nil, fmt.Errorf("%s: %w", cmd.StartTag(), err)
+		}
+		cmd.ExpectedExit = i
 	}
 
 	return cmd, cmd.Validate()
@@ -125,6 +135,10 @@ func (cmd *Cmd) work(root string, src string) error {
 
 	if err != nil {
 		return err
+	}
+
+	if res.ExitCode != cmd.ExpectedExit {
+		return fmt.Errorf("%s: exit code %d != %d", cmd.StartTag(), res.ExitCode, cmd.ExpectedExit)
 	}
 
 	data["duration"] = res.Duration.String()

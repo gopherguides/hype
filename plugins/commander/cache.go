@@ -103,7 +103,7 @@ func (c *cacher) Path(cmd *Cmd, data Data) string {
 	ats := cmd.Attrs()
 	src := ats["src"]
 
-	runDir := filepath.Join(src)
+	runDir := filepath.Join(c.Dir, src)
 	h, _ := hash(runDir)
 
 	cargs := name.File(cmd.Node.StartTag(), ".json")

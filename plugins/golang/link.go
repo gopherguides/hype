@@ -3,6 +3,7 @@ package golang
 import (
 	"bytes"
 	"fmt"
+	"path"
 	"strings"
 
 	"github.com/gopherguides/hype"
@@ -58,7 +59,15 @@ func NewLink(node *hype.Node) (*Link, error) {
 
 	link.Set("for", href)
 
-	text := hype.QuickText(strings.ReplaceAll(href, "#", "."))
+	dt := strings.ReplaceAll(href, "#", ".")
+
+	if _, ok := ats["full-pkg"]; !ok {
+		spl := strings.Split(href, "#")
+		base := path.Base(spl[0])
+		if len(spl) > 1 {
+			dt = fmt.Sprintf("%s.%s", base, spl[1])
+		}
+	}
 
 	a := &hype.Element{
 		Node: hype.NewNode(htmx.AttrNode("a", ats)),
@@ -72,6 +81,7 @@ func NewLink(node *hype.Node) (*Link, error) {
 		return nil, err
 	}
 
+	text := hype.QuickText(dt)
 	code.Children = append(code.Children, text)
 	a.Children = hype.Tags{code}
 

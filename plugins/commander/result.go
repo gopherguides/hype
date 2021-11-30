@@ -107,26 +107,33 @@ func (r Result) Out(ats Attributes, data Data) (string, error) {
 	}
 
 	if len(r.stderr) > 0 && !ats.HasKeys("hide-stderr") {
-		fmt.Fprintf(bb, "-------\n")
+		fmt.Fprintf(bb, "--------------\n")
 		line := fmt.Sprintf("STDERR:\n\n%s\n", r.stderr)
 		fmt.Fprint(bb, line)
 	}
 
-	if len(data) > 0 && !ats.HasKeys("hide-data") {
-		fmt.Fprintf(bb, "-------\n")
+	pd := map[string]string{}
+	if !ats.HasKeys("hide-data") {
+		for k, v := range data {
+			if !ats.HasKeys("hide-" + k) {
+				pd[k] = v
+			}
+		}
+	}
+
+	if len(pd) > 0 {
+		fmt.Fprintf(bb, "--------------\n")
 
 		keys := make([]string, 0, len(data))
-		for k := range data {
-			if !ats.HasKeys("hide-" + k) {
-				keys = append(keys, k)
-			}
+		for k := range pd {
+			keys = append(keys, k)
 		}
 		sort.Strings(keys)
 
 		w := tabwriter.NewWriter(bb, 0, 0, 1, ' ', tabwriter.StripEscape)
 
 		for _, k := range keys {
-			fmt.Fprintf(w, "%s:\t%s\n", k, data[k])
+			fmt.Fprintf(w, "%s:\t%s\n", k, pd[k])
 		}
 
 		w.Flush()

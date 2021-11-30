@@ -7,14 +7,20 @@ import (
 )
 
 func hash(dir string) (string, error) {
+	dir, err := filepath.Abs(dir)
+	if err != nil {
+		return "", err
+	}
+
 	base := filepath.Base(dir)
+
 	dir = filepath.Dir(dir)
 
 	cab := os.DirFS(dir)
 
 	var infos fileInfos
 
-	err := fs.WalkDir(cab, base, func(path string, d fs.DirEntry, err error) error {
+	err = fs.WalkDir(cab, base, func(path string, d fs.DirEntry, err error) error {
 		if err != nil {
 			return err
 		}

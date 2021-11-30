@@ -4,6 +4,7 @@ import (
 	"fmt"
 	"io/fs"
 	"path/filepath"
+	"strings"
 
 	"github.com/gopherguides/hype/atomx"
 	"golang.org/x/net/html"
@@ -113,6 +114,11 @@ func (i *Include) setSources(dir string, tags Tags) {
 
 			source, ok := st.Source()
 			if !ok {
+				continue
+			}
+
+			ss := source.String()
+			if strings.HasPrefix(ss, dir) {
 				continue
 			}
 
