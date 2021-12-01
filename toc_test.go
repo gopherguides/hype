@@ -50,30 +50,30 @@ func Test_TOC(t *testing.T) {
 	r.NotNil(toc)
 
 	exp := `My Big Book
-	CHAPTER 0
-		Chapter 0
-			Section 0.1
-				Subsection 0.1.1
-			Section 0.2
-				Subsection 0.2.1
-					Subsubsection 0.2.1a
-		Chapter 0.A
-			Section 0.A.1
-	CHAPTER 1
-		Chapter 1
-			Section 1.1
-			Section 1.2
-			Section 1.3
-				Subsection 1.3.1
-					Subsubsection 1.3.1a
-				Subsection 1.3.2
-		Chapter 1A
-			Section 1.A.1
-				Subsection 1.A.1.1
-				Subsection 1.A.1.2
-			Section 1.A.2
-		Chapter 1B
-			Section 1.B.1`
+  Chapter 0
+    Chapter 0
+      Section 0.1
+        Subsection 0.1.1
+      Section 0.2
+        Subsection 0.2.1
+          Subsubsection 0.2.1a
+    Chapter 0.A
+      Section 0.A.1
+  Chapter 1
+    Chapter 1
+      Section 1.1
+      Section 1.2
+      Section 1.3
+        Subsection 1.3.1
+          Subsubsection 1.3.1a
+        Subsection 1.3.2
+    Chapter 1A
+      Section 1.A.1
+        Subsection 1.A.1.1
+        Subsection 1.A.1.2
+      Section 1.A.2
+    Chapter 1B
+      Section 1.B.1`
 
 	act := toc.String()
 	act = strings.TrimSpace(act)
