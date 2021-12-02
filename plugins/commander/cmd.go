@@ -4,10 +4,13 @@ import (
 	"bytes"
 	"context"
 	"fmt"
+	"os"
 	"path/filepath"
 	"runtime"
 	"strconv"
 	"strings"
+	"syscall"
+	"time"
 
 	"github.com/gopherguides/hype"
 	"github.com/mattn/go-shellwords"
@@ -85,7 +88,7 @@ func NewCmd(node *hype.Node) (*Cmd, error) {
 func (cmd *Cmd) work(root string, src string) error {
 	ex, err := cmd.Get("exec")
 	if err != nil {
-		return err
+		return fmt.Errorf("%s: %w", cmd.StartTag(), err)
 	}
 
 	args, err := shellwords.Parse(ex)
@@ -123,6 +126,15 @@ func (cmd *Cmd) work(root string, src string) error {
 
 	}
 
+	timeout := 5 * time.Second
+	if to, ok := ats["timeout"]; ok {
+		d, err := time.ParseDuration(to)
+		if err != nil {
+			return err
+		}
+		timeout = d
+	}
+
 	ctx := context.Background()
 
 	var ag []string
@@ -131,7 +143,26 @@ func (cmd *Cmd) work(root string, src string) error {
 	}
 
 	runDir := filepath.Join(root, src)
-	res, err := Run(ctx, runDir, cmd.Env, n, ag...)
+	jog := &Runner{
+		Args:    ag,
+		Root:    runDir,
+		Env:     cmd.Env,
+		Name:    n,
+		Timeout: timeout,
+	}
+
+	if sig, ok := ats["signal"]; ok {
+		switch sig {
+		case "syscall.SIGINT":
+			jog.Signal = syscall.SIGINT
+		case "os.Interrupt":
+			jog.Signal = os.Interrupt
+		default:
+			return fmt.Errorf("%s: invalid signal %q", cmd.StartTag(), sig)
+		}
+	}
+
+	res, err := jog.Run(ctx)
 
 	if err != nil {
 		return err
