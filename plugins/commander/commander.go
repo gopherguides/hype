@@ -23,3 +23,12 @@ func Register(p *hype.Parser) {
 	p.SetCustomTag(COMMAND, fn)
 
 }
+
+var cmds = map[string]hype.Attributes{
+	"tree": hype.Attributes{
+		"hide-data": "true",
+	},
+	"cat": hype.Attributes{
+		"hide-data": "true",
+	},
+}

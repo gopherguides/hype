@@ -92,6 +92,13 @@ func (r Result) String() string {
 	return string(b)
 }
 
+func (r Result) sep(w io.Writer) {
+	for i := 0; i < 80; i++ {
+		fmt.Fprint(w, "-")
+	}
+	fmt.Fprintln(w)
+}
+
 func (r Result) Out(ats Attributes, data Data) (string, error) {
 	bb := &bytes.Buffer{}
 
@@ -107,7 +114,7 @@ func (r Result) Out(ats Attributes, data Data) (string, error) {
 	}
 
 	if len(r.stderr) > 0 && !ats.HasKeys("hide-stderr") {
-		fmt.Fprintf(bb, "--------------\n")
+		r.sep(bb)
 		line := fmt.Sprintf("STDERR:\n\n%s\n", r.stderr)
 		fmt.Fprint(bb, line)
 	}
@@ -122,8 +129,7 @@ func (r Result) Out(ats Attributes, data Data) (string, error) {
 	}
 
 	if len(pd) > 0 {
-		fmt.Fprintf(bb, "--------------\n")
-
+		r.sep(bb)
 		keys := make([]string, 0, len(data))
 		for k := range pd {
 			keys = append(keys, k)

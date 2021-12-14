@@ -1,6 +1,7 @@
 package commander
 
 import (
+	"crypto/md5"
 	"encoding/json"
 	"fmt"
 	"io"
@@ -9,7 +10,6 @@ import (
 	"runtime"
 	"sync"
 
-	"github.com/gobuffalo/flect/name"
 	"github.com/gopherguides/hype"
 )
 
@@ -34,10 +34,13 @@ type cacher struct {
 	sync.Mutex
 }
 
-func (c *cacher) Retrieve(cmd *Cmd, data Data) error {
+func (c *cacher) Retrieve(root string, cmd *Cmd, data Data) error {
 
-	cfp := c.Path(cmd, data)
-
+	cfp, err := c.Path(root, cmd, data)
+	if err != nil {
+		return err
+	}
+	// fmt.Println("Retrieve", cfp)
 	c.Lock()
 	defer c.Unlock()
 
@@ -61,8 +64,13 @@ func (c *cacher) Retrieve(cmd *Cmd, data Data) error {
 	return cmd.Validate()
 }
 
-func (c *cacher) Store(cmd *Cmd, data Data, res Result) error {
-	cfp := c.Path(cmd, data)
+func (c *cacher) Store(root string, cmd *Cmd, data Data, res Result) error {
+	cfp, err := c.Path(root, cmd, data)
+	if err != nil {
+		return err
+	}
+
+	// fmt.Println("Store", cfp)
 
 	c.Lock()
 	defer c.Unlock()
@@ -97,18 +105,22 @@ func (c *cacher) Store(cmd *Cmd, data Data, res Result) error {
 	return nil
 }
 
-func (c *cacher) Path(cmd *Cmd, data Data) string {
+func (c *cacher) Path(root string, cmd *Cmd, data Data) (string, error) {
 	c.Lock()
 	defer c.Unlock()
-	ats := cmd.Attrs()
-	src := ats["src"]
 
-	runDir := filepath.Join(c.Dir, src)
-	h, _ := hash(runDir)
+	h, err := hash(root)
+	if err != nil {
+		return "", fmt.Errorf("could not hash %s: %w", root, err)
+	}
 
-	cargs := name.File(cmd.Node.StartTag(), ".json")
+	tag := cmd.Node.StartTag()
 
-	cfp := filepath.Join(c.Dir, h, cargs)
+	th := md5.New()
+	fmt.Fprint(th, tag)
+	hs := fmt.Sprintf("%x", th.Sum(nil))
+
+	cfp := filepath.Join(c.Dir, h, hs+".json")
 	os.MkdirAll(filepath.Dir(cfp), 0755)
-	return cfp
+	return cfp, nil
 }

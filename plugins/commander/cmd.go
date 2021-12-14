@@ -4,12 +4,10 @@ import (
 	"bytes"
 	"context"
 	"fmt"
-	"os"
 	"path/filepath"
 	"runtime"
 	"strconv"
 	"strings"
-	"syscall"
 	"time"
 
 	"github.com/gopherguides/hype"
@@ -86,6 +84,8 @@ func NewCmd(node *hype.Node) (*Cmd, error) {
 }
 
 func (cmd *Cmd) work(root string, src string) error {
+	data := Data{}
+
 	ex, err := cmd.Get("exec")
 	if err != nil {
 		return fmt.Errorf("%s: %w", cmd.StartTag(), err)
@@ -104,23 +104,27 @@ func (cmd *Cmd) work(root string, src string) error {
 
 	ats := cmd.Attrs()
 
-	data := Data{}
-
 	e := strings.Join(cmd.Env, ",")
 	e = strings.TrimSpace(e)
 	if len(e) > 0 {
 		data["env"] = e
 	}
 
-	n := cmd.Args[0]
+	name := cmd.Args[0]
+	if x, ok := cmds[name]; ok {
+		for k, v := range x {
+			ats[k] = v
+		}
+	}
 
-	if ats.HasKeys("data-go") || n == "go" {
+	if ats.HasKeys("data-go") || name == "go" {
 		data["go"] = runtime.Version()
 	}
 
 	if !ats.HasKeys("no-cache") {
-
-		if err := cache.Retrieve(cmd, data); err == nil {
+		err := cache.Retrieve(root, cmd, data)
+		// fmt.Printf("TODO >> cmd.go:123 err %[1]T %[1]v\n", err)
+		if err == nil {
 			return nil
 		}
 
@@ -147,19 +151,8 @@ func (cmd *Cmd) work(root string, src string) error {
 		Args:    ag,
 		Root:    runDir,
 		Env:     cmd.Env,
-		Name:    n,
+		Name:    name,
 		Timeout: timeout,
-	}
-
-	if sig, ok := ats["signal"]; ok {
-		switch sig {
-		case "syscall.SIGINT":
-			jog.Signal = syscall.SIGINT
-		case "os.Interrupt":
-			jog.Signal = os.Interrupt
-		default:
-			return fmt.Errorf("%s: invalid signal %q", cmd.StartTag(), sig)
-		}
 	}
 
 	res, err := jog.Run(ctx)
@@ -185,7 +178,7 @@ func (cmd *Cmd) work(root string, src string) error {
 	// 	return nil
 	// }
 
-	if err := cache.Store(cmd, data, res); err != nil {
+	if err := cache.Store(root, cmd, data, res); err != nil {
 		return err
 	}
 
