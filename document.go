@@ -29,7 +29,7 @@ func (d *Document) Overview() string {
 }
 
 func (d Document) MarshalJSON() ([]byte, error) {
-	m := map[string]interface{}{
+	m := map[string]any{
 		"document": htmx.NewNodeJSON(d.Node.html),
 		"fs":       d.FS,
 	}
@@ -42,15 +42,7 @@ func (doc *Document) Meta() Metas {
 		return nil
 	}
 
-	meta := doc.Children.ByType(&Meta{})
-	res := make([]*Meta, 0, len(meta))
-	for _, m := range meta {
-		if md, ok := m.(*Meta); ok {
-			res = append(res, md)
-		}
-	}
-
-	return res
+	return ByType(doc.Children, &Meta{})
 }
 
 func (d Document) Validate(checks ...ValidatorFn) error {
@@ -124,17 +116,12 @@ func (doc *Document) Body() (*Body, error) {
 		return nil, fmt.Errorf("document can not be nil")
 	}
 
-	bodies := doc.Children.ByAtom("body")
+	bodies := ByType(doc.Children, &Body{})
 	if len(bodies) == 0 {
 		return nil, fmt.Errorf("body not found")
 	}
 
-	body, ok := bodies[0].(*Body)
-	if !ok {
-		return nil, fmt.Errorf("node not a body %v", bodies[0])
-	}
-
-	return body, nil
+	return bodies[0], nil
 }
 
 // Title returns the <title> tag contents.
@@ -150,22 +137,15 @@ func (doc *Document) Pages() Pages {
 		return nil
 	}
 
-	pages := doc.Children.ByAtom("page")
-	res := make(Pages, 0, len(pages))
+	pages := ByType(doc.Children, &Page{})
 
-	if len(pages) == 0 {
-		body, err := doc.Body()
-		if err != nil {
-			return nil
-		}
-		return append(res, body.AsPage())
+	if len(pages) > 0 {
+		return pages
 	}
 
-	for _, m := range pages {
-		if md, ok := m.(*Page); ok {
-			res = append(res, md)
-		}
+	body, err := doc.Body()
+	if err != nil {
+		return nil
 	}
-
-	return res
+	return Pages{body.AsPage()}
 }

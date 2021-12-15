@@ -65,22 +65,6 @@ func Test_Tags_AllAdam(t *testing.T) {
 	r.Len(act, 0)
 }
 
-func Test_Tags_AllType(t *testing.T) {
-	t.Parallel()
-	r := require.New(t)
-
-	p := testParser(t, testdata)
-
-	doc, err := p.ParseFile("big.html")
-	r.NoError(err)
-
-	act := doc.Children.ByType(&Meta{})
-	r.Len(act, 19)
-
-	act = doc.Children.ByType(&InlineCode{})
-	r.Len(act, 0)
-}
-
 func Test_Tags_ByAttrs(t *testing.T) {
 	t.Parallel()
 	r := require.New(t)
@@ -117,5 +101,34 @@ func Test_Tags_ByAttrs(t *testing.T) {
 			r.Len(act, tt.exp)
 		})
 	}
+
+}
+
+func Test_ByType(t *testing.T) {
+	t.Parallel()
+	r := require.New(t)
+
+	p := testParser(t, testdata)
+
+	doc, err := p.ParseFile("html5.html")
+	r.NoError(err)
+	r.NotNil(doc)
+
+	metas := ByType(doc.Children, &Meta{})
+	r.Len(metas, 9)
+
+	m := metas[0]
+	r.Equal("charset", m.Key)
+	r.Equal("utf-8", m.Val)
+
+	codes := ByType(doc.Children, &SourceCode{})
+	r.Len(codes, 3)
+
+	c := codes[0]
+	r.Equal("go", c.Lang())
+
+	src, ok := c.Source()
+	r.True(ok)
+	r.Equal("src/main.go", src.String())
 
 }

@@ -1,6 +1,6 @@
 module github.com/gopherguides/hype
 
-go 1.17
+go 1.18
 
 // replace github.com/markbates/sweets => ../sweets
 // replace github.com/markbates/hepa => ../hepa

@@ -1,7 +1,6 @@
 package hype
 
 import (
-	"fmt"
 	"io/fs"
 	"os"
 	"path/filepath"
@@ -78,7 +77,7 @@ func Test_TOC(t *testing.T) {
 	act := toc.String()
 	act = strings.TrimSpace(act)
 
-	fmt.Println(act)
+	// fmt.Println(act)
 
 	r.Equal(exp, act)
 }

@@ -2,7 +2,6 @@ package hype
 
 import (
 	"fmt"
-	"reflect"
 	"strings"
 
 	"github.com/gopherguides/hype/atomx"
@@ -68,26 +67,26 @@ func (tags Tags) ByAtom(want ...Atom) Tags {
 	return res
 }
 
-func (tags Tags) ByType(want interface{}) Tags {
-	var res Tags
+// func (tags Tags) ByType(want any) Tags {
+// 	var res Tags
 
-	if want == nil {
-		return res
-	}
+// 	if want == nil {
+// 		return res
+// 	}
 
-	wt := reflect.TypeOf(want)
+// 	wt := reflect.TypeOf(want)
 
-	for _, t := range tags {
-		tt := reflect.TypeOf(t)
-		if tt.AssignableTo(wt) {
-			res = append(res, t)
-		}
+// 	for _, t := range tags {
+// 		tt := reflect.TypeOf(t)
+// 		if tt.AssignableTo(wt) {
+// 			res = append(res, t)
+// 		}
 
-		res = append(res, t.GetChildren().ByType(want)...)
-	}
+// 		res = append(res, t.GetChildren().ByType(want)...)
+// 	}
 
-	return res
-}
+// 	return res
+// }
 
 func (tags Tags) ByAttrs(query Attributes) Tags {
 	var res Tags
@@ -100,5 +99,19 @@ func (tags Tags) ByAttrs(query Attributes) Tags {
 
 		res = append(res, t.GetChildren().ByAttrs(query)...)
 	}
+	return res
+}
+
+func ByType[T Tag](tags Tags, want T) []T {
+	var res []T
+
+	for _, t := range tags {
+		if x, ok := t.(T); ok {
+			res = append(res, x)
+		}
+
+		res = append(res, ByType(t.GetChildren(), want)...)
+	}
+
 	return res
 }
