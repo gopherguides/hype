@@ -4,6 +4,8 @@ import (
 	"bytes"
 	"context"
 	"fmt"
+	"io"
+	"os"
 	"path/filepath"
 	"runtime"
 	"strconv"
@@ -162,6 +164,9 @@ func (cmd *Cmd) work(root string, src string) error {
 	}
 
 	if res.ExitCode != cmd.ExpectedExit {
+
+		io.Copy(os.Stderr, res.Stderr())
+		io.Copy(os.Stdout, res.Stdout())
 		return fmt.Errorf("%s: exit code %d != %d", cmd.StartTag(), res.ExitCode, cmd.ExpectedExit)
 	}
 

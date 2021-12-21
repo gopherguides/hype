@@ -65,7 +65,7 @@ func NewGo(node *hype.Node) (hype.Tag, error) {
 		}
 	}
 
-	ev := strings.Join(env, " ")
+	ev := strings.Join(env, ",")
 	if len(ev) > 0 {
 		node.Set("environ", ev)
 	}
