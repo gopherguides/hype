@@ -19,6 +19,7 @@ func testParser(t testing.TB, cab fs.FS, root string) *hype.Parser {
 	if err != nil {
 		t.Fatal(err)
 	}
+	p.Root = root
 
 	Register(p)
 	return p

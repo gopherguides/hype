@@ -15,6 +15,7 @@ import (
 // Parser will convert HTML documents into, easy to use, nice types.
 type Parser struct {
 	*fsx.FS
+	Cache *Cache
 	sync.RWMutex
 	customTags   TagMap
 	snippetRules map[string]string
@@ -96,6 +97,7 @@ func (p *Parser) SubParser(path string) (*Parser, error) {
 	if err != nil {
 		return nil, err
 	}
+
 	p2.Root = filepath.Join(p.Root, path)
 
 	for k, v := range p.snippetRules {
@@ -155,6 +157,7 @@ func (p *Parser) ParseFile(name string) (*Document, error) {
 
 func (p *Parser) ParseReader(r io.ReadCloser) (*Document, error) {
 	p.init()
+
 	node, err := html.Parse(r)
 	if err != nil {
 		return nil, err

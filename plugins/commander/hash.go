@@ -31,11 +31,10 @@ func hash(dir string) (string, error) {
 		}
 
 		fi := fileInfo{
-			Name:    info.Name(),
-			Size:    info.Size(),
-			Mode:    info.Mode(),
-			ModTime: info.ModTime().UnixNano(),
-			IsDir:   info.IsDir(),
+			Name:  info.Name(),
+			Size:  info.Size(),
+			Mode:  info.Mode(),
+			IsDir: info.IsDir(),
 		}
 
 		infos = append(infos, fi)

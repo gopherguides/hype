@@ -6,11 +6,6 @@ import (
 	"io/fs"
 )
 
-type CacheFile struct {
-	Result Result `json:"result,omitempty"`
-	HTML   string `json:"html,omitempty"`
-}
-
 type fileInfo struct {
 	Name    string      // base name of the file
 	Size    int64       // length in bytes for regular files; system-dependent for others

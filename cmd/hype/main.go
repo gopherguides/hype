@@ -50,6 +50,7 @@ func defaultSW(sw *cleo.Router) cleo.HandlerFn {
 		if err != nil {
 			return err
 		}
+		p.Root = pwd
 
 		b, err := ioutil.ReadAll(rt.Stdin)
 		if err != nil {

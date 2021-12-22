@@ -3,6 +3,7 @@ package commander
 import (
 	"bytes"
 	"context"
+	"crypto/md5"
 	"fmt"
 	"io"
 	"os"
@@ -36,7 +37,7 @@ func (c *Cmd) SetSource(src string) {
 }
 
 func (c *Cmd) Finalize(p *hype.Parser) error {
-	return c.work(p.Root, c.Attrs()["src"])
+	return c.work(p, c.Attrs()["src"])
 }
 
 func (c *Cmd) StartTag() string {
@@ -85,7 +86,12 @@ func NewCmd(node *hype.Node) (*Cmd, error) {
 	return cmd, cmd.Validate()
 }
 
-func (cmd *Cmd) work(root string, src string) error {
+func (cmd *Cmd) work(p *hype.Parser, src string) error {
+	if p == nil {
+		return fmt.Errorf("parser is nil")
+	}
+	root := p.Root
+
 	data := Data{}
 
 	ex, err := cmd.Get("exec")
@@ -123,13 +129,20 @@ func (cmd *Cmd) work(root string, src string) error {
 		data["go"] = runtime.Version()
 	}
 
-	if !ats.HasKeys("no-cache") {
-		err := cache.Retrieve(root, cmd, data)
-		// fmt.Printf("TODO >> cmd.go:123 err %[1]T %[1]v\n", err)
-		if err == nil {
-			return nil
-		}
+	cacheKey, err := cmd.CacheKey(root)
+	if err != nil {
+		return err
+	}
 
+	if !ats.HasKeys("no-cache") {
+		if p.Cache != nil {
+
+			b, err := p.Cache.Retrieve(root, cacheKey)
+			if err == nil {
+				cmd.Children = hype.Tags{hype.QuickText(string(b))}
+				return cmd.Validate()
+			}
+		}
 	}
 
 	timeout := 5 * time.Second
@@ -179,13 +192,30 @@ func (cmd *Cmd) work(root string, src string) error {
 
 	cmd.Children = hype.Tags{hype.QuickText(s)}
 
-	// if res.Err != nil {
-	// 	return nil
-	// }
+	if p.Cache == nil {
+		return nil
+	}
 
-	if err := cache.Store(root, cmd, data, res); err != nil {
+	if err := p.Cache.Store(root, cacheKey, []byte(s)); err != nil {
 		return err
 	}
 
 	return nil
+}
+
+func (cmd *Cmd) CacheKey(root string) (string, error) {
+
+	h, err := hash(root)
+	if err != nil {
+		return "", fmt.Errorf("could not hash %s: %w", root, err)
+	}
+
+	tag := cmd.Node.StartTag()
+
+	th := md5.New()
+	fmt.Fprint(th, tag)
+	hs := fmt.Sprintf("%x", th.Sum(nil))
+
+	s := filepath.Join(h, hs)
+	return s, nil
 }

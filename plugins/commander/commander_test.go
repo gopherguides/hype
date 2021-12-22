@@ -22,8 +22,8 @@ func testParser(t testing.TB, cab fs.FS, root string) *hype.Parser {
 	r := require.New(t)
 
 	p, err := hype.NewParser(cab)
-	p.Root = root
 	r.NoError(err)
+	p.Root = root
 
 	Register(p)
 	return p
