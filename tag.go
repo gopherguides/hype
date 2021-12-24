@@ -70,6 +70,11 @@ func (tags Tags) ByAtom(want ...Atom) Tags {
 	return res
 }
 
+// ByAtom returns all tags that match the given atoms.
+func ByAtom(tags Tags, want ...Atom) Tags {
+	return tags.ByAtom(want...)
+}
+
 // ByAttrs returns all tags that match the given attributes.
 func (tags Tags) ByAttrs(query Attributes) Tags {
 	var res Tags
@@ -83,6 +88,11 @@ func (tags Tags) ByAttrs(query Attributes) Tags {
 		res = append(res, t.GetChildren().ByAttrs(query)...)
 	}
 	return res
+}
+
+// ByAttrs returns all tags that match the given attributes.
+func ByAttrs(tags Tags, query Attributes) Tags {
+	return tags.ByAttrs(query)
 }
 
 // ByType returns all tags that match the given type.

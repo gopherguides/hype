@@ -29,8 +29,7 @@ func Test_NewInclude(t *testing.T) {
 	}{
 		{name: "missing src attr", cab: testdata, node: srcMissing, err: true},
 		{name: "missing src file", cab: testdata, node: fileMissing, err: true},
-		{name: "nil all the way", err: true},
-		{name: "non include tag", node: htmx.ElementNode("p"), err: true},
+		{name: "nil all the way", cab: testdata, err: true},
 		{name: "valid include", cab: testdata, node: validInc},
 	}
 
