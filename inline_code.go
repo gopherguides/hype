@@ -8,10 +8,17 @@ import (
 	"golang.org/x/net/html"
 )
 
+// InlineCode represents inline code.
+//
+// Example:
+// 	This is inline `code`.
+// 	This is inline <code>code</code>.
 type InlineCode struct {
 	*Node
 }
 
+// Lang represents the language of an inline code snippet.
+// Returns an empty string.
 func (c *InlineCode) Lang() string {
 	return ""
 }
@@ -28,11 +35,13 @@ func (c *InlineCode) String() string {
 	return sb.String()
 }
 
+// Validate the InlineCode
 func (inc InlineCode) Validate(checks ...ValidatorFn) error {
 	checks = append(checks, AtomValidator(atomx.Code))
 	return inc.Node.Validate(html.ElementNode, checks...)
 }
 
+// NewInlineCode returns a new InlineCode from the given node.
 func NewInlineCode(node *Node) (*InlineCode, error) {
 	c := &InlineCode{
 		Node: node,

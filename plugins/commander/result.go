@@ -2,7 +2,6 @@ package commander
 
 import (
 	"bytes"
-	"encoding/json"
 	"fmt"
 	"io"
 	"path/filepath"
@@ -13,20 +12,21 @@ import (
 
 	"github.com/markbates/hepa"
 	"github.com/markbates/hepa/filters"
-	"github.com/mattn/go-shellwords"
 )
 
+// Result is the result of running a command.
 type Result struct {
-	Duration time.Duration
-	Err      error  // error from running command
-	ExitCode int    // exit code
-	Root     string // directory where the command was run
-	Pwd      string // where it was actually run
+	Duration time.Duration // time to run the command
+	Err      error         // error from running command
+	ExitCode int           // exit code
+	Pwd      string        // where it was actually run
+	Root     string        // directory where the command was run
 	args     []string
 	stderr   []byte
 	stdout   []byte
 }
 
+// Args returns a copy of the args used to run the command.
 func (r Result) Args() []string {
 	args := make([]string, len(r.args))
 	copy(args, r.args)
@@ -34,6 +34,10 @@ func (r Result) Args() []string {
 	return args
 }
 
+// CmdString returns a string representation of the command that was run.
+//
+// Example:
+//	$ go run main.go
 func (r Result) CmdString() string {
 	if len(r.args) == 0 {
 		return ""
@@ -42,54 +46,19 @@ func (r Result) CmdString() string {
 	return fmt.Sprintf("$ %s", strings.Join(r.args, " "))
 }
 
+// Stdout returns the results from stdout as a Reader.
 func (r Result) Stdout() io.Reader {
 	return bytes.NewReader(r.stdout)
 }
 
+// Stderr returns the results from stderr as a Reader.
 func (r Result) Stderr() io.Reader {
 	return bytes.NewReader(r.stderr)
 }
 
-func (r Result) MarshalJSON() ([]byte, error) {
-	x := resultJSON{
-		Args:     strings.Join(r.args, " "),
-		Exit:     r.ExitCode,
-		Root:     r.Root,
-		Duration: r.Duration,
-		Stderr:   r.stderr,
-		Stdout:   r.stdout,
-	}
-
-	if r.Err != nil {
-		x.Error = r.Err.Error()
-	}
-
-	return json.MarshalIndent(x, "", "  ")
-}
-
-func (r *Result) UnmarshalJSON(data []byte) error {
-	var x resultJSON
-
-	if err := json.Unmarshal(data, &x); err != nil {
-		return err
-	}
-
-	args, _ := shellwords.Parse(x.Args)
-
-	r.args = args
-	r.Err = fmt.Errorf(x.Error)
-	r.ExitCode = x.Exit
-	r.Root = x.Root
-	r.stderr = x.Stderr
-	r.stdout = x.Stdout
-	r.Duration = time.Duration(x.Duration)
-
-	return nil
-}
-
+// String returns the CmdString.
 func (r Result) String() string {
-	b, _ := json.Marshal(r)
-	return string(b)
+	return r.CmdString()
 }
 
 func (r Result) sep(w io.Writer) {
@@ -99,7 +68,8 @@ func (r Result) sep(w io.Writer) {
 	fmt.Fprintln(w)
 }
 
-func (r Result) Out(ats Attributes, data Data) (string, error) {
+// ToHTML returns the results as an HTML tag.
+func (r Result) ToHTML(ats Attributes, data Data) (string, error) {
 	bb := &bytes.Buffer{}
 
 	args := r.Args()
@@ -165,14 +135,4 @@ func (r Result) Out(ats Attributes, data Data) (string, error) {
 	s := strings.TrimSpace(string(b))
 
 	return s, nil
-}
-
-type resultJSON struct {
-	Args     string        `json:"args"`
-	Duration time.Duration `json:"elasped"`
-	Error    string        `json:"error"`
-	Exit     int           `json:"exit"`
-	Root     string        `json:"root"`
-	Stderr   []byte        `json:"stderr"`
-	Stdout   []byte        `json:"stdout"`
 }

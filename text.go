@@ -5,6 +5,7 @@ import (
 	"golang.org/x/net/html"
 )
 
+// Text represents a text node in the HTML document.
 type Text struct {
 	*Node
 }
@@ -28,6 +29,7 @@ func (t Text) Validate(checks ...ValidatorFn) error {
 	return t.Node.Validate(html.TextNode, checks...)
 }
 
+// NewText creates a new Text from an html.Node.
 func NewText(node *html.Node) (*Text, error) {
 	t := &Text{
 		Node: NewNode(node),
@@ -36,6 +38,7 @@ func NewText(node *html.Node) (*Text, error) {
 	return t, t.Validate()
 }
 
+// QuickText creates a new Text from a string.
 func QuickText(s string) *Text {
 	n := htmx.TextNode(s)
 	nn := NewNode(n)
@@ -44,6 +47,7 @@ func QuickText(s string) *Text {
 	}
 }
 
+// NewText creates a new Text from an html.Node.
 func (p *Parser) NewText(node *html.Node) (*Text, error) {
 	return NewText(node)
 }

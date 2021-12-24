@@ -7,21 +7,24 @@ import (
 	"strings"
 )
 
+// Snippet
 type Snippet struct {
-	Content  string
-	File     string
-	Language string
-	Name     string
-	Start    int
-	End      int
+	Content  string // The content of the snippet
+	File     string // the file name of the snippet
+	Language string // the language of the snippet
+	Name     string // the name of the snippet
+	Start    int    // the start line of the snippet
+	End      int    // the end line of the snippet
 }
 
 func (snip Snippet) String() string {
 	return snip.Content
 }
 
+// Snippets is a map of Snippet
 type Snippets map[string]Snippet
 
+// Snippets returns a map of Snippets from the given file.
 func (p *Parser) Snippets(src string, b []byte) (Snippets, error) {
 	p.RLock()
 	defer p.RUnlock()
@@ -37,6 +40,7 @@ func (p *Parser) SnippetRule(ext string, rule string) {
 	p.snippetRules[ext] = rule
 }
 
+// ParseSnippets will parse the given src and return a map of Snippets.
 func ParseSnippets(path string, src []byte, rules map[string]string) (Snippets, error) {
 	if rules == nil {
 		rules = map[string]string{}

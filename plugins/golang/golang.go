@@ -2,39 +2,14 @@ package golang
 
 import (
 	"fmt"
-	"os"
-	"path/filepath"
-	"runtime"
 	"strings"
 
 	"github.com/gopherguides/hype"
 	"github.com/gopherguides/hype/plugins/commander"
 )
 
-const cacheDir = ".hype/golang"
-
-func CachePath() (string, error) {
-	root, err := os.UserHomeDir()
-	if err != nil {
-		return "", err
-	}
-	fp := filepath.Join(root, cacheDir, runtime.Version())
-	return fp, nil
-}
-
+// Register registers all of this plugin's commands.
 func Register(p *hype.Parser) {
-	p.SetCustomTag(GODOC, func(node *hype.Node) (hype.Tag, error) {
-		fmt.Printf("%s is deprecated\n", node.StartTag())
-
-		ats := node.Attrs()
-
-		ex := fmt.Sprintf("go doc %s", ats["exec"])
-		node.Set("exec", ex)
-		node.Set("hide-duration", "true")
-
-		return commander.NewCmd(node)
-	})
-
 	p.SetCustomTag(LINK, func(node *hype.Node) (hype.Tag, error) {
 		return NewLink(node)
 	})
@@ -44,6 +19,12 @@ func Register(p *hype.Parser) {
 	})
 }
 
+// NewGo returns a new commander.Cmd based on the given node.
+// See commander.Cmd for more information.
+//
+// Example:
+// 	"<go build="-o ./bin" timeout="10s" src="./cmd/foo"></go>"
+// 	"<go test="-v -cover ./..." timeout="10s" src="./cmd/foo"></go>"
 func NewGo(node *hype.Node) (hype.Tag, error) {
 	if node == nil {
 		return nil, fmt.Errorf("node is nil")

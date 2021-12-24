@@ -7,6 +7,7 @@ import (
 	"github.com/gopherguides/hype/mdx"
 )
 
+// ParseMD parses the given markdown into a Document.
 func (p *Parser) ParseMD(src []byte) (*Document, error) {
 	mdp := mdx.New()
 

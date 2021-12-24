@@ -1,11 +1,12 @@
 package hype
 
 import (
+	"io/fs"
+	"os"
 	"testing"
 	"testing/fstest"
 
 	"github.com/gopherguides/hype/htmx"
-	"github.com/markbates/fsx"
 	"github.com/stretchr/testify/require"
 	"golang.org/x/net/html"
 )
@@ -106,8 +107,7 @@ func Test_Node_String(t *testing.T) {
 	t.Parallel()
 	r := require.New(t)
 
-	cab, err := fsx.DirFS("testdata")
-	r.NoError(err)
+	cab := os.DirFS("testdata")
 
 	name := `html5.html`
 
@@ -117,7 +117,7 @@ func Test_Node_String(t *testing.T) {
 	r.NoError(err)
 	r.NotNil(doc)
 
-	exp, err := p.ReadFile(name)
+	exp, err := fs.ReadFile(p, name)
 	r.NoError(err)
 	r.NotEmpty(exp)
 

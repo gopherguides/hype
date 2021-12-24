@@ -20,6 +20,7 @@ func (ms Metas) Value(key string) (string, bool) {
 	return "", false
 }
 
+// Meta represents a <meta> tag.
 type Meta struct {
 	*Node
 	Key string
@@ -30,6 +31,7 @@ func (m Meta) String() string {
 	return m.InlineTag()
 }
 
+// Validate the meta tag
 func (m *Meta) Validate(checks ...ValidatorFn) error {
 	if m == nil {
 		return fmt.Errorf("nil Meta")
@@ -75,6 +77,7 @@ func (m *Meta) Validate(checks ...ValidatorFn) error {
 	return m.Node.Validate(html.ElementNode, checks...)
 }
 
+// MetaNode returns a meta tag from the given node.
 func NewMeta(node *Node) (*Meta, error) {
 	m := &Meta{
 		Node: node,

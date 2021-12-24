@@ -11,10 +11,15 @@ import (
 	"golang.org/x/net/html"
 )
 
+// Heading is an HTML heading element.
+// 	H1, H2, H3, H4, H5, H6
+//
+// HTML Attributes:
+// 	id: ID of the heading. Defaults to the heading text dasherized.
 type Heading struct {
 	*Node
-	Parent *Heading
-	Level  int
+	Parent *Heading // Parent heading
+	Level  int      // Heading level
 }
 
 func (h Heading) String() string {
@@ -25,6 +30,7 @@ func (h Heading) String() string {
 	return bb.String()
 }
 
+// ID returns the id of the heading.
 func (h *Heading) ID() string {
 	id, err := h.Get("id")
 	if err == nil {
@@ -38,6 +44,7 @@ func (h *Heading) ID() string {
 	return id
 }
 
+// Validate the heading
 func (h Heading) Validate(checks ...ValidatorFn) error {
 	checks = append(checks, AtomValidator(atomx.Headings()...))
 	if len(h.ID()) == 0 {
@@ -46,6 +53,7 @@ func (h Heading) Validate(checks ...ValidatorFn) error {
 	return h.Node.Validate(html.ElementNode, checks...)
 }
 
+// NewHeading returns a new Heading from the given node.
 func NewHeading(node *Node) (*Heading, error) {
 	h := &Heading{
 		Node: node,

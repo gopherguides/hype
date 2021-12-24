@@ -6,6 +6,7 @@ import (
 	"golang.org/x/net/html"
 )
 
+// NodeJSON is a JSON representation of an html.Node.
 type NodeJSON struct {
 	Atom       string     `json:"atom,omitempty"`
 	Attributes Attributes `json:"attributes,omitempty"`
@@ -15,15 +16,18 @@ type NodeJSON struct {
 	Type       string     `json:"type,omitempty"`
 }
 
+// String returns the marshaled JSON representation of the NodeJSON.
 func (node NodeJSON) String() string {
 	b, _ := json.Marshal(node)
 	return string(b)
 }
 
+// MarshalNode will marshal the given html.Node into JSON.
 func MarshalNode(node *html.Node) ([]byte, error) {
 	return json.Marshal(NewNodeJSON(node))
 }
 
+// NewNodeJSON returns a new NodeJSON for the given html.Node.
 func NewNodeJSON(node *html.Node) NodeJSON {
 	if node == nil {
 		return NodeJSON{}

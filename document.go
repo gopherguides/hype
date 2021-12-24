@@ -3,16 +3,16 @@ package hype
 import (
 	"encoding/json"
 	"fmt"
+	"io/fs"
 
 	"github.com/gopherguides/hype/htmx"
-	"github.com/markbates/fsx"
 	"golang.org/x/net/html"
 )
 
 // Document represents an HTML document
 type Document struct {
 	*Node
-	FS *fsx.FS
+	fs.FS
 }
 
 func (d Document) String() string {
@@ -45,6 +45,7 @@ func (doc *Document) Meta() Metas {
 	return ByType(doc.Children, &Meta{})
 }
 
+// Validate the document
 func (d Document) Validate(checks ...ValidatorFn) error {
 	fn := func(n *Node) error {
 
@@ -63,7 +64,7 @@ func (d Document) Validate(checks ...ValidatorFn) error {
 func (p *Parser) NewDocument(n *html.Node) (*Document, error) {
 
 	doc := &Document{
-		FS:   p.FS,
+		FS:   p,
 		Node: NewNode(n),
 	}
 
@@ -111,6 +112,7 @@ func (p *Parser) finalize(tags ...Tag) error {
 	return nil
 }
 
+// Body returns the <body> tag for the document.
 func (doc *Document) Body() (*Body, error) {
 	if doc == nil {
 		return nil, fmt.Errorf("document can not be nil")

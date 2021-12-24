@@ -8,7 +8,6 @@ import (
 
 	"github.com/gopherguides/hype"
 	"github.com/markbates/cleo"
-	"github.com/markbates/fsx"
 )
 
 func main() {
@@ -40,7 +39,7 @@ func defaultSW(sw *cleo.Router) cleo.HandlerFn {
 			}
 		}
 
-		cab, err := fsx.DirFS(pwd)
+		cab := os.DirFS(pwd)
 		if err != nil {
 			return err
 		}

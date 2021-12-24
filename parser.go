@@ -8,18 +8,19 @@ import (
 	"sync"
 
 	"github.com/gopherguides/hype/atomx"
-	"github.com/markbates/fsx"
 	"golang.org/x/net/html"
 )
 
 // Parser will convert HTML documents into, easy to use, nice types.
 type Parser struct {
-	*fsx.FS
-	Cache *Cache
-	sync.RWMutex
+	fs.FS        // the filesystem to use
+	Root  string // the root directory of the parser
+	Cache *Cache // the cache to use (optional)
+
 	customTags   TagMap
 	snippetRules map[string]string
 	once         sync.Once
+	sync.RWMutex
 }
 
 func (p *Parser) init() {
@@ -76,6 +77,7 @@ func (p *Parser) init() {
 	})
 }
 
+// SetCustomTag will set a custom tag for the parser.
 func (p *Parser) SetCustomTag(atom atomx.Atom, fn CustomTagFn) {
 	p.init()
 
@@ -84,11 +86,12 @@ func (p *Parser) SetCustomTag(atom atomx.Atom, fn CustomTagFn) {
 	p.Unlock()
 }
 
+// SubParser will create a new Parser that will use the same FS as the parent.
 func (p *Parser) SubParser(path string) (*Parser, error) {
 	p.Lock()
 	defer p.Unlock()
 
-	cab, err := p.Sub(path)
+	cab, err := fs.Sub(p.FS, path)
 	if err != nil {
 		return nil, err
 	}
@@ -111,13 +114,14 @@ func (p *Parser) SubParser(path string) (*Parser, error) {
 	return p2, nil
 }
 
+// NewParser will create a new Parser.
 func NewParser(cab fs.FS) (*Parser, error) {
 	if cab == nil {
 		return nil, fmt.Errorf("cab can not be nil")
 	}
 
 	p := &Parser{
-		FS:         fsx.NewFS(cab),
+		FS:         cab,
 		customTags: TagMap{},
 		snippetRules: map[string]string{
 			".html": "<!-- %s -->",
@@ -155,6 +159,7 @@ func (p *Parser) ParseFile(name string) (*Document, error) {
 	return doc, nil
 }
 
+// ParseReader will parse the given reader and return a Document.
 func (p *Parser) ParseReader(r io.ReadCloser) (*Document, error) {
 	p.init()
 
@@ -166,6 +171,8 @@ func (p *Parser) ParseReader(r io.ReadCloser) (*Document, error) {
 	return p.NewDocument(node)
 }
 
+// CustomTag will return the custom tag for the given atom,
+// or nil if there is no custom tag.
 func (p *Parser) CustomTag(atom atomx.Atom) (CustomTagFn, bool) {
 	p.init()
 

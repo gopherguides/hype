@@ -4,11 +4,13 @@ import (
 	"golang.org/x/net/html"
 )
 
+// Code represents a type of code block.
 type Code interface {
 	Tag
 	Lang() string
 }
 
+// NewCode will return the appropriate code type for the given node.
 func NewCode(node *Node, p *Parser) (Code, error) {
 	err := node.Validate(html.ElementNode, AtomValidator("code"))
 

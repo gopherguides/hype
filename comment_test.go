@@ -3,7 +3,6 @@ package hype
 import (
 	"encoding/json"
 	"testing"
-	"testing/fstest"
 
 	"github.com/gopherguides/hype/htmx"
 	"github.com/stretchr/testify/require"
@@ -13,18 +12,16 @@ func Test_Parser_NewComment(t *testing.T) {
 	t.Parallel()
 	r := require.New(t)
 
-	p := testParser(t, fstest.MapFS{})
-
 	node := htmx.CommentNode("ssh")
 
-	c, err := p.NewComment(node)
+	c, err := NewComment(node)
 	r.NoError(err)
 
 	r.Equal(`<!-- ssh -->`, c.String())
 
-	_, err = p.NewComment(nil)
+	_, err = NewComment(nil)
 	r.Error(err)
-	_, err = p.NewComment(htmx.TextNode("hello"))
+	_, err = NewComment(htmx.TextNode("hello"))
 	r.Error(err)
 }
 

@@ -20,6 +20,7 @@ type ValidatableHTTP interface {
 	ValidateHTTP(client *http.Client) error
 }
 
+// AtomValidator returns a validator that checks that the node has the given atoms.
 func AtomValidator(atoms ...Atom) ValidatorFn {
 	return func(n *Node) error {
 
@@ -31,6 +32,8 @@ func AtomValidator(atoms ...Atom) ValidatorFn {
 	}
 }
 
+// SourceValidator returns a validator that checks that the node has a
+// src attribute that points to a file in the given cab.
 func SourceValidator(cab fs.FS, tag Tag) ValidatorFn {
 	return func(n *Node) error {
 
@@ -49,6 +52,7 @@ func SourceValidator(cab fs.FS, tag Tag) ValidatorFn {
 	}
 }
 
+// AttrValidator returns a validator that checks that the node has the given attributes.
 func AttrValidator(query Attributes) ValidatorFn {
 	return func(n *Node) error {
 		if !n.Attrs().Matches(query) {
@@ -58,6 +62,7 @@ func AttrValidator(query Attributes) ValidatorFn {
 	}
 }
 
+// ChildrenValidator returns validators that validate a tags children.
 func ChildrenValidators(tag Tag, checks ...ValidatorFn) []ValidatorFn {
 	fn := func(n *Node) error {
 		return n.Children.Validate(checks...)

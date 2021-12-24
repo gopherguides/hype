@@ -10,11 +10,13 @@ import (
 	"golang.org/x/net/html"
 )
 
+// Include is a node that includes another file in its body.
 type Include struct {
 	*Node
 	Data string
 }
 
+// Source returns the source of the include.
 func (c *Include) Source() (Source, bool) {
 	c.RLock()
 	defer c.RUnlock()
@@ -34,16 +36,19 @@ func (i Include) String() string {
 	return fmt.Sprintf("<include %s />", i.Attrs())
 }
 
+// Validate the include
 func (i Include) Validate(checks ...ValidatorFn) error {
 	checks = append(checks, AtomValidator(atomx.Include))
 	return i.Node.Validate(html.ElementNode, checks...)
 }
 
+// ValidateFS validates the include against the given filesystem.
 func (i Include) ValidateFS(fs fs.FS, checks ...ValidatorFn) error {
 	checks = append(checks, SourceValidator(fs, &i))
 	return i.Validate(checks...)
 }
 
+// NewInclude creates a new Include node based on the given node.
 func NewInclude(node *Node, p *Parser) (*Include, error) {
 
 	i := &Include{
@@ -66,7 +71,7 @@ func NewInclude(node *Node, p *Parser) (*Include, error) {
 	case ".html", ".md":
 		// let these fall through as we'll handle them properly below
 	default:
-		b, err := p.ReadFile(src)
+		b, err := fs.ReadFile(p, src)
 		if err != nil {
 			return nil, err
 		}

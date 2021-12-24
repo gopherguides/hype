@@ -10,6 +10,7 @@ import (
 	"golang.org/x/net/html"
 )
 
+// Nodeable returns a Node.
 type Nodeable interface {
 	DaNode() *Node
 }
@@ -18,6 +19,8 @@ type Nodes []*Node
 
 var _ Atomable = &Node{}
 
+// The Node type is used to represent a single node in the HTML tree.
+// Node is a wrapper around html.Node.
 type Node struct {
 	Children Tags
 	DataAtom Atom
@@ -26,6 +29,7 @@ type Node struct {
 	sync.RWMutex
 }
 
+// Type is the type of the node.
 func (n *Node) Type() html.NodeType {
 	if n == nil || n.html == nil {
 		return html.ErrorNode
@@ -34,6 +38,7 @@ func (n *Node) Type() html.NodeType {
 	return n.html.Type
 }
 
+// Validate the node.
 func (n *Node) Validate(nt html.NodeType, validators ...ValidatorFn) error {
 	if n == nil {
 		return fmt.Errorf("nil node")
@@ -60,6 +65,7 @@ func (n *Node) Validate(nt html.NodeType, validators ...ValidatorFn) error {
 	return nil
 }
 
+// Clone returns a deep copy of the node.
 func (n *Node) Clone() *Node {
 	node := &Node{
 		Children: n.Children,
@@ -69,6 +75,7 @@ func (n *Node) Clone() *Node {
 	return node
 }
 
+// Atom returns the atom of the node.
 func (n *Node) Atom() Atom {
 	n.RLock()
 	defer n.RUnlock()
@@ -101,10 +108,12 @@ func (n *Node) InlineTag() string {
 	return st
 }
 
+// GetChildren returns the children of the node.
 func (n *Node) GetChildren() Tags {
 	return n.Children
 }
 
+// DaNode returns the underlying Node.
 func (n *Node) DaNode() *Node {
 	return n
 }
@@ -126,6 +135,7 @@ func (n *Node) Attrs() Attributes {
 	return ats
 }
 
+// Delete an attribute from the node.
 func (n *Node) Delete(key string) {
 	n.Lock()
 	defer n.Unlock()
@@ -135,6 +145,7 @@ func (n *Node) Delete(key string) {
 	delete(n.attrs, key)
 }
 
+// Set an attribute on the node.
 func (n *Node) Set(key string, val string) {
 	n.Lock()
 	defer n.Unlock()
@@ -157,6 +168,7 @@ func (n *Node) Get(key string) (string, error) {
 	return n.attrs.Get(key)
 }
 
+// NewNode creates a new Node.
 func NewNode(n *html.Node) *Node {
 	node := &Node{
 		html:     n,
@@ -175,6 +187,8 @@ func (g *Node) MarshalJSON() ([]byte, error) {
 	return htmx.MarshalNode(g.html)
 }
 
+// ParseNode parses the given node and returns the
+// appropriate Tag implementation.
 func (p *Parser) ParseNode(node *html.Node) (Tag, error) {
 	if node == nil {
 		return nil, fmt.Errorf("nil node")

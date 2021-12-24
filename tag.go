@@ -7,6 +7,7 @@ import (
 	"github.com/gopherguides/hype/atomx"
 )
 
+// Tag represents a tag in the HTML document.
 type Tag interface {
 	atomx.Atomable
 	Attrs() Attributes
@@ -30,6 +31,7 @@ type Tagger interface {
 
 type Tags []Tag
 
+// Validate the tags and their children.
 func (tags Tags) Validate(checks ...ValidatorFn) error {
 	for _, t := range tags {
 		if v, ok := t.(Validatable); ok {
@@ -53,6 +55,7 @@ func (tags Tags) String() string {
 	return strings.Join(s, "")
 }
 
+// ByAtom returns all tags that match the given atoms.
 func (tags Tags) ByAtom(want ...Atom) Tags {
 	var res Tags
 	for _, t := range tags {
@@ -67,27 +70,7 @@ func (tags Tags) ByAtom(want ...Atom) Tags {
 	return res
 }
 
-// func (tags Tags) ByType(want any) Tags {
-// 	var res Tags
-
-// 	if want == nil {
-// 		return res
-// 	}
-
-// 	wt := reflect.TypeOf(want)
-
-// 	for _, t := range tags {
-// 		tt := reflect.TypeOf(t)
-// 		if tt.AssignableTo(wt) {
-// 			res = append(res, t)
-// 		}
-
-// 		res = append(res, t.GetChildren().ByType(want)...)
-// 	}
-
-// 	return res
-// }
-
+// ByAttrs returns all tags that match the given attributes.
 func (tags Tags) ByAttrs(query Attributes) Tags {
 	var res Tags
 	for _, t := range tags {
@@ -102,6 +85,7 @@ func (tags Tags) ByAttrs(query Attributes) Tags {
 	return res
 }
 
+// ByType returns all tags that match the given type.
 func ByType[T Tag](tags Tags, want T) []T {
 	var res []T
 

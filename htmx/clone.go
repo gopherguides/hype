@@ -2,6 +2,7 @@ package htmx
 
 import "golang.org/x/net/html"
 
+// CloneNode returns a copy of the given node.
 func CloneNode(n *html.Node) *html.Node {
 	if n == nil {
 		return nil

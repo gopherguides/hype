@@ -10,13 +10,13 @@ import (
 	"time"
 )
 
+// Runner executes a command.
 type Runner struct {
-	Args    []string
-	Env     []string
-	Name    string
-	Root    string
-	Signal  os.Signal
-	Timeout time.Duration
+	Args    []string      // args to pass to the command
+	Env     []string      // env vars to pass to the command
+	Name    string        // name of the command
+	Root    string        // root directory to run the command in
+	Timeout time.Duration // timeout for the command
 	sync.RWMutex
 }
 

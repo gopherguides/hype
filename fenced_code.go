@@ -7,6 +7,12 @@ import (
 	"golang.org/x/net/html"
 )
 
+// FencedCode represents a fenced code block.
+//
+// Example:
+// 	```go
+// 	fmt.Println("Hello, World!")
+// 	```
 type FencedCode struct {
 	*Node
 }
@@ -22,6 +28,8 @@ func (c FencedCode) String() string {
 	return sb.String()
 }
 
+// Lang returns the language of the fenced code block.
+// Defaults to plain.
 func (c *FencedCode) Lang() string {
 	ats := c.Attrs()
 	if l, ok := ats["language"]; ok {
@@ -46,6 +54,7 @@ func (fc FencedCode) Validate(checks ...ValidatorFn) error {
 	return fc.Node.Validate(html.ElementNode, checks...)
 }
 
+// NewFencedCode returns a new FencedCode from the given node.
 func NewFencedCode(node *Node) (*FencedCode, error) {
 	c := &FencedCode{
 		Node: node,

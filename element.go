@@ -8,6 +8,7 @@ import (
 	"golang.org/x/net/html"
 )
 
+// Element is a generic HTML element.
 type Element struct {
 	*Node
 }
@@ -31,10 +32,12 @@ func (e Element) String() string {
 	return sb.String()
 }
 
+// Validate the element
 func (e Element) Validate(checks ...ValidatorFn) error {
 	return e.Node.Validate(html.ElementNode, checks...)
 }
 
+// ElementNode returns an element node from the given node.
 func (p *Parser) ElementNode(n *html.Node) (Tag, error) {
 	node := NewNode(n)
 

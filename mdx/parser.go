@@ -13,6 +13,7 @@ import (
 
 const extensions = blackfriday.CommonExtensions | blackfriday.LaxHTMLBlocks
 
+// Parser for parsing Markdown
 type Parser struct {
 	*sync.RWMutex
 	cur   int
@@ -32,6 +33,7 @@ func (p *Parser) end(w io.Writer) {
 	fmt.Fprintln(w, "</page>")
 }
 
+// NewParser returns a new Parser.
 func New() *Parser {
 	p := &Parser{
 		RWMutex: &sync.RWMutex{},
@@ -99,6 +101,7 @@ func (p *Parser) parse(lines []string) ([]byte, error) {
 	return act, nil
 }
 
+// Parse parses the Markdown and returns the HTML.
 func (p *Parser) Parse(src []byte) ([]byte, error) {
 	p.Lock()
 	p.lines = strings.Split(string(src), "\n")
@@ -107,7 +110,8 @@ func (p *Parser) Parse(src []byte) ([]byte, error) {
 	return p.parse(p.lines)
 }
 
-func (p *Parser) Next() (string, bool) {
+// next returns the next line in the Markdown.
+func (p *Parser) next() (string, bool) {
 	p.Lock()
 	ll := len(p.lines)
 	cur := p.cur

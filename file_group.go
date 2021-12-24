@@ -8,11 +8,16 @@ import (
 	"golang.org/x/net/html"
 )
 
+// FileGroup represents a collection of files.
+//
+// HTML Attributes:
+// 	name (required): The name of the file group.
 type FileGroup struct {
 	*Node
 	name string
 }
 
+// Name returns the name of the file group.
 func (fg *FileGroup) Name() string {
 	fg.Lock()
 	name := fg.name
@@ -37,6 +42,7 @@ func (fg *FileGroup) String() string {
 	return bb.String()
 }
 
+// Validate the file group
 func (fg FileGroup) Validate(checks ...ValidatorFn) error {
 	checks = append(checks,
 		AtomValidator(atomx.Filegroup),
@@ -48,6 +54,7 @@ func (fg FileGroup) Validate(checks ...ValidatorFn) error {
 	return fg.Node.Validate(html.ElementNode, checks...)
 }
 
+// NewFileGroup returns a new FileGroup from the given node.
 func NewFileGroup(node *Node) (*FileGroup, error) {
 
 	fg := &FileGroup{

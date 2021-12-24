@@ -9,6 +9,7 @@ import (
 	"github.com/boltdb/bolt"
 )
 
+// ErrCacheMiss is returned when a cache miss occurs.
 type ErrCacheMiss struct {
 	Key string
 }
@@ -17,6 +18,7 @@ func (ecm ErrCacheMiss) Error() string {
 	return fmt.Sprintf("cache miss: %s", ecm.Key)
 }
 
+// Cache is a cache for storing and retrieving data.
 type Cache struct {
 	Root string // default: pwd
 
@@ -24,6 +26,7 @@ type Cache struct {
 	db *bolt.DB
 }
 
+// Open the cache at the given path.
 func (c *Cache) Open() error {
 	if c == nil {
 		return fmt.Errorf("cache is nil")
@@ -32,7 +35,6 @@ func (c *Cache) Open() error {
 	os.MkdirAll(c.Root, 0755)
 
 	fp := filepath.Join(c.Root, "cache.db")
-	fmt.Println("[CACHE]: open", fp)
 	db, err := bolt.Open(fp, 0755, nil)
 	if err != nil {
 		return err
@@ -45,6 +47,7 @@ func (c *Cache) Open() error {
 	return nil
 }
 
+// Close the cache.
 func (c *Cache) Close() error {
 	if c == nil {
 		return nil
@@ -52,7 +55,6 @@ func (c *Cache) Close() error {
 
 	c.Lock()
 	if c.db != nil {
-		fmt.Println("closing db")
 		c.db.Close()
 	}
 
@@ -60,6 +62,7 @@ func (c *Cache) Close() error {
 	return nil
 }
 
+// DB returns the bolt database for the given root.
 func (c *Cache) DB(root string) (*bolt.DB, error) {
 	if c == nil {
 		return nil, fmt.Errorf("cache is nil")
@@ -97,10 +100,12 @@ func (c *Cache) DB(root string) (*bolt.DB, error) {
 	return c.db, nil
 }
 
+// BucketName returns the name of the cache bucket.
 func (c *Cache) BucketName() []byte {
 	return []byte("hype-cache")
 }
 
+// Store the given data in the cache.
 func (c *Cache) Store(root string, key string, value []byte) error {
 	// fmt.Printf("[CACHE]: store\t%q\n", key)
 	db, err := c.DB(root)
@@ -118,6 +123,7 @@ func (c *Cache) Store(root string, key string, value []byte) error {
 	})
 }
 
+// Retrieve the data from the cache.
 func (c *Cache) Retrieve(root string, key string) ([]byte, error) {
 	// fmt.Printf("[CACHE]: retrieve\t%q\n", key)
 	db, err := c.DB(root)

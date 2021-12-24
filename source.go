@@ -13,11 +13,13 @@ import (
 	"time"
 )
 
+// Sourceable is a tag that has a src attribute.
 type Sourceable interface {
 	Tag
 	Source() (Source, bool)
 }
 
+// SetSourceable is a tag that can have its src attribute set.
 type SetSourceable interface {
 	Sourceable
 	SetSource(s string)
@@ -25,14 +27,17 @@ type SetSourceable interface {
 
 type Source string
 
+// Ext returns the file extension of the source.
 func (s Source) Ext() string {
 	return filepath.Ext(string(s))
 }
 
+// Base returns the base name of the source.
 func (s Source) Base() string {
 	return filepath.Base(string(s))
 }
 
+// Dir returns the directory of the source.
 func (s Source) Dir() string {
 	return filepath.Dir(string(s))
 }
@@ -41,6 +46,9 @@ func (s Source) String() string {
 	return string(s)
 }
 
+// Lang returns the language of the source
+// based on the file extension.
+// Defaults to "plain".
 func (s Source) Lang() string {
 	ext := s.Ext()
 	ext = strings.TrimPrefix(ext, ".")
@@ -52,6 +60,7 @@ func (s Source) Lang() string {
 	return ext
 }
 
+// MimeType of the source. Defaults to "text/plain".
 func (s Source) MimeType() string {
 	m := mime.TypeByExtension(s.Ext())
 	if len(m) == 0 {
@@ -61,11 +70,13 @@ func (s Source) MimeType() string {
 	return m
 }
 
+// SchemeLess returns the source without the scheme.
 func (s Source) Schemeless() string {
 	sc, _ := s.Scheme()
 	return strings.TrimPrefix(s.String(), fmt.Sprintf("%s://", sc))
 }
 
+// Scheme returns the scheme of the source.
 func (s Source) Scheme() (string, error) {
 	u, err := url.Parse(string(s))
 
@@ -81,6 +92,7 @@ func (s Source) Scheme() (string, error) {
 	return sc, nil
 }
 
+// IsFile returns true if the source is a file.
 func (s Source) IsFile() bool {
 	// its ok to ignore the error
 	// before the zero value of
@@ -93,6 +105,7 @@ func (s Source) IsFile() bool {
 	return sc == "file"
 }
 
+// IsHTTP returns true if the source is a http(s) source.
 func (s Source) IsHTTP() bool {
 	// its ok to ignore the error
 	// before the zero value of
@@ -105,6 +118,7 @@ func (s Source) IsHTTP() bool {
 	return sc == "http" || sc == "https"
 }
 
+// StatFile returns the file info of the source.
 func (s Source) StatFile(cab fs.FS) (fs.FileInfo, error) {
 	if !s.IsFile() {
 		return nil, fmt.Errorf("source is not a file: %q", s)
@@ -113,6 +127,7 @@ func (s Source) StatFile(cab fs.FS) (fs.FileInfo, error) {
 	return fs.Stat(cab, s.Schemeless())
 }
 
+// StatHTTP returns the file info of an http(s) source.
 func (s Source) StatHTTP(client *http.Client) (fs.FileInfo, error) {
 	if !s.IsHTTP() {
 		return nil, fmt.Errorf("source is not a http(s) source: %q", s)
@@ -132,11 +147,6 @@ func (s Source) StatHTTP(client *http.Client) (fs.FileInfo, error) {
 		return nil, err
 	}
 
-	// Last-Modified
-	// Last-Modified: <day-name>, <day> <month> <year> <hour>:<minute>:<second> GMT
-	// Last-Modified: Wed, 21 Oct 2015 07:28:00 GMT
-	// RFC1123
-
 	mod, err := time.Parse(http.TimeFormat, res.Header.Get("Last-Modified"))
 	if err != nil {
 		return nil, err
@@ -153,12 +163,10 @@ func (s Source) StatHTTP(client *http.Client) (fs.FileInfo, error) {
 	return cab.Stat(s.Schemeless())
 }
 
-// SetTag will set the "src" attribute
-// of the tag.
+// SetTag will set the "src" attribute of the tag.
 // If the tag implements the SetSourceable
 // that will be used.
-// Otherwise the tags attributes will be set
-// directly.
+// Otherwise the tags attributes will be set directly.
 func (s Source) SetTag(tag Tag) {
 	if sc, ok := tag.(SetSourceable); ok {
 		sc.SetSource(string(s))

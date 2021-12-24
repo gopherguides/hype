@@ -13,11 +13,19 @@ import (
 
 var _ Tag = &SourceCode{}
 
+// SourceCode represents a code file on disk.
+//
+// HTML Attributes:
+// 	src (required): the path to the source file.
+// 		`<code src="foo.go"></code>`
+// 	snippet: the name of a snippet to use.
+// 		`<code src="foo.go" snippet="example"></code>`
+// 	lang: the language of the code. Defaults to the file extension.
 type SourceCode struct {
 	*Node
-	Snippets Snippets
-	Body     string // Full source of file
-	lang     string
+	Snippets Snippets // map of snippets in the file
+	Body     string   // Full source of file
+	lang     string   // language of the file
 }
 
 func (c *SourceCode) Source() (Source, bool) {

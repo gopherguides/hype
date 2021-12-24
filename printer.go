@@ -7,18 +7,22 @@ import (
 	"sync"
 )
 
+// TransformerFn is a function that transforms a tag for printing.
 type TransformerFn func(tag Tag) (Tag, error)
 
 func defaultTransformer(tag Tag) (Tag, error) {
 	return tag, nil
 }
 
+// Printer can be used for custom printing of a Document.
 type Printer struct {
 	*sync.RWMutex
 	former TransformerFn
 	output io.Writer
 }
 
+// Transformer returns the current transformer function,
+// or a no-op function if none is set.
 func (p *Printer) Transformer() TransformerFn {
 	p.Lock()
 	if p.former == nil {
@@ -30,6 +34,7 @@ func (p *Printer) Transformer() TransformerFn {
 	return fn
 }
 
+// Print will print the given tags.
 func (p *Printer) Print(tags ...Tag) error {
 
 	type taggable interface {
@@ -59,10 +64,12 @@ func (p *Printer) Print(tags ...Tag) error {
 	return nil
 }
 
+// Transform will transform the given tag.
 func (p *Printer) Transform(tag Tag) (Tag, error) {
 	return p.Transformer()(tag)
 }
 
+// SetTransformer sets the transformer function.
 func (p *Printer) SetTransformer(fn TransformerFn) {
 	p.Lock()
 	defer p.Unlock()
@@ -70,12 +77,15 @@ func (p *Printer) SetTransformer(fn TransformerFn) {
 	p.former = fn
 }
 
+// SetOutput sets the output writer.
 func (p *Printer) SetOutput(w io.Writer) {
 	p.Lock()
 	defer p.Unlock()
 	p.output = w
 }
 
+// Out returns the current output writer.
+// If none is set, it returns os.Stdout.
 func (p *Printer) Out() io.Writer {
 	p.RLock()
 	defer p.RUnlock()
@@ -87,6 +97,7 @@ func (p *Printer) Out() io.Writer {
 	return os.Stdout
 }
 
+// NewPrinter returns a new Printer.
 func NewPrinter(w io.Writer) *Printer {
 	p := &Printer{
 		RWMutex: &sync.RWMutex{},

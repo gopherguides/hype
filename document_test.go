@@ -121,7 +121,6 @@ func Test_Document_JSON(t *testing.T) {
 
 	act := string(b)
 
-	r.Contains(act, `"fs":{"assets":{`)
 	r.Contains(act, `"document":{"children":[`)
 }
 

@@ -13,10 +13,13 @@ import (
 
 var _ hype.Tag = &Link{}
 
+// Link represents a link to Go documentation
+// on pkg.go.dev.
 type Link struct {
 	*hype.Node
 }
 
+// String returns an HTML representation of the tag.
 func (link Link) String() string {
 	bb := &bytes.Buffer{}
 	fmt.Fprint(bb, link.StartTag())
@@ -25,14 +28,28 @@ func (link Link) String() string {
 	return bb.String()
 }
 
+// Validate the link
 func (link *Link) Validate(checks ...hype.ValidatorFn) error {
 	if link == nil {
 		return fmt.Errorf("link is nil")
 	}
 
+	checks = append(checks, hype.AtomValidator(LINK))
 	return link.Node.Validate(html.ElementNode, checks...)
 }
 
+// NewLink returns a new Link from the given node.
+// The package/type for the link can be set with the
+// "href" attribute or by placing the package/type in the
+// body of the tag. Packages must use query string style pathing.
+//
+// HTML Attributes:
+// 	target: Sets the default target for the "a" tag. Defaults to "_blank".
+//
+// Example:
+// 	<godoc#a>github.com/gobuffalo/buffalo#App.Name</godoc#a>
+// 	<godoc#a>context#Context</godoc#a>
+// 	<godoc#a href="context#Context"></godoc#a>
 func NewLink(node *hype.Node) (*Link, error) {
 	link := &Link{
 		Node: node,

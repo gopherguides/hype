@@ -9,10 +9,11 @@ import (
 
 type Tocs []*Toc
 
+// Toc represents a table of contents.
 type Toc struct {
-	Children Tocs
-	Indent   int
-	Title    string
+	Children Tocs   // Children of this Toc.
+	Indent   int    // Indentation level.
+	Title    string // Title of this Toc.
 }
 
 func (t Toc) String() string {
@@ -28,6 +29,7 @@ func (t Toc) String() string {
 	return bb.String()
 }
 
+// Tocs returns a table of contents for the given documents.
 func TocsFromDocs(title string, docs ...*Document) (*Toc, error) {
 	toc := &Toc{
 		Title: title,
@@ -87,7 +89,6 @@ func tocKids(parent *Toc, tags Tags) {
 			}
 
 			tocKids(parent, tag.GetChildren())
-			// parent.Children = append(parent.Children, toc)
 		}
 	}
 }

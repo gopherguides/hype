@@ -8,12 +8,21 @@ import (
 	"golang.org/x/net/html"
 )
 
+// Attributes is a map of key/value pairs
+// respresenting HTML element attributes.
+//
+// Example:
+// 	`<div class="foo" id="bar" />`
+// 	map[string]string{"class": "foo", "id": "bar"}
 type Attributes map[string]string
 
+// AttributesString returns a string representation of the
+// HTMl node's attributes.
 func AttributesString(node *html.Node) string {
 	return NewAttributes(node).String()
 }
 
+// NewAttributes returns a new Attributes from the given node.
 func NewAttributes(node *html.Node) Attributes {
 	ats := Attributes{}
 	if node == nil {
@@ -27,6 +36,8 @@ func NewAttributes(node *html.Node) Attributes {
 	return ats
 }
 
+// Get returns the value of the attribute with the given key.
+// If the attribute does not exist an error is returned.
 func (ats Attributes) Get(key string) (string, error) {
 	if ats == nil {
 		return "", fmt.Errorf("no attributes")
@@ -34,11 +45,12 @@ func (ats Attributes) Get(key string) (string, error) {
 
 	v, ok := ats[key]
 	if !ok {
-		return "", fmt.Errorf("no attribute %q", key)
+		return "", ErrAttrNotFound(key)
 	}
 	return v, nil
 }
 
+// HasKey returns true if the attributes contain all of the keys.
 func (ats Attributes) HasKeys(keys ...string) bool {
 	for _, key := range keys {
 		if _, ok := ats[key]; !ok {
@@ -48,6 +60,11 @@ func (ats Attributes) HasKeys(keys ...string) bool {
 	return true
 }
 
+// Matches returns true if the attributes match the given keys/values.
+//
+// Specials:
+//	*: Matches any attribute value.
+//	map[string]string{"src": "*"}
 func (ats Attributes) Matches(query map[string]string) bool {
 	for k, v := range query {
 		av, ok := ats[k]
@@ -66,6 +83,7 @@ func (ats Attributes) Matches(query map[string]string) bool {
 	return true
 }
 
+// Attrs returns a slice of html.Attribute from the attributes.
 func (ats Attributes) Attrs() []html.Attribute {
 	if ats == nil {
 		return nil
@@ -82,6 +100,11 @@ func (ats Attributes) Attrs() []html.Attribute {
 	return ha
 }
 
+// String returns a string representation of the attributes
+// in HTML element attribute format.
+//
+// Example:
+//	`class="foo" id="bar"`
 func (ats Attributes) String() string {
 	if len(ats) == 0 {
 		return ""
@@ -95,8 +118,9 @@ func (ats Attributes) String() string {
 	return strings.Join(lines, " ")
 }
 
-func AttrNode(name string, ats Attributes) *html.Node {
-	node := ElementNode(name)
+// AttrNode returns a new html.Node with the attributes.
+func AttrNode(atom string, ats Attributes) *html.Node {
+	node := ElementNode(atom)
 	node.Attr = ats.Attrs()
 	return node
 }

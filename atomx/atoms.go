@@ -2,6 +2,8 @@
 
 package atomx
 
+// Headings returns all the heading elements.
+
 func Headings() Atoms {
 	return Atoms{
 		H1,
@@ -12,6 +14,8 @@ func Headings() Atoms {
 		H6,
 	}
 }
+
+// Inlines returns all the inline elements.
 
 func Inlines() Atoms {
 	return Atoms{

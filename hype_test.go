@@ -6,7 +6,6 @@ import (
 	"os"
 	"testing"
 
-	"github.com/markbates/fsx"
 	"github.com/stretchr/testify/require"
 )
 
@@ -20,7 +19,7 @@ func testParser(t *testing.T, cab fs.FS) *Parser {
 
 	r := require.New(t)
 
-	p, err := NewParser(fsx.NewFS(cab))
+	p, err := NewParser(cab)
 	r.NoError(err)
 	return p
 }
