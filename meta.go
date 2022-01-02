@@ -10,21 +10,9 @@ var _ Tag = &Meta{}
 
 type Metas []*Meta
 
-// Value returns the value for the key in the <meta> tags.
-func (ms Metas) Value(key string) (string, bool) {
-	for _, m := range ms {
-		if m.Key == key {
-			return m.Val, true
-		}
-	}
-	return "", false
-}
-
 // Meta represents a <meta> tag.
 type Meta struct {
 	*Node
-	Key string
-	Val string
 }
 
 func (m Meta) String() string {
@@ -37,43 +25,6 @@ func (m *Meta) Validate(checks ...ValidatorFn) error {
 		return fmt.Errorf("nil Meta")
 	}
 
-	fn := func(node *Node) error {
-		ats := node.Attrs()
-
-		if ch, ok := ats["charset"]; ok {
-			ats["property"] = "charset"
-			ats["content"] = ch
-		}
-
-		if len(m.Key) > 0 && len(m.Val) > 0 {
-			return nil
-		}
-
-		prop, pok := ats["property"]
-		name, nok := ats["name"]
-
-		if pok && nok {
-			return fmt.Errorf("both property and name defined, pick one %v", node)
-		}
-
-		if !pok && !nok {
-			return fmt.Errorf("missing property/name %v", node)
-		}
-
-		if len(prop) == 0 {
-			prop = name
-		}
-
-		val, ok := ats["content"]
-		if !ok {
-			return fmt.Errorf("missing content %v", node)
-		}
-		m.Key = prop
-		m.Val = val
-		return nil
-	}
-
-	checks = append(checks, fn)
 	return m.Node.Validate(html.ElementNode, checks...)
 }
 

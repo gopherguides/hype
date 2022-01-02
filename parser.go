@@ -4,6 +4,7 @@ import (
 	"fmt"
 	"io"
 	"io/fs"
+	"net/http"
 	"path/filepath"
 	"sync"
 
@@ -13,9 +14,10 @@ import (
 
 // Parser will convert HTML documents into, easy to use, nice types.
 type Parser struct {
-	fs.FS        // the filesystem to use
-	Root  string // the root directory of the parser
-	Cache *Cache // the cache to use (optional)
+	fs.FS               // the filesystem to use
+	Root   string       // the root directory of the parser
+	Cache  *Cache       // the cache to use (optional)
+	Client *http.Client // the http client to use (optional)
 
 	customTags   TagMap
 	snippetRules map[string]string
@@ -160,7 +162,7 @@ func (p *Parser) ParseFile(name string) (*Document, error) {
 }
 
 // ParseReader will parse the given reader and return a Document.
-func (p *Parser) ParseReader(r io.ReadCloser) (*Document, error) {
+func (p *Parser) ParseReader(r io.Reader) (*Document, error) {
 	p.init()
 
 	node, err := html.Parse(r)

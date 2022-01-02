@@ -117,10 +117,6 @@ func Test_ByType(t *testing.T) {
 	metas := ByType(doc.Children, &Meta{})
 	r.Len(metas, 9)
 
-	m := metas[0]
-	r.Equal("charset", m.Key)
-	r.Equal("utf-8", m.Val)
-
 	codes := ByType(doc.Children, &SourceCode{})
 	r.Len(codes, 3)
 
