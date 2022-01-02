@@ -2,6 +2,7 @@ package htmx
 
 import (
 	"fmt"
+	"regexp"
 	"sort"
 	"strings"
 
@@ -60,7 +61,8 @@ func (ats Attributes) HasKeys(keys ...string) bool {
 	return true
 }
 
-// Matches returns true if the attributes match the given keys/values.
+// Matches returns true if the attributes match, via regexp,
+// the given keys/values.
 //
 // Specials:
 //	*: Matches any attribute value.
@@ -76,7 +78,12 @@ func (ats Attributes) Matches(query map[string]string) bool {
 			continue
 		}
 
-		if av != v {
+		rx, err := regexp.Compile(v)
+		if err != nil {
+			return false
+		}
+
+		if !rx.MatchString(av) {
 			return false
 		}
 	}
