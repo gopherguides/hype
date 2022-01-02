@@ -57,7 +57,7 @@ func (n *Node) Validate(nt html.NodeType, validators ...ValidatorFn) error {
 	}
 
 	for _, v := range validators {
-		if err := v(n); err != nil {
+		if err := v(nil, n); err != nil {
 			return err
 		}
 	}

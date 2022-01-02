@@ -96,7 +96,7 @@ func (c *SourceCode) String() string {
 }
 
 func (sc SourceCode) Validate(checks ...ValidatorFn) error {
-	fn := func(n *Node) error {
+	fn := func(p *Parser, n *Node) error {
 
 		if _, ok := sc.Source(); !ok {
 			return fmt.Errorf("missing source: %v", sc)
