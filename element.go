@@ -8,6 +8,9 @@ import (
 	"golang.org/x/net/html"
 )
 
+var _ Tag = &Element{}
+var _ Validatable = &Element{}
+
 // Element is a generic HTML element.
 type Element struct {
 	*Node
@@ -33,15 +36,15 @@ func (e Element) String() string {
 }
 
 // Validate the element
-func (e Element) Validate(checks ...ValidatorFn) error {
-	return e.Node.Validate(html.ElementNode, checks...)
+func (e Element) Validate(p *Parser, checks ...ValidatorFn) error {
+	return e.Node.Validate(p, html.ElementNode, checks...)
 }
 
 // ElementNode returns an element node from the given node.
 func (p *Parser) ElementNode(n *html.Node) (Tag, error) {
 	node := NewNode(n)
 
-	err := node.Validate(html.ElementNode)
+	err := node.Validate(p, html.ElementNode)
 	if err != nil {
 		return nil, err
 	}
@@ -64,5 +67,5 @@ func (p *Parser) ElementNode(n *html.Node) (Tag, error) {
 		Node: node,
 	}
 
-	return el, el.Validate()
+	return el, nil
 }

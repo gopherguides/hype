@@ -7,6 +7,8 @@ import (
 )
 
 var _ SetSourceable = &Image{}
+var _ Validatable = &Image{}
+var _ ValidatableFS = &Image{}
 
 // Image represents an HTML image.
 type Image struct {
@@ -35,24 +37,23 @@ func (i Image) String() string {
 }
 
 // Validate the image
-func (i Image) Validate(checks ...ValidatorFn) error {
+func (i Image) Validate(p *Parser, checks ...ValidatorFn) error {
 	checks = append(checks, AtomValidator("img", "image"))
-	return i.Node.Validate(html.ElementNode, checks...)
+	return i.Node.Validate(p, html.ElementNode, checks...)
 }
 
 // ValidateFS validates the image against the given filesystem.
-func (i Image) ValidateFS(cab fs.FS, checks ...ValidatorFn) error {
+func (i Image) ValidateFS(p *Parser, cab fs.FS, checks ...ValidatorFn) error {
 	checks = append(checks, SourceValidator(cab, &i))
 
-	return i.Validate(checks...)
+	return i.Validate(p, checks...)
 }
 
 // NewImage returns a new Image from the given node.
 func NewImage(cab fs.FS, node *Node) (*Image, error) {
-
 	i := &Image{
 		Node: node,
 	}
 
-	return i, i.ValidateFS(cab)
+	return i, i.ValidateFS(nil, cab)
 }

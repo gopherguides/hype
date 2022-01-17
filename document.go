@@ -46,9 +46,9 @@ func (doc *Document) Meta() Metas {
 }
 
 // Validate the document
-func (d Document) Validate(checks ...ValidatorFn) error {
-	chocks := ChildrenValidators(d, checks...)
-	err := d.Node.Validate(html.DocumentNode, chocks...)
+func (d Document) Validate(p *Parser, checks ...ValidatorFn) error {
+	chocks := ChildrenValidators(d, p, checks...)
+	err := d.Node.Validate(p, html.DocumentNode, chocks...)
 
 	return err
 }
@@ -62,7 +62,7 @@ func (p *Parser) NewDocument(n *html.Node) (*Document, error) {
 		Node: NewNode(n),
 	}
 
-	if err := doc.Validate(); err != nil {
+	if err := doc.Validate(p); err != nil {
 		return nil, err
 	}
 
@@ -76,12 +76,12 @@ func (p *Parser) NewDocument(n *html.Node) (*Document, error) {
 		c = c.NextSibling
 	}
 
-	err := doc.Validate()
+	err := doc.Validate(p)
 	if err != nil {
 		return nil, err
 	}
 
-	err = p.finalize(doc.Children...)
+	err = p.finalize(doc)
 	if err != nil {
 		return nil, err
 	}
@@ -103,6 +103,8 @@ func (p *Parser) finalize(tags ...Tag) error {
 		}
 	}
 
+	// charset
+
 	return nil
 }
 
@@ -118,13 +120,6 @@ func (doc *Document) Body() (*Body, error) {
 	}
 
 	return bodies[0], nil
-}
-
-// Title returns the <title> tag contents.
-// If there is no <title> then the first <h1> is used.
-// Default: Untitled
-func (doc *Document) Title() string {
-	return findTitle(doc.Children)
 }
 
 // Pages returns all of the <page> tags for the document.

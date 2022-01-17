@@ -17,8 +17,8 @@ func (c Comment) String() string {
 	return fmt.Sprintf("<!-- %s -->", c.Atom())
 }
 
-func (c Comment) Validate(checks ...ValidatorFn) error {
-	return c.Node.Validate(html.CommentNode, checks...)
+func (c Comment) Validate(p *Parser, checks ...ValidatorFn) error {
+	return c.Node.Validate(p, html.CommentNode, checks...)
 }
 
 // NewComment returns a new Comment from the given node.
@@ -32,5 +32,5 @@ func NewComment(n *html.Node) (*Comment, error) {
 		Node: NewNode(n),
 	}
 
-	return c, c.Validate()
+	return c, c.Validate(nil)
 }

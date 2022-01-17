@@ -8,6 +8,9 @@ import (
 	"golang.org/x/net/html"
 )
 
+var _ Tag = &InlineCode{}
+var _ Validatable = &InlineCode{}
+
 // InlineCode represents inline code.
 //
 // Example:
@@ -36,9 +39,9 @@ func (c *InlineCode) String() string {
 }
 
 // Validate the InlineCode
-func (inc InlineCode) Validate(checks ...ValidatorFn) error {
+func (inc InlineCode) Validate(p *Parser, checks ...ValidatorFn) error {
 	checks = append(checks, AtomValidator(atomx.Code))
-	return inc.Node.Validate(html.ElementNode, checks...)
+	return inc.Node.Validate(p, html.ElementNode, checks...)
 }
 
 // NewInlineCode returns a new InlineCode from the given node.
@@ -47,5 +50,5 @@ func NewInlineCode(node *Node) (*InlineCode, error) {
 		Node: node,
 	}
 
-	return c, c.Validate()
+	return c, c.Validate(nil)
 }

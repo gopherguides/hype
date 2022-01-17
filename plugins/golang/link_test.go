@@ -23,7 +23,7 @@ func Test_Link(t *testing.T) {
 	doc, err := p.ParseFile("link.md")
 	r.NoError(err)
 
-	exp := `<html><head></head><body>
+	exp := `<html><head><meta charset="utf-8" /></head><body>
 <page>
 
 <h1>Links</h1>

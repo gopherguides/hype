@@ -39,7 +39,7 @@ func (n *Node) Type() html.NodeType {
 }
 
 // Validate the node.
-func (n *Node) Validate(nt html.NodeType, validators ...ValidatorFn) error {
+func (n *Node) Validate(p *Parser, nt html.NodeType, validators ...ValidatorFn) error {
 	if n == nil {
 		return fmt.Errorf("nil node")
 	}
@@ -57,7 +57,7 @@ func (n *Node) Validate(nt html.NodeType, validators ...ValidatorFn) error {
 	}
 
 	for _, v := range validators {
-		if err := v(nil, n); err != nil {
+		if err := v(p, n); err != nil {
 			return err
 		}
 	}

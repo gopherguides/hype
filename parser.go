@@ -14,10 +14,11 @@ import (
 
 // Parser will convert HTML documents into, easy to use, nice types.
 type Parser struct {
-	fs.FS               // the filesystem to use
-	Root   string       // the root directory of the parser
-	Cache  *Cache       // the cache to use (optional)
-	Client *http.Client // the http client to use (optional)
+	fs.FS                                             // the filesystem to use
+	Root         string                               `json:"root,omitempty"` // the root directory of the parser
+	Cache        *Cache                               `json:"-"`              // the cache to use (optional)
+	Client       *http.Client                         `json:"-"`              // the http client to use (optional)
+	PreProcessor func(r io.Reader) (io.Reader, error) `json:"-"`              // the preprocessor to use (optional)
 
 	customTags   TagMap
 	snippetRules map[string]string
@@ -48,7 +49,7 @@ func (p *Parser) init() {
 		p.customTags[atomx.Image] = img
 
 		p.customTags[atomx.Code] = func(node *Node) (Tag, error) {
-			return NewCode(node, p)
+			return NewCode(p, node)
 		}
 
 		p.customTags[atomx.Body] = func(node *Node) (Tag, error) {
@@ -69,6 +70,10 @@ func (p *Parser) init() {
 
 		p.customTags[atomx.Page] = func(node *Node) (Tag, error) {
 			return NewPage(node)
+		}
+
+		p.customTags[atomx.Head] = func(node *Node) (Tag, error) {
+			return NewHead(node)
 		}
 
 		for _, h := range atomx.Headings() {
@@ -102,6 +107,7 @@ func (p *Parser) SubParser(path string) (*Parser, error) {
 	if err != nil {
 		return nil, err
 	}
+	p2.PreProcessor = p.PreProcessor
 
 	p2.Root = filepath.Join(p.Root, path)
 
@@ -164,6 +170,14 @@ func (p *Parser) ParseFile(name string) (*Document, error) {
 // ParseReader will parse the given reader and return a Document.
 func (p *Parser) ParseReader(r io.Reader) (*Document, error) {
 	p.init()
+
+	var err error
+	if p.PreProcessor != nil {
+		r, err = p.PreProcessor(r)
+		if err != nil {
+			return nil, err
+		}
+	}
 
 	node, err := html.Parse(r)
 	if err != nil {

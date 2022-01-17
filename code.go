@@ -11,8 +11,8 @@ type Code interface {
 }
 
 // NewCode will return the appropriate code type for the given node.
-func NewCode(node *Node, p *Parser) (Code, error) {
-	err := node.Validate(html.ElementNode, AtomValidator("code"))
+func NewCode(p *Parser, node *Node) (Code, error) {
+	err := node.Validate(p, html.ElementNode, AtomValidator("code"))
 
 	if err != nil {
 		return nil, err

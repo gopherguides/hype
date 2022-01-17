@@ -9,11 +9,11 @@ import (
 type ValidatorFn func(p *Parser, n *Node) error
 
 type Validatable interface {
-	Validate(validators ...ValidatorFn) error
+	Validate(p *Parser, validators ...ValidatorFn) error
 }
 
 type ValidatableFS interface {
-	ValidateFS(cab fs.FS, validators ...ValidatorFn) error
+	ValidateFS(p *Parser, cab fs.FS, validators ...ValidatorFn) error
 }
 
 type ValidatableHTTP interface {
@@ -42,7 +42,23 @@ func SourceValidator(cab fs.FS, tag Tag) ValidatorFn {
 			return fmt.Errorf("expected tag %v to have source", tag)
 		}
 
-		_, err := source.StatFile(cab)
+		if source.IsFile() {
+			if _, err := source.StatFile(cab); err != nil {
+				return err
+			}
+			return nil
+		}
+
+		if p == nil {
+			return nil
+		}
+
+		client := p.Client
+		if client == nil {
+			return fmt.Errorf("no http client available")
+		}
+
+		_, err := source.StatHTTP(client)
 
 		if err != nil {
 			return err
@@ -63,14 +79,14 @@ func AttrValidator(query Attributes) ValidatorFn {
 }
 
 // ChildrenValidator returns validators that validate a tags children.
-func ChildrenValidators(tag Tag, checks ...ValidatorFn) []ValidatorFn {
-	fn := func(p *Parser, n *Node) error {
-		return n.Children.Validate(checks...)
-	}
+func ChildrenValidators(tag Tag, p *Parser, checks ...ValidatorFn) []ValidatorFn {
 
 	chock := make([]ValidatorFn, len(checks))
 	copy(chock, checks)
 
+	fn := func(p *Parser, n *Node) error {
+		return n.Children.Validate(p, checks...)
+	}
 	chock = append(chock, fn)
 
 	return chock

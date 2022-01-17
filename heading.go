@@ -3,13 +3,14 @@ package hype
 import (
 	"bytes"
 	"fmt"
-	"strconv"
-	"strings"
 
 	"github.com/gobuffalo/flect"
 	"github.com/gopherguides/hype/atomx"
 	"golang.org/x/net/html"
 )
+
+var _ Tag = &Heading{}
+var _ Validatable = &Heading{}
 
 // Heading is an HTML heading element.
 // 	H1, H2, H3, H4, H5, H6
@@ -19,7 +20,15 @@ import (
 type Heading struct {
 	*Node
 	Parent *Heading // Parent heading
-	Level  int      // Heading level
+}
+
+func (h Heading) Level() int {
+	for i, a := range atomx.Headings() {
+		if h.DataAtom == a {
+			return i + 1
+		}
+	}
+	return 0
 }
 
 func (h Heading) String() string {
@@ -45,12 +54,12 @@ func (h *Heading) ID() string {
 }
 
 // Validate the heading
-func (h Heading) Validate(checks ...ValidatorFn) error {
+func (h Heading) Validate(p *Parser, checks ...ValidatorFn) error {
 	checks = append(checks, AtomValidator(atomx.Headings()...))
 	if len(h.ID()) == 0 {
 		return fmt.Errorf("%s: missing id", h.Atom())
 	}
-	return h.Node.Validate(html.ElementNode, checks...)
+	return h.Node.Validate(p, html.ElementNode, checks...)
 }
 
 // NewHeading returns a new Heading from the given node.
@@ -59,25 +68,5 @@ func NewHeading(node *Node) (*Heading, error) {
 		Node: node,
 	}
 
-	err := h.Validate()
-	if err != nil {
-		return nil, err
-	}
-
-	heads := atomx.Headings()
-	for _, a := range heads {
-		if a != node.Atom() {
-			continue
-		}
-
-		s := strings.TrimPrefix(a.String(), "h")
-		lvl, err := strconv.Atoi(s)
-		if err != nil {
-			return nil, err
-		}
-		h.Level = lvl
-
-	}
-
-	return h, h.Validate()
+	return h, nil
 }

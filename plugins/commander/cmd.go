@@ -20,6 +20,7 @@ import (
 
 var _ hype.Tag = &Cmd{}
 var _ hype.SetSourceable = &Cmd{}
+var _ hype.Validatable = &Cmd{}
 
 // Cmd can be used to run a command.
 // HTML Attributes:
@@ -85,9 +86,9 @@ func (c *Cmd) String() string {
 }
 
 // Validate returns an error if the command is invalid.
-func (c *Cmd) Validate(checks ...hype.ValidatorFn) error {
+func (c *Cmd) Validate(p *hype.Parser, checks ...hype.ValidatorFn) error {
 	checks = append(checks, hype.AtomValidator("cmd"))
-	return c.Node.Validate(html.ElementNode, checks...)
+	return c.Node.Validate(p, html.ElementNode, checks...)
 }
 
 // NewCmd returns a new Cmd from the given node.
@@ -98,7 +99,7 @@ func NewCmd(node *hype.Node) (*Cmd, error) {
 		Node: node,
 	}
 
-	if err := cmd.Validate(); err != nil {
+	if err := cmd.Validate(nil); err != nil {
 		return nil, err
 	}
 
@@ -116,7 +117,7 @@ func NewCmd(node *hype.Node) (*Cmd, error) {
 		cmd.ExpectedExit = i
 	}
 
-	return cmd, cmd.Validate()
+	return cmd, cmd.Validate(nil)
 }
 
 func (cmd *Cmd) work(p *hype.Parser, src string) error {
@@ -173,7 +174,7 @@ func (cmd *Cmd) work(p *hype.Parser, src string) error {
 			b, err := p.Cache.Retrieve(root, cacheKey)
 			if err == nil {
 				cmd.Children = hype.Tags{hype.QuickText(string(b))}
-				return cmd.Validate()
+				return cmd.Validate(p)
 			}
 		}
 	}

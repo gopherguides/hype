@@ -32,15 +32,15 @@ type Tagger interface {
 type Tags []Tag
 
 // Validate the tags and their children.
-func (tags Tags) Validate(checks ...ValidatorFn) error {
+func (tags Tags) Validate(p *Parser, checks ...ValidatorFn) error {
 	for _, t := range tags {
 		if v, ok := t.(Validatable); ok {
-			if err := v.Validate(checks...); err != nil {
+			if err := v.Validate(p, checks...); err != nil {
 				return err
 			}
 		}
 
-		if err := t.GetChildren().Validate(checks...); err != nil {
+		if err := t.GetChildren().Validate(p, checks...); err != nil {
 			return err
 		}
 	}
@@ -107,5 +107,19 @@ func ByType[T Tag](tags Tags, want T) []T {
 		res = append(res, ByType(t.GetChildren(), want)...)
 	}
 
+	return res
+}
+
+func (tags Tags) Delete(atoms ...Atom) Tags {
+	var res Tags
+	for _, t := range tags {
+		if t.Atom().Is(atoms...) {
+			continue
+		}
+
+		node := t.DaNode()
+		node.Children = node.Children.Delete(atoms...)
+		res = append(res, t)
+	}
 	return res
 }

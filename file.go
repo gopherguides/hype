@@ -9,6 +9,10 @@ import (
 	"golang.org/x/net/html"
 )
 
+var _ Tag = &File{}
+var _ Validatable = &File{}
+var _ ValidatableFS = &File{}
+
 // File is a file node.
 type File struct {
 	*Node
@@ -47,17 +51,17 @@ func (f *File) String() string {
 }
 
 // Validate the file
-func (f File) Validate(checks ...ValidatorFn) error {
+func (f File) Validate(p *Parser, checks ...ValidatorFn) error {
 	checks = append(checks, AtomValidator(atomx.File))
 
-	return f.Node.Validate(html.ElementNode, checks...)
+	return f.Node.Validate(p, html.ElementNode, checks...)
 }
 
 // ValidateFS validates the file against the given filesystem.
-func (f File) ValidateFS(cab fs.FS, checks ...ValidatorFn) error {
+func (f File) ValidateFS(p *Parser, cab fs.FS, checks ...ValidatorFn) error {
 	checks = append(checks, SourceValidator(cab, &f))
 
-	return f.Validate(checks...)
+	return f.Validate(p, checks...)
 }
 
 // NewFile returns a new File from the given node.
@@ -66,5 +70,5 @@ func NewFile(cab fs.FS, node *Node) (*File, error) {
 		Node: node,
 	}
 
-	return fg, fg.ValidateFS(cab)
+	return fg, nil
 }

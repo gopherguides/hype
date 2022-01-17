@@ -10,6 +10,10 @@ import (
 	"golang.org/x/net/html"
 )
 
+var _ Tag = &Include{}
+var _ Validatable = &Include{}
+var _ ValidatableFS = &Include{}
+
 // Include is a node that includes another file in its body.
 type Include struct {
 	*Node
@@ -37,15 +41,15 @@ func (i Include) String() string {
 }
 
 // Validate the include
-func (i Include) Validate(checks ...ValidatorFn) error {
+func (i Include) Validate(p *Parser, checks ...ValidatorFn) error {
 	checks = append(checks, AtomValidator(atomx.Include))
-	return i.Node.Validate(html.ElementNode, checks...)
+	return i.Node.Validate(p, html.ElementNode, checks...)
 }
 
 // ValidateFS validates the include against the given filesystem.
-func (i Include) ValidateFS(fs fs.FS, checks ...ValidatorFn) error {
+func (i Include) ValidateFS(p *Parser, fs fs.FS, checks ...ValidatorFn) error {
 	checks = append(checks, SourceValidator(fs, &i))
-	return i.Validate(checks...)
+	return i.Validate(p, checks...)
 }
 
 // NewInclude creates a new Include node based on the given node.
@@ -55,7 +59,7 @@ func NewInclude(node *Node, p *Parser) (*Include, error) {
 		Node: node,
 	}
 
-	if err := i.ValidateFS(p.FS); err != nil {
+	if err := i.ValidateFS(p, p.FS); err != nil {
 		return nil, err
 	}
 

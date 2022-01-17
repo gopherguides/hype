@@ -17,8 +17,8 @@ func (dt DocType) String() string {
 	return fmt.Sprintf("<!doctype %s>\n", dt.Atom())
 }
 
-func (dt DocType) Validate(checks ...ValidatorFn) error {
-	return dt.Node.Validate(html.DoctypeNode, checks...)
+func (dt DocType) Validate(p *Parser, checks ...ValidatorFn) error {
+	return dt.Node.Validate(p, html.DoctypeNode, checks...)
 }
 
 // NewDocType returns a new DocType from the given node.
@@ -33,5 +33,5 @@ func NewDocType(n *html.Node) (*DocType, error) {
 		Node: NewNode(n),
 	}
 
-	return dt, dt.Validate()
+	return dt, nil
 }

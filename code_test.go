@@ -45,7 +45,7 @@ func Test_NewCode(t *testing.T) {
 			r := require.New(t)
 
 			p := testParser(t, testdata)
-			c, err := NewCode(tt.node, p)
+			c, err := NewCode(p, tt.node)
 
 			if tt.err {
 				r.Error(err)
@@ -71,7 +71,7 @@ func Test_Parse_Code(t *testing.T) {
 	doc, err := p.ParseFile("code.md")
 	r.NoError(err)
 
-	exp := `<html><head></head><body>
+	exp := `<html><head><meta charset="utf-8" /></head><body>
 <page>
 
 <h1>Code Test</h1>

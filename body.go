@@ -9,6 +9,7 @@ import (
 )
 
 var _ Tag = &Body{}
+var _ Validatable = &Body{}
 
 // Body represents the body of a document.
 type Body struct {
@@ -40,9 +41,9 @@ func (b Body) AsPage() *Page {
 }
 
 // Validate the body
-func (b Body) Validate(checks ...ValidatorFn) error {
+func (b Body) Validate(p *Parser, checks ...ValidatorFn) error {
 	checks = append(checks, AtomValidator("body"))
-	return b.Node.Validate(html.ElementNode, checks...)
+	return b.Node.Validate(p, html.ElementNode, checks...)
 }
 
 // NewBody returns a new Body from the given node.
@@ -51,5 +52,5 @@ func NewBody(node *Node) (*Body, error) {
 		Node: node,
 	}
 
-	return b, b.Validate()
+	return b, nil
 }

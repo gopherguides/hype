@@ -3,6 +3,7 @@ package hype
 import (
 	"testing"
 
+	"github.com/gopherguides/hype/atomx"
 	"github.com/gopherguides/hype/htmx"
 	"github.com/stretchr/testify/require"
 )
@@ -127,4 +128,28 @@ func Test_ByType(t *testing.T) {
 	r.True(ok)
 	r.Equal("src/main.go", src.String())
 
+}
+
+func Test_Tags_Delete(t *testing.T) {
+	t.Parallel()
+	r := require.New(t)
+	p := testParser(t, testdata)
+
+	doc, err := p.ParseFile("html5.html")
+	r.NoError(err)
+	r.NotNil(doc)
+
+	exp := doc.Children.ByAtom(atomx.Code)
+
+	images := doc.Children.ByAtom(atomx.Img)
+	r.Len(images, 1)
+
+	doc.Children = doc.Children.Delete(atomx.Img)
+
+	act := doc.Children.ByAtom(atomx.Code)
+
+	r.Equal(len(exp), len(act))
+
+	images = doc.Children.ByAtom(atomx.Img)
+	r.Len(images, 0)
 }

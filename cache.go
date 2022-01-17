@@ -23,7 +23,9 @@ type Cache struct {
 	Root string // default: pwd
 
 	sync.RWMutex
-	db *bolt.DB
+	db   *bolt.DB
+	once sync.Once
+	err  error
 }
 
 // Open the cache at the given path.
@@ -68,36 +70,35 @@ func (c *Cache) DB(root string) (*bolt.DB, error) {
 		return nil, fmt.Errorf("cache is nil")
 	}
 
-	c.Lock()
-	if c.db != nil {
+	c.once.Do(func() {
+		c.Lock()
 		defer c.Unlock()
-		err := c.db.Update(func(tx *bolt.Tx) error {
+
+		db := c.db
+		if db != nil {
+			return
+		}
+
+		db, err := bolt.Open(filepath.Join(root, "hype.db"), 0755, nil)
+		if err != nil {
+			c.err = err
+			return
+		}
+
+		err = db.Update(func(tx *bolt.Tx) error {
 			_, err := tx.CreateBucketIfNotExists(c.BucketName())
 			return err
 		})
-		return c.db, err
-	}
-	c.Unlock()
 
-	db, err := bolt.Open(filepath.Join(root, "hype.db"), 0755, nil)
-	if err != nil {
-		return nil, err
-	}
+		if err != nil {
+			c.err = err
+			return
+		}
 
-	err = db.Update(func(tx *bolt.Tx) error {
-		_, err := tx.CreateBucketIfNotExists(c.BucketName())
-		return err
+		c.db = db
 	})
 
-	if err != nil {
-		return nil, err
-	}
-
-	c.Lock()
-	c.db = db
-	c.Unlock()
-
-	return c.db, nil
+	return c.db, c.err
 }
 
 // BucketName returns the name of the cache bucket.

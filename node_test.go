@@ -56,7 +56,7 @@ func Test_Node_Nil(t *testing.T) {
 		t.Run(tt.name, func(t *testing.T) {
 			r := require.New(t)
 
-			err := tt.node.Validate(tt.nt, tt.funs...)
+			err := tt.node.Validate(nil, tt.nt, tt.funs...)
 
 			if tt.valid {
 				r.NoError(err)

@@ -8,8 +8,9 @@ import (
 )
 
 var (
-	_     Tag = &Page{}
-	BREAK     = QuickText("<!--BREAK-->")
+	_     Tag         = &Page{}
+	_     Validatable = &Page{}
+	BREAK             = QuickText("<!--BREAK-->")
 )
 
 type Pages []*Page
@@ -25,43 +26,46 @@ type Page struct {
 // the first <h1> tag will be used. If the first
 // <h1> tag does not exist, "untitled" will be
 // returned.
-func (p Page) Title() string {
-	return findTitle(p.Children)
+func (page Page) Title() string {
+	return findTitle(page.Children)
 }
 
-func (p Page) String() string {
+func (page Page) String() string {
 	sb := &strings.Builder{}
 
-	sb.WriteString(p.StartTag())
+	sb.WriteString(page.StartTag())
 
-	kids := p.GetChildren()
+	kids := page.GetChildren()
 	if len(kids) > 0 {
 		fmt.Fprintf(sb, "\n%s\n", kids)
 	}
 
-	fmt.Fprintln(sb, p.EndTag())
+	fmt.Fprintln(sb, page.EndTag())
 	return sb.String()
 }
 
-func (p *Page) EndTag() string {
-	return fmt.Sprintf("%s%s", p.Node.EndTag(), BREAK)
+func (page Page) EndTag() string {
+	return fmt.Sprintf("%s%s", page.Node.EndTag(), BREAK)
 }
 
-func (p Page) Validate(checks ...ValidatorFn) error {
-	return p.Node.Validate(html.ElementNode, checks...)
+func (page Page) Validate(p *Parser, checks ...ValidatorFn) error {
+	return page.Node.Validate(p, html.ElementNode, checks...)
+}
+
+func (page *Page) ShiftHeadings(n int) {
+	heads := ByType(page.Children, &Heading{})
+	for _, h := range heads {
+		lvl := h.Level()
+		lvl += n
+		h.DataAtom = Atom(fmt.Sprintf("h%d", lvl))
+	}
 }
 
 // NewPage returns a new Page from the given node.
 func NewPage(node *Node) (*Page, error) {
-	p := &Page{
+	page := &Page{
 		Node: node,
 	}
 
-	err := p.Validate()
-
-	if err != nil {
-		return nil, err
-	}
-
-	return p, p.Validate()
+	return page, nil
 }

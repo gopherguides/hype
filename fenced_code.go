@@ -7,6 +7,9 @@ import (
 	"golang.org/x/net/html"
 )
 
+var _ Tag = &FencedCode{}
+var _ Validatable = &FencedCode{}
+
 // FencedCode represents a fenced code block.
 //
 // Example:
@@ -49,9 +52,9 @@ func (c *FencedCode) Lang() string {
 	return "plain"
 }
 
-func (fc FencedCode) Validate(checks ...ValidatorFn) error {
+func (fc FencedCode) Validate(p *Parser, checks ...ValidatorFn) error {
 	checks = append(checks, AtomValidator("code"))
-	return fc.Node.Validate(html.ElementNode, checks...)
+	return fc.Node.Validate(p, html.ElementNode, checks...)
 }
 
 // NewFencedCode returns a new FencedCode from the given node.
@@ -60,7 +63,7 @@ func NewFencedCode(node *Node) (*FencedCode, error) {
 		Node: node,
 	}
 
-	if err := c.Validate(); err != nil {
+	if err := c.Validate(nil); err != nil {
 		return nil, err
 	}
 
@@ -68,5 +71,5 @@ func NewFencedCode(node *Node) (*FencedCode, error) {
 	c.Set("language", lang)
 	c.Set("class", fmt.Sprintf("language-%s", lang))
 
-	return c, c.Validate()
+	return c, nil
 }

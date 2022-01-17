@@ -8,6 +8,9 @@ import (
 	"golang.org/x/net/html"
 )
 
+var _ Tag = &FileGroup{}
+var _ Validatable = &FileGroup{}
+
 // FileGroup represents a collection of files.
 //
 // HTML Attributes:
@@ -43,7 +46,7 @@ func (fg *FileGroup) String() string {
 }
 
 // Validate the file group
-func (fg FileGroup) Validate(checks ...ValidatorFn) error {
+func (fg FileGroup) Validate(p *Parser, checks ...ValidatorFn) error {
 	checks = append(checks,
 		AtomValidator(atomx.Filegroup),
 		AttrValidator(Attributes{
@@ -51,7 +54,7 @@ func (fg FileGroup) Validate(checks ...ValidatorFn) error {
 		},
 		),
 	)
-	return fg.Node.Validate(html.ElementNode, checks...)
+	return fg.Node.Validate(p, html.ElementNode, checks...)
 }
 
 // NewFileGroup returns a new FileGroup from the given node.
@@ -61,5 +64,5 @@ func NewFileGroup(node *Node) (*FileGroup, error) {
 		Node: node,
 	}
 
-	return fg, fg.Validate()
+	return fg, nil
 }

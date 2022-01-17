@@ -13,7 +13,7 @@ func Test_NewMeta(t *testing.T) {
 	r := require.New(t)
 
 	_, err := NewMeta(nil)
-	r.Error(err)
+	r.NoError(err)
 
 	const key = `props`
 	const val = `yo!`
@@ -36,10 +36,6 @@ func Test_NewMeta(t *testing.T) {
 			node := NewNode(n)
 
 			m, err := NewMeta(node)
-			if tt.err {
-				r.Error(err)
-				return
-			}
 
 			r.NoError(err)
 			r.NotNil(m)

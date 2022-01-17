@@ -12,6 +12,7 @@ import (
 )
 
 var _ hype.Tag = &Link{}
+var _ hype.Validatable = &Link{}
 
 // Link represents a link to Go documentation
 // on pkg.go.dev.
@@ -29,13 +30,13 @@ func (link Link) String() string {
 }
 
 // Validate the link
-func (link *Link) Validate(checks ...hype.ValidatorFn) error {
+func (link *Link) Validate(p *hype.Parser, checks ...hype.ValidatorFn) error {
 	if link == nil {
 		return fmt.Errorf("link is nil")
 	}
 
 	checks = append(checks, hype.AtomValidator(LINK))
-	return link.Node.Validate(html.ElementNode, checks...)
+	return link.Node.Validate(p, html.ElementNode, checks...)
 }
 
 // NewLink returns a new Link from the given node.
@@ -55,7 +56,7 @@ func NewLink(node *hype.Node) (*Link, error) {
 		Node: node,
 	}
 
-	if err := link.Validate(); err != nil {
+	if err := link.Validate(nil); err != nil {
 		return nil, err
 	}
 
@@ -104,5 +105,5 @@ func NewLink(node *hype.Node) (*Link, error) {
 
 	link.Children = hype.Tags{a}
 
-	return link, link.Validate()
+	return link, link.Validate(nil)
 }

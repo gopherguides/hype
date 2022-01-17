@@ -124,30 +124,6 @@ func Test_Document_JSON(t *testing.T) {
 	r.Contains(act, `"document":{"children":[`)
 }
 
-func Test_Document_Title(t *testing.T) {
-	t.Parallel()
-
-	table := []struct {
-		name string
-		exp  string
-	}{
-		{name: "pages.md", exp: "First H1"},
-		{name: "html5.html", exp: "A Basic HTML5 Template"},
-	}
-
-	for _, tt := range table {
-		t.Run(tt.name, func(t *testing.T) {
-			r := require.New(t)
-
-			doc := ParseFile(t, testdata, tt.name)
-			r.NotNil(doc)
-
-			r.Equal(tt.exp, doc.Title())
-		})
-	}
-
-}
-
 func Test_Document_Pages(t *testing.T) {
 	t.Parallel()
 

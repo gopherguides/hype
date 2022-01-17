@@ -12,6 +12,8 @@ import (
 )
 
 var _ Tag = &SourceCode{}
+var _ Validatable = &SourceCode{}
+var _ ValidatableFS = &SourceCode{}
 
 // SourceCode represents a code file on disk.
 //
@@ -95,7 +97,7 @@ func (c *SourceCode) String() string {
 	return sb.String()
 }
 
-func (sc SourceCode) Validate(checks ...ValidatorFn) error {
+func (sc SourceCode) Validate(p *Parser, checks ...ValidatorFn) error {
 	fn := func(p *Parser, n *Node) error {
 
 		if _, ok := sc.Source(); !ok {
@@ -111,12 +113,12 @@ func (sc SourceCode) Validate(checks ...ValidatorFn) error {
 
 	checks = append(checks, AtomValidator(atomx.Code), fn)
 
-	return sc.Node.Validate(html.ElementNode, checks...)
+	return sc.Node.Validate(p, html.ElementNode, checks...)
 }
 
-func (sc SourceCode) ValidateFS(cab fs.FS, checks ...ValidatorFn) error {
+func (sc SourceCode) ValidateFS(p *Parser, cab fs.FS, checks ...ValidatorFn) error {
 	checks = append(checks, SourceValidator(cab, &sc))
-	return sc.Validate(checks...)
+	return sc.Validate(p, checks...)
 }
 
 func NewSourceCode(cab fs.FS, node *Node, rules map[string]string) (*SourceCode, error) {
@@ -124,7 +126,7 @@ func NewSourceCode(cab fs.FS, node *Node, rules map[string]string) (*SourceCode,
 		Node: node,
 	}
 
-	if err := c.Validate(); err != nil {
+	if err := c.Validate(nil); err != nil {
 		return nil, err
 	}
 
@@ -175,5 +177,5 @@ func NewSourceCode(cab fs.FS, node *Node, rules map[string]string) (*SourceCode,
 
 	c.Children = Tags{text}
 
-	return c, c.ValidateFS(cab)
+	return c, nil
 }
