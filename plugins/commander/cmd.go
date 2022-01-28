@@ -244,6 +244,8 @@ func (cmd *Cmd) work(p *hype.Parser, src string) error {
 
 		io.Copy(os.Stderr, res.Stderr())
 		io.Copy(os.Stdout, res.Stdout())
+		fmt.Println(string(res.stderr))
+		fmt.Println(string(res.stdout))
 		return fmt.Errorf("%s: exit code %d != %d", cmd.StartTag(), res.ExitCode, cmd.ExpectedExit)
 	}
 

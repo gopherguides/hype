@@ -89,6 +89,7 @@ func (r Result) ToHTML(ats Attributes, data Data) (string, error) {
 	if len(r.stderr) > 0 && !ats.HasKeys("hide-stderr") {
 		r.sep(bb)
 		line := fmt.Sprintf("STDERR:\n\n%s\n", r.stderr)
+		line = html.EscapeString(line)
 		fmt.Fprint(bb, line)
 	}
 
