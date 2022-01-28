@@ -3,9 +3,11 @@ package commander
 import (
 	"bytes"
 	"context"
+	"fmt"
 	"os"
 	"os/exec"
 	"path/filepath"
+	"strings"
 	"sync"
 	"time"
 )
@@ -18,6 +20,14 @@ type Runner struct {
 	Root    string        // root directory to run the command in
 	Timeout time.Duration // timeout for the command
 	sync.RWMutex
+}
+
+func (r Runner) CmdString() string {
+	if len(r.Args) == 0 {
+		return r.Name
+	}
+
+	return fmt.Sprintf("$ %s %s", r.Name, strings.Join(r.Args, " "))
 }
 
 func (r *Runner) Run(ctx context.Context) (Result, error) {

@@ -9,6 +9,7 @@ import (
 	"sync"
 
 	"github.com/gopherguides/hype/atomx"
+	"github.com/jmoiron/sqlx"
 	"golang.org/x/net/html"
 )
 
@@ -16,7 +17,7 @@ import (
 type Parser struct {
 	fs.FS                                             // the filesystem to use
 	Root         string                               `json:"root,omitempty"` // the root directory of the parser
-	Cache        *Cache                               `json:"-"`              // the cache to use (optional)
+	DB           *sqlx.DB                             `json:"-"`              // the database to use (optional)
 	Client       *http.Client                         `json:"-"`              // the http client to use (optional)
 	PreProcessor func(r io.Reader) (io.Reader, error) `json:"-"`              // the preprocessor to use (optional)
 
@@ -108,6 +109,7 @@ func (p *Parser) SubParser(path string) (*Parser, error) {
 		return nil, err
 	}
 	p2.PreProcessor = p.PreProcessor
+	p2.DB = p.DB
 
 	p2.Root = filepath.Join(p.Root, path)
 

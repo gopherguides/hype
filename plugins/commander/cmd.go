@@ -3,7 +3,8 @@ package commander
 import (
 	"bytes"
 	"context"
-	"crypto/md5"
+	"database/sql"
+	"errors"
 	"fmt"
 	"io"
 	"os"
@@ -163,20 +164,10 @@ func (cmd *Cmd) work(p *hype.Parser, src string) error {
 		data["go"] = runtime.Version()
 	}
 
-	cacheKey, err := cmd.CacheKey(root)
+	fp := filepath.Join(root, src)
+	sum, err := hash(fp)
 	if err != nil {
 		return err
-	}
-
-	if !ats.HasKeys("no-cache") {
-		if p.Cache != nil {
-
-			b, err := p.Cache.Retrieve(root, cacheKey)
-			if err == nil {
-				cmd.Children = hype.Tags{hype.QuickText(string(b))}
-				return cmd.Validate(p)
-			}
-		}
 	}
 
 	timeout := 5 * time.Second
@@ -195,16 +186,55 @@ func (cmd *Cmd) work(p *hype.Parser, src string) error {
 		ag = cmd.Args[1:]
 	}
 
-	runDir := filepath.Join(root, src)
 	jog := &Runner{
 		Args:    ag,
-		Root:    runDir,
+		Root:    fp,
 		Env:     cmd.Env,
 		Name:    name,
 		Timeout: timeout,
 	}
 
-	res, err := jog.Run(ctx)
+	cache := &Cache{
+		Command:   jog.CmdString(),
+		Exit:      cmd.ExpectedExit,
+		GoVersion: runtime.Version(),
+		Src:       fp,
+		Sum:       sum,
+	}
+
+	if !ats.HasKeys("no-cache") && p.DB != nil {
+
+		exists, err := func() (bool, error) {
+			err := cache.Fetch(p.DB)
+			if errors.Is(err, sql.ErrNoRows) {
+				return false, nil
+			}
+
+			if err != nil {
+				return false, err
+			}
+
+			return true, nil
+		}()
+
+		if err != nil {
+			return err
+		}
+
+		if exists {
+			cmd.Children = hype.Tags{hype.QuickText(cache.Body)}
+			return cmd.Validate(p)
+		}
+
+	}
+
+	res := Result{
+		ExitCode: cmd.ExpectedExit,
+		Root:     fp,
+		Pwd:      src,
+		Sum:      sum,
+	}
+	res, err = jog.Run(ctx)
 
 	if err != nil {
 		return err
@@ -226,31 +256,15 @@ func (cmd *Cmd) work(p *hype.Parser, src string) error {
 
 	cmd.Children = hype.Tags{hype.QuickText(s)}
 
-	if p.Cache == nil {
+	if p.DB == nil {
 		return nil
 	}
 
-	if err := p.Cache.Store(root, cacheKey, []byte(s)); err != nil {
+	cache.Body = s
+
+	if err := cache.Insert(p.DB); err != nil {
 		return err
 	}
 
 	return nil
-}
-
-// CacheKey returns a unique key for the command.
-func (cmd *Cmd) CacheKey(root string) (string, error) {
-
-	h, err := hash(root)
-	if err != nil {
-		return "", fmt.Errorf("could not hash %s: %w", root, err)
-	}
-
-	tag := cmd.Node.StartTag()
-
-	th := md5.New()
-	fmt.Fprint(th, tag)
-	hs := fmt.Sprintf("%x", th.Sum(nil))
-
-	s := filepath.Join(h, hs)
-	return s, nil
 }

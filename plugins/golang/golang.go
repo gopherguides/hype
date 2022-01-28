@@ -9,7 +9,8 @@ import (
 )
 
 // Register registers all of this plugin's commands.
-func Register(p *hype.Parser) {
+func Register(p *hype.Parser) error {
+
 	p.SetCustomTag(LINK, func(node *hype.Node) (hype.Tag, error) {
 		return NewLink(node)
 	})
@@ -17,6 +18,8 @@ func Register(p *hype.Parser) {
 	p.SetCustomTag(GO, func(node *hype.Node) (hype.Tag, error) {
 		return NewGo(node)
 	})
+
+	return nil
 }
 
 // NewGo returns a new commander.Cmd based on the given node.

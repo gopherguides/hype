@@ -3,6 +3,7 @@ package commander
 import (
 	"bytes"
 	"fmt"
+	"html"
 	"io"
 	"path/filepath"
 	"sort"
@@ -21,6 +22,7 @@ type Result struct {
 	ExitCode int           // exit code
 	Pwd      string        // where it was actually run
 	Root     string        // directory where the command was run
+	Sum      string        // hash of the directory where the command was run
 	args     []string
 	stderr   []byte
 	stdout   []byte
@@ -80,6 +82,7 @@ func (r Result) ToHTML(ats Attributes, data Data) (string, error) {
 
 	if len(r.stdout) > 0 && !ats.HasKeys("hide-stdout") {
 		line := fmt.Sprintf("%s\n", r.stdout)
+		line = html.EscapeString(line)
 		fmt.Fprint(bb, line)
 	}
 
