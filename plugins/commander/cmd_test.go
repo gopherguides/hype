@@ -49,11 +49,13 @@ func Test_Cmd_Run_Error(t *testing.T) {
 	act := err.Error()
 	act = strings.TrimSpace(act)
 
-	fmt.Println(act)
+	// fmt.Println(act)
 	exp := `expected exit code 0, got 1:
 <cmd exec="go run -tags sad ." exit="1" src="cmd">
-file name:	"run.md"
-command:	"$ go run -tags sad ."`
+
+-------
+File Name:	"run.md"
+Command:	"$ go run -tags sad ."`
 
 	r.True(strings.HasPrefix(act, exp))
 }

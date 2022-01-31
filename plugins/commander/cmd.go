@@ -7,6 +7,7 @@ import (
 	"errors"
 	"fmt"
 	"io"
+	"os"
 	"path/filepath"
 	"runtime"
 	"strconv"
@@ -239,16 +240,36 @@ func (cmd *Cmd) work(p *hype.Parser) error {
 	if err != nil {
 		bb := &bytes.Buffer{}
 		fmt.Fprintln(bb, cmd.Node.StartTag())
-		fmt.Fprintf(bb, "file name:\t%q\n", p.FileName)
-		fmt.Fprintf(bb, "command:\t%q\n", res.CmdString())
-		fmt.Fprintf(bb, "duration:\t%q\n", res.Duration.String())
-		fmt.Fprintf(bb, "exit code:\t%d\n", res.ExitCode)
-		fmt.Fprintf(bb, "pwd:\t\t%q\n", res.Pwd)
-		fmt.Fprintf(bb, "root:\t\t%q\n", res.Root)
+		fmt.Fprintln(bb, "\n-------")
+		fmt.Fprintf(bb, "File Name:\t%q\n", p.FileName)
+		fmt.Fprintf(bb, "Command:\t%q\n", res.CmdString())
+		fmt.Fprintf(bb, "Duration:\t%q\n", res.Duration.String())
+		fmt.Fprintf(bb, "Exit Code:\t%d\n", res.ExitCode)
+		fmt.Fprintf(bb, "PWD:\t\t%q\n", res.Pwd)
+		fmt.Fprintf(bb, "Root:\t\t%q\n", res.Root)
+		if len(data) > 0 {
+			fmt.Fprintln(bb, "Data:")
+			for k, v := range data {
+				fmt.Fprintf(bb, "\t%q:\t%q\n", k, v)
+			}
+		}
+		fmt.Fprintln(bb, "\n-------")
 		fmt.Fprintln(bb, "STDOUT:")
 		io.Copy(bb, res.Stdout())
+		fmt.Fprintln(bb, "\n-------")
 		fmt.Fprintln(bb, "STDERR:")
 		io.Copy(bb, res.Stderr())
+		fmt.Fprintln(bb, "\n--------")
+		fmt.Fprintln(bb, "ENVIRON:")
+		for _, e := range os.Environ() {
+			fmt.Fprintf(bb, "\t%q\n", e)
+		}
+		if len(cmd.Env) > 0 {
+			fmt.Fprintln(bb, "CUSTOM ENV:")
+			for _, e := range cmd.Env {
+				fmt.Fprintf(bb, "\t%q\n", e)
+			}
+		}
 		return fmt.Errorf("%w:\n%s", err, bb.String())
 	}
 
