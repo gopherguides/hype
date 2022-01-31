@@ -7,7 +7,6 @@ import (
 	"errors"
 	"fmt"
 	"io"
-	"os"
 	"path/filepath"
 	"runtime"
 	"strconv"
@@ -64,7 +63,7 @@ func (c *Cmd) SetSource(src string) {
 // Finalize runs the command and saves the output.
 // This is called *after* the parsing has completed.
 func (c *Cmd) Finalize(p *hype.Parser) error {
-	return c.work(p, c.Attrs()["src"])
+	return c.work(p)
 }
 
 // StartTag returns the start tag of the command.
@@ -121,7 +120,7 @@ func NewCmd(node *hype.Node) (*Cmd, error) {
 	return cmd, cmd.Validate(nil)
 }
 
-func (cmd *Cmd) work(p *hype.Parser, src string) error {
+func (cmd *Cmd) work(p *hype.Parser) error {
 	if p == nil {
 		return fmt.Errorf("parser is nil")
 	}
@@ -146,6 +145,7 @@ func (cmd *Cmd) work(p *hype.Parser, src string) error {
 	cmd.Args = args
 
 	ats := cmd.Attrs()
+	src := ats["src"]
 
 	e := strings.Join(cmd.Env, ",")
 	e = strings.TrimSpace(e)
@@ -234,19 +234,22 @@ func (cmd *Cmd) work(p *hype.Parser, src string) error {
 		Pwd:      src,
 		Sum:      sum,
 	}
-	res, err = jog.Run(ctx)
+	res, err = jog.Run(ctx, cmd.ExpectedExit)
 
 	if err != nil {
-		return err
-	}
-
-	if res.ExitCode != cmd.ExpectedExit {
-
-		io.Copy(os.Stderr, res.Stderr())
-		io.Copy(os.Stdout, res.Stdout())
-		fmt.Println(string(res.stderr))
-		fmt.Println(string(res.stdout))
-		return fmt.Errorf("%s: exit code %d != %d", cmd.StartTag(), res.ExitCode, cmd.ExpectedExit)
+		bb := &bytes.Buffer{}
+		fmt.Fprintln(bb, cmd.Node.StartTag())
+		fmt.Fprintf(bb, "file name:\t%q\n", p.FileName)
+		fmt.Fprintf(bb, "command:\t%q\n", res.CmdString())
+		fmt.Fprintf(bb, "duration:\t%q\n", res.Duration.String())
+		fmt.Fprintf(bb, "exit code:\t%d\n", res.ExitCode)
+		fmt.Fprintf(bb, "pwd:\t\t%q\n", res.Pwd)
+		fmt.Fprintf(bb, "root:\t\t%q\n", res.Root)
+		fmt.Fprintln(bb, "STDOUT:")
+		io.Copy(bb, res.Stdout())
+		fmt.Fprintln(bb, "STDERR:")
+		io.Copy(bb, res.Stderr())
+		return fmt.Errorf("%w:\n%s", err, bb.String())
 	}
 
 	data["duration"] = res.Duration.String()

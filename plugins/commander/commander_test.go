@@ -8,6 +8,7 @@ import (
 	"testing"
 
 	"github.com/gopherguides/hype"
+	"github.com/gopherguides/hype/htmx"
 	"github.com/stretchr/testify/require"
 )
 
@@ -54,4 +55,16 @@ func assertExp(t testing.TB, name string, act string) {
 
 	exp := string(b)
 	r.Equal(exp, act)
+}
+
+func cmdTag(t testing.TB, ats hype.Attributes) *Cmd {
+	t.Helper()
+
+	c := &Cmd{
+		Node: hype.NewNode(
+			htmx.AttrNode("cmd", ats),
+		),
+	}
+
+	return c
 }

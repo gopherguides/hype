@@ -30,13 +30,16 @@ func (r Runner) CmdString() string {
 	return fmt.Sprintf("$ %s %s", r.Name, strings.Join(r.Args, " "))
 }
 
-func (r *Runner) Run(ctx context.Context) (Result, error) {
+func (r *Runner) Run(ctx context.Context, exp int) (Result, error) {
 	runDir := r.Root
 	env := r.Env
 	name := r.Name
 	args := r.Args
 
-	var err error
+	_, err := exec.LookPath(name)
+	if err != nil {
+		return Result{}, err
+	}
 
 	if ext := filepath.Ext(runDir); len(ext) > 0 {
 		runDir = filepath.Dir(runDir)
@@ -92,6 +95,12 @@ func (r *Runner) Run(ctx context.Context) (Result, error) {
 
 	res.stderr = bytes.ReplaceAll(res.stderr, sch, rpl)
 	res.stdout = bytes.ReplaceAll(res.stdout, sch, rpl)
+
+	if res.ExitCode != exp {
+
+		return res, fmt.Errorf("expected exit code %d, got %d", exp, res.ExitCode)
+
+	}
 
 	return res, nil
 }

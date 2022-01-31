@@ -16,10 +16,11 @@ import (
 // Parser will convert HTML documents into, easy to use, nice types.
 type Parser struct {
 	fs.FS                                             // the filesystem to use
-	Root         string                               `json:"root,omitempty"` // the root directory of the parser
-	DB           *sqlx.DB                             `json:"-"`              // the database to use (optional)
-	Client       *http.Client                         `json:"-"`              // the http client to use (optional)
-	PreProcessor func(r io.Reader) (io.Reader, error) `json:"-"`              // the preprocessor to use (optional)
+	Root         string                               `json:"root,omitempty"`      // the root directory of the parser
+	FileName     string                               `json:"file_name,omitempty"` // the file being parsed (might be empty)
+	DB           *sqlx.DB                             `json:"-"`                   // the database to use (optional)
+	Client       *http.Client                         `json:"-"`                   // the http client to use (optional)
+	PreProcessor func(r io.Reader) (io.Reader, error) `json:"-"`                   // the preprocessor to use (optional)
 
 	customTags   TagMap
 	snippetRules map[string]string
@@ -145,6 +146,11 @@ func NewParser(cab fs.FS) (*Parser, error) {
 // ParseFile will parse the requested file and return a Document.
 // The file MUST be present in the parser's FS.
 func (p *Parser) ParseFile(name string) (*Document, error) {
+	if p == nil {
+		return nil, fmt.Errorf("parser can not be nil")
+	}
+	p.FileName = name
+
 	var r io.ReadCloser
 	r, err := p.Open(name)
 	if err != nil {

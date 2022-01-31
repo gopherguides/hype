@@ -10,7 +10,7 @@ import (
 func Test_Run(t *testing.T) {
 	t.Parallel()
 
-	t.Skip()
+	// t.Skip()
 	ctx := context.Background()
 
 	table := []struct {
@@ -35,6 +35,7 @@ func Test_Run(t *testing.T) {
 			exp: &Result{
 				ExitCode: -1,
 			},
+			err: true,
 		},
 		{
 			name: "bad go run",
@@ -57,7 +58,7 @@ func Test_Run(t *testing.T) {
 				Name: tt.cmd,
 				Args: tt.args,
 			}
-			res, err := runner.Run(ctx)
+			res, err := runner.Run(ctx, tt.exp.ExitCode)
 
 			// fmt.Println(res)
 

@@ -2,6 +2,7 @@ package commander
 
 import (
 	"bytes"
+	"encoding/json"
 	"fmt"
 	"html"
 	"io"
@@ -26,6 +27,20 @@ type Result struct {
 	args     []string
 	stderr   []byte
 	stdout   []byte
+}
+
+func (r Result) MarshalJSON() ([]byte, error) {
+	m := map[string]any{
+		"cmd":       r.CmdString(),
+		"duration":  r.Duration.String(),
+		"exit_code": r.ExitCode,
+		"pwd":       r.Pwd,
+		"root":      r.Root,
+	}
+	if r.Err != nil {
+		m["err"] = r.Err.Error()
+	}
+	return json.Marshal(m)
 }
 
 // Args returns a copy of the args used to run the command.
