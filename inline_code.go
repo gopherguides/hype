@@ -50,5 +50,13 @@ func NewInlineCode(node *Node) (*InlineCode, error) {
 		Node: node,
 	}
 
+	if err := c.Validate(nil); err != nil {
+		return nil, err
+	}
+
+	s := node.Children.String()
+	s = html.EscapeString(s)
+	c.Children = Tags{QuickText(s)}
+
 	return c, c.Validate(nil)
 }

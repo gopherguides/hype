@@ -165,17 +165,7 @@ func NewSourceCode(cab fs.FS, node *Node, rules map[string]string) (*SourceCode,
 
 	esc := html.EscapeString(string(b))
 
-	tn := &html.Node{
-		Data: esc,
-		Type: html.TextNode,
-	}
-
-	text, err := NewText(tn)
-	if err != nil {
-		return nil, err
-	}
-
-	c.Children = Tags{text}
+	c.Children = Tags{QuickText(esc)}
 
 	return c, nil
 }
