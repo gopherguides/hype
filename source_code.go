@@ -60,7 +60,7 @@ func (c *SourceCode) Lang() string {
 func (c *SourceCode) StartTag() string {
 	t := c.Node.StartTag()
 
-	return fmt.Sprintf("<p><pre class=\"code-block\">%s", t)
+	return fmt.Sprintf("<p><pre>%s", t)
 }
 
 func (c *SourceCode) EndTag() string {

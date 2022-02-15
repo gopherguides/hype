@@ -29,7 +29,7 @@ func Test_Printer_Doc(t *testing.T) {
 	exp := `<html><head><meta charset="utf-8"></meta></head><body><page>
 <h1>Hello</h1>
 
-<p><pre class="code-block"><code class="language-go" language="go" src="src/main.go">package main
+<p><pre><code class="language-go" language="go" src="src/main.go">package main
 
 // snippet: main
 func main() {
