@@ -38,7 +38,7 @@ func (r *Runner) Run(ctx context.Context, exp int) (Result, error) {
 
 	_, err := exec.LookPath(name)
 	if err != nil {
-		return Result{}, err
+		return Result{}, fmt.Errorf("%s: %w", r.CmdString(), err)
 	}
 
 	if ext := filepath.Ext(runDir); len(ext) > 0 {
