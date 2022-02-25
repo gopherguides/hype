@@ -43,6 +43,12 @@ func (p *Printer) Print(tags ...Tag) error {
 	}
 
 	for _, tag := range tags {
+		if doc, ok := tag.(*Document); ok {
+			if err := p.Print(doc.Children...); err != nil {
+				return err
+			}
+			continue
+		}
 
 		tag, err := p.Transform(tag)
 		if err != nil {
