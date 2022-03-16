@@ -15,23 +15,23 @@ type Document struct {
 	fs.FS
 }
 
-func (d Document) String() string {
-	return d.Children.String()
+func (doc Document) String() string {
+	return doc.Children.String()
 }
 
 // Overview returns the contents of the first <overview> tag in the document.
-func (d *Document) Overview() string {
-	tags := d.Children.ByAtom("overview")
+func (doc *Document) Overview() string {
+	tags := doc.Children.ByAtom("overview")
 	if len(tags) == 0 {
 		return ""
 	}
 	return tags[0].GetChildren().String()
 }
 
-func (d Document) MarshalJSON() ([]byte, error) {
+func (doc Document) MarshalJSON() ([]byte, error) {
 	m := map[string]any{
-		"document": htmx.NewNodeJSON(d.Node.html),
-		"fs":       d.FS,
+		"document": htmx.NewNodeJSON(doc.Node.html),
+		"fs":       doc.FS,
 	}
 	return json.Marshal(m)
 }
