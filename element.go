@@ -40,8 +40,8 @@ func (e Element) Validate(p *Parser, checks ...ValidatorFn) error {
 	return e.Node.Validate(p, html.ElementNode, checks...)
 }
 
-// ElementNode returns an element node from the given node.
-func (p *Parser) ElementNode(n *html.Node) (Tag, error) {
+// NewElement returns an element node from the given node.
+func (p *Parser) NewElement(n *html.Node) (Tag, error) {
 	node := NewNode(n)
 
 	err := node.Validate(p, html.ElementNode)

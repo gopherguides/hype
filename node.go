@@ -202,7 +202,7 @@ func (p *Parser) ParseNode(node *html.Node) (Tag, error) {
 	case html.DocumentNode:
 		return p.NewDocument(node)
 	case html.ElementNode:
-		return p.ElementNode(node)
+		return p.NewElement(node)
 	case html.ErrorNode:
 		return nil, fmt.Errorf(node.Data)
 	case html.TextNode:
