@@ -199,8 +199,7 @@ func (p *Parser) ParseReader(r io.Reader) (*Document, error) {
 		return nil, err
 	}
 
-	doc, err := p.NewDocument(node)
-	return doc, p.PostParseHooks.Run(p, err)
+	return p.NewDocument(node)
 }
 
 // CustomTag will return the custom tag for the given atom,
