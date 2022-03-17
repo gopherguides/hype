@@ -125,6 +125,11 @@ func (cmd *Cmd) work(p *hype.Parser) error {
 	if p == nil {
 		return fmt.Errorf("parser is nil")
 	}
+
+	if cmd == nil {
+		return fmt.Errorf("cmd is nil")
+	}
+
 	root := p.Root
 
 	data := Data{}

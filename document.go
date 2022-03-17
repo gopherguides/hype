@@ -46,9 +46,9 @@ func (doc *Document) Meta() Metas {
 }
 
 // Validate the document
-func (d Document) Validate(p *Parser, checks ...ValidatorFn) error {
-	chocks := ChildrenValidators(d, p, checks...)
-	err := d.Node.Validate(p, html.DocumentNode, chocks...)
+func (doc Document) Validate(p *Parser, checks ...ValidatorFn) error {
+	chocks := ChildrenValidators(doc, p, checks...)
+	err := doc.Node.Validate(p, html.DocumentNode, chocks...)
 
 	return err
 }

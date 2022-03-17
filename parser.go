@@ -15,12 +15,14 @@ import (
 
 // Parser will convert HTML documents into, easy to use, nice types.
 type Parser struct {
-	fs.FS                                             // the filesystem to use
-	Root         string                               `json:"root,omitempty"`      // the root directory of the parser
-	FileName     string                               `json:"file_name,omitempty"` // the file being parsed (might be empty)
-	DB           *sqlx.DB                             `json:"-"`                   // the database to use (optional)
-	Client       *http.Client                         `json:"-"`                   // the http client to use (optional)
-	PreProcessor func(r io.Reader) (io.Reader, error) `json:"-"`                   // the preprocessor to use (optional)
+	fs.FS                                               // the filesystem to use
+	Root           string                               `json:"root,omitempty"`      // the root directory of the parser
+	FileName       string                               `json:"file_name,omitempty"` // the file being parsed (might be empty)
+	DB             *sqlx.DB                             `json:"-"`                   // the database to use (optional)
+	Client         *http.Client                         `json:"-"`                   // the http client to use (optional)
+	PreProcessor   func(r io.Reader) (io.Reader, error) `json:"-"`                   // the preprocessor to use (optional)
+	PreParseHooks  PreParseHooks                        `json:"-"`                   // the pre-parse hooks to use (optional)
+	PostParseHooks PostParseHooks                       `json:"-"`                   // the post-parse hooks to use (optional)
 
 	customTags   TagMap
 	snippetRules map[string]string
@@ -187,12 +189,17 @@ func (p *Parser) ParseReader(r io.Reader) (*Document, error) {
 		}
 	}
 
+	if err := p.PreParseHooks.Run(p); err != nil {
+		return nil, err
+	}
+
 	node, err := html.Parse(r)
 	if err != nil {
 		return nil, err
 	}
 
-	return p.NewDocument(node)
+	doc, err := p.NewDocument(node)
+	return doc, p.PostParseHooks.Run(p, err)
 }
 
 // CustomTag will return the custom tag for the given atom,

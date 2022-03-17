@@ -2,6 +2,10 @@ package golang
 
 import (
 	"fmt"
+	"io/fs"
+	"os"
+	"os/exec"
+	"path/filepath"
 	"strings"
 
 	"github.com/gopherguides/hype"
@@ -18,6 +22,40 @@ func Register(p *hype.Parser) error {
 	p.SetCustomTag(GO, func(node *hype.Node) (hype.Tag, error) {
 		return NewGo(node)
 	})
+
+	p.PreParseHooks = append(p.PreParseHooks, tidy)
+
+	return nil
+}
+
+func tidy(p *hype.Parser) error {
+	if p == nil {
+		return fmt.Errorf("parser is nil")
+	}
+
+	err := fs.WalkDir(p.FS, ".", func(path string, d fs.DirEntry, err error) error {
+		if err != nil {
+			return err
+		}
+
+		name := filepath.Base(path)
+		if name != "go.mod" {
+			return nil
+		}
+
+		c := exec.Command("go", "mod", "tidy", "-v")
+		c.Stdout = os.Stdout
+		c.Stderr = os.Stderr
+
+		dir := filepath.Join(p.Root, filepath.Dir(path))
+		c.Dir = dir
+
+		return c.Run()
+	})
+
+	if err != nil {
+		return err
+	}
 
 	return nil
 }
