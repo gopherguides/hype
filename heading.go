@@ -22,6 +22,10 @@ type Heading struct {
 	Parent *Heading // Parent heading
 }
 
+func (h Heading) Title() string {
+	return h.GetChildren().String()
+}
+
 func (h Heading) Level() int {
 	for i, a := range atomx.Headings() {
 		if h.DataAtom == a {

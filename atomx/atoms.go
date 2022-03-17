@@ -19,7 +19,6 @@ func Headings() Atoms {
 
 func Inlines() Atoms {
 	return Atoms{
-		A,
 		Img,
 		Image,
 		Br,

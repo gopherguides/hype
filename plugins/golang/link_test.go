@@ -1,6 +1,7 @@
 package golang
 
 import (
+	"fmt"
 	"os"
 	"testing"
 
@@ -30,7 +31,7 @@ func Test_Link(t *testing.T) {
 
 <h2>Element links</h2>
 
-<p>This <godoc#a for="context"><a href="https://pkg.go.dev/context" target="_blank" /></godoc#a> link is <godoc#a for="io#Writer"><a href="https://pkg.go.dev/io#Writer" target="_blank" /></godoc#a> SEE ME.</p>
+<p>This <godoc#a for="context"><a href="https://pkg.go.dev/context" target="_blank"><code>context</code></a></godoc#a> link is <godoc#a for="io#Writer"><a href="https://pkg.go.dev/io#Writer" target="_blank"><code>io.Writer</code></a></godoc#a> SEE ME.</p>
 
 </page><!--BREAK-->
 
@@ -39,7 +40,7 @@ func Test_Link(t *testing.T) {
 </html>`
 	act := doc.String()
 
-	// fmt.Println(act)
+	fmt.Println(act)
 	r.Contains(act, "SEE ME")
 	r.Equal(exp, act)
 
