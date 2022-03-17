@@ -139,6 +139,7 @@ func NewParser(cab fs.FS) (*Parser, error) {
 		snippetRules: map[string]string{
 			".html": "<!-- %s -->",
 			".go":   "// %s",
+			".rb":   "# %s",
 		},
 	}
 
