@@ -1,25 +1,17 @@
 package main
 
-type Venue struct{}
+import "fmt"
 
-// snippet: entertainer
-type Entertainer interface {
-	// snippet: entertainer-funcs
-	Name() string
-	Perform(v Venue) error
-	// snippet: entertainer-funcs
+// snippet: hello
+func Hello() {
+	fmt.Println("Hello, World!")
 }
 
-// snippet: entertainer
+// snippet: hello
 
-type Setuper interface {
-	// snippet: setuper-funcs
-	Setup(v Venue) error
-	// snippet: setuper-funcs
+// snippet: goodbye
+func Goodbye() {
+	fmt.Println("Goodbye, World!")
 }
 
-type Teardowner interface {
-	// snippet: teardowner-funcs
-	Teardown(v Venue) error
-	// snippet: teardowner-funcs
-}
+// snippet: goodbye

@@ -35,8 +35,8 @@ func Test_Parser_NewSourceCode(t *testing.T) {
 		{
 			name: "valid snippet",
 			lang: "go",
-			node: htmx.AttrNode("code", Attributes{"src": "src/snippets.go", "snippet": "entertainer-funcs"}),
-			exp:  "<p><pre><code class=\"language-go\" language=\"go\" snippet=\"entertainer-funcs\" src=\"src/snippets.go\">Name() string\nPerform(v Venue) error</code></pre></p>",
+			node: htmx.AttrNode("code", Attributes{"src": "src/snippets.go", "snippet": "hello"}),
+			exp:  "<p><pre><code class=\"language-go\" language=\"go\" snippet=\"hello\" src=\"src/snippets.go\">func Hello() {\n\tfmt.Println(&#34;Hello, World!&#34;)\n}\n</code></pre></p>",
 		},
 		{
 			name: "valid HTML",
