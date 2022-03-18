@@ -4,6 +4,7 @@ INSERT INTO cmd_cache (
         exit,
         go_version,
         src,
+        tag,
         sum
     )
 VALUES (
@@ -12,5 +13,6 @@ VALUES (
         :exit,
         :go_version,
         :src,
+        :tag,
         :sum
     )

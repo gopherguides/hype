@@ -205,6 +205,7 @@ func (cmd *Cmd) work(p *hype.Parser) error {
 		Exit:      cmd.ExpectedExit,
 		GoVersion: runtime.Version(),
 		Src:       fp,
+		Tag:       cmd.StartTag(),
 		Sum:       sum,
 	}
 

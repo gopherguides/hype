@@ -12,6 +12,7 @@ type Cache struct {
 	Exit      int    `db:"exit"`
 	GoVersion string `db:"go_version"`
 	Src       string `db:"src"`
+	Tag       string `db:"tag"`
 	Sum       string `db:"sum"`
 }
 
@@ -20,7 +21,7 @@ func (c *Cache) Fetch(db *sqlx.DB) error {
 		return fmt.Errorf("fetch: db is nil")
 	}
 
-	err := db.Get(c, fetchSQL, c.Command, c.Exit, c.GoVersion, c.Src, c.Sum)
+	err := db.Get(c, fetchSQL, c.Command, c.Exit, c.GoVersion, c.Src, c.Tag, c.Sum)
 
 	if err != nil {
 		return err
@@ -40,6 +41,7 @@ func (c *Cache) Insert(db *sqlx.DB) error {
 		"exit":       c.Exit,
 		"go_version": c.GoVersion,
 		"src":        c.Src,
+		"tag":        c.Tag,
 		"sum":        c.Sum,
 	}
 

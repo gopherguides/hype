@@ -94,7 +94,9 @@ func (r *Runner) Run(ctx context.Context, exp int) (Result, error) {
 	rpl := []byte(".")
 
 	res.stderr = bytes.ReplaceAll(res.stderr, sch, rpl)
+	res.stderr = bytes.TrimSpace(res.stderr)
 	res.stdout = bytes.ReplaceAll(res.stdout, sch, rpl)
+	res.stdout = bytes.TrimSpace(res.stdout)
 
 	if res.ExitCode != exp {
 

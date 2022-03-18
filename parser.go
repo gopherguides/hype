@@ -137,8 +137,9 @@ func NewParser(cab fs.FS) (*Parser, error) {
 		FS:         cab,
 		customTags: TagMap{},
 		snippetRules: map[string]string{
-			".html": "<!-- %s -->",
 			".go":   "// %s",
+			".html": "<!-- %s -->",
+			".md":   "// %s",
 			".rb":   "# %s",
 		},
 	}

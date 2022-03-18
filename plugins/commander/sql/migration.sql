@@ -22,6 +22,7 @@ CREATE TABLE IF NOT EXISTS "cmd_cache" (
   "exit" integer NOT NULL DEFAULT 0,
   "go_version" text NOT NULL,
   "src" TEXT NOT NULL,
+  "tag" TEXT NOT NULL,
   "sum" TEXT NOT NULL
 );
 PRAGMA foreign_keys = true;
