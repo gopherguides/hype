@@ -26,7 +26,7 @@ func Test_Run(t *testing.T) {
 			cmd:  "echo",
 			args: []string{"Hello, World"},
 			exp: &Result{
-				stdout: []byte("Hello, World\n"),
+				stdout: []byte("Hello, World"),
 			},
 		},
 		{
@@ -44,7 +44,7 @@ func Test_Run(t *testing.T) {
 			args: []string{"run", "-tags", "sad", "."},
 			exp: &Result{
 				ExitCode: 1,
-				stderr:   []byte("boom!\nexit status 255\n"),
+				stderr:   []byte("boom!\nexit status 255"),
 			},
 		},
 	}

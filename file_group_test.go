@@ -28,9 +28,9 @@ func Test_FileGroup(t *testing.T) {
 	r.Equal("snippets", fg.Name())
 
 	exp := `<filegroup name="snippets">
-  <file src="src/snip.html"></file>
-  <file src="src/snip.txt"></file>
-  <file src="src/snippets.go"></file>
+  <file src="src/snip.html">src/snip.html</file>
+  <file src="src/snip.txt">src/snip.txt</file>
+  <file src="src/snippets.go">src/snippets.go</file>
 </filegroup>`
 
 	act := fg.String()

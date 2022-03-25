@@ -29,7 +29,7 @@ func Test_File(t *testing.T) {
 	r.True(ok)
 	r.Equal("src/main.go", src.String())
 
-	exp := `<file src="src/main.go"></file>`
+	exp := `<file src="src/main.go">src/main.go</file>`
 	act := f.String()
 
 	// fmt.Println(act)

@@ -101,8 +101,8 @@ func ExampleByType() {
 	}
 
 	// output:
-	// <file src="src/main.go"></file>
-	// <file src="src/snip.html"></file>
+	// <file src="src/main.go">src/main.go</file>
+	// <file src="src/snip.html">src/snip.html</file>
 }
 
 func ExampleByAtom() {
@@ -122,8 +122,8 @@ func ExampleByAtom() {
 	}
 
 	// output:
-	// <file src="src/main.go"></file>
-	// <file src="src/snip.html"></file>
+	// <file src="src/main.go">src/main.go</file>
+	// <file src="src/snip.html">src/snip.html</file>
 }
 
 func ExampleByAttrs() {
@@ -145,5 +145,5 @@ func ExampleByAttrs() {
 	}
 
 	// output:
-	// <file src="src/main.go"></file>
+	// <file src="src/main.go">src/main.go</file>
 }

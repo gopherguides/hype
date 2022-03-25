@@ -43,6 +43,9 @@ func (f *File) String() string {
 	fmt.Fprint(bb, f.StartTag())
 
 	body := f.Children.String()
+	if len(body) == 0 {
+		fmt.Fprint(bb, f.attrs["src"])
+	}
 
 	fmt.Fprint(bb, body)
 
