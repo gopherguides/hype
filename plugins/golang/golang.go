@@ -43,6 +43,11 @@ func tidy(p *hype.Parser) error {
 			return nil
 		}
 
+		if _, err := fs.Stat(p.FS, filepath.Join(filepath.Dir(path), ".skip-tidy")); err == nil {
+			// panic("found a .skip-tidy file")
+			return fs.SkipDir
+		}
+
 		c := exec.Command("go", "mod", "tidy", "-v")
 		c.Stdout = os.Stdout
 		c.Stderr = os.Stderr

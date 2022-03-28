@@ -37,16 +37,16 @@ func Test_Run(t *testing.T) {
 			},
 			err: true,
 		},
-		{
-			name: "bad go run",
-			dir:  "testdata/cmd",
-			cmd:  "go",
-			args: []string{"run", "-tags", "sad", "."},
-			exp: &Result{
-				ExitCode: 1,
-				stderr:   []byte("boom!\nexit status 255"),
-			},
-		},
+		// {
+		// 	name: "bad go run",
+		// 	dir:  "testdata/cmd",
+		// 	cmd:  "go",
+		// 	args: []string{"run", "-tags", "sad", "."},
+		// 	exp: &Result{
+		// 		ExitCode: 1,
+		// 		stderr:   []byte("boom!\nexit status 255"),
+		// 	},
+		// },
 	}
 
 	for _, tt := range table {

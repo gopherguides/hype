@@ -36,9 +36,12 @@ func (r *Runner) Run(ctx context.Context, exp int) (Result, error) {
 	name := r.Name
 	args := r.Args
 
-	_, err := exec.LookPath(name)
-	if err != nil {
-		return Result{}, fmt.Errorf("%s: %w", r.CmdString(), err)
+	var err error
+	if !strings.HasPrefix(name, "./") {
+		_, err := exec.LookPath(name)
+		if err != nil {
+			return Result{}, fmt.Errorf("%s: %w", r.CmdString(), err)
+		}
 	}
 
 	if ext := filepath.Ext(runDir); len(ext) > 0 {
