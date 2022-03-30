@@ -29,6 +29,15 @@ type Node struct {
 	sync.RWMutex
 }
 
+func (n *Node) String() string {
+	if n == nil {
+		return ""
+	}
+	n.RLock()
+	defer n.RUnlock()
+	return n.Children.String()
+}
+
 // Type is the type of the node.
 func (n *Node) Type() html.NodeType {
 	if n == nil || n.html == nil {

@@ -96,3 +96,61 @@ func Test_Parse_Code(t *testing.T) {
 	r.Equal(exp, doc.String())
 
 }
+
+func Test_Code_MultipleSources(t *testing.T) {
+	t.Parallel()
+	r := require.New(t)
+
+	node := htmx.AttrNode("code", Attributes{
+		"src": "src/snippets.go,src/snippets.js",
+	})
+
+	sc, err := NewSourceCode(testdata, NewNode(node), nil)
+	r.NoError(err)
+
+	kids := sc.GetChildren()
+	r.Len(kids, 2)
+
+	const exp = `<p><pre><code src="src/snippets.go,src/snippets.js"><p><pre><code class="language-go" language="go" src="src/snippets.go">package main
+
+import &#34;fmt&#34;
+
+func Hello() {
+	fmt.Println(&#34;Hello, World!&#34;)
+}
+
+
+func Goodbye() {
+	fmt.Println(&#34;Goodbye, World!&#34;)
+}
+
+</code></pre></p><p><pre><code class="language-js" language="js" src="src/snippets.js">function hello() {
+    console.log(&#39;Hello, World!&#39;);
+}
+
+function goodbye() {
+    console.log(&#39;Goodbye, World!&#39;);
+}</code></pre></p></code></pre></p>`
+
+	act := sc.String()
+
+	// fmt.Println(act)
+
+	r.Equal(exp, act)
+
+}
+
+func Test_Code_MultipleSources_Errors(t *testing.T) {
+	t.Parallel()
+	r := require.New(t)
+
+	p := testParser(t, testdata)
+
+	node := htmx.AttrNode("code", Attributes{
+		"src":     "src/snippets.go,src/snippets.js",
+		"snippet": "hello",
+	})
+
+	_, err := NewCode(p, NewNode(node))
+	r.Error(err)
+}

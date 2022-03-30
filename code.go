@@ -1,6 +1,8 @@
 package hype
 
 import (
+	"strings"
+
 	"golang.org/x/net/html"
 )
 
@@ -24,7 +26,11 @@ func NewCode(p *Parser, node *Node) (Code, error) {
 		return NewInlineCode(node)
 	}
 
-	if _, ok := ats["src"]; ok {
+	if src, ok := ats["src"]; ok {
+		if len(strings.Split(src, "#")) > 1 {
+			return NewMultiSourceCode(p.FS, node, p.snippetRules)
+		}
+
 		return NewSourceCode(p.FS, node, p.snippetRules)
 	}
 

@@ -122,74 +122,124 @@ func (sc SourceCode) ValidateFS(p *Parser, cab fs.FS, checks ...ValidatorFn) err
 }
 
 func NewSourceCode(cab fs.FS, node *Node, rules map[string]string) (*SourceCode, error) {
-	c := &SourceCode{
+	sc := &SourceCode{
 		Node: node,
 	}
 
-	if err := c.Validate(nil); err != nil {
+	if err := sc.Validate(nil); err != nil {
 		return nil, err
 	}
 
-	src, err := c.Get("src")
+	src, err := sc.Get("src")
 	if err != nil {
 		return nil, err
 	}
 
-	// handle multiple sources
 	srcs := strings.Split(src, ",")
 	if len(srcs) > 1 {
-		if _, ok := c.attrs["snippet"]; ok {
-			return nil, fmt.Errorf("snippets can't be combined with multiple sources: %s", src)
+		// handle multiple sources
+		if err := sc.handleSources(srcs, cab, rules); err != nil {
+			return nil, err
 		}
-
-		for _, src := range srcs {
-			kn := node.Clone()
-			kn.attrs["src"] = src
-			kid, err := NewSourceCode(cab, kn, rules)
-			if err != nil {
-				return nil, err
-			}
-			c.Children = append(c.Children, kid)
-		}
-		// x , err := NewSourceCode(cab, node, rules)
-		// if err != nil {
-		// 	return nil, err
-		// }
-		// c.Children
-		return c, nil
+		return sc, nil
 	}
 
-	if lang, ok := c.attrs["lang"]; ok {
-		c.lang = lang
+	if err := sc.handleLang(); err != nil {
+		return nil, err
 	}
 
-	lang := c.Lang()
-	c.Set("language", lang)
-	c.Set("class", fmt.Sprintf("language-%s", lang))
+	fn := strings.Split(src, "#")[0]
 
-	b, err := fs.ReadFile(cab, src)
+	b, err := fs.ReadFile(cab, fn)
 	if err != nil {
 		return nil, err
 	}
-	c.Body = string(bytes.TrimSpace(b))
 
+	sc.Body = string(bytes.TrimSpace(b))
+
+	if err := sc.handleSnippets(src, b, rules); err != nil {
+		return nil, err
+	}
+
+	return sc, nil
+}
+
+func (sc *SourceCode) handleSnippets(src string, b []byte, rules map[string]string) error {
 	snips, err := ParseSnippets(src, b, rules)
 	if err != nil {
-		return nil, err
+		return err
 	}
-	c.Snippets = snips
+	sc.Snippets = snips
 
-	if n, ok := c.attrs["snippet"]; ok {
-		snip, ok := c.Snippets[n]
-		if !ok {
-			return nil, fmt.Errorf("could not find snippet %q in %q", n, src)
+	var name string
+
+	split := strings.Split(src, "#")
+	if len(split) > 1 {
+		name = split[1]
+	}
+
+	if n, ok := sc.attrs["snippet"]; ok {
+		if len(name) > 0 {
+			return fmt.Errorf("snippet and snippet name cannot be used together %s", n)
 		}
+		name = n
+	}
+
+	if len(name) > 0 { // no snippet name
+		snip, ok := sc.Snippets[name]
+		if !ok {
+			return fmt.Errorf("could not find snippet %q in %q", name, src)
+		}
+
 		b = []byte(snip.String())
 	}
 
 	esc := html.EscapeString(string(b))
 
-	c.Children = Tags{QuickText(esc)}
+	sc.Children = Tags{QuickText(esc)}
 
-	return c, nil
+	return nil
+}
+
+func (sc *SourceCode) handleSources(srcs []string, cab fs.FS, rules map[string]string) error {
+	if sc == nil {
+		return fmt.Errorf("nil source code")
+	}
+
+	node := sc.Node
+	if node == nil {
+		return fmt.Errorf("nil node")
+	}
+
+	if _, ok := sc.attrs["snippet"]; ok {
+		return fmt.Errorf("snippets can't be combined with multiple sources")
+	}
+
+	for _, src := range srcs {
+		kn := node.Clone()
+		kn.attrs["src"] = src
+		kid, err := NewSourceCode(cab, kn, rules)
+		if err != nil {
+			return err
+		}
+		sc.Children = append(sc.Children, kid)
+	}
+
+	return nil
+}
+
+func (sc *SourceCode) handleLang() error {
+	if sc == nil {
+		return fmt.Errorf("nil source code")
+	}
+
+	if lang, ok := sc.attrs["lang"]; ok {
+		sc.lang = lang
+	}
+
+	lang := sc.Lang()
+	sc.Set("language", lang)
+	sc.Set("class", fmt.Sprintf("language-%s", lang))
+
+	return nil
 }
