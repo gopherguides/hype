@@ -135,6 +135,30 @@ func NewSourceCode(cab fs.FS, node *Node, rules map[string]string) (*SourceCode,
 		return nil, err
 	}
 
+	// handle multiple sources
+	srcs := strings.Split(src, ",")
+	if len(srcs) > 1 {
+		if _, ok := c.attrs["snippet"]; ok {
+			return nil, fmt.Errorf("snippets can't be combined with multiple sources: %s", src)
+		}
+
+		for _, src := range srcs {
+			kn := node.Clone()
+			kn.attrs["src"] = src
+			kid, err := NewSourceCode(cab, kn, rules)
+			if err != nil {
+				return nil, err
+			}
+			c.Children = append(c.Children, kid)
+		}
+		// x , err := NewSourceCode(cab, node, rules)
+		// if err != nil {
+		// 	return nil, err
+		// }
+		// c.Children
+		return c, nil
+	}
+
 	if lang, ok := c.attrs["lang"]; ok {
 		c.lang = lang
 	}

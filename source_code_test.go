@@ -65,3 +65,44 @@ func Test_Parser_NewSourceCode(t *testing.T) {
 	}
 
 }
+
+func Test_SourceCode_MultipleSources(t *testing.T) {
+	t.Parallel()
+	r := require.New(t)
+
+	node := htmx.AttrNode("code", Attributes{"src": "src/snippets.go,src/snippets.js"})
+
+	sc, err := NewSourceCode(testdata, NewNode(node), nil)
+	r.NoError(err)
+
+	kids := sc.GetChildren()
+	r.Len(kids, 2)
+
+	const exp = `<p><pre><code src="src/snippets.go,src/snippets.js"><p><pre><code class="language-go" language="go" src="src/snippets.go">package main
+
+import &#34;fmt&#34;
+
+func Hello() {
+	fmt.Println(&#34;Hello, World!&#34;)
+}
+
+
+func Goodbye() {
+	fmt.Println(&#34;Goodbye, World!&#34;)
+}
+
+</code></pre></p><p><pre><code class="language-js" language="js" src="src/snippets.js">function hello() {
+    console.log(&#39;Hello, World!&#39;);
+}
+
+function goodbye() {
+    console.log(&#39;Goodbye, World!&#39;);
+}</code></pre></p></code></pre></p>`
+
+	act := sc.String()
+
+	// fmt.Println(act)
+
+	r.Equal(exp, act)
+
+}

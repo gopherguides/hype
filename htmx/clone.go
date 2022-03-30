@@ -18,5 +18,6 @@ func CloneNode(n *html.Node) *html.Node {
 		NextSibling: CloneNode(n.NextSibling),
 		Parent:      n.Parent,
 		PrevSibling: n.PrevSibling,
+		Type:        n.Type,
 	}
 }

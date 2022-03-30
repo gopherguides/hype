@@ -53,7 +53,7 @@ func (n *Node) Validate(p *Parser, nt html.NodeType, validators ...ValidatorFn) 
 	}
 
 	if n.Type() != nt {
-		return fmt.Errorf("node type mismatch: %v != %v", n.Type(), nt)
+		return fmt.Errorf("node type mismatch: %v != %v", htmx.NodeType(n.Type()), htmx.NodeType(nt))
 	}
 
 	for _, v := range validators {
@@ -69,8 +69,9 @@ func (n *Node) Validate(p *Parser, nt html.NodeType, validators ...ValidatorFn) 
 func (n *Node) Clone() *Node {
 	node := &Node{
 		Children: n.Children,
-		html:     htmx.CloneNode(n.html),
+		DataAtom: n.DataAtom,
 		attrs:    n.Attrs(),
+		html:     htmx.CloneNode(n.html),
 	}
 	return node
 }
