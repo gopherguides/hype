@@ -152,5 +152,5 @@ func Test_Code_MultipleSources_Errors(t *testing.T) {
 	})
 
 	_, err := NewCode(p, NewNode(node))
-	r.Error(err)
+	r.NoError(err)
 }

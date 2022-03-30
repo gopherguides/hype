@@ -32,7 +32,7 @@ var _ hype.Validatable = &Cmd{}
 // 	environ: A comma-separated list of environment variables to pass to the command.
 // 		`<cmd environ="key=value,key2=value2"></cmd>`
 // 	exit: The expected exit code. Defaults to 0.
-// 	timeout: The timeout duration for the command. Defaults to infinity
+// 	timeout: The timeout duration for the command. Defaults to 30s
 // 		`<cmd timeout="3s"></cmd>`
 // 	no-cache: If true, the results of the command will not be cached.
 // 		`<cmd no-cache></cmd>`

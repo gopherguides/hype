@@ -44,10 +44,6 @@ func NewMultiSourceCode(cab fs.FS, node *Node, rules map[string]string) (*MultiS
 
 	srcs := strings.Split(src, ",")
 
-	if _, ok := ms.attrs["snippet"]; ok {
-		return nil, fmt.Errorf("snippets can't be combined with multiple sources")
-	}
-
 	for _, src := range srcs {
 		kn := node.Clone()
 		kn.attrs["src"] = src

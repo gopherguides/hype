@@ -211,10 +211,6 @@ func (sc *SourceCode) handleSources(srcs []string, cab fs.FS, rules map[string]s
 		return fmt.Errorf("nil node")
 	}
 
-	if _, ok := sc.attrs["snippet"]; ok {
-		return fmt.Errorf("snippets can't be combined with multiple sources")
-	}
-
 	for _, src := range srcs {
 		kn := node.Clone()
 		kn.attrs["src"] = src
