@@ -7,6 +7,7 @@ import (
 	"errors"
 	"fmt"
 	"io"
+	"io/fs"
 	"os"
 	"path/filepath"
 	"runtime"
@@ -15,6 +16,7 @@ import (
 	"time"
 
 	"github.com/gopherguides/hype"
+	"github.com/gopherguides/hype/htmx"
 	"github.com/mattn/go-shellwords"
 	"golang.org/x/net/html"
 )
@@ -94,8 +96,10 @@ func (c *Cmd) Validate(p *hype.Parser, checks ...hype.ValidatorFn) error {
 
 // NewCmd returns a new Cmd from the given node.
 // The command is *not* run until Finalize is called.
-//
-func NewCmd(node *hype.Node) (*Cmd, error) {
+// If the `code` attribute is set, then a `hype.Element`
+// is created and returned containing the code and the
+// command.
+func NewCmd(cab fs.FS, node *hype.Node) (hype.Tag, error) {
 	cmd := &Cmd{
 		Node: node,
 	}
@@ -118,7 +122,51 @@ func NewCmd(node *hype.Node) (*Cmd, error) {
 		cmd.ExpectedExit = i
 	}
 
+	if _, ok := ats["code"]; ok {
+		return newCodeCmd(cab, cmd)
+	}
+
 	return cmd, cmd.Validate(nil)
+}
+
+func newCodeCmd(cab fs.FS, cmd *Cmd) (*hype.Element, error) {
+	if cmd == nil {
+		return nil, errors.New("cmd is nil")
+	}
+
+	el := &hype.Element{
+		Node: hype.NewNode(htmx.ElementNode("div")),
+	}
+
+	ats := cmd.Attrs()
+
+	src, ok := ats["src"]
+	if !ok {
+		return nil, fmt.Errorf("missing src attribute")
+	}
+
+	code, ok := ats["code"]
+	if !ok {
+		return nil, errors.New("code is not set")
+	}
+
+	cs := strings.Split(code, ",")
+	for i, c := range cs {
+		cs[i] = filepath.Join(src, c)
+	}
+
+	ats["src"] = strings.Join(cs, ",")
+
+	hn := hype.NewNode(htmx.AttrNode("code", ats))
+
+	sc, err := hype.NewSourceCode(cab, hn, nil)
+	if err != nil {
+		return nil, err
+	}
+	el.Children = append(el.Children, sc)
+
+	el.Children = append(el.Children, cmd)
+	return el, nil
 }
 
 func (cmd *Cmd) work(p *hype.Parser) error {

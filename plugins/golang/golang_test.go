@@ -58,7 +58,7 @@ func Test_NewGo(t *testing.T) {
 
 			node := hype.NewNode(htmx.AttrNode("go", tt.ats))
 
-			tag, err := NewGo(node)
+			tag, err := NewGo(testdata, node)
 			if tt.err {
 				r.Error(err)
 				return

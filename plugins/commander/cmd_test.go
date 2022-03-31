@@ -6,13 +6,11 @@ import (
 	"strings"
 	"testing"
 
-	"github.com/gopherguides/hype"
 	"github.com/stretchr/testify/require"
 )
 
 func Test_Cmd_Tag(t *testing.T) {
 	t.Parallel()
-	t.Skip()
 	r := require.New(t)
 
 	os.RemoveAll("~/.hype")
@@ -24,38 +22,67 @@ func Test_Cmd_Tag(t *testing.T) {
 
 	act := doc.String()
 
-	fmt.Println(act)
-	assertExp(t, "cmd.exp.html", act)
+	// fmt.Println(act)
+	assertExp(t, "cmd.exp.tmpl", act)
 }
 
 func Test_Cmd_Run_Error(t *testing.T) {
 	t.Parallel()
 	r := require.New(t)
 
-	cmd := cmdTag(t, hype.Attributes{
-		"exec": "go run -tags sad .",
-		"src":  "cmd",
-		"exit": "1",
-	})
-
-	r.NotNil(cmd)
-
 	p := testParser(t, testdata, "testdata")
 	p.FileName = "run.md"
 
-	err := cmd.work(p)
+	_, err := p.ParseMD([]byte(`<cmd exec="go run ." src="cmd-err"></cmd>`))
+
 	r.Error(err)
 
 	act := err.Error()
 	act = strings.TrimSpace(act)
 
 	// fmt.Println(act)
-	exp := `expected exit code 0, got 1:
-<cmd exec="go run -tags sad ." exit="1" src="cmd">
 
--------
-File Name:	"run.md"
-Command:	"$ go run -tags sad ."`
+	exp := `expected exit code 0, got 2:
+<cmd exec="go run ." src="cmd-err">`
 
-	r.True(strings.HasPrefix(act, exp))
+	r.Contains(act, exp)
+
+	exp = `./main.go:6:14: undefined: missing`
+	r.Contains(act, exp)
+
+}
+
+func Test_Cmd_Code(t *testing.T) {
+	t.Parallel()
+	r := require.New(t)
+
+	p := testParser(t, testdata, "testdata")
+	p.FileName = "run.md"
+
+	doc, err := p.ParseMD([]byte(`<cmd exec="go run ." src="cmd" code="main.go" snippet="example" hide-duration></cmd>`))
+	r.NoError(err)
+
+	act := doc.String()
+
+	fmt.Println(act)
+
+	exp := `<html><head><meta charset="utf-8" /></head><body>
+<page>
+
+<div><p><pre><code class="language-go" code="main.go" exec="go run ." hide-duration="" language="go" snippet="example" src="cmd/main.go">func main() {
+	fmt.Println(&#34;Hello, world!&#34;)
+}
+</code></pre></p><cmd code="main.go" exec="go run ." hide-duration="" snippet="example" src="cmd"><pre class="code-block"><code class="language-plain" language="plain">$ go run .
+
+Hello, world!
+--------------------------------------------------------------------------------
+go: go1.18</code></pre></cmd></div>
+
+</page><!--BREAK-->
+
+
+</body>
+</html>`
+
+	r.Equal(exp, act)
 }

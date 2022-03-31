@@ -20,7 +20,7 @@ type Data map[string]string
 
 func CustomTag(p *hype.Parser) (hype.CustomTagFn, error) {
 	fn := func(node *hype.Node) (hype.Tag, error) {
-		return NewCmd(node)
+		return NewCmd(p.FS, node)
 	}
 
 	return fn, nil

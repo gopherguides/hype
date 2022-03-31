@@ -20,8 +20,15 @@ var _ ValidatableFS = &SourceCode{}
 // HTML Attributes:
 // 	src (required): the path to the source file.
 // 		`<code src="foo.go"></code>`
+// 		// multiple sources
+// 		`<code src="foo.go,bar.go"></code>`
+// 		// sources with hash tag snippets
+// 		`<code src="foo.go#example"></code>`
 // 	snippet: the name of a snippet to use.
 // 		`<code src="foo.go" snippet="example"></code>`
+// 		// multiple sources with a snippet attribute
+// 		// will apply the snippet to all sources
+// 		`<code src="foo.go,bar.go" snippet="example"></code>`
 // 	lang: the language of the code. Defaults to the file extension.
 type SourceCode struct {
 	*Node

@@ -20,7 +20,7 @@ func Register(p *hype.Parser) error {
 	})
 
 	p.SetCustomTag(GO, func(node *hype.Node) (hype.Tag, error) {
-		return NewGo(node)
+		return NewGo(p.FS, node)
 	})
 
 	p.PreParseHooks = append(p.PreParseHooks, tidy)
@@ -51,6 +51,7 @@ func tidy(p *hype.Parser) error {
 		c := exec.Command("go", "mod", "tidy", "-v")
 		c.Stdout = os.Stdout
 		c.Stderr = os.Stderr
+		c.Env = append(os.Environ(), "GOWORK=off")
 
 		dir := filepath.Join(p.Root, filepath.Dir(path))
 		c.Dir = dir
@@ -71,7 +72,7 @@ func tidy(p *hype.Parser) error {
 // Example:
 // 	"<go build="-o ./bin" timeout="10s" src="./cmd/foo"></go>"
 // 	"<go test="-v -cover ./..." timeout="10s" src="./cmd/foo"></go>"
-func NewGo(node *hype.Node) (hype.Tag, error) {
+func NewGo(cab fs.FS, node *hype.Node) (hype.Tag, error) {
 	if node == nil {
 		return nil, fmt.Errorf("node is nil")
 	}
@@ -79,7 +80,7 @@ func NewGo(node *hype.Node) (hype.Tag, error) {
 	node.DataAtom = commander.CMD
 	ats := node.Attrs()
 
-	var env []string
+	env := []string{}
 	if e, ok := ats["environ"]; ok {
 		e = strings.TrimSpace(e)
 		env = append(env, e)
@@ -112,7 +113,7 @@ func NewGo(node *hype.Node) (hype.Tag, error) {
 		node.Delete(k)
 	}
 
-	return commander.NewCmd(node)
+	return commander.NewCmd(cab, node)
 }
 
 var goCmds = map[string]hype.Attributes{

@@ -60,11 +60,20 @@ func assertExp(t testing.TB, name string, act string) {
 func cmdTag(t testing.TB, ats hype.Attributes) *Cmd {
 	t.Helper()
 
-	c := &Cmd{
-		Node: hype.NewNode(
-			htmx.AttrNode("cmd", ats),
-		),
+	r := require.New(t)
+
+	node := hype.NewNode(
+		htmx.AttrNode("cmd", ats),
+	)
+
+	cmd, err := NewCmd(testdata, node)
+	r.NoError(err)
+
+	if c, ok := cmd.(*Cmd); ok {
+		return c
 	}
 
-	return c
+	t.Fatalf("cmdTag: cmd is not a Cmd")
+
+	return nil
 }

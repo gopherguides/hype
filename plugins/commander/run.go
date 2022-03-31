@@ -65,6 +65,7 @@ func (r *Runner) Run(ctx context.Context, exp int) (Result, error) {
 	c := exec.CommandContext(ctx, name, args...)
 	c.Dir = runDir
 	c.Env = append(os.Environ(), env...)
+	c.Env = append(c.Env, "GOWORK=off")
 
 	stdout := &bytes.Buffer{}
 	stderr := &bytes.Buffer{}
