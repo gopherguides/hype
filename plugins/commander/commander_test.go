@@ -62,11 +62,13 @@ func cmdTag(t testing.TB, ats hype.Attributes) *Cmd {
 
 	r := require.New(t)
 
+	p := testParser(t, testdata, "")
+
 	node := hype.NewNode(
 		htmx.AttrNode("cmd", ats),
 	)
 
-	cmd, err := NewCmd(testdata, node)
+	cmd, err := NewCmd(p, node)
 	r.NoError(err)
 
 	if c, ok := cmd.(*Cmd); ok {

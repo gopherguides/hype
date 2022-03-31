@@ -214,3 +214,21 @@ func (p *Parser) CustomTag(atom atomx.Atom) (CustomTagFn, bool) {
 	fn, ok := p.customTags[atom]
 	return fn, ok
 }
+
+func (p *Parser) SnippetRules() map[string]string {
+	p.init()
+	p.RLock()
+	defer p.RUnlock()
+
+	m := map[string]string{}
+
+	if p.snippetRules == nil {
+		return m
+	}
+
+	for k, v := range p.snippetRules {
+		m[k] = v
+	}
+
+	return m
+}

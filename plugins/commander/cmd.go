@@ -7,7 +7,6 @@ import (
 	"errors"
 	"fmt"
 	"io"
-	"io/fs"
 	"os"
 	"path/filepath"
 	"runtime"
@@ -22,7 +21,6 @@ import (
 )
 
 var _ hype.Tag = &Cmd{}
-var _ hype.SetSourceable = &Cmd{}
 var _ hype.Validatable = &Cmd{}
 
 // Cmd can be used to run a command.
@@ -56,11 +54,6 @@ type Cmd struct {
 // Source returns the src attribute of the tag.
 func (c *Cmd) Source() (hype.Source, bool) {
 	return hype.SrcAttr(c.Attrs())
-}
-
-// SetSource sets the src attribute of the tag.
-func (c *Cmd) SetSource(src string) {
-	c.Set("src", src)
 }
 
 // Finalize runs the command and saves the output.
@@ -99,7 +92,15 @@ func (c *Cmd) Validate(p *hype.Parser, checks ...hype.ValidatorFn) error {
 // If the `code` attribute is set, then a `hype.Element`
 // is created and returned containing the code and the
 // command.
-func NewCmd(cab fs.FS, node *hype.Node) (hype.Tag, error) {
+func NewCmd(p *hype.Parser, node *hype.Node) (hype.Tag, error) {
+	if node == nil {
+		return nil, fmt.Errorf("nil node")
+	}
+
+	if p == nil {
+		return nil, fmt.Errorf("nil parser")
+	}
+
 	cmd := &Cmd{
 		Node: node,
 	}
@@ -123,15 +124,19 @@ func NewCmd(cab fs.FS, node *hype.Node) (hype.Tag, error) {
 	}
 
 	if _, ok := ats["code"]; ok {
-		return newCodeCmd(cab, cmd)
+		return newCodeCmd(p, cmd)
 	}
 
 	return cmd, cmd.Validate(nil)
 }
 
-func newCodeCmd(cab fs.FS, cmd *Cmd) (*hype.Element, error) {
+func newCodeCmd(p *hype.Parser, cmd *Cmd) (*hype.Element, error) {
 	if cmd == nil {
-		return nil, errors.New("cmd is nil")
+		return nil, fmt.Errorf("nil cmd")
+	}
+
+	if p == nil {
+		return nil, fmt.Errorf("nil parser")
 	}
 
 	el := &hype.Element{
@@ -159,7 +164,7 @@ func newCodeCmd(cab fs.FS, cmd *Cmd) (*hype.Element, error) {
 
 	hn := hype.NewNode(htmx.AttrNode("code", ats))
 
-	sc, err := hype.NewSourceCode(cab, hn, nil)
+	sc, err := hype.NewSourceCode(p.FS, hn, p.SnippetRules())
 	if err != nil {
 		return nil, err
 	}
