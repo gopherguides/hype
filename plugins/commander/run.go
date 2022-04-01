@@ -85,7 +85,7 @@ func (r *Runner) Run(ctx context.Context, exp int) (Result, error) {
 
 	res.Duration = time.Since(start)
 
-	res.Err = err
+	res.Err = fmt.Errorf("%s: %w", r.CmdString(), err)
 
 	if c.ProcessState != nil {
 		res.ExitCode = c.ProcessState.ExitCode()
