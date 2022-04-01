@@ -16,6 +16,10 @@ type Text struct {
 	*Node
 }
 
+func (t Text) Markdown() string {
+	return t.String()
+}
+
 func (t Text) StartTag() string {
 	return t.String()
 }

@@ -20,6 +20,10 @@ type InlineCode struct {
 	*Node
 }
 
+func (i InlineCode) Markdown() string {
+	return fmt.Sprintf("`%s`", i.GetChildren().Markdown())
+}
+
 // Lang represents the language of an inline code snippet.
 // Returns an empty string.
 func (c *InlineCode) Lang() string {

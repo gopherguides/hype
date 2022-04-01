@@ -16,6 +16,17 @@ type Element struct {
 	*Node
 }
 
+func (el Element) Markdown() string {
+	switch el.Atom() {
+	case atomx.A:
+		return fmt.Sprintf("[%s](%s)", el.GetChildren().Markdown(), el.attrs["href"])
+	case atomx.B, atomx.Strong:
+		return fmt.Sprintf("**%s**", el.GetChildren().Markdown())
+	}
+
+	return el.GetChildren().Markdown()
+}
+
 func (e Element) String() string {
 	at := e.Atom()
 

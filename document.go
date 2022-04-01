@@ -15,6 +15,10 @@ type Document struct {
 	fs.FS
 }
 
+func (doc Document) Markdown() string {
+	return doc.GetChildren().Markdown()
+}
+
 func (doc Document) String() string {
 	return doc.Children.String()
 }

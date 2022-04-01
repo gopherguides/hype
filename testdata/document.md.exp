@@ -1,0 +1,64 @@
+# Testing Includes
+
+text goes here **bold** and stuff
+
+what about `inline code`?
+
+[]: # Path: testdata/includes.md
+
+
+# Included File
+
+this is a [link](http://example.com) to something
+
+```js
+function foo() {
+  return &#34;bar&#34;;
+}
+
+```
+
+
+```go
+package main
+
+type Venue struct{}
+
+// snippet: entertainer
+type Entertainer interface {
+	// snippet: entertainer-funcs
+	Name() string
+	Perform(v Venue) error
+	// snippet: entertainer-funcs
+}
+
+// snippet: entertainer
+
+type Setuper interface {
+	// snippet: setuper-funcs
+	Setup(v Venue) error
+	// snippet: setuper-funcs
+}
+
+type Teardowner interface {
+	// snippet: teardowner-funcs
+	Teardown(v Venue) error
+	// snippet: teardowner-funcs
+}
+
+```
+
+
+more text
+
+<img id="paul" src="includes/assets/paul.png" />
+
+even more text
+
+
+
+
+
+more text goes here
+
+<img id="george" src="assets/foo.png" />

@@ -76,6 +76,14 @@ func (c *SourceCode) EndTag() string {
 	return fmt.Sprintf("%s</pre></p>", t)
 }
 
+func (c SourceCode) Markdown() string {
+	bb := &bytes.Buffer{}
+	fmt.Fprintf(bb, "```%s\n", c.Lang())
+	fmt.Fprintln(bb, c.GetChildren().Markdown())
+	fmt.Fprintln(bb, "```")
+	return bb.String()
+}
+
 // String returns a properly formatted <code> tag.
 // If a snippet is defined on the original <code snippet="foo"> tag, then that snippet's content is used, otherwise the the Source code is used.
 func (c *SourceCode) String() string {

@@ -1,6 +1,7 @@
 package hype
 
 import (
+	"bytes"
 	"fmt"
 	"strings"
 
@@ -18,6 +19,14 @@ var _ Validatable = &FencedCode{}
 // 	```
 type FencedCode struct {
 	*Node
+}
+
+func (c FencedCode) Markdown() string {
+	bb := &bytes.Buffer{}
+	fmt.Fprintf(bb, "```%s\n", c.Lang())
+	fmt.Fprintln(bb, c.GetChildren().Markdown())
+	fmt.Fprintln(bb, "```")
+	return bb.String()
 }
 
 func (c FencedCode) String() string {

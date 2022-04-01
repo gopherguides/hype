@@ -35,6 +35,16 @@ func (h Heading) Level() int {
 	return 0
 }
 
+func (h Heading) Markdown() string {
+	bb := &bytes.Buffer{}
+	for i := 0; i < h.Level(); i++ {
+		bb.WriteRune('#')
+	}
+
+	fmt.Fprintf(bb, " %s", h.GetChildren())
+	return bb.String()
+}
+
 func (h Heading) String() string {
 	bb := &bytes.Buffer{}
 	fmt.Fprint(bb, h.StartTag())

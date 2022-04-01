@@ -1,6 +1,12 @@
 # Included File
 
-some text
+this is a [link](http://example.com) to something
+
+```js
+function foo() {
+  return "bar";
+}
+```
 
 <code src="src/snippets.go"></code>
 

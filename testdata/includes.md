@@ -1,6 +1,10 @@
 # Testing Includes
 
-text goes here
+text goes here **bold** and stuff
+
+what about `inline code`?
+
+[]: # Path: testdata/includes.md
 
 <include src="includes/_includes.md"></include>
 

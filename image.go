@@ -15,6 +15,10 @@ type Image struct {
 	*Node
 }
 
+func (i Image) Markdown() string {
+	return i.String()
+}
+
 // Source returns the source of the image.
 func (c *Image) Source() (Source, bool) {
 	c.RLock()

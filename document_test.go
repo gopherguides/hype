@@ -1,7 +1,9 @@
 package hype
 
 import (
+	"fmt"
 	"io"
+	"io/fs"
 	"strings"
 	"testing"
 
@@ -145,5 +147,29 @@ func Test_Document_Pages(t *testing.T) {
 			r.Len(doc.Pages(), tt.exp)
 		})
 	}
+
+}
+
+func Test_Document_Markdown(t *testing.T) {
+	t.Parallel()
+	r := require.New(t)
+
+	p := testParser(t, testdata)
+
+	doc, err := p.ParseFile("includes.md")
+	r.NoError(err)
+
+	act := doc.Markdown()
+	act = strings.TrimSpace(act)
+
+	fmt.Println(act)
+
+	b, err := fs.ReadFile(testdata, "document.md.exp")
+	r.NoError(err)
+
+	exp := string(b)
+	exp = strings.TrimSpace(exp)
+
+	r.Equal(exp, act)
 
 }
