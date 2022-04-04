@@ -35,6 +35,7 @@ type SourceCode struct {
 	Snippets Snippets // map of snippets in the file
 	Body     string   // Full source of file
 	lang     string   // language of the file
+	multiSrc bool
 }
 
 func (c *SourceCode) Source() (Source, bool) {
@@ -65,12 +66,28 @@ func (c *SourceCode) Lang() string {
 }
 
 func (c *SourceCode) StartTag() string {
+	if c.Node == nil {
+		return ""
+	}
+
+	if c.multiSrc {
+		return ""
+	}
+
 	t := c.Node.StartTag()
 
 	return fmt.Sprintf("<p><pre>%s", t)
 }
 
 func (c *SourceCode) EndTag() string {
+	if c.Node == nil {
+		return ""
+	}
+
+	if c.multiSrc {
+		return ""
+	}
+
 	t := c.Node.EndTag()
 
 	return fmt.Sprintf("%s</pre></p>", t)
@@ -147,38 +164,53 @@ func NewSourceCode(cab fs.FS, node *Node, rules map[string]string) (*SourceCode,
 		return nil, err
 	}
 
+	return sc, nil
+}
+
+func (sc *SourceCode) Finalize(p *Parser) error {
+	if sc == nil {
+		return fmt.Errorf("source code is nil")
+	}
+
+	if p == nil {
+		return fmt.Errorf("parser is nil")
+	}
+
+	cab := p.FS
+	rules := p.snippetRules
+
 	src, err := sc.Get("src")
 	if err != nil {
-		return nil, err
+		return err
 	}
 
 	srcs := strings.Split(src, ",")
 	if len(srcs) > 1 {
 		// handle multiple sources
-		if err := sc.handleSources(srcs, cab, rules); err != nil {
-			return nil, err
+		if err := sc.handleSources(p, srcs); err != nil {
+			return err
 		}
-		return sc, nil
+		return nil
 	}
 
 	if err := sc.handleLang(); err != nil {
-		return nil, err
+		return err
 	}
 
 	fn := strings.Split(src, "#")[0]
 
 	b, err := fs.ReadFile(cab, fn)
 	if err != nil {
-		return nil, err
+		return err
 	}
 
 	sc.Body = string(bytes.TrimSpace(b))
 
 	if err := sc.handleSnippets(src, b, rules); err != nil {
-		return nil, err
+		return err
 	}
 
-	return sc, nil
+	return nil
 }
 
 func (sc *SourceCode) handleSnippets(src string, b []byte, rules map[string]string) error {
@@ -218,7 +250,7 @@ func (sc *SourceCode) handleSnippets(src string, b []byte, rules map[string]stri
 	return nil
 }
 
-func (sc *SourceCode) handleSources(srcs []string, cab fs.FS, rules map[string]string) error {
+func (sc *SourceCode) handleSources(p *Parser, srcs []string) error {
 	if sc == nil {
 		return fmt.Errorf("nil source code")
 	}
@@ -228,13 +260,25 @@ func (sc *SourceCode) handleSources(srcs []string, cab fs.FS, rules map[string]s
 		return fmt.Errorf("nil node")
 	}
 
+	if p == nil {
+		return fmt.Errorf("nil parser")
+	}
+
+	sc.multiSrc = true
+
 	for _, src := range srcs {
 		kn := node.Clone()
 		kn.attrs["src"] = src
-		kid, err := NewSourceCode(cab, kn, rules)
+
+		kid, err := NewSourceCode(p.FS, kn, p.snippetRules)
 		if err != nil {
 			return err
 		}
+
+		if err := kid.Finalize(p); err != nil {
+			return err
+		}
+
 		sc.Children = append(sc.Children, kid)
 	}
 

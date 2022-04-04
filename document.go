@@ -85,31 +85,12 @@ func (p *Parser) NewDocument(n *html.Node) (*Document, error) {
 		return nil, err
 	}
 
-	err = p.finalize(doc)
+	err = doc.GetChildren().Finalize(p)
 	if err != nil {
 		return nil, err
 	}
 
 	return doc, nil
-}
-
-func (p *Parser) finalize(tags ...Tag) error {
-	for _, tag := range tags {
-		if f, ok := tag.(Finalizer); ok {
-			if err := f.Finalize(p); err != nil {
-				return err
-			}
-		}
-
-		err := p.finalize(tag.GetChildren()...)
-		if err != nil {
-			return err
-		}
-	}
-
-	// charset
-
-	return nil
 }
 
 // Body returns the <body> tag for the document.

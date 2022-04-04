@@ -11,20 +11,23 @@ import (
 func Test_Parser_NewSourceCode(t *testing.T) {
 	t.Parallel()
 
+	p := testParser(t, testdata)
+
 	table := []struct {
-		err  bool
-		exp  string
-		lang string
-		name string
-		node *html.Node
+		finalErr bool
+		parseErr bool
+		exp      string
+		lang     string
+		name     string
+		node     *html.Node
 	}{
-		{name: "nil", err: true},
-		{name: "non code node", node: htmx.ElementNode("p"), err: true},
-		{name: "no src attr", node: htmx.ElementNode("code"), err: true},
+		{name: "nil", parseErr: true},
+		{name: "non code node", node: htmx.ElementNode("p"), parseErr: true},
+		{name: "no src attr", node: htmx.ElementNode("code"), parseErr: true},
 		{
-			name: "src file missing",
-			node: htmx.AttrNode("code", Attributes{"src": "404.go"}),
-			err:  true,
+			name:     "src file missing",
+			node:     htmx.AttrNode("code", Attributes{"src": "404.go"}),
+			finalErr: true,
 		},
 		{
 			name: "valid Go",
@@ -51,13 +54,19 @@ func Test_Parser_NewSourceCode(t *testing.T) {
 			r := require.New(t)
 
 			sc, err := NewSourceCode(testdata, NewNode(tt.node), nil)
-			if tt.err {
+			if tt.parseErr {
 				r.Error(err)
 				return
 			}
 
 			r.NoError(err)
 			r.NotNil(sc)
+
+			err = sc.Finalize(p)
+			if tt.finalErr {
+				r.Error(err)
+				return
+			}
 
 			r.Equal(tt.lang, sc.Lang())
 			r.Equal(tt.exp, sc.String())
@@ -76,8 +85,10 @@ func Test_SourceCode_HashtagSnippets(t *testing.T) {
 
 	p := testParser(t, testdata)
 
-	sc, err := NewCode(p, NewNode(node))
+	sc, err := NewSourceCode(p, NewNode(node), p.snippetRules)
 	r.NoError(err)
+
+	r.NoError(sc.Finalize(p))
 
 	kids := sc.GetChildren()
 	r.Len(kids, 2)

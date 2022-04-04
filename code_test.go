@@ -108,10 +108,12 @@ func Test_Code_MultipleSources(t *testing.T) {
 	sc, err := NewSourceCode(testdata, NewNode(node), nil)
 	r.NoError(err)
 
+	r.NoError(sc.Finalize(testParser(t, testdata)))
+
 	kids := sc.GetChildren()
 	r.Len(kids, 2)
 
-	const exp = `<p><pre><code src="src/snippets.go,src/snippets.js"><p><pre><code class="language-go" language="go" src="src/snippets.go">package main
+	const exp = `<p><pre><code class="language-go" language="go" src="src/snippets.go">package main
 
 import &#34;fmt&#34;
 
@@ -130,7 +132,7 @@ func Goodbye() {
 
 function goodbye() {
     console.log(&#39;Goodbye, World!&#39;);
-}</code></pre></p></code></pre></p>`
+}</code></pre></p>`
 
 	act := sc.String()
 

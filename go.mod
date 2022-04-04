@@ -6,7 +6,7 @@ go 1.18
 // replace github.com/markbates/hepa => ../hepa
 
 require (
-	github.com/gobuffalo/flect v0.2.4
+	github.com/gobuffalo/flect v0.2.5
 	github.com/jmoiron/sqlx v1.3.4
 	github.com/markbates/cleo v0.0.0-20211224163523-ce782c92f4ce
 	github.com/markbates/hepa v0.0.0-20211129002629-856d16f89b9d
@@ -14,7 +14,7 @@ require (
 	github.com/mattn/go-shellwords v1.0.12
 	github.com/russross/blackfriday/v2 v2.1.0
 	github.com/stretchr/testify v1.7.0
-	golang.org/x/net v0.0.0-20220225172249-27dd8689420f
+	golang.org/x/net v0.0.0-20220403103023-749bd193bc2b
 )
 
 require (

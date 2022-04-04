@@ -56,10 +56,12 @@ func Test_Cmd_Code(t *testing.T) {
 	t.Parallel()
 	r := require.New(t)
 
-	p := testParser(t, testdata, "testdata")
-	p.FileName = "run.md"
+	dir := "testdata/set-sources"
+	cab := os.DirFS(dir)
 
-	doc, err := p.ParseMD([]byte(`<cmd exec="go run ." src="cmd" code="main.go" snippet="example" hide-duration></cmd>`))
+	p := testParser(t, cab, dir)
+
+	doc, err := p.ParseFile("module.md")
 	r.NoError(err)
 
 	act := doc.String()
@@ -69,12 +71,42 @@ func Test_Cmd_Code(t *testing.T) {
 	exp := `<html><head><meta charset="utf-8" /></head><body>
 <page>
 
-<div><p><pre><code class="language-go" code="main.go" exec="go run ." hide-duration="" language="go" snippet="example" src="cmd/main.go">func main() {
-	fmt.Println(&#34;Hello, world!&#34;)
-}
-</code></pre></p><cmd code="main.go" exec="go run ." hide-duration="" snippet="example" src="cmd"><pre class="code-block"><code class="language-plain" language="plain">$ go run .
+<h1>Hello World</h1>
 
-Hello, world!
+<img src="assets/foo.png" />
+
+<p><pre><code class="language-go" language="go" src="src/demo.go">package main
+
+import &#34;fmt&#34;
+
+func main() {
+	fmt.Println(&#34;Hello, World!&#34;)
+}
+
+</code></pre></p>
+
+</page><!--BREAK-->
+
+<page>
+
+<h1>Foo</h1>
+
+<p><pre><code class="language-js" language="js" src="foo/src/foo.js">function hello() {
+    console.log(&#39;Hello, World!&#39;);
+}
+
+function goodbye() {
+    console.log(&#39;Goodbye, World!&#39;);
+}</code></pre></p>
+
+<p>Some text</p>
+
+<div><p><pre><code class="language-go#example" code="main.go#example" exec="go run main.go" hide-duration="" language="go#example" src="foo/src/bar/main.go#example">func main() {
+	fmt.Println(&#34;Hello, World!&#34;)
+}
+</code></pre></p><cmd code="main.go#example" exec="go run main.go" hide-duration="" src="foo/src/bar"><pre class="code-block"><code class="language-plain" language="plain">$ go run main.go
+
+Hello, World!
 --------------------------------------------------------------------------------
 go: go1.18</code></pre></cmd></div>
 

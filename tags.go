@@ -122,3 +122,20 @@ func (tags Tags) Markdown() string {
 
 	return bb.String()
 }
+
+func (tags Tags) Finalize(p *Parser) error {
+	for _, tag := range tags {
+		if f, ok := tag.(Finalizer); ok {
+			if err := f.Finalize(p); err != nil {
+				return err
+			}
+		}
+
+		err := tag.GetChildren().Finalize(p)
+		if err != nil {
+			return err
+		}
+	}
+
+	return nil
+}

@@ -1,7 +1,6 @@
 package hype
 
 import (
-	"fmt"
 	"io"
 	"io/fs"
 	"strings"
@@ -162,7 +161,7 @@ func Test_Document_Markdown(t *testing.T) {
 	act := doc.Markdown()
 	act = strings.TrimSpace(act)
 
-	fmt.Println(act)
+	// fmt.Println(act)
 
 	b, err := fs.ReadFile(testdata, "document.md.exp")
 	r.NoError(err)
