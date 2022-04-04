@@ -79,7 +79,9 @@ func (c *SourceCode) EndTag() string {
 func (c SourceCode) Markdown() string {
 	bb := &bytes.Buffer{}
 	fmt.Fprintf(bb, "```%s\n", c.Lang())
-	fmt.Fprintln(bb, c.GetChildren().Markdown())
+	text := c.GetChildren().Markdown()
+	text = html.UnescapeString(text)
+	fmt.Fprintln(bb, text)
 	fmt.Fprintln(bb, "```")
 	return bb.String()
 }
