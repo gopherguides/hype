@@ -1,7 +1,6 @@
 package golang
 
 import (
-	"fmt"
 	"os"
 	"testing"
 
@@ -40,7 +39,7 @@ func Test_Link(t *testing.T) {
 </html>`
 	act := doc.String()
 
-	fmt.Println(act)
+	// fmt.Println(act)
 	r.Contains(act, "SEE ME")
 	r.Equal(exp, act)
 

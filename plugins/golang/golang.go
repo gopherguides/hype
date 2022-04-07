@@ -98,6 +98,10 @@ func NewGo(cab fs.FS, node *hype.Node) (hype.Tag, error) {
 		node.Set("environ", ev)
 	}
 
+	if _, err := node.Get("sym"); err == nil {
+		return NewSymbol(node)
+	}
+
 	for k, gats := range goCmds {
 		ex, ok := ats[k]
 		if !ok {

@@ -22,7 +22,7 @@ type Runner struct {
 	sync.RWMutex
 }
 
-func (r Runner) CmdString() string {
+func (r *Runner) CmdString() string {
 	if len(r.Args) == 0 {
 		return r.Name
 	}
@@ -85,7 +85,9 @@ func (r *Runner) Run(ctx context.Context, exp int) (Result, error) {
 
 	res.Duration = time.Since(start)
 
-	res.Err = fmt.Errorf("%s: %w", r.CmdString(), err)
+	if err != nil {
+		res.Err = fmt.Errorf("%s: %w", r.CmdString(), err)
+	}
 
 	if c.ProcessState != nil {
 		res.ExitCode = c.ProcessState.ExitCode()

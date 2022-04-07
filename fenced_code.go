@@ -81,6 +81,7 @@ func NewFencedCode(node *Node) (*FencedCode, error) {
 	c.Set("class", fmt.Sprintf("language-%s", lang))
 
 	s := node.Children.String()
+
 	s = html.EscapeString(s)
 
 	c.Children = Tags{QuickText(s)}
