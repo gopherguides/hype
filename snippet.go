@@ -68,6 +68,9 @@ func ParseSnippets(path string, src []byte, rules map[string]string) (Snippets, 
 			snip, ok := open[name]
 			if ok {
 				snip.End = i + 1
+				if _, ok := snips[name]; ok {
+					return nil, fmt.Errorf("duplicate snippet: %s#%s", path, name)
+				}
 				snips[name] = snip
 				delete(open, name)
 			}
@@ -79,7 +82,6 @@ func ParseSnippets(path string, src []byte, rules map[string]string) (Snippets, 
 				open[name] = snip
 			}
 
-			snips[name] = snip
 			continue
 		}
 
@@ -88,6 +90,10 @@ func ParseSnippets(path string, src []byte, rules map[string]string) (Snippets, 
 			open[k] = snip
 		}
 
+	}
+
+	if len(open) > 0 {
+		return nil, fmt.Errorf("unclosed snippet: %s#%s", path, open)
 	}
 
 	return snips, nil

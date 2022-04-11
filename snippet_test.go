@@ -111,3 +111,40 @@ func Test_ParseSnippets_Ruby(t *testing.T) {
 	act := snip.Content
 	r.Equal(exp, act)
 }
+
+func Test_ParseSnippets_Unclosed(t *testing.T) {
+	t.Parallel()
+	r := require.New(t)
+
+	src := `package demo
+	// snippet: example
+	func Hello() {
+	}
+	`
+
+	p := testParser(t, testdata)
+
+	_, err := p.Snippets("demo.go", []byte(src))
+	r.Error(err)
+}
+
+func Test_ParseSnippets_Duplicate(t *testing.T) {
+	t.Parallel()
+	r := require.New(t)
+
+	src := `package demo
+	// snippet: example
+	func Hello() {
+	}
+	// snippet: example
+	// snippet: example
+	func Goodbye() {
+	}
+	// snippet: example
+	`
+
+	p := testParser(t, testdata)
+
+	_, err := p.Snippets("demo.go", []byte(src))
+	r.Error(err)
+}
