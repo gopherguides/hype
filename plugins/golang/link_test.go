@@ -30,7 +30,7 @@ func Test_Link(t *testing.T) {
 
 <h2>Element links</h2>
 
-<p>This <godoc#a for="context"><a href="https://pkg.go.dev/context" target="_blank"><code>context</code></a></godoc#a> link is <godoc#a for="io#Writer"><a href="https://pkg.go.dev/io#Writer" target="_blank"><code>io.Writer</code></a></godoc#a> SEE ME.</p>
+<p>This <godoc#a for="context"><a href="https://pkg.go.dev/context" target="_blank"><code class="inline-code">context</code></a></godoc#a> link is <godoc#a for="io#Writer"><a href="https://pkg.go.dev/io#Writer" target="_blank"><code class="inline-code">io.Writer</code></a></godoc#a> SEE ME.</p>
 
 </page><!--BREAK-->
 

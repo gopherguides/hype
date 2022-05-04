@@ -26,7 +26,7 @@ func Test_Parser_NewInlineCode(t *testing.T) {
 		{name: "nil", err: true},
 		{name: "nil html node", node: &Node{}, err: true},
 		{name: "non code node", node: NewNode(htmx.ElementNode("p")), err: true},
-		{name: "valid", node: valid, exp: `<code>hello</code>`},
+		{name: "valid", node: valid, exp: `<code class="inline-code">hello</code>`},
 	}
 
 	for _, tt := range table {

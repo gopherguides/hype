@@ -108,7 +108,7 @@ function goodbye() {
 
 Hello, World!
 --------------------------------------------------------------------------------
-go: go1.18</code></pre></cmd></div>
+go: go1.18.1</code></pre></cmd></div>
 
 </page><!--BREAK-->
 

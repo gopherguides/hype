@@ -62,5 +62,7 @@ func NewInlineCode(node *Node) (*InlineCode, error) {
 	s = html.EscapeString(s)
 	c.Children = Tags{QuickText(s)}
 
+	c.Set("class", "inline-code")
+
 	return c, c.Validate(nil)
 }

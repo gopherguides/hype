@@ -17,7 +17,7 @@ func Test_Parser_ParseMD_TagBug(t *testing.T) {
 	r.NoError(err)
 
 	act := doc.String()
-	exp := `<li>In the terminal type <code>git config --global user.name &#34;&lt;your name&gt;&#34;</code> and press “enter”.</li>`
+	exp := `<li>In the terminal type <code class="inline-code">git config --global user.name &#34;&lt;your name&gt;&#34;</code> and press “enter”.</li>`
 
 	// fmt.Println(act)
 	r.Contains(act, exp)

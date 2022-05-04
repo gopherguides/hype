@@ -76,7 +76,7 @@ func Test_Parse_Code(t *testing.T) {
 
 <h1>Code Test</h1>
 
-<p>This is <code>inline</code> code.</p>
+<p>This is <code class="inline-code">inline</code> code.</p>
 
 <p>Fenced code block:</p>
 
