@@ -2,91 +2,62 @@ package hype
 
 import (
 	"fmt"
-	"io/fs"
 	"path/filepath"
 	"strings"
+	"sync"
 
-	"github.com/gopherguides/hype/atomx"
-	"golang.org/x/net/html"
+	"github.com/gofrs/uuid/v3"
 )
 
-var _ Tag = &Include{}
-var _ Validatable = &Include{}
-var _ ValidatableFS = &Include{}
-
-// Include is a node that includes another file in its body.
 type Include struct {
-	*Node
-	Data string
+	*Element
+
+	dir string
+	pp  sync.Once
 }
 
-// Source returns the source of the include.
-func (c *Include) Source() (Source, bool) {
-	c.RLock()
-	defer c.RUnlock()
-	return SrcAttr(c.attrs)
-}
-
-func (i Include) String() string {
-	if i.Node == nil {
-		return "<include />"
+func (inc *Include) PostParse(p *Parser, d *Document, err error) error {
+	if err != nil {
+		return nil
 	}
 
-	kids := i.Children
-	if len(kids) > 0 {
-		return i.Children.String()
+	if inc == nil {
+		return ErrIsNil("include")
 	}
 
-	return fmt.Sprintf("<include %s />", i.Attrs())
-}
-
-// Validate the include
-func (i Include) Validate(p *Parser, checks ...ValidatorFn) error {
-	checks = append(checks, AtomValidator(atomx.Include))
-	return i.Node.Validate(p, html.ElementNode, checks...)
-}
-
-// ValidateFS validates the include against the given filesystem.
-func (i Include) ValidateFS(p *Parser, fs fs.FS, checks ...ValidatorFn) error {
-	checks = append(checks, SourceValidator(fs, &i))
-	return i.Validate(p, checks...)
-}
-
-// NewInclude creates a new Include node based on the given node.
-func NewInclude(node *Node, p *Parser) (*Include, error) {
-
-	i := &Include{
-		Node: node,
+	if err := inc.setSources(); err != nil {
+		return err
 	}
 
-	if err := i.ValidateFS(p, p.FS); err != nil {
-		return nil, err
+	return nil
+}
+
+func (inc *Include) String() string {
+	return inc.Children().String()
+}
+
+func NewInclude(p *Parser, el *Element) (*Include, error) {
+	if p == nil {
+		return nil, ErrIsNil("parser")
 	}
 
-	source, ok := i.Source()
+	if el == nil {
+		return nil, ErrIsNil("element")
+	}
+
+	if p.FS == nil {
+		return nil, ErrIsNil("p.FS")
+	}
+
+	src, ok := el.Get("src")
 	if !ok {
-		return nil, fmt.Errorf("include node has no source")
+		return nil, fmt.Errorf("missing src attribute")
 	}
 
-	ext := source.Ext()
-	src := source.String()
+	sdir := filepath.Dir(src)
+	base := filepath.Base(src)
 
-	switch ext {
-	case ".html", ".md":
-		// let these fall through as we'll handle them properly below
-	default:
-		b, err := fs.ReadFile(p, src)
-		if err != nil {
-			return nil, err
-		}
-		i.Data = string(b)
-		return i, nil
-	}
-
-	base := source.Base()
-	dir := source.Dir()
-
-	p2, err := p.SubParser(dir)
+	p2, err := p.Sub(sdir)
 	if err != nil {
 		return nil, err
 	}
@@ -101,39 +72,68 @@ func NewInclude(node *Node, p *Parser) (*Include, error) {
 		return nil, err
 	}
 
-	i.setSources(dir, body.Children)
-	i.Children = body.Children
+	inc := &Include{
+		Element: el,
+		dir:     sdir,
+	}
 
-	return i, nil
+	inc.Nodes = body.Nodes
+
+	fn := func(fig *Figure) (string, error) {
+		uid, err := uuid.NewV4()
+		if err != nil {
+			return "", err
+		}
+
+		return uid.String(), nil
+
+	}
+
+	if err := RestripeFigureIDs(inc.Nodes, fn); err != nil {
+		return nil, err
+	}
+
+	return inc, nil
 }
 
-func (i *Include) setSources(dir string, tags Tags) {
-	for _, tag := range tags {
-		i.setSources(dir, tag.GetChildren())
+// NewIncludeNodes implements the ParseElementFn type
+func NewIncludeNodes(p *Parser, el *Element) (Nodes, error) {
+	inc, err := NewInclude(p, el)
+	if err != nil {
+		return nil, err
+	}
 
-		srcs := tag.GetChildren().ByAttrs(Attributes{
+	return Nodes{inc}, nil
+}
+
+func (inc *Include) setSources() error {
+	if inc == nil {
+		return nil
+	}
+
+	var err error
+	inc.pp.Do(func() {
+		kids := ByAttrs(inc.Children(), map[string]string{
 			"src": "*",
 		})
 
-		for _, src := range srcs {
-			st, ok := src.(SetSourceable)
-			if !ok {
+		for _, n := range kids {
+			ats := n.Attrs()
+
+			src, _ := ats.Get("src")
+
+			if strings.HasPrefix(src, "http") || strings.HasPrefix(src, inc.dir) {
 				continue
 			}
 
-			source, ok := st.Source()
-			if !ok {
-				continue
+			src = filepath.Join(inc.dir, src)
+
+			if err = ats.Set("src", src); err != nil {
+				return
 			}
-
-			ss := source.String()
-			if strings.HasPrefix(ss, dir) {
-				continue
-			}
-
-			xs := filepath.Join(dir, source.String())
-
-			st.SetSource(xs)
 		}
-	}
+
+	})
+
+	return err
 }

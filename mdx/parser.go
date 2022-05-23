@@ -16,8 +16,9 @@ const extensions = blackfriday.CommonExtensions | blackfriday.LaxHTMLBlocks
 // Parser for parsing Markdown
 type Parser struct {
 	*sync.RWMutex
-	cur   int
-	lines []string
+	DisablePages bool
+	cur          int
+	lines        []string
 }
 
 func (p *Parser) render(src []byte) []byte {
@@ -26,11 +27,15 @@ func (p *Parser) render(src []byte) []byte {
 }
 
 func (p *Parser) start(w io.Writer) {
-	fmt.Fprintln(w, "<page>")
+	if !p.DisablePages {
+		fmt.Fprintln(w, "<page>")
+	}
 }
 
 func (p *Parser) end(w io.Writer) {
-	fmt.Fprintln(w, "</page>")
+	if !p.DisablePages {
+		fmt.Fprintln(w, "</page>")
+	}
 }
 
 // NewParser returns a new Parser.

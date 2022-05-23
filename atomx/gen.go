@@ -20,11 +20,15 @@ import (
 )
 
 var hype = []string{
+	"cmd",
 	"code",
 	"file",
 	"filegroup",
+	"go",
 	"include",
 	"page",
+	"ref",
+	"unknown",
 }
 
 func main() {
@@ -107,11 +111,12 @@ var headings = []string{
 
 var inlines = []string{
 	"a",
-	"img",
-	"image",
-	"br",
 	"b",
+	"br",
+	"image",
+	"img",
 	"link",
+	"ref",
 }
 
 var elements = []string{

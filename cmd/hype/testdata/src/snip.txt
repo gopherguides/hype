@@ -1,4 +1,0 @@
-Line 1
-// snippet: main
-Line 2
-// snippet: main

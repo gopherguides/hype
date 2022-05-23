@@ -1,121 +1,114 @@
 package hype
 
 import (
-	"encoding/json"
-	"io/fs"
 	"testing"
+	"testing/fstest"
 
-	"github.com/gopherguides/hype/htmx"
 	"github.com/stretchr/testify/require"
-	"golang.org/x/net/html"
 )
 
-func Test_NewInclude(t *testing.T) {
-	t.Parallel()
-
-	validInc := htmx.AttrNode("include", map[string]string{
-		"src": "html5.html",
-	})
-	fileMissing := htmx.AttrNode("include", map[string]string{
-		"src": "404.html",
-	})
-	srcMissing := htmx.ElementNode("include")
-
-	table := []struct {
-		name string
-		cab  fs.FS
-		node *html.Node
-		err  bool
-	}{
-		{name: "missing src attr", cab: testdata, node: srcMissing, err: true},
-		{name: "missing src file", cab: testdata, node: fileMissing, err: true},
-		{name: "nil all the way", cab: testdata, err: true},
-		{name: "valid include", cab: testdata, node: validInc},
-	}
-
-	for _, tt := range table {
-		t.Run(tt.name, func(t *testing.T) {
-			r := require.New(t)
-
-			p := testParser(t, tt.cab)
-			i, err := NewInclude(NewNode(tt.node), p)
-
-			if tt.err {
-				r.Error(err)
-				return
-			}
-
-			r.NoError(err)
-			r.NotNil(i)
-		})
-	}
-
-}
-
-func Test_Include_JSON(t *testing.T) {
+func Test_Include(t *testing.T) {
 	t.Parallel()
 	r := require.New(t)
 
-	validInc := htmx.AttrNode("include", map[string]string{
-		"src": "html5.html",
-	})
+	mod := `# Page 1
 
-	inc := &Include{
-		Node: NewNode(validInc),
+<include src="second/second.md"></include>`
+
+	second := `# Second Page
+
+<img src="assets/second.png"></img>`
+
+	cab := fstest.MapFS{
+		"module.md": &fstest.MapFile{
+			Data: []byte(mod),
+		},
+		"second/second.md": &fstest.MapFile{
+			Data: []byte(second),
+		},
+		"second/assets/second.png": &fstest.MapFile{},
 	}
 
-	exp := `{"attributes":{"src":"html5.html"},"data":"include","type":"element"}`
+	p := NewParser(cab)
 
-	b, err := json.Marshal(inc)
-	r.NoError(err)
-	r.Equal(exp, string(b))
-}
-
-func Test_Include_Source(t *testing.T) {
-	t.Skip()
-	t.Parallel()
-	r := require.New(t)
-
-	p := testParser(t, testdata)
-	doc, err := p.ParseFile("includes.md")
+	doc, err := p.ParseFile("module.md")
 	r.NoError(err)
 	r.NotNil(doc)
 
-	images := []string{
-		"includes/assets/paul.png",
-		"assets/foo.png",
+	exp := `<html><head></head><body><page>
+<h1>Page 1</h1>
+</page>
+<page>
+<h1>Second Page</h1>
+
+<img src="second/assets/second.png"></img>
+</page>
+
+</body></html>`
+	act := doc.String()
+
+	// fmt.Println(act)
+	r.Equal(exp, act)
+
+}
+
+func Test_Include_Nested(t *testing.T) {
+	t.Parallel()
+	r := require.New(t)
+
+	mod := `# Page 1
+
+<include src="second/second.md"></include>`
+
+	second := `# Second Page
+
+<img src="assets/second.png"></img>
+
+<include src="third/third.md"></include>`
+
+	third := `# Third Page
+
+<img src="assets/third.png"></img>`
+
+	cab := fstest.MapFS{
+		"module.md": &fstest.MapFile{
+			Data: []byte(mod),
+		},
+		"second/second.md": &fstest.MapFile{
+			Data: []byte(second),
+		},
+		"second/assets/second.png": &fstest.MapFile{},
+		"second/third/third.md": &fstest.MapFile{
+			Data: []byte(third),
+		},
+		"second/third/assets/third.png": &fstest.MapFile{},
 	}
 
-	files := []string{"includes/src/snippets.go"}
-	codes := []string{"includes/src/snippets.go"}
+	p := NewParser(cab)
 
-	table := []struct {
-		name string
-		t    Tag
-		exp  []string
-	}{
-		{name: "images", t: &Image{}, exp: images},
-		{name: "files", t: &File{}, exp: files},
-		{name: "codes", t: &SourceCode{}, exp: codes},
-	}
+	doc, err := p.ParseFile("module.md")
+	r.NoError(err)
+	r.NotNil(doc)
 
-	for _, tt := range table {
-		t.Run(tt.name, func(t *testing.T) {
-			r := require.New(t)
+	exp := `<html><head></head><body><page>
+<h1>Page 1</h1>
+</page>
+<page>
+<h1>Second Page</h1>
 
-			tags := ByType(doc.Children, tt.t)
-			// tags := doc.Children.ByType(tt.t)
-			r.Len(tags, len(tt.exp))
+<img src="second/assets/second.png"></img>
+</page>
+<page>
+<h1>Third Page</h1>
 
-			for i, exp := range tt.exp {
+<img src="second/third/assets/third.png"></img>
+</page>
 
-				tag := tags[i]
 
-				act := tag.Attrs()["src"]
-				r.Equal(exp, act)
-			}
+</body></html>`
+	act := doc.String()
 
-		})
-	}
+	// fmt.Println(act)
+	r.Equal(exp, act)
 
 }

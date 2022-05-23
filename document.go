@@ -1,127 +1,139 @@
 package hype
 
 import (
-	"encoding/json"
+	"context"
 	"fmt"
 	"io/fs"
+	"sync"
 
-	"github.com/gopherguides/hype/htmx"
-	"golang.org/x/net/html"
+	"github.com/gopherguides/hype/atomx"
+	"golang.org/x/sync/errgroup"
 )
 
-// Document represents an HTML document
+var _ Node = &Document{}
+
 type Document struct {
-	*Node
 	fs.FS
+	sync.RWMutex
+
+	Nodes     Nodes
+	Parser    *Parser // Parser used to create the document
+	Root      string
+	SectionID int
+	Snippets  *Snippets
+	Title     string
 }
 
-func (doc Document) Markdown() string {
-	return doc.GetChildren().Markdown()
-}
-
-func (doc Document) String() string {
-	return doc.Children.String()
-}
-
-// Overview returns the contents of the first <overview> tag in the document.
-func (doc *Document) Overview() string {
-	tags := doc.Children.ByAtom("overview")
-	if len(tags) == 0 {
-		return ""
-	}
-	return tags[0].GetChildren().String()
-}
-
-func (doc Document) MarshalJSON() ([]byte, error) {
-	m := map[string]any{
-		"document": htmx.NewNodeJSON(doc.Node.html),
-		"fs":       doc.FS,
-	}
-	return json.Marshal(m)
-}
-
-// Meta returns all of the <meta> tags for the document.
-func (doc *Document) Meta() Metas {
+func (doc *Document) Pages() ([]*Page, error) {
 	if doc == nil {
-		return nil
+		return nil, ErrIsNil("document")
 	}
 
-	return ByType(doc.Children, &Meta{})
+	pages := ByType[*Page](doc.Nodes)
+
+	if len(pages) == 0 {
+		body, err := doc.Body()
+		if err != nil {
+			return nil, err
+		}
+
+		pages = append(pages, body.AsPage())
+	}
+
+	return pages, nil
 }
 
-// Validate the document
-func (doc Document) Validate(p *Parser, checks ...ValidatorFn) error {
-	chocks := ChildrenValidators(doc, p, checks...)
-	err := doc.Node.Validate(p, html.DocumentNode, chocks...)
+func (doc *Document) Body() (*Body, error) {
+	if doc == nil {
+		return nil, ErrIsNil("document")
+	}
+
+	bodies := ByType[*Body](doc.Nodes)
+
+	if len(bodies) == 0 {
+		return nil, ErrIsNil("body")
+	}
+
+	body := bodies[0]
+
+	return body, nil
+}
+
+func (doc *Document) Children() Nodes {
+	return doc.Nodes
+}
+
+func (doc *Document) String() string {
+	return doc.Children().String()
+}
+
+func (doc *Document) Execute(ctx context.Context) error {
+	if doc == nil {
+		return ErrIsNil("document")
+	}
+
+	err := doc.Children().PreExecute(ctx, doc)
+	if err != nil {
+		return err
+	}
+
+	wg := &errgroup.Group{}
+
+	// execute
+	// error gets passed to post executers
+	err = doc.Nodes.Execute(wg, ctx, doc)
+	if err != nil {
+		return err
+	}
+
+	err = wg.Wait()
+
+	if err == nil {
+		err = doc.processRefs()
+	}
+
+	if perr := doc.Children().PostExecute(ctx, doc, err); perr != nil {
+		return perr
+	}
 
 	return err
 }
 
-// NewDocument parses the node and returns a Document.
-// The node must be of type html.DocumentNode.
-func (p *Parser) NewDocument(n *html.Node) (*Document, error) {
-
-	doc := &Document{
-		FS:   p,
-		Node: NewNode(n),
-	}
-
-	if err := doc.Validate(p); err != nil {
-		return nil, err
-	}
-
-	c := doc.Node.html.FirstChild
-	for c != nil {
-		tag, err := p.ParseNode(c)
-		if err != nil {
-			return nil, err
+func (doc *Document) processRefs() error {
+	figs := ByType[*Figure](doc.Nodes)
+	for i, fig := range figs {
+		fig.SectionID = doc.SectionID
+		fig.Pos = i + 1
+		caps := ByType[*Figcaption](fig.Nodes)
+		if len(caps) > 1 {
+			return fmt.Errorf("more than one figcaption")
 		}
-		doc.Children = append(doc.Children, tag)
-		c = c.NextSibling
+
+		fc := &Figcaption{
+			Element: NewEl(atomx.Figcaption, fig),
+		}
+
+		if len(caps) == 0 {
+			return fmt.Errorf("no figcaption")
+		}
+
+		if len(caps) == 1 {
+			fc = caps[0]
+		}
+
+		em := NewEl(atomx.Em, fc)
+		em.Set("class", "figure-name")
+		em.Nodes = append(em.Nodes, TextNode(fmt.Sprintf("%s:", fig.Name())))
+
+		fcns := fc.Nodes
+		fc.Nodes = Nodes{em, TextNode(" ")}
+		fc.Nodes = append(fc.Nodes, fcns...)
+
 	}
 
-	err := doc.Validate(p)
-	if err != nil {
-		return nil, err
+	fn := func(fig *Figure) (string, error) {
+		return fmt.Sprintf("fig-%d-%d", fig.SectionID, fig.Pos), nil
 	}
 
-	err = doc.GetChildren().Finalize(p)
-	if err != nil {
-		return nil, err
-	}
-
-	return doc, nil
-}
-
-// Body returns the <body> tag for the document.
-func (doc *Document) Body() (*Body, error) {
-	if doc == nil {
-		return nil, fmt.Errorf("document can not be nil")
-	}
-
-	bodies := ByType(doc.Children, &Body{})
-	if len(bodies) == 0 {
-		return nil, fmt.Errorf("body not found")
-	}
-
-	return bodies[0], nil
-}
-
-// Pages returns all of the <page> tags for the document.
-func (doc *Document) Pages() Pages {
-	if doc == nil {
-		return nil
-	}
-
-	pages := ByType(doc.Children, &Page{})
-
-	if len(pages) > 0 {
-		return pages
-	}
-
-	body, err := doc.Body()
-	if err != nil {
-		return nil
-	}
-	return Pages{body.AsPage()}
+	return RestripeFigureIDs(doc.Nodes, fn)
 }

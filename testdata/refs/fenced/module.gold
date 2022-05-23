@@ -1,0 +1,43 @@
+<html><head></head><body><page>
+<h1>Explicit Interface Implementation</h1>
+
+<p>In a lot of object oriented languages, such as C# and Java, you have to <em>explicitly</em> declare that your type is implementing a very specific interface.</p>
+
+<p>In C#, <ref id="fig-1-1"><a href="#fig-1-1">Figure 1.1</a></ref>, you declare that you are using the <code>Performer</code> interface by using the <code>:</code> operator after the class name and listing the interfaces you want to use.</p>
+
+<figure id="fig-1-1">
+<pre><code class="language-c#" language="c#">interface Performer {
+	void Perform();
+}
+
+// explicitly implements Performer
+class Musician : Performer {
+	public void Perform() {}
+}
+
+</code></pre>
+
+<figcaption><em class="figure-name">Figure 1.1:</em> Example C# implementation of the <code>Performer</code> interface.</figcaption>
+</figure>
+
+<p>In Java, <ref id="fig-1-2"><a href="#fig-1-2">Figure 1.2</a></ref>, you use the <code>implements</code> keyword after the class name to tell the compiler that your type wants to implement the <code>Performer</code> interface.</p>
+
+<div>
+
+<figure id="fig-1-2">
+<pre><code class="language-java" language="java">interface Performer {
+	void Perform();
+}
+
+// explicitly implements Performer
+class Musician implements Performer {
+	void Perform() {}
+}
+</code></pre>
+
+<figcaption><em class="figure-name">Figure 1.2:</em> Example Java implementation of <code>Performer</code> interface.</figcaption>
+</figure>
+
+</div>
+</page>
+</body></html>

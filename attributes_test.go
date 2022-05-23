@@ -6,38 +6,67 @@ import (
 	"github.com/stretchr/testify/require"
 )
 
-func Test_SrcAttr(t *testing.T) {
+func Test_Language(t *testing.T) {
 	t.Parallel()
 
-	good := Attributes{
-		"src": "foo.go",
-	}
+	good := &Attributes{}
+	good.Set("language", "go")
 
-	skip := Attributes{
-		"src":      "foo.go",
-		"skip-src": "true",
-	}
+	class := &Attributes{}
+	class.Set("class", "language-go")
+
+	short := &Attributes{}
+	short.Set("lang", "go")
 
 	table := []struct {
 		name string
-		ats  Attributes
-		src  string
-		err  bool
+		ats  *Attributes
+		exp  string
 	}{
-		{name: "src found", ats: good, src: "foo.go"},
-		{name: "src not found", ats: Attributes{}, err: true},
-		{name: "src found, but skipped", ats: skip, err: true},
+		{name: "empty", ats: &Attributes{}, exp: "text"},
+		{name: "good", ats: good, exp: "go"},
+		{name: "prefix", ats: class, exp: "go"},
+		{name: "short", ats: short, exp: "go"},
 	}
 
 	for _, tt := range table {
 		t.Run(tt.name, func(t *testing.T) {
-
 			r := require.New(t)
 
-			act, ok := SrcAttr(tt.ats)
-			r.Equal(!tt.err, ok)
+			act := Language(tt.ats, "text")
+			r.Equal(tt.exp, act)
+		})
+	}
 
-			r.Equal(Source(tt.src), act)
+}
+
+func Test_AttrMatches(t *testing.T) {
+	t.Parallel()
+	r := require.New(t)
+
+	ats := &Attributes{}
+	r.NoError(ats.Set("src", "foo.png"))
+
+	table := []struct {
+		name  string
+		query map[string]string
+		exp   bool
+	}{
+		{name: "empty map", query: map[string]string{}, exp: true},
+		{name: "good", query: map[string]string{"src": "foo.png"}, exp: true},
+		{name: "wildcard", query: map[string]string{"src": ".*"}, exp: true},
+		{name: "bad", query: map[string]string{"src": "bar.png"}, exp: false},
+		{name: "empty value", query: map[string]string{"src": ""}, exp: false},
+		{name: "missing", query: map[string]string{"bar": "bar.png"}, exp: false},
+	}
+
+	for _, tc := range table {
+		t.Run(tc.name, func(t *testing.T) {
+			r := require.New(t)
+
+			act := AttrMatches(ats, tc.query)
+			r.Equal(tc.exp, act)
+
 		})
 	}
 

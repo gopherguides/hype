@@ -3,21 +3,22 @@ package hype
 import (
 	"testing"
 
-	"github.com/gopherguides/hype/htmx"
 	"github.com/stretchr/testify/require"
+	"golang.org/x/net/html"
 )
 
-func Test_Heading_Markdown(t *testing.T) {
+func Test_NewHeading(t *testing.T) {
 	t.Parallel()
 	r := require.New(t)
 
-	node := htmx.ElementNode("h3")
+	h, err := NewHeading(&Element{
+		HTMLNode: &html.Node{
+			Type: html.ElementNode,
+			Data: "h1",
+		},
+	})
 
-	h, err := NewHeading(NewNode(node))
 	r.NoError(err)
-
-	h.Children = append(h.Children, QuickText("hello"))
-
-	r.Equal("### hello", h.Markdown())
-
+	r.Equal("<h1></h1>", h.String())
+	r.Equal(1, h.Level())
 }

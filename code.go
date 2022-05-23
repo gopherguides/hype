@@ -1,38 +1,20 @@
 package hype
 
-import (
-	"strings"
-
-	"golang.org/x/net/html"
-)
-
-// Code represents a type of code block.
-type Code interface {
-	Tag
-	Lang() string
-}
-
-// NewCode will return the appropriate code type for the given node.
-func NewCode(p *Parser, node *Node) (Code, error) {
-	err := node.Validate(p, html.ElementNode, AtomValidator("code"))
-
-	if err != nil {
-		return nil, err
+// NewCodeNodes implements the ParseElementFn type
+func NewCodeNodes(p *Parser, el *Element) (Nodes, error) {
+	if el == nil {
+		return nil, ErrIsNil("element")
 	}
 
-	ats := node.Attrs()
+	ats := el.Attrs()
 
-	if len(ats) == 0 {
-		return NewInlineCode(node)
+	if ats.Len() == 0 {
+		return NewInlineCodeNodes(p, el)
 	}
 
-	if src, ok := ats["src"]; ok {
-		if len(strings.Split(src, "#")) > 1 {
-			return NewMultiSourceCode(p.FS, node, p.snippetRules)
-		}
-
-		return NewSourceCode(p.FS, node, p.snippetRules)
+	if _, ok := ats.Get("src"); ok {
+		return NewSourceCodeNodes(p, el)
 	}
 
-	return NewFencedCode(node)
+	return NewFencedCodeNodes(p, el)
 }

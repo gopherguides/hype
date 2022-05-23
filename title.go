@@ -1,49 +1,18 @@
 package hype
 
-import "fmt"
-
-func findTitle(tags Tags) string {
-	titles := tags.ByAtom("title")
+// FindTitle finds the title element in the given HTML document.
+// If no title element is found, the first h1 element is returned.
+// If no h1 element is found, `"Untitled"` is returned.
+func FindTitle(nodes Nodes) string {
+	titles := ByAtom(nodes, "title")
 	if len(titles) > 0 {
-		return titles[0].GetChildren().String()
+		return titles[0].Children().String()
 	}
 
-	h1s := tags.ByAtom("h1")
+	h1s := ByAtom(nodes, "h1")
 	if len(h1s) > 0 {
-		return h1s[0].GetChildren().String()
+		return h1s[0].Children().String()
 	}
 
 	return "Untitled"
-}
-
-// Title returns the <title> tag contents.
-// If there is no <title> then the first <h1> is used.
-// Default: Untitled
-func (doc *Document) Title() string {
-	return findTitle(doc.Children)
-}
-
-func (doc *Document) SetTitle(title string) error {
-	titles := doc.Children.ByAtom("title")
-	if len(titles) > 0 {
-		el, ok := titles[0].(*Element)
-		if !ok {
-			return fmt.Errorf("title is not an element, %T", titles[0])
-		}
-
-		el.Children = []Tag{QuickText(title)}
-		return nil
-	}
-
-	h1s := doc.Children.ByAtom("h1")
-	if len(h1s) > 0 {
-		el, ok := h1s[0].(*Heading)
-		if !ok {
-			return fmt.Errorf("h1 is not a heading, %T", h1s[0])
-		}
-		el.Children = []Tag{QuickText(title)}
-		return nil
-	}
-
-	return fmt.Errorf("no appriopriate title tag found")
 }

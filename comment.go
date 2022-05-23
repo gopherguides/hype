@@ -1,36 +1,17 @@
 package hype
 
-import (
-	"fmt"
+import "fmt"
 
-	"golang.org/x/net/html"
-)
+type Comment string
 
-var _ Tag = &Comment{}
-
-// Comment represents an HTML comment.
-type Comment struct {
-	*Node
+func (tn Comment) Children() Nodes {
+	return Nodes{}
 }
 
-func (c Comment) String() string {
-	return fmt.Sprintf("<!-- %s -->", c.Atom())
+func (tn Comment) String() string {
+	return fmt.Sprintf("<!-- %s -->", string(tn))
 }
 
-func (c Comment) Validate(p *Parser, checks ...ValidatorFn) error {
-	return c.Node.Validate(p, html.CommentNode, checks...)
-}
-
-// NewComment returns a new Comment from the given node.
-func (p *Parser) NewComment(node *html.Node) (*Comment, error) {
-	return NewComment(node)
-}
-
-// NewComment returns a new Comment from the given node.
-func NewComment(n *html.Node) (*Comment, error) {
-	c := &Comment{
-		Node: NewNode(n),
-	}
-
-	return c, c.Validate(nil)
+func (tn Comment) Text() string {
+	return string(tn)
 }

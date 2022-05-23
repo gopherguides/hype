@@ -1,0 +1,46 @@
+questions:
+  - text: "The zero value of an interface is?"
+    answers:
+      - "^nil"
+      - "A pointer"
+      - "A struct"
+      - "The interface itself"
+      - "None of these"
+  - text: "How are interfaces implemented in Go?"
+    answers:
+      - "^Implicitly"
+      - "Explicitly"
+  - text: "Types can implement more than one interface at a time?"
+    answers:
+      - "^true"
+      - "false"
+  - text: "The process of checking if an interface implements another type is called?"
+    answers:
+      - "^Type assertion"
+      - "Interface assertion"
+      - "Type casting"
+      - "Type inference"
+  - text: "Which of the following implements 'io.ReadWriteCloser'?"
+    answers:
+      - "^os.File"
+      - "bytes.Buffer"
+      - "zip.File"
+  - text: "Which of the following will panic if the type assertion fails?"
+    answers:
+      - "^'w := i.(io.Writer)'"
+      - "'w, ok := i.(io.Writer)'"
+  - text: "The minimum number of methods for an interface is?"
+    answers:
+      - "^0"
+      - "1"
+      - "2"
+  - text: The maximum number of methods allowed for interfaces?
+    answers:
+      - "^unlimited"
+      - "2"
+      - "4"
+      - "10"
+  - text: "The empty interface, 'interface{}', can be used to match all types?"
+    answers:
+      - "^true"
+      - "false"

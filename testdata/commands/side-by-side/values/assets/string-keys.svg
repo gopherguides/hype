@@ -1,0 +1,134 @@
+<?xml version="1.0" encoding="UTF-8" standalone="no"?>
+<!DOCTYPE svg PUBLIC "-//W3C//DTD SVG 1.1//EN" "http://www.w3.org/Graphics/SVG/1.1/DTD/svg11.dtd">
+<svg version="1.1" xmlns:xl="http://www.w3.org/1999/xlink" xmlns:dc="http://purl.org/dc/elements/1.1/" xmlns="http://www.w3.org/2000/svg" viewBox="72.682245 260.11277 1354.6355 979.7745" width="1354.6355" height="979.7745">
+  <defs>
+    <font-face font-family="Helvetica Neue" font-size="24.395" panose-1="2 0 5 3 0 0 0 2 0 4" units-per-em="1000" underline-position="-100" underline-thickness="50" slope="0" x-height="517" cap-height="714" ascent="951.9958" descent="-212.99744" font-weight="400">
+      <font-face-src>
+        <font-face-name name="HelveticaNeue"/>
+      </font-face-src>
+    </font-face>
+    <font-face font-family="Monaco" font-size="12" units-per-em="1000" underline-position="-37.597656" underline-thickness="75.68359" slope="0" x-height="545.41016" cap-height="757.8125" ascent="1e3" descent="-250" font-weight="400">
+      <font-face-src>
+        <font-face-name name="Monaco"/>
+      </font-face-src>
+    </font-face>
+    <marker orient="auto" overflow="visible" markerUnits="strokeWidth" id="FilledArrow_Marker" stroke-linejoin="miter" stroke-miterlimit="10" viewBox="-1 -3 6 6" markerWidth="6" markerHeight="6" color="black">
+      <g>
+        <path d="M 3.7333333 0 L 0 -1.4 L 0 1.4 Z" fill="currentColor" stroke="currentColor" stroke-width="1"/>
+      </g>
+    </marker>
+  </defs>
+  <metadata> Produced by OmniGraffle 7.19.1\n2021-11-06 22:55:39 +0000</metadata>
+  <g id="Canvas_1" fill="none" stroke-dasharray="none" fill-opacity="1" stroke="none" stroke-opacity="1">
+    <title>Canvas 1</title>
+    <g id="Canvas_1_string_keys">
+      <title>string keys</title>
+      <g id="Graphic_39">
+        <rect x="624.72376" y="260.8751" width="250.55248" height="129.46764" fill="#c1c1c1"/>
+        <rect x="624.72376" y="260.8751" width="250.55248" height="129.46764" stroke="black" stroke-linecap="round" stroke-linejoin="round" stroke-width="1.5246842"/>
+        <text transform="translate(632.3472 311.2674)" fill="black">
+          <tspan font-family="Helvetica Neue" font-size="24.395" font-weight="400" fill="black" x="44.906927" y="23">Background()</tspan>
+        </text>
+      </g>
+      <g id="Graphic_38">
+        <rect x="366.867" y="543.3389" width="250.55248" height="129.46764" fill="fuchsia"/>
+        <rect x="366.867" y="543.3389" width="250.55248" height="129.46764" stroke="black" stroke-linecap="round" stroke-linejoin="round" stroke-width="1.5246842"/>
+        <text transform="translate(374.4904 585.7302)" fill="white">
+          <tspan font-family="Helvetica Neue" font-size="24.395" font-weight="400" fill="white" x="63.215374" y="23">Context A</tspan>
+          <tspan font-family="Monaco" font-size="12" font-weight="400" fill="white" x="16.83641" y="40.683057">ctx.Value(request_id) =&gt; nil</tspan>
+        </text>
+      </g>
+      <g id="Line_37">
+        <line x1="750" y1="390.34274" x2="505.8174" y2="535.2255" marker-end="url(#FilledArrow_Marker)" stroke="black" stroke-linecap="round" stroke-linejoin="round" stroke-dasharray="3.0,12.0" stroke-width="3"/>
+      </g>
+      <g id="Graphic_36">
+        <rect x="158.90254" y="826.4027" width="250.55248" height="129.46764" fill="#ff80ff"/>
+        <rect x="158.90254" y="826.4027" width="250.55248" height="129.46764" stroke="black" stroke-linecap="round" stroke-linejoin="round" stroke-width="1.5246842"/>
+        <text transform="translate(166.52596 868.794)" fill="black">
+          <tspan font-family="Helvetica Neue" font-size="24.395" font-weight="400" fill="black" x="56.433564" y="23">Context A1</tspan>
+          <tspan font-family="Monaco" font-size="12" font-weight="400" fill="black" x="16.83641" y="40.683057">ctx.Value(request_id) =&gt; nil</tspan>
+        </text>
+      </g>
+      <g id="Line_35">
+        <line x1="491.111" y1="673.5689" x2="296.9686" y2="816.9565" marker-end="url(#FilledArrow_Marker)" stroke="black" stroke-linecap="round" stroke-linejoin="round" stroke-dasharray="3.0,12.0" stroke-width="3"/>
+      </g>
+      <g id="Graphic_34">
+        <rect x="882.5805" y="543.3389" width="250.55248" height="129.46764" fill="#8080ff"/>
+        <rect x="882.5805" y="543.3389" width="250.55248" height="129.46764" stroke="black" stroke-linecap="round" stroke-linejoin="round" stroke-width="1.5246842"/>
+        <text transform="translate(890.204 585.7302)" fill="white">
+          <tspan font-family="Helvetica Neue" font-size="24.395" font-weight="400" fill="white" x="62.76407" y="23">Context B</tspan>
+          <tspan font-family="Monaco" font-size="12" font-weight="400" fill="white" x="16.83641" y="40.683057">WithValue(request_id, B-123)</tspan>
+        </text>
+      </g>
+      <g id="Graphic_33">
+        <rect x="624.72376" y="826.4027" width="250.55248" height="129.46764" fill="yellow"/>
+        <rect x="624.72376" y="826.4027" width="250.55248" height="129.46764" stroke="black" stroke-linecap="round" stroke-linejoin="round" stroke-width="1.5246842"/>
+        <text transform="translate(632.3472 868.794)" fill="black">
+          <tspan font-family="Helvetica Neue" font-size="24.395" font-weight="400" fill="black" x="55.98226" y="23">Context B1</tspan>
+          <tspan font-family="Monaco" font-size="12" font-weight="400" fill="black" x="13.235825" y="40.683057">WithValue(request_id: B1-abc)</tspan>
+        </text>
+      </g>
+      <g id="Line_32">
+        <line x1="750" y1="390.34274" x2="992.8978" y2="534.46316" marker-end="url(#FilledArrow_Marker)" stroke="black" stroke-linecap="round" stroke-linejoin="round" stroke-dasharray="3.0,12.0" stroke-width="3"/>
+      </g>
+      <g id="Line_31">
+        <line x1="1006.577" y1="673.5689" x2="763.6602" y2="818.2658" marker-end="url(#FilledArrow_Marker)" stroke="black" stroke-linecap="round" stroke-linejoin="round" stroke-dasharray="3.0,12.0" stroke-width="3"/>
+      </g>
+      <g id="Graphic_30">
+        <rect x="1090.545" y="826.4027" width="250.55248" height="129.46764" fill="#c0c0ff"/>
+        <rect x="1090.545" y="826.4027" width="250.55248" height="129.46764" stroke="black" stroke-linecap="round" stroke-linejoin="round" stroke-width="1.5246842"/>
+        <text transform="translate(1098.1684 868.794)" fill="black">
+          <tspan font-family="Helvetica Neue" font-size="24.395" font-weight="400" fill="black" x="55.98226" y="23">Context B2</tspan>
+          <tspan font-family="Monaco" font-size="12" font-weight="400" fill="black" x="24.037582" y="40.683057">ctx.Value(request_id) =&gt; B</tspan>
+        </text>
+      </g>
+      <g id="Line_29">
+        <line x1="1007.8568" y1="672.8065" x2="1201.9992" y2="816.1942" marker-end="url(#FilledArrow_Marker)" stroke="black" stroke-linecap="round" stroke-linejoin="round" stroke-dasharray="3.0,12.0" stroke-width="3"/>
+      </g>
+      <g id="Graphic_28">
+        <rect x="73.44459" y="1109.4665" width="250.55248" height="129.46764" fill="#ffffc0"/>
+        <rect x="73.44459" y="1109.4665" width="250.55248" height="129.46764" stroke="black" stroke-linecap="round" stroke-linejoin="round" stroke-width="1.5246842"/>
+        <text transform="translate(81.06801 1151.8578)" fill="black">
+          <tspan font-family="Helvetica Neue" font-size="24.395" font-weight="400" fill="black" x="49.4322" y="23">Context B1a</tspan>
+          <tspan font-family="Monaco" font-size="12" font-weight="400" fill="black" x="6.034653" y="40.683057">ctx.Value(request_id) =&gt; B1-abc</tspan>
+        </text>
+      </g>
+      <g id="Line_27">
+        <line x1="750" y1="955.8703" x2="214.03744" y2="1105.199" marker-end="url(#FilledArrow_Marker)" stroke="black" stroke-linecap="round" stroke-linejoin="round" stroke-dasharray="3.0,12.0" stroke-width="3"/>
+      </g>
+      <g id="Graphic_26">
+        <rect x="440.96404" y="1109.4665" width="250.55248" height="129.46764" fill="#ffffc0"/>
+        <rect x="440.96404" y="1109.4665" width="250.55248" height="129.46764" stroke="black" stroke-linecap="round" stroke-linejoin="round" stroke-width="1.5246842"/>
+        <text transform="translate(448.58746 1151.8578)" fill="black">
+          <tspan font-family="Helvetica Neue" font-size="24.395" font-weight="400" fill="black" x="48.74914" y="23">Context B1b</tspan>
+          <tspan font-family="Monaco" font-size="12" font-weight="400" fill="black" x="6.034653" y="40.683057">ctx.Value(request_id) =&gt; B1-abc</tspan>
+        </text>
+      </g>
+      <g id="Line_25">
+        <line x1="750" y1="955.8703" x2="579.3519" y2="1098.5071" marker-end="url(#FilledArrow_Marker)" stroke="black" stroke-linecap="round" stroke-linejoin="round" stroke-dasharray="3.0,12.0" stroke-width="3"/>
+      </g>
+      <g id="Graphic_24">
+        <rect x="808.4835" y="1109.6573" width="250.55248" height="129.46764" fill="#ffffc0"/>
+        <rect x="808.4835" y="1109.6573" width="250.55248" height="129.46764" stroke="black" stroke-linecap="round" stroke-linejoin="round" stroke-width="1.5246842"/>
+        <text transform="translate(816.1069 1152.0486)" fill="black">
+          <tspan font-family="Helvetica Neue" font-size="24.395" font-weight="400" fill="black" x="49.4322" y="23">Context B1c</tspan>
+          <tspan font-family="Monaco" font-size="12" font-weight="400" fill="black" x="6.034653" y="40.683057">ctx.Value(request_id) =&gt; B1-abc</tspan>
+        </text>
+      </g>
+      <g id="Graphic_23">
+        <rect x="1176.003" y="1109.6573" width="250.55248" height="129.46764" fill="#ffffc0"/>
+        <rect x="1176.003" y="1109.6573" width="250.55248" height="129.46764" stroke="black" stroke-linecap="round" stroke-linejoin="round" stroke-width="1.5246842"/>
+        <text transform="translate(1183.6264 1152.0486)" fill="black">
+          <tspan font-family="Helvetica Neue" font-size="24.395" font-weight="400" fill="black" x="48.74914" y="23">Context B1d</tspan>
+          <tspan font-family="Monaco" font-size="12" font-weight="400" fill="black" x="6.034653" y="40.683057">ctx.Value(request_id) =&gt; B1-abc</tspan>
+        </text>
+      </g>
+      <g id="Line_22">
+        <line x1="750" y1="955.8703" x2="920.6554" y2="1098.6904" marker-end="url(#FilledArrow_Marker)" stroke="black" stroke-linecap="round" stroke-linejoin="round" stroke-dasharray="3.0,12.0" stroke-width="3"/>
+      </g>
+      <g id="Line_21">
+        <line x1="752.7328" y1="956.6327" x2="1283.2312" y2="1104.6225" marker-end="url(#FilledArrow_Marker)" stroke="black" stroke-linecap="round" stroke-linejoin="round" stroke-dasharray="3.0,12.0" stroke-width="3"/>
+      </g>
+    </g>
+  </g>
+</svg>

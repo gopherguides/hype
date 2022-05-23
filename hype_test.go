@@ -1,61 +1,56 @@
 package hype
 
 import (
-	"io"
+	"fmt"
 	"io/fs"
-	"os"
 	"testing"
 
 	"github.com/stretchr/testify/require"
 )
 
-var (
-	testdata = os.DirFS("testdata")
-	week01   = os.DirFS("testdata/week01")
-)
+type brokenReader struct{}
 
-func testParser(t *testing.T, cab fs.FS) *Parser {
-	t.Helper()
-
-	r := require.New(t)
-
-	p, err := NewParser(cab)
-	r.NoError(err)
-	return p
+func (brokenReader) Read(p []byte) (n int, err error) {
+	return 0, fmt.Errorf("broken reader")
 }
 
-func ParseFile(t *testing.T, cab fs.FS, name string) *Document {
+func compareOutputFile(t testing.TB, cab fs.FS, act string, expFile string) {
 	t.Helper()
 
 	r := require.New(t)
 
-	p := testParser(t, cab)
-
-	doc, err := p.ParseFile(name)
+	b, err := fs.ReadFile(cab, expFile)
 	r.NoError(err)
-	return doc
+
+	exp := string(b)
+
+	compareOutput(t, act, exp)
 }
 
-func ParseMD(t *testing.T, cab fs.FS, src []byte) *Document {
+func compareOutput(t testing.TB, act string, exp string) {
 	t.Helper()
 
 	r := require.New(t)
 
-	p := testParser(t, cab)
+	// fn := func(s string) string {
 
-	doc, err := p.ParseMD(src)
-	r.NoError(err)
-	return doc
-}
+	// 	// rx, err := regexp.Compile(`[0-9a-fA-F]{8}\b-[0-9a-fA-F]{4}\b-[0-9a-fA-F]{4}\b-[0-9a-fA-F]{4}\b-[0-9a-fA-F]{12}`)
 
-func ParseReader(t *testing.T, cab fs.FS, rc io.ReadCloser) *Document {
-	t.Helper()
+	// 	// r.NoError(err)
 
-	r := require.New(t)
+	// 	// uuids := rx.FindAllString(s, -1)
+	// 	// for i, u := range uuids {
+	// 	// 	s = strings.Replace(s, u, fmt.Sprintf("uuid-%d", i), -1)
+	// 	// }
 
-	p := testParser(t, cab)
+	// 	return strings.TrimSpace(s)
+	// }
 
-	doc, err := p.ParseReader(rc)
-	r.NoError(err)
-	return doc
+	// act = fn(act)
+
+	// exp = fn(exp)
+
+	// fmt.Println(act)
+	r.Equal(exp, act)
+
 }

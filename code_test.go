@@ -3,156 +3,63 @@ package hype
 import (
 	"testing"
 
-	"github.com/gopherguides/hype/htmx"
 	"github.com/stretchr/testify/require"
 )
 
-func Test_NewCode(t *testing.T) {
-	t.Parallel()
-
-	inline := NewNode(htmx.ElementNode("code"))
-	inline.Children = Tags{
-		&Text{
-			Node: NewNode(htmx.TextNode("hello")),
-		},
-	}
-
-	src := NewNode(htmx.AttrNode("code", Attributes{
-		"src": "src/main.go",
-	}))
-
-	fenced := NewNode(htmx.AttrNode("code", Attributes{
-		"class": "language-go",
-	}))
-
-	table := []struct {
-		err  bool
-		lang string
-		name string
-		node *Node
-	}{
-		{name: "nil", err: true},
-
-		{name: "nil html node", node: &Node{}, err: true},
-		{name: "non code node", node: NewNode(htmx.ElementNode("p")), err: true},
-		{name: "valid inline", node: inline, lang: ""},
-		{name: "valid src", lang: "go", node: src},
-		{name: "valid fenced", lang: "go", node: fenced},
-	}
-
-	for _, tt := range table {
-		t.Run(tt.name, func(t *testing.T) {
-			r := require.New(t)
-
-			p := testParser(t, testdata)
-			c, err := NewCode(p, tt.node)
-
-			if tt.err {
-				r.Error(err)
-				return
-			}
-
-			r.NoError(err)
-			r.NotNil(c)
-			r.Equal(tt.lang, c.Lang())
-
-		})
-	}
-
-}
-
-func Test_Parse_Code(t *testing.T) {
-	t.Parallel()
-
-	r := require.New(t)
-
-	p := testParser(t, testdata)
-
-	doc, err := p.ParseFile("code.md")
-	r.NoError(err)
-
-	exp := `<html><head><meta charset="utf-8" /></head><body>
-<page>
-
-<h1>Code Test</h1>
-
-<p>This is <code class="inline-code">inline</code> code.</p>
-
-<p>Fenced code block:</p>
-
-<pre><code class="language-sh" language="sh">$ echo hi</code></pre>
-
-<p>A src file:</p>
-
-<p><pre><code class="language-go" language="go" snippet="main" src="src/main.go">func main() {</code></pre></p>
-
-</page><!--BREAK-->
-
-
-</body>
-</html>`
-
-	// fmt.Println(doc.String())
-	r.Equal(exp, doc.String())
-
-}
-
-func Test_Code_MultipleSources(t *testing.T) {
+func Test_NewCodeNodes_InlineCode(t *testing.T) {
 	t.Parallel()
 	r := require.New(t)
 
-	node := htmx.AttrNode("code", Attributes{
-		"src": "src/snippets.go,src/snippets.js",
-	})
+	el := NewEl("code", nil)
 
-	sc, err := NewSourceCode(testdata, NewNode(node), nil)
+	nodes, err := NewCodeNodes(nil, el)
 	r.NoError(err)
 
-	r.NoError(sc.Finalize(testParser(t, testdata)))
+	r.Len(nodes, 1)
 
-	kids := sc.GetChildren()
-	r.Len(kids, 2)
-
-	const exp = `<p><pre><code class="language-go" language="go" src="src/snippets.go">package main
-
-import &#34;fmt&#34;
-
-func Hello() {
-	fmt.Println(&#34;Hello, World!&#34;)
+	ic, ok := nodes[0].(*InlineCode)
+	r.True(ok)
+	r.Equal(ic.Element, el)
 }
 
-
-func Goodbye() {
-	fmt.Println(&#34;Goodbye, World!&#34;)
-}
-
-</code></pre></p><p><pre><code class="language-js" language="js" src="src/snippets.js">function hello() {
-    console.log(&#39;Hello, World!&#39;);
-}
-
-function goodbye() {
-    console.log(&#39;Goodbye, World!&#39;);
-}</code></pre></p>`
-
-	act := sc.String()
-
-	// fmt.Println(act)
-
-	r.Equal(exp, act)
-
-}
-
-func Test_Code_MultipleSources_Errors(t *testing.T) {
+func Test_NewCodeNodes_SourceCode(t *testing.T) {
 	t.Parallel()
 	r := require.New(t)
 
-	p := testParser(t, testdata)
+	el := NewEl("code", nil)
 
-	node := htmx.AttrNode("code", Attributes{
-		"src":     "src/snippets.go,src/snippets.js",
-		"snippet": "hello",
-	})
+	r.NoError(el.Set("src", "main.go"))
 
-	_, err := NewCode(p, NewNode(node))
+	nodes, err := NewCodeNodes(nil, el)
 	r.NoError(err)
+
+	r.Len(nodes, 1)
+
+	pre, ok := nodes[0].(*Element)
+	r.True(ok)
+
+	nodes = pre.Nodes
+	r.Len(nodes, 1)
+
+	sc, ok := nodes[0].(*SourceCode)
+	r.True(ok)
+	r.Equal(sc.Element, el)
+}
+
+func Test_NewCode_FencedCode(t *testing.T) {
+	t.Parallel()
+	r := require.New(t)
+
+	el := NewEl("code", nil)
+
+	r.NoError(el.Set("language", "go"))
+
+	nodes, err := NewCodeNodes(nil, el)
+	r.NoError(err)
+
+	r.Len(nodes, 1)
+
+	fc, ok := nodes[0].(*FencedCode)
+	r.True(ok)
+	r.Equal(fc.Element, el)
 }

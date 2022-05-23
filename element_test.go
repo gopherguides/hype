@@ -1,83 +1,112 @@
 package hype
 
 import (
-	"encoding/json"
-	"fmt"
 	"testing"
 
-	"github.com/gopherguides/hype/htmx"
 	"github.com/stretchr/testify/require"
+	"golang.org/x/net/html"
 )
+
+func Test_Element_StartTag(t *testing.T) {
+	t.Parallel()
+
+	r := require.New(t)
+
+	hn := &html.Node{
+		Data: "div",
+	}
+
+	attrs := &Attributes{}
+	r.NoError(attrs.Set("class", "foo"))
+	r.NoError(attrs.Set("id", "bar"))
+
+	table := []struct {
+		name string
+		e    *Element
+		exp  string
+	}{
+		{name: "empty", e: &Element{}, exp: ""},
+		{name: "with atom", e: &Element{
+			HTMLNode: hn,
+		}, exp: "<div>"},
+		{name: "with attrs", e: &Element{
+			HTMLNode:   hn,
+			Attributes: attrs,
+		}, exp: `<div class="foo" id="bar">`},
+	}
+
+	for _, tc := range table {
+		t.Run(tc.name, func(t *testing.T) {
+			r := require.New(t)
+
+			r.Equal(tc.exp, tc.e.StartTag())
+		})
+	}
+
+}
+
+func Test_Element_EndTag(t *testing.T) {
+	t.Parallel()
+
+	table := []struct {
+		name string
+		e    *Element
+		exp  string
+	}{
+		{name: "empty", e: &Element{}, exp: ""},
+		{name: "with atom", e: &Element{
+			HTMLNode: &html.Node{Data: "div"},
+		}, exp: "</div>"},
+	}
+
+	for _, tc := range table {
+		t.Run(tc.name, func(t *testing.T) {
+			r := require.New(t)
+
+			r.Equal(tc.exp, tc.e.EndTag())
+		})
+	}
+
+}
 
 func Test_Element_String(t *testing.T) {
 	t.Parallel()
+
 	r := require.New(t)
 
-	bd := htmx.AttrNode("div", Attributes{
-		"id": "main",
-	})
-
-	el := &Element{
-		Node: NewNode(bd),
-	}
-	el.Children = append(el.Children, &Text{
-		Node: NewNode(htmx.TextNode("hi")),
-	})
-
-	exp := `<div id="main">hi</div>`
-	act := el.String()
-	r.Equal(exp, act)
-
-}
-
-func Test_Element_JSON(t *testing.T) {
-	t.Parallel()
-	r := require.New(t)
-
-	bd := htmx.AttrNode("div", Attributes{
-		"id": "main",
-	})
-	bd.FirstChild = htmx.TextNode("hi")
-
-	el := &Element{
-		Node: NewNode(bd),
+	hn := &html.Node{
+		Data: "div",
 	}
 
-	b, err := json.Marshal(el)
-	r.NoError(err)
+	attrs := &Attributes{}
+	r.NoError(attrs.Set("class", "foo"))
+	r.NoError(attrs.Set("id", "bar"))
 
-	exp := `{"atom":"div","attributes":{"id":"main"},"children":[{"data":"hi","type":"text"}],"data":"div","type":"element"}`
+	table := []struct {
+		name string
+		e    *Element
+		exp  string
+	}{
+		{name: "empty", e: &Element{}, exp: ""},
+		{name: "with atom", e: &Element{
+			HTMLNode: hn,
+		}, exp: "<div></div>"},
+		{name: "with attrs", e: &Element{
+			HTMLNode:   hn,
+			Attributes: attrs,
+		}, exp: `<div class="foo" id="bar"></div>`},
+		{name: "with kids", e: &Element{
+			HTMLNode: hn,
+			Nodes:    Nodes{TextNode("hello")},
+		}, exp: "<div>hello</div>"},
+	}
 
-	act := string(b)
+	for _, tc := range table {
+		t.Run(tc.name, func(t *testing.T) {
+			r := require.New(t)
 
-	r.Equal(exp, act)
-}
+			r.Equal(tc.exp, tc.e.String())
+		})
+	}
 
-var _ Tag = &customTag{}
-
-type customTag struct {
-	*Node
-}
-
-func (c customTag) String() string {
-	return fmt.Sprintf("before\n%s\nafter", c.Children.String())
-}
-
-func Test_Parser_ElementNode_Custom(t *testing.T) {
-	t.Parallel()
-	r := require.New(t)
-
-	p := testParser(t, testdata)
-	p.SetCustomTag("foo", func(node *Node) (Tag, error) {
-		return customTag{Node: node}, nil
-	})
-
-	doc, err := p.ParseFile("assignment.md")
-	r.NoError(err)
-
-	act := doc.String()
-	// fmt.Println(act)
-	exp := "<html><head><meta charset=\"utf-8\" /></head><body>\n<page>\n\n<h1>Assignment 42</h1>\n\n<assignment number=\"42\">\n\n<p>Instructions!</p>\n\n</assignment>\n\n</page><!--BREAK-->\n\n\n</body>\n</html>"
-
-	r.Equal(exp, act)
 }

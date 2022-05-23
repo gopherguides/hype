@@ -19,11 +19,13 @@ func Headings() Atoms {
 
 func Inlines() Atoms {
 	return Atoms{
-		Img,
-		Image,
-		Br,
+		A,
 		B,
+		Br,
+		Image,
+		Img,
 		Link,
+		Ref,
 	}
 }
 
@@ -73,6 +75,7 @@ const (
 	Checked                   Atom = "checked"
 	Cite                      Atom = "cite"
 	Class                     Atom = "class"
+	Cmd                       Atom = "cmd"
 	Code                      Atom = "code"
 	Col                       Atom = "col"
 	Colgroup                  Atom = "colgroup"
@@ -128,6 +131,7 @@ const (
 	Formtarget                Atom = "formtarget"
 	Frame                     Atom = "frame"
 	Frameset                  Atom = "frameset"
+	Go                        Atom = "go"
 	H1                        Atom = "h1"
 	H2                        Atom = "h2"
 	H3                        Atom = "h3"
@@ -144,8 +148,8 @@ const (
 	Hr                        Atom = "hr"
 	Href                      Atom = "href"
 	Hreflang                  Atom = "hreflang"
-	Html                      Atom = "html"
-	HttpEquiv                 Atom = "http-equiv"
+	HTML                      Atom = "html"
+	HTTPEquiv                 Atom = "http-equiv"
 	I                         Atom = "i"
 	Icon                      Atom = "icon"
 	ID                        Atom = "id"
@@ -325,6 +329,7 @@ const (
 	Radiogroup                Atom = "radiogroup"
 	Rb                        Atom = "rb"
 	Readonly                  Atom = "readonly"
+	Ref                       Atom = "ref"
 	Referrerpolicy            Atom = "referrerpolicy"
 	Rel                       Atom = "rel"
 	Required                  Atom = "required"
@@ -390,6 +395,7 @@ const (
 	Typemustmatch             Atom = "typemustmatch"
 	U                         Atom = "u"
 	Ul                        Atom = "ul"
+	Unknown                   Atom = "unknown"
 	Updateviacache            Atom = "updateviacache"
 	Usemap                    Atom = "usemap"
 	Value                     Atom = "value"

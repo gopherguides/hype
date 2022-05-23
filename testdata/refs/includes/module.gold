@@ -1,0 +1,41 @@
+<html><head></head><body><page>
+<p>Simple References</p>
+
+<p>In <ref id="fig-1-1"><a href="#fig-1-1">Figure 1.1</a></ref> we see the reference.</p>
+
+<figure id="fig-1-1">
+<pre><code class="language-go" language="go" src="src/greet/main.go#example">fmt.Println("Hello, World!")</code></pre>
+
+<img src="assets/foo.png"></img>
+
+<figcaption><em class="figure-name">Figure 1.1:</em> Optional caption</figcaption>
+</figure>
+</page>
+<page>
+<h1>Include References</h1>
+
+<p>This <ref id="fig-1-1"><a href="#fig-1-1">Figure 1.1</a></ref> is in an included file.</p>
+
+<cmd doc="-short context.Canceled" exec="go doc -short context.Canceled" figure-id="ref1"><pre><code class="language-text" language="text">$ go doc -short context.Canceled
+
+var Canceled = errors.New(&#34;context canceled&#34;)
+    Canceled is the error returned by Context.Err when the context is canceled.</code></pre></cmd>
+
+<p>More included text that references <ref id="fig-1-1"><a href="#fig-1-1">Figure 1.1</a></ref>.</p>
+
+<pre><code class="language-go" language="go">package main
+
+import "fmt"
+
+func main() {
+    fmt.Println("Howdy!")
+}
+</code></pre>
+
+<p>end note</p>
+</page>
+
+<page>
+<p>Some more text that references <ref id="fig-1-1"><a href="#fig-1-1">Figure 1.1</a></ref>.</p>
+</page>
+</body></html>

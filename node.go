@@ -2,221 +2,59 @@ package hype
 
 import (
 	"fmt"
-	"strings"
-	"sync"
 
-	"github.com/gopherguides/hype/atomx"
-	"github.com/gopherguides/hype/htmx"
 	"golang.org/x/net/html"
 )
 
-// Nodeable returns a Node.
-type Nodeable interface {
-	DaNode() *Node
+type Node interface {
+	Children() Nodes
 }
 
-type Nodes []*Node
+type Nodes []Node
 
-var _ Atomable = &Node{}
-
-// The Node type is used to represent a single node in the HTML tree.
-// Node is a wrapper around html.Node.
-type Node struct {
-	Children Tags
-	DataAtom Atom
-	attrs    Attributes
-	html     *html.Node
-	sync.RWMutex
+type HTMLNode interface {
+	Node
+	HTML() *html.Node
 }
 
-func (n *Node) String() string {
-	if n == nil {
-		return ""
-	}
-	n.RLock()
-	defer n.RUnlock()
-	return n.Children.String()
-}
-
-// Type is the type of the node.
-func (n *Node) Type() html.NodeType {
-	if n == nil || n.html == nil {
-		return html.ErrorNode
-	}
-
-	return n.html.Type
-}
-
-// Validate the node.
-func (n *Node) Validate(p *Parser, nt html.NodeType, validators ...ValidatorFn) error {
-	if n == nil {
-		return fmt.Errorf("nil node")
-	}
-
-	if n.html == nil {
-		return fmt.Errorf("html node is nil: %v", n)
-	}
-
-	if nt == 0 {
-		return fmt.Errorf("invalid NodeType provided: %v", nt)
-	}
-
-	if n.Type() != nt {
-		return fmt.Errorf("node type mismatch: %v != %v", htmx.NodeType(n.Type()), htmx.NodeType(nt))
-	}
-
-	for _, v := range validators {
-		if err := v(p, n); err != nil {
-			return err
+func (list Nodes) String() string {
+	var s string
+	for _, n := range list {
+		if st, ok := n.(fmt.Stringer); ok {
+			s += st.String()
+			continue
 		}
+		s += n.Children().String()
 	}
 
-	return nil
+	return s
 }
 
-// Clone returns a deep copy of the node.
-func (n *Node) Clone() *Node {
-	node := &Node{
-		Children: n.Children,
-		DataAtom: n.DataAtom,
-		attrs:    n.Attrs(),
-		html:     htmx.CloneNode(n.html),
-	}
-	return node
+func (list Nodes) Children() Nodes {
+	return list
 }
 
-// Atom returns the atom of the node.
-func (n *Node) Atom() Atom {
-	n.RLock()
-	defer n.RUnlock()
-
-	return n.DataAtom
-}
-
-func (n *Node) StartTag() string {
-	sb := &strings.Builder{}
-
-	at := n.Atom()
-
-	fmt.Fprintf(sb, "<%s", at)
-	ats := n.Attrs().String()
-	if len(ats) > 0 {
-		fmt.Fprintf(sb, " %s", ats)
-	}
-	fmt.Fprintf(sb, ">")
-	return sb.String()
-}
-
-func (n *Node) EndTag() string {
-	return fmt.Sprintf("</%s>", n.Atom())
-}
-
-func (n *Node) InlineTag() string {
-	st := n.StartTag()
-	st = strings.TrimSuffix(st, ">")
-	st += " />"
-	return st
-}
-
-// GetChildren returns the children of the node.
-func (n *Node) GetChildren() Tags {
-	return n.Children
-}
-
-// DaNode returns the underlying Node.
-func (n *Node) DaNode() *Node {
-	return n
-}
-
-// Attrs returns a copy of the attributes, not the underlying attributes. Use Set to modify attributes.
-func (n *Node) Attrs() Attributes {
-	n.RLock()
-	defer n.RUnlock()
-
-	if n.attrs == nil {
-		return Attributes{}
+func (list Nodes) Delete(node Node) Nodes {
+	if len(list) == 0 {
+		return list
 	}
 
-	ats := Attributes{}
-	for k, v := range n.attrs {
-		ats[k] = v
+	nodes := make(Nodes, 0, len(list)-1)
+	for _, n := range list {
+		if n == node {
+			continue
+		}
+		nodes = append(nodes, n)
 	}
 
-	return ats
+	return nodes
 }
 
-// Delete an attribute from the node.
-func (n *Node) Delete(key string) {
-	n.Lock()
-	defer n.Unlock()
-	if n.attrs == nil {
-		n.attrs = Attributes{}
-	}
-	delete(n.attrs, key)
-}
-
-// Set an attribute on the node.
-func (n *Node) Set(key string, val string) {
-	n.Lock()
-	defer n.Unlock()
-	if n.attrs == nil {
-		n.attrs = Attributes{}
-	}
-	n.attrs[key] = val
-}
-
-// Get a key from the attributes. Will error if the key doesn't exist.
-func (n *Node) Get(key string) (string, error) {
-	n.Lock()
-	if n.attrs == nil {
-		n.attrs = Attributes{}
-	}
-	n.Unlock()
-
-	n.RLock()
-	defer n.RUnlock()
-	return n.attrs.Get(key)
-}
-
-// NewNode creates a new Node.
-func NewNode(n *html.Node) *Node {
-	node := &Node{
-		html:     n,
-		attrs:    NewAttributes(n),
-		DataAtom: atomx.UNKNOWN,
+func ToNodes[T Node](list []T) Nodes {
+	nodes := make(Nodes, len(list))
+	for i, n := range list {
+		nodes[i] = n
 	}
 
-	if n != nil {
-		node.DataAtom = Atom(n.Data)
-	}
-
-	return node
-}
-
-func (g *Node) MarshalJSON() ([]byte, error) {
-	return htmx.MarshalNode(g.html)
-}
-
-// ParseNode parses the given node and returns the
-// appropriate Tag implementation.
-func (p *Parser) ParseNode(node *html.Node) (Tag, error) {
-	if node == nil {
-		return nil, fmt.Errorf("nil node")
-	}
-
-	switch node.Type {
-	case html.CommentNode:
-		return p.NewComment(node)
-	case html.DoctypeNode:
-		return p.NewDocType(node)
-	case html.DocumentNode:
-		return p.NewDocument(node)
-	case html.ElementNode:
-		return p.NewElement(node)
-	case html.ErrorNode:
-		return nil, fmt.Errorf(node.Data)
-	case html.TextNode:
-		return p.NewText(node)
-	}
-	return nil, fmt.Errorf("unknown type %v", node)
+	return nodes
 }

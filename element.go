@@ -1,82 +1,134 @@
 package hype
 
 import (
+	"bytes"
 	"fmt"
+	"sort"
 	"strings"
+	"sync"
 
-	"github.com/gopherguides/hype/atomx"
 	"golang.org/x/net/html"
+	"golang.org/x/net/html/atom"
 )
 
-var _ Tag = &Element{}
-var _ Validatable = &Element{}
+var _ HTMLNode = &Element{}
 
-// Element is a generic HTML element.
 type Element struct {
-	*Node
+	*Attributes
+	sync.RWMutex
+
+	HTMLNode *html.Node
+	Nodes    Nodes
+	Parent   Node
 }
 
-func (el Element) Markdown() string {
-	switch el.Atom() {
-	case atomx.A:
-		return fmt.Sprintf("[%s](%s)", el.GetChildren().Markdown(), el.attrs["href"])
-	case atomx.B, atomx.Strong:
-		return fmt.Sprintf("**%s**", el.GetChildren().Markdown())
+func (el *Element) Clone() (*Element, error) {
+	if el == nil {
+		return nil, ErrIsNil("element")
 	}
 
-	return el.GetChildren().Markdown()
-}
-
-func (e Element) String() string {
-	at := e.Atom()
-
-	if at.Is(atomx.Inlines()...) {
-		return e.InlineTag()
-	}
-
-	sb := &strings.Builder{}
-	sb.WriteString(e.StartTag())
-
-	kids := e.GetChildren()
-	if len(kids) > 0 {
-		fmt.Fprintf(sb, "%s", kids)
-	}
-
-	sb.WriteString(e.EndTag())
-	return sb.String()
-}
-
-// Validate the element
-func (e Element) Validate(p *Parser, checks ...ValidatorFn) error {
-	return e.Node.Validate(p, html.ElementNode, checks...)
-}
-
-// NewElement returns an element node from the given node.
-func (p *Parser) NewElement(n *html.Node) (Tag, error) {
-	node := NewNode(n)
-
-	err := node.Validate(p, html.ElementNode)
+	ats, err := el.Attributes.Clone()
 	if err != nil {
 		return nil, err
 	}
 
-	c := n.FirstChild
-	for c != nil {
-		tag, err := p.ParseNode(c)
-		if err != nil {
-			return nil, err
-		}
-		node.Children = append(node.Children, tag)
-		c = c.NextSibling
+	nel := &Element{
+		Attributes: ats,
+		HTMLNode: &html.Node{
+			Attr:      el.HTMLNode.Attr,
+			Data:      el.HTMLNode.Data,
+			DataAtom:  el.HTMLNode.DataAtom,
+			Namespace: el.HTMLNode.Namespace,
+			Type:      el.HTMLNode.Type,
+		},
+		Nodes:  el.Nodes,
+		Parent: el.Parent,
 	}
 
-	if fn, ok := p.CustomTag(atomx.Atom(n.Data)); ok {
-		return fn(node)
+	return nel, nil
+}
+
+func (el *Element) Atom() Atom {
+	if el.HTMLNode == nil {
+		return Atom("")
 	}
 
-	el := &Element{
-		Node: node,
+	return Atom(el.HTMLNode.Data)
+}
+
+func (el *Element) Children() Nodes {
+	el.RLock()
+	defer el.RUnlock()
+	return el.Nodes
+}
+
+func (el *Element) HTML() *html.Node {
+	return el.HTMLNode
+}
+
+// StartTag returns the start tag for the element.
+// For example, for an element with an Atom of "div", the start tag would be "<div>".
+func (el *Element) StartTag() string {
+	a := el.Atom()
+	if len(a) == 0 {
+		return ""
 	}
 
-	return el, nil
+	if el.Attributes == nil || el.Attributes.Len() == 0 {
+		return fmt.Sprintf("<%s>", a)
+	}
+
+	bb := &bytes.Buffer{}
+
+	var lines []string
+
+	el.Attributes.Range(func(k string, v string) bool {
+		lines = append(lines, fmt.Sprintf("%s=%q", k, v))
+		return true
+	})
+
+	sort.Strings(lines)
+
+	fmt.Fprintf(bb, "<%s %s>", a, strings.Join(lines, " "))
+
+	return bb.String()
+}
+
+// EndTag returns the end tag for the element.
+// For example, for an element with an Atom of "div", the end tag would be "</div>".
+func (el *Element) EndTag() string {
+	a := el.Atom()
+	if len(a) == 0 {
+		return ""
+	}
+
+	return fmt.Sprintf("</%s>", a)
+}
+
+// String returns StartTag() + Children().String() + EndTag()
+func (el *Element) String() string {
+	s := el.StartTag()
+	s += el.Children().String()
+	s += el.EndTag()
+	return s
+}
+
+func (el *Element) Attrs() *Attributes {
+	if el == nil {
+		return &Attributes{}
+	}
+
+	return el.Attributes
+}
+
+func NewEl[T ~string](at T, parent Node) *Element {
+	return &Element{
+		Attributes: &Attributes{},
+		HTMLNode: &html.Node{
+			Type:     html.ElementNode,
+			Data:     string(at),
+			DataAtom: atom.Lookup([]byte(string(at))),
+		},
+		Parent: parent,
+	}
 }

@@ -1,6 +1,6 @@
 # Numbers
 
-Go has two types of numeric types.  The first type is an `architecture independent` type.  This means that regardless of the architecture you compile for, the type will have the correct size (bytes).  The second type is a `implementation` specific type, and the byte size of that numeric type can vary based on the architecture the program is built for.
+Go has two types of numeric types. The first type is an `architecture independent` type. This means that regardless of the architecture you compile for, the type will have the correct size (bytes). The second type is a `implementation` specific type, and the byte size of that numeric type can vary based on the architecture the program is built for.
 
 Go has the following architecture-independent numeric types:
 
@@ -33,13 +33,13 @@ Implementation specific types will have their size defined by the architecture t
 
 ## Picking The Correct Numeric Type
 
-In Go, picking the correct [type](https://golang.org/ref/spec#Types) usually has more to do with performance for the target architecture you are programming for than the size of the data you are working with.  However, without needing to know the specific ramifications of performance for your program, you can follow some of these basic guidelines when first starting out.
+In Go, picking the correct [type](https://golang.org/ref/spec#Types) usually has more to do with performance for the target architecture you are programming for than the size of the data you are working with. However, without needing to know the specific ramifications of performance for your program, you can follow some of these basic guidelines when first starting out.
 
-For integer data, it's common in Go to use the implementation types like `int` or `uint`.  This will typically result in the fastest processing speed for your target architecture.
+For integer data, it's common in Go to use the implementation types like `int` or `uint`. This will typically result in the fastest processing speed for your target architecture.
 
-If you know you won't exceed a specific size range, then picking an architecture-independent type can both increase speed decrease memory usage.  To understand integer ranges, we can look at the following examples:
+If you know you won't exceed a specific size range, then picking an architecture-independent type can both increase speed decrease memory usage. To understand integer ranges, we can look at the following examples:
 
-```plain
+```text
 int8 (-128 -> 127)
 int16 (-32768 -> 32767)
 int32 (− 2,147,483,648 -> 2,147,483,647)
@@ -48,7 +48,7 @@ int64 (− 9,223,372,036,854,775,808 -> 9,223,372,036,854,775,807)
 
 And for unsigned integers, we have the following ranges:
 
-```plain
+```text
 uint8 (with alias byte, 0 -> 255)
 uint16 (0 -> 65,535)
 uint32 (0 -> 4,294,967,295)
@@ -57,7 +57,7 @@ uint64 (0 -> 18,446,744,073,709,551,615)
 
 For floats:
 
-```plain
+```text
 float32 (+- 1O-45 -> +- 3.4 * 1038 )
 (IEEE-754) float64 (+- 5 * 10-324 -> 1.7 * 10308 )
 ```
@@ -66,9 +66,9 @@ Now that we have looked at some of the possible ranges for numeric data types, w
 
 ## Overflow Vs. Wraparound
 
-Go has the potential to both `overflow` a number as well as `wraparound` a number. An `overflow` happens when you try to store a value larger than the data type was designed to store.  When one happens vs. the other is dependent on if the value can be calculated at compile time or at runtime.
+Go has the potential to both `overflow` a number as well as `wraparound` a number. An `overflow` happens when you try to store a value larger than the data type was designed to store. When one happens vs. the other is dependent on if the value can be calculated at compile time or at runtime.
 
-At compile time, if the compiler can determine a value will be too large to hold in the data type specified, it will throw an `overflow` error.  This means that the value you calculated to store is too large for the data type you specified.
+At compile time, if the compiler can determine a value will be too large to hold in the data type specified, it will throw an `overflow` error. This means that the value you calculated to store is too large for the data type you specified.
 
 If we take the following example:
 
@@ -96,7 +96,7 @@ If we change the program to add `1` to the variable when we assign it, it will n
 
 Because the compiler can determine it will overflow the value it will now throw an error:
 
-```plain
+```text
 constant 256 overflows uint8
 ```
 
@@ -106,7 +106,7 @@ Understanding the boundaries of your data will help you avoid potential bugs in 
 
 Go does not [saturate](https://en.wikipedia.org/wiki/Saturation_arithmetic) variables during mathematical operations such as addition or multiplication. In languages that saturate, if you had a `uint8` with a max value of `255`, and added `1`, the value would still be the max (saturated) value of `255`.
 
-In go, however, it will always wrap around.  There is no saturation in Go.
+In go, however, it will always wrap around. There is no saturation in Go.
 
 <code src="src/numbers/maxuint8-saturation/main.go" snippet="main"></code>
 

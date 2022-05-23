@@ -28,7 +28,7 @@ In many languages, the correct way to iterate over a string would look very much
 
 But, this will not have the output you would expect:
 
-```plain
+```text
 0: H
 1: e
 2: l
@@ -67,8 +67,4 @@ If you intend to walk through each character in a string, the proper way is to u
 Range ensures that we use the proper index and length of int32's to capture the proper rune value.
 
 > Suggested Reading/Viewing:
-> [GopherCon 2016: Marcel van Lohuizen - Handling Text from Around the World in Go](https://www.youtube.com/watch?v=K7rMS9Y7_x0)
-> [Strings, bytes, runes and characters in Go](https://blog.golang.org/strings)
-> [The Rune Type](https://golang.org/doc/go1#rune)
-> [Stack Overflow: What is a rune?](https://stackoverflow.com/questions/19310700/what-is-a-rune)
-
+> [GopherCon 2016: Marcel van Lohuizen - Handling Text from Around the World in Go](https://www.youtube.com/watch?v=K7rMS9Y7_x0) > [Strings, bytes, runes and characters in Go](https://blog.golang.org/strings) > [The Rune Type](https://golang.org/doc/go1#rune) > [Stack Overflow: What is a rune?](https://stackoverflow.com/questions/19310700/what-is-a-rune)

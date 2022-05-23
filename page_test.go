@@ -3,133 +3,68 @@ package hype
 import (
 	"strings"
 	"testing"
+	"testing/fstest"
 
 	"github.com/stretchr/testify/require"
 )
 
-func Test_Page_ShiftHeadings(t *testing.T) {
+func Test_Pages(t *testing.T) {
 	t.Parallel()
 	r := require.New(t)
 
-	doc := ParseFile(t, testdata, "pages.md")
-	r.NotNil(doc)
+	mod := `# Page 1
 
-	pages := doc.Pages()
-	r.Len(pages, 4)
+<include src="second/second.md"></include>
 
-	page := pages[1]
+more text
 
-	start := `<page>
+<include src="third/third.md"></include>
 
-<h1>Second H1</h1>
+adfadf`
 
-<p>page 2</p>
+	cab := fstest.MapFS{
+		"module.md": &fstest.MapFile{
+			Data: []byte(mod),
+		},
+		"second/second.md": &fstest.MapFile{
+			Data: []byte(`# Second`),
+		},
+		"third/third.md": &fstest.MapFile{
+			Data: []byte(`# Third`),
+		},
+	}
 
-<h2>H2 under Second H1</h2>
+	p := NewParser(cab)
 
-<p>page 2.A</p>
-
-<h3>H3!</h3>
-
-<p>page 2.B</p>
-
-</page><!--BREAK-->`
-
-	start = strings.TrimSpace(start)
-	act := page.String()
-	act = strings.TrimSpace(act)
-
-	r.Equal(start, act)
-
-	page.ShiftHeadings(1)
-
-	exp := `<page>
-
-<h2>Second H1</h2>
-
-<p>page 2</p>
-
-<h3>H2 under Second H1</h3>
-
-<p>page 2.A</p>
-
-<h4>H3!</h4>
-
-<p>page 2.B</p>
-
-</page><!--BREAK-->`
-
-	act = page.String()
-	act = strings.TrimSpace(act)
-
-	r.Equal(exp, act)
-}
-
-func Test_Parser_NewPage(t *testing.T) {
-	t.Parallel()
-	r := require.New(t)
-
-	doc := ParseFile(t, testdata, "pages.md")
-	r.NotNil(doc)
-
-	pages := doc.Pages()
-	r.Len(pages, 4)
-
-	const exp = `<html><head><meta charset="utf-8" /></head><body>
-<page>
-
-<h1>First H1</h1>
-
-<p>page 1</p>
-
-</page><!--BREAK-->
-
-<page>
-
-<h1>Second H1</h1>
-
-<p>page 2</p>
-
-<h2>H2 under Second H1</h2>
-
-<p>page 2.A</p>
-
-<h3>H3!</h3>
-
-<p>page 2.B</p>
-
-</page><!--BREAK-->
-
-<page>
-
-<h1>Code Test</h1>
-
-<p>This is <code class="inline-code">inline</code> code.</p>
-
-<p>Fenced code block:</p>
-
-<pre><code class="language-sh" language="sh">$ echo hi</code></pre>
-
-<p>A src file:</p>
-
-<p><pre><code class="language-go" language="go" snippet="main" src="src/main.go">func main() {</code></pre></p>
-
-</page><!--BREAK-->
-
-
-<page>
-
-<h1>Last H1</h1>
-
-<p>Last page</p>
-
-</page><!--BREAK-->
-
-
-</body>
-</html>`
+	doc, err := p.Parse(strings.NewReader(mod))
+	r.NoError(err)
 
 	act := doc.String()
+	act = strings.TrimSpace(act)
+
 	// fmt.Println(act)
+	exp := `<html><head></head><body><page>
+<h1>Page 1</h1>
+</page>
+<page>
+<h1>Second</h1>
+</page>
+
+<page>
+<p>more text</p>
+</page>
+<page>
+<h1>Third</h1>
+</page>
+
+<page>
+<p>adfadf</p>
+</page>
+</body></html>`
+
 	r.Equal(exp, act)
+
+	pages := ByType[*Page](doc.Nodes)
+	r.Len(pages, 5)
+
 }

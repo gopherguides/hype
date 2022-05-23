@@ -1,56 +1,36 @@
 package hype
 
-import (
-	"fmt"
-	"strings"
-
-	"github.com/gopherguides/hype/atomx"
-	"golang.org/x/net/html"
-)
-
-var _ Tag = &Body{}
-var _ Validatable = &Body{}
-
-// Body represents the body of a document.
+// Body is a container for all the elements in a document.
 type Body struct {
-	*Node
-}
-
-func (b Body) String() string {
-	sb := &strings.Builder{}
-	sb.WriteString(b.StartTag())
-
-	kids := b.GetChildren()
-	if len(kids) > 0 {
-		fmt.Fprintf(sb, "\n%s\n", kids)
-	}
-
-	sb.WriteString(b.EndTag() + "\n")
-	return sb.String()
+	*Element
 }
 
 // AsPage returns the body as a Page.
-func (b Body) AsPage() *Page {
-	p := &Page{
-		Node: b.Clone(),
+func (b *Body) AsPage() *Page {
+	return &Page{
+		Element: b.Element,
 	}
-
-	p.DataAtom = atomx.Page
-
-	return p
 }
 
-// Validate the body
-func (b Body) Validate(p *Parser, checks ...ValidatorFn) error {
-	checks = append(checks, AtomValidator("body"))
-	return b.Node.Validate(p, html.ElementNode, checks...)
-}
-
-// NewBody returns a new Body from the given node.
-func NewBody(node *Node) (*Body, error) {
-	b := &Body{
-		Node: node,
+// NewBody creates a new Body.
+func NewBody(el *Element) (*Body, error) {
+	if el == nil {
+		return nil, ErrIsNil("element")
 	}
 
-	return b, nil
+	body := &Body{
+		Element: el,
+	}
+
+	return body, nil
+}
+
+// NewBodyNodes implements the ParseElementFn type
+func NewBodyNodes(p *Parser, el *Element) (Nodes, error) {
+	body, err := NewBody(el)
+	if err != nil {
+		return nil, err
+	}
+
+	return Nodes{body}, nil
 }

@@ -10,7 +10,8 @@ fmt.Println(gopher)
 ```
 
 Output:
-```plain
+
+```text
 Gopher
 ```
 
@@ -29,7 +30,7 @@ Constants can be `untyped`. This can be useful when working with numbers such as
 
 ## Typed
 
-If you declare a constant with a type, it will be that exact type.  `leapYear` was defined as data type `int32`.  This means it can only operate with `int32` data types.  `year` was declared with no type, so it is considered `untyped`.  Because of this, you can use it with any integer data type.
+If you declare a constant with a type, it will be that exact type. `leapYear` was defined as data type `int32`. This means it can only operate with `int32` data types. `year` was declared with no type, so it is considered `untyped`. Because of this, you can use it with any integer data type.
 
 <code src="src/constants/const_type/main.go"></code>
 
@@ -44,4 +45,3 @@ Remember that the `untyped` `const` or `var` will be converted to the `type` it 
 Output:
 
 <code src="src/constants/const-infer/main.go" snippet="output"></code>
-

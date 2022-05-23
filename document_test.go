@@ -1,173 +1,88 @@
 package hype
 
 import (
-	"io"
-	"io/fs"
-	"strings"
+	"context"
 	"testing"
+	"testing/fstest"
+	"time"
 
-	"github.com/gopherguides/hype/htmx"
 	"github.com/stretchr/testify/require"
-	"golang.org/x/net/html"
 )
 
-func Test_Parser_NewDocument(t *testing.T) {
+func Test_Document_Execute(t *testing.T) {
 	t.Parallel()
 	r := require.New(t)
 
-	p := testParser(t, testdata)
+	mod := `# Page 1
 
-	// snippet: errors
-	_, err := p.NewDocument(nil)
-	r.Error(err)
+<foo></foo>
 
-	_, err = p.NewDocument(htmx.TextNode(""))
-	r.Error(err)
-	// snippet: errors
+<include src="second/second.md"></include>`
 
-	f, err := testdata.Open("html5.html")
-	r.NoError(err)
-	defer f.Close()
+	second := `# Second Page
 
-	n, err := html.Parse(f)
-	r.NoError(err)
+<foo></foo>`
 
-	doc, err := p.NewDocument(n)
-	r.NoError(err)
-	r.NotNil(doc)
-
-	r.Len(doc.Children, 2)
-
-	dt, ok := doc.Children[0].(*DocType)
-	r.True(ok)
-
-	r.True(IsAtom(dt, "html5"))
-
-	html, ok := doc.Children[1].(*Element)
-	r.True(ok)
-
-	r.True(IsAtom(html, "html"))
-
-	r.Len(html.Children, 3)
-
-	head := html.Children[0]
-	r.NotNil(head)
-	r.True(IsAtom(head, "head"))
-
-	r.Len(head.GetChildren(), 29)
-
-}
-
-func Test_Document_Body(t *testing.T) {
-	t.Parallel()
-	r := require.New(t)
-
-	p := testParser(t, testdata)
-
-	var d *Document
-	_, err := d.Body()
-	r.Error(err)
-
-	doc, err := p.ParseFile("html5.html")
-	r.NoError(err)
-	r.NotNil(doc)
-
-	body, err := doc.Body()
-	r.NoError(err)
-	r.NotNil(body)
-
-	r.Len(body.Children, 13)
-}
-
-func Test_Document_Meta(t *testing.T) {
-	t.Parallel()
-	r := require.New(t)
-
-	p := testParser(t, testdata)
-
-	doc, err := p.ParseFile("big.html")
-	r.NoError(err)
-	r.NotNil(doc)
-
-	data := doc.Meta()
-	r.Len(data, 19)
-}
-
-func Test_Document_Overview(t *testing.T) {
-	t.Parallel()
-	r := require.New(t)
-
-	in := `<overview>hi</overview>`
-
-	p := testParser(t, testdata)
-	doc, err := p.ParseReader(io.NopCloser(strings.NewReader(in)))
-	r.NoError(err)
-	r.NotNil(doc)
-
-	ov := doc.Overview()
-	r.Equal("hi", ov)
-}
-
-func Test_Document_JSON(t *testing.T) {
-	t.Parallel()
-	r := require.New(t)
-
-	p := testParser(t, testdata)
-
-	doc, err := p.ParseFile("html5.html")
-	r.NoError(err)
-
-	b, err := doc.MarshalJSON()
-	r.NoError(err)
-
-	act := string(b)
-
-	r.Contains(act, `"document":{"children":[`)
-}
-
-func Test_Document_Pages(t *testing.T) {
-	t.Parallel()
-
-	table := []struct {
-		name string
-		exp  int
-	}{
-		{name: "pages.md", exp: 4},
-		{name: "html5.html", exp: 1},
+	cab := fstest.MapFS{
+		"module.md": &fstest.MapFile{
+			Data: []byte(mod),
+		},
+		"second/second.md": &fstest.MapFile{
+			Data: []byte(second),
+		},
 	}
 
-	for _, tt := range table {
-		t.Run(tt.name, func(t *testing.T) {
-			r := require.New(t)
+	p := NewParser(cab)
+	p.NodeParsers["foo"] = func(p *Parser, el *Element) (Nodes, error) {
+		x := executeNode{
+			Element: el,
+		}
+		x.ExecuteFn = func(ctx context.Context, d *Document) error {
+			time.Sleep(time.Millisecond * 10)
 
-			doc := ParseFile(t, testdata, tt.name)
-			r.NotNil(doc)
+			x.Lock()
+			x.Nodes = append(x.Nodes, TextNode("baz"))
+			x.Unlock()
+			return nil
+		}
 
-			r.Len(doc.Pages(), tt.exp)
-		})
+		x.Nodes = append(x.Nodes, TextNode("bar"))
+
+		return Nodes{x}, nil
 	}
 
-}
-
-func Test_Document_Markdown(t *testing.T) {
-	t.Parallel()
-	r := require.New(t)
-
-	p := testParser(t, testdata)
-
-	doc, err := p.ParseFile("includes.md")
+	doc, err := p.ParseFile("module.md")
 	r.NoError(err)
 
-	act := doc.Markdown()
-	act = strings.TrimSpace(act)
+	ctx, cancel := context.WithTimeout(context.Background(), time.Millisecond*100)
+	defer cancel()
 
+	go func() {
+		defer cancel()
+
+		err = doc.Execute(ctx)
+		r.NoError(err)
+	}()
+
+	<-ctx.Done()
+
+	r.NotEqual(context.DeadlineExceeded, ctx.Err())
+
+	act := doc.String()
 	// fmt.Println(act)
 
-	b, err := fs.ReadFile(testdata, "document.md.exp")
-	r.NoError(err)
+	exp := `<html><head></head><body><page>
+<h1>Page 1</h1>
 
-	exp := string(b)
-	exp = strings.TrimSpace(exp)
+<foo>barbaz</foo>
+</page>
+<page>
+<h1>Second Page</h1>
+
+<foo>barbaz</foo>
+</page>
+
+</body></html>`
 
 	r.Equal(exp, act)
 

@@ -1,90 +1,63 @@
 package hype
 
-import (
-	"bytes"
-	"fmt"
-	"strings"
-
-	"golang.org/x/net/html"
-)
-
-var _ Tag = &FencedCode{}
-var _ Validatable = &FencedCode{}
-
-// FencedCode represents a fenced code block.
-//
-// Example:
-// 	```go
-// 	fmt.Println("Hello, World!")
-// 	```
 type FencedCode struct {
-	*Node
+	*Element
 }
 
-func (c FencedCode) Markdown() string {
-	bb := &bytes.Buffer{}
-	fmt.Fprintf(bb, "```%s\n", c.Lang())
-	fmt.Fprintln(bb, c.GetChildren().Markdown())
-	fmt.Fprintln(bb, "```")
-	return bb.String()
-}
-
-func (c FencedCode) String() string {
-	sb := &strings.Builder{}
-
-	text := c.Children.String()
-	text = strings.TrimSpace(text)
-	fmt.Fprint(sb, c.StartTag())
-	fmt.Fprint(sb, text)
-	fmt.Fprint(sb, c.EndTag())
-	return sb.String()
-}
-
-// Lang returns the language of the fenced code block.
-// Defaults to plain.
-func (c *FencedCode) Lang() string {
-	ats := c.Attrs()
-	if l, ok := ats["language"]; ok {
-		return l
+func (code *FencedCode) StartTag() string {
+	if code == nil || code.Element == nil {
+		return ""
 	}
 
-	for _, v := range ats {
-		if !strings.HasPrefix(v, "language-") {
-			continue
-		}
+	return code.Element.StartTag()
+}
 
-		lang := strings.TrimPrefix(v, "language-")
-		c.Set("language", lang)
+func (code *FencedCode) EndTag() string {
+	if code == nil || code.Element == nil {
+		return ""
+	}
+
+	return "</code>"
+}
+
+func (code *FencedCode) String() string {
+	return code.StartTag() + code.Children().String() + code.EndTag()
+}
+
+func (code *FencedCode) Lang() string {
+	lang := "plain"
+	if code == nil {
 		return lang
 	}
 
-	return "plain"
+	return Language(code.Attrs(), lang)
 }
 
-func (fc FencedCode) Validate(p *Parser, checks ...ValidatorFn) error {
-	checks = append(checks, AtomValidator("code"))
-	return fc.Node.Validate(p, html.ElementNode, checks...)
-}
-
-// NewFencedCode returns a new FencedCode from the given node.
-func NewFencedCode(node *Node) (*FencedCode, error) {
-	c := &FencedCode{
-		Node: node,
+func NewFencedCode(el *Element) (*FencedCode, error) {
+	if el == nil {
+		return nil, ErrIsNil("element")
 	}
 
-	if err := c.Validate(nil); err != nil {
+	code := &FencedCode{
+		Element: el,
+	}
+
+	if err := code.Set("language", code.Lang()); err != nil {
 		return nil, err
 	}
 
-	lang := c.Lang()
-	c.Set("language", lang)
-	c.Set("class", fmt.Sprintf("language-%s", lang))
+	if err := code.Set("class", "language-"+code.Lang()); err != nil {
+		return nil, err
+	}
 
-	s := node.Children.String()
+	return code, nil
+}
 
-	s = html.EscapeString(s)
+func NewFencedCodeNodes(p *Parser, el *Element) (Nodes, error) {
+	code, err := NewFencedCode(el)
+	if err != nil {
+		return nil, err
+	}
 
-	c.Children = Tags{QuickText(s)}
-
-	return c, nil
+	return Nodes{code}, nil
 }

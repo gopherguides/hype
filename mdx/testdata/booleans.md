@@ -11,10 +11,11 @@ fmt.Println(ok)
 
 Output:
 
-```plain
+```text
 false
 ```
-In this example we defined a **variable** called `ok` with the data type of `bool`.  When it was printed, we saw the output was `false`.  In Go, all variables have a `zero` value.  In the case of the `bool` data type, the zero value is `false`.
+
+In this example we defined a **variable** called `ok` with the data type of `bool`. When it was printed, we saw the output was `false`. In Go, all variables have a `zero` value. In the case of the `bool` data type, the zero value is `false`.
 
 To declare a variable and initialize the value, the `:=` operator can be used:
 
@@ -25,7 +26,7 @@ fmt.Println(found)
 
 Output:
 
-```plain
+```text
 true
 ```
 
