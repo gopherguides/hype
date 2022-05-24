@@ -151,10 +151,6 @@ func NewAttrCode(p *Parser, el *Element) (Nodes, error) {
 	if err := ats.Set("src", code); err != nil {
 		return nil, err
 	}
-	lang := Language(el.Attributes, "text")
-	if err := ats.Set("language", lang); err != nil {
-		return nil, err
-	}
 
 	cel := NewEl("code", el.Parent)
 	cel.Attributes = ats
