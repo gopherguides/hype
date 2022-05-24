@@ -2,7 +2,6 @@ package hype
 
 import (
 	"context"
-	"fmt"
 	"os"
 	"path/filepath"
 	"strings"
@@ -40,7 +39,7 @@ func Test_References_Simple(t *testing.T) {
 			act := doc.String()
 			act = strings.TrimSpace(act)
 
-			fmt.Println(act)
+			// fmt.Println(act)
 			compareOutputFile(t, cab, act, "module.gold")
 		})
 	}
