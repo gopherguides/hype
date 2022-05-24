@@ -5,6 +5,7 @@ import (
 	"html"
 	"os"
 	"path/filepath"
+	"strconv"
 	"strings"
 
 	"github.com/gopherguides/hype/atomx"
@@ -54,18 +55,10 @@ func NewCmdResult(p *Parser, c *Cmd, res *clam.Result) (*CmdResult, error) {
 
 	// actual body content:
 	body := strings.Join(lines, "\n\n")
-	body = strings.TrimSpace(body)
-
-	if len(res.Dir) > 0 {
-		body = strings.ReplaceAll(body, res.Dir, ".")
+	body, err := resultBody(res, c.Attrs(), body)
+	if err != nil {
+		return nil, err
 	}
-
-	if pwd, err := os.Getwd(); err == nil {
-		body = strings.ReplaceAll(body, fmt.Sprintf("%s%s", pwd, string(filepath.Separator)), "")
-	}
-
-	body = html.EscapeString(body)
-	//
 
 	pre := NewEl(atomx.Pre, cmd)
 	cel := NewEl(atomx.Code, pre)
@@ -78,4 +71,39 @@ func NewCmdResult(p *Parser, c *Cmd, res *clam.Result) (*CmdResult, error) {
 	cmd.Nodes = Nodes{pre}
 
 	return cmd, nil
+}
+
+func resultBody(res *clam.Result, ats *Attributes, body string) (string, error) {
+	body = strings.TrimSpace(body)
+
+	if len(res.Dir) > 0 {
+		body = strings.ReplaceAll(body, res.Dir, ".")
+	}
+
+	if pwd, err := os.Getwd(); err == nil {
+		body = strings.ReplaceAll(body, fmt.Sprintf("%s%s", pwd, string(filepath.Separator)), "")
+	}
+
+	body = html.EscapeString(body)
+
+	mo, ok := ats.Get("truncate")
+	if !ok {
+		return body, nil
+	}
+
+	max, err := strconv.ParseInt(mo, 0, 64)
+	if err != nil {
+		return "", err
+	}
+
+	lines := make([]string, 0, max)
+	for _, l := range strings.Split(body, "\n") {
+		if len(lines) >= int(max) {
+			lines = append(lines, "...")
+			break
+		}
+		lines = append(lines, l)
+	}
+
+	return strings.Join(lines, "\n"), nil
 }
