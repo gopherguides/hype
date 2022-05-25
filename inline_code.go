@@ -1,7 +1,46 @@
 package hype
 
+import (
+	"bytes"
+	"fmt"
+	"html"
+)
+
 type InlineCode struct {
 	*Element
+}
+
+func (code *InlineCode) StartTag() string {
+	if code == nil || code.Element == nil {
+		return "<code>"
+	}
+
+	return code.Element.StartTag()
+}
+
+func (code *InlineCode) EndTag() string {
+	if code == nil || code.Element == nil {
+		return "</code>"
+	}
+
+	return code.Element.EndTag()
+}
+
+func (code *InlineCode) String() string {
+	if code == nil || code.Element == nil {
+		return "<code></code>"
+	}
+
+	bb := &bytes.Buffer{}
+
+	fmt.Fprint(bb, code.StartTag())
+
+	body := code.Nodes.String()
+	body = html.EscapeString(body)
+	fmt.Fprint(bb, body)
+	fmt.Fprint(bb, code.EndTag())
+
+	return bb.String()
 }
 
 func NewInlineCode(el *Element) (*InlineCode, error) {
