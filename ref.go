@@ -2,6 +2,8 @@ package hype
 
 import (
 	"context"
+	"fmt"
+	"strings"
 	"sync"
 
 	"github.com/gopherguides/hype/atomx"
@@ -27,7 +29,7 @@ func (r *Ref) PostExecute(ctx context.Context, doc *Document, err error) error {
 	}
 
 	if r.Figure == nil {
-		return ErrIsNil("figure")
+		return fmt.Errorf("%w: %s", ErrIsNil("figure"), r.StartTag())
 	}
 
 	href := NewEl(atomx.A, r)
@@ -50,14 +52,28 @@ func NewRef(el *Element) (*Ref, error) {
 		Element: el,
 	}
 
-	id, ok := el.Get("id")
-	if !ok {
-		return nil, ErrAttrNotFound("id")
+	// get the id from the inner nodes
+	id := el.Nodes.String()
+
+	// use the id attr, if it exists
+	if i, ok := el.Get("id"); ok {
+		id = i
 	}
+
+	id = strings.TrimSpace(id)
 
 	if len(id) == 0 {
 		return nil, ErrAttrEmpty("id")
 	}
+
+	// set the id back on the element
+	// for consistency
+	if err := r.Set("id", id); err != nil {
+		return nil, err
+	}
+
+	// clear out any existing inner nodes
+	r.Nodes = Nodes{}
 
 	return r, nil
 }
