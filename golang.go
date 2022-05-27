@@ -38,6 +38,10 @@ func NewGolangs(p *Parser, el *Element) (Nodes, error) {
 				if err := el.Set("language", "go"); err != nil {
 					return nil, err
 				}
+
+				if err := el.Set("hide-cmd", ""); err != nil {
+					return nil, err
+				}
 			}
 
 			if len(gv) >= 0 {
