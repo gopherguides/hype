@@ -47,10 +47,14 @@ func Logger(ctx context.Context) {
 	fmt.Println("B\t", "request_id:", b)
 }</code></pre>
 
-<cmd exec="go run main.go" run="main.go" src="values/src/string-keys"><pre><code class="language-text" language="text">$ go run main.go
+<cmd data-go-version="go.test" exec="go run main.go" run="main.go" src="values/src/string-keys"><pre><code class="language-text" language="text">$ go run main.go
 
 A	 request_id: 456
-B	 request_id: 456</code></pre></cmd>
+B	 request_id: 456
+
+--------------------------------------------------------------------------------
+Go Version: go.test
+</code></pre></cmd>
 </page>
 
 

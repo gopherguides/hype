@@ -1,0 +1,17 @@
+<html><head></head><body><page>
+<h1>Commands with Data</h1>
+
+<p>This is a command with data attrs.</p>
+
+<cmd data-extremes="joel" data-foo="bar" exec="echo 'hello'"><pre><code class="language-text" language="text">$ echo hello
+
+hello
+
+--------------------------------------------------------------------------------
+Extremes: joel
+Foo:      bar
+</code></pre></cmd>
+
+<p>Hopefully this works.</p>
+</page>
+</body></html>

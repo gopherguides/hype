@@ -101,12 +101,14 @@ func Test_Golang_Sym(t *testing.T) {
 	act = strings.TrimSpace(act)
 
 	exp := `<html><head></head><body><page>
-<cmd exec="go doc -cmd -u -src -short Foo" figure-id="xyz" language="go" src="sym" sym="Foo"><pre><code class="language-go" language="go">$ go doc -cmd -u -src -short Foo
-
-// Foo is a foo.
+<cmd data-go-version="go.test" exec="go doc -cmd -u -src -short Foo" figure-id="xyz" hide-cmd="" language="go" src="sym" sym="Foo"><pre><code class="language-go" language="go">// Foo is a foo.
 func Foo() string {
 	return &#34;foo&#34;
-}</code></pre></cmd>
+}
+
+--------------------------------------------------------------------------------
+Go Version: go.test
+</code></pre></cmd>
 </page>
 </body></html>`
 
@@ -140,11 +142,13 @@ func Test_Golang_Sym_main(t *testing.T) {
 	act = strings.TrimSpace(act)
 
 	exp := `<html><head></head><body><page>
-<cmd exec="go doc -cmd -u -src -short main" language="go" src="sym/cmd" sym="main"><pre><code class="language-go" language="go">$ go doc -cmd -u -src -short main
-
-func main() {
+<cmd data-go-version="go.test" exec="go doc -cmd -u -src -short main" hide-cmd="" language="go" src="sym/cmd" sym="main"><pre><code class="language-go" language="go">func main() {
 	Greet()
-}</code></pre></cmd>
+}
+
+--------------------------------------------------------------------------------
+Go Version: go.test
+</code></pre></cmd>
 </page>
 </body></html>`
 

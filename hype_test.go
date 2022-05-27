@@ -8,6 +8,12 @@ import (
 	"github.com/stretchr/testify/require"
 )
 
+func init() {
+	goVersion = func() string {
+		return "go.test"
+	}
+}
+
 type brokenReader struct{}
 
 func (brokenReader) Read(p []byte) (n int, err error) {

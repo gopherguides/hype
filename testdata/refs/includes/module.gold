@@ -16,10 +16,14 @@
 
 <p>This <ref id="fig-1-1"><a href="#fig-1-1">Figure 1.1</a></ref> is in an included file.</p>
 
-<cmd doc="-short context.Canceled" exec="go doc -short context.Canceled" figure-id="ref1"><pre><code class="language-text" language="text">$ go doc -short context.Canceled
+<cmd data-go-version="go.test" doc="-short context.Canceled" exec="go doc -short context.Canceled" figure-id="ref1"><pre><code class="language-text" language="text">$ go doc -short context.Canceled
 
 var Canceled = errors.New(&#34;context canceled&#34;)
-    Canceled is the error returned by Context.Err when the context is canceled.</code></pre></cmd>
+    Canceled is the error returned by Context.Err when the context is canceled.
+
+--------------------------------------------------------------------------------
+Go Version: go.test
+</code></pre></cmd>
 
 <p>More included text that references <ref id="fig-1-1"><a href="#fig-1-1">Figure 1.1</a></ref>.</p>
 

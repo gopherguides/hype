@@ -3,11 +3,18 @@ package hype
 import (
 	"fmt"
 	"path"
+	"runtime"
 	"sort"
 	"strings"
 
 	"github.com/gopherguides/hype/atomx"
 )
+
+var goVersion = runtime.Version
+
+func GoVersion() string {
+	return goVersion()
+}
 
 func NewGolangs(p *Parser, el *Element) (Nodes, error) {
 	if el == nil {
@@ -138,6 +145,10 @@ func NewGoDocLinkNodes(p *Parser, el *Element) (Nodes, error) {
 
 func setGolangAtrs(ats *Attributes) {
 	if ats == nil {
+		return
+	}
+
+	if err := ats.Set("data-go-version", GoVersion()); err != nil {
 		return
 	}
 

@@ -1,13 +1,17 @@
 package hype
 
 import (
+	"bytes"
 	"fmt"
 	"html"
 	"os"
 	"path/filepath"
+	"sort"
 	"strconv"
 	"strings"
+	"text/tabwriter"
 
+	"github.com/gobuffalo/flect"
 	"github.com/gopherguides/hype/atomx"
 	"github.com/markbates/clam"
 )
@@ -30,8 +34,10 @@ func NewCmdResult(p *Parser, c *Cmd, res *clam.Result) (*CmdResult, error) {
 
 	cmd.Parent = c
 
+	ats := c.Attrs()
+
 	lang := "text"
-	lang = Language(c.Attrs(), lang)
+	lang = Language(ats, lang)
 
 	var lines []string
 
@@ -65,6 +71,59 @@ func NewCmdResult(p *Parser, c *Cmd, res *clam.Result) (*CmdResult, error) {
 	cel.Set("language", lang)
 	cel.Set("class", "language-"+lang)
 	cel.Nodes = append(cel.Nodes, TextNode(body))
+
+	type dt struct {
+		key string
+		val string
+	}
+
+	datum := []dt{}
+	ats.Range(func(k string, v string) bool {
+		if !strings.HasPrefix(k, "data-") {
+			return true
+		}
+
+		v = strings.TrimSpace(v)
+		if len(v) == 0 {
+			return true
+		}
+
+		k = strings.TrimPrefix(k, "data-")
+		k = flect.Titleize(k)
+
+		datum = append(datum, dt{
+			key: k,
+			val: v,
+		})
+
+		return true
+	})
+
+	if len(datum) > 0 {
+		sort.Slice(datum, func(i, j int) bool {
+			return datum[i].key < datum[j].key
+		})
+
+		bb := &bytes.Buffer{}
+		tw := tabwriter.NewWriter(bb, 0, 0, 0, ' ', 0)
+
+		for i := 0; i < 80; i++ {
+			fmt.Fprint(tw, "-")
+		}
+
+		fmt.Fprintln(tw)
+
+		for _, d := range datum {
+			fmt.Fprintf(tw, "%s:\t %s\n", d.key, d.val)
+		}
+
+		if err := tw.Flush(); err != nil {
+			return nil, err
+		}
+
+		text := fmt.Sprintf("\n\n%s", bb.String())
+		cel.Nodes = append(cel.Nodes, TextNode(text))
+	}
 
 	pre.Nodes = append(pre.Nodes, cel)
 
