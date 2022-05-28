@@ -67,3 +67,26 @@ func Test_References_Fenced(t *testing.T) {
 	// fmt.Println(act)
 	compareOutputFile(t, cab, act, "module.gold")
 }
+
+func Test_Refs_Images(t *testing.T) {
+	t.Parallel()
+	r := require.New(t)
+
+	root := "testdata/refs/images"
+	cab := os.DirFS(root)
+
+	p := NewParser(cab)
+	p.Root = root
+
+	doc, err := p.ParseFile("module.md")
+	r.NoError(err)
+
+	err = doc.Execute(context.Background())
+	r.NoError(err)
+
+	act := doc.String()
+	act = strings.TrimSpace(act)
+
+	// fmt.Println(act)
+	compareOutputFile(t, cab, act, "module.gold")
+}

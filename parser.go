@@ -142,6 +142,7 @@ func (p *Parser) ParseFragment(r io.Reader) (Nodes, error) {
 	}
 
 	pages := ByType[*Page](doc.Nodes)
+
 	if len(pages) > 0 {
 		return pages[0].Nodes, nil
 	}

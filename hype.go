@@ -16,6 +16,8 @@ func DefaultElements() map[Atom]ParseElementFn {
 		atomx.Figcaption: NewFigcaptionNodes,
 		atomx.Figure:     NewFigureNodes,
 		atomx.Go:         NewGolangNodes,
+		atomx.Image:      NewImageNodes,
+		atomx.Img:        NewImageNodes,
 		atomx.Include:    NewIncludeNodes,
 		atomx.Link:       NewLinkNodes,
 		atomx.Page:       NewPageNodes,
