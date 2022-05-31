@@ -5,8 +5,6 @@ import (
 	"path/filepath"
 	"strings"
 	"sync"
-
-	"github.com/gofrs/uuid/v3"
 )
 
 type Include struct {
@@ -80,13 +78,12 @@ func NewInclude(p *Parser, el *Element) (*Include, error) {
 	inc.Nodes = body.Nodes
 
 	fn := func(fig *Figure) (string, error) {
-		uid, err := uuid.NewV4()
-		if err != nil {
-			return "", err
+		id, ok := fig.Get("id")
+		if !ok || len(id) == 0 {
+			return "", ErrAttrEmpty("id")
 		}
 
-		return uid.String(), nil
-
+		return fmt.Sprintf("%s#%s", src, id), nil
 	}
 
 	if err := RestripeFigureIDs(inc.Nodes, fn); err != nil {

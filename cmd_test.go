@@ -175,19 +175,11 @@ func Test_NewCmdNodes_Code(t *testing.T) {
 <pre><code class="language-go" language="go" src="greet/go.mod">module demo
 
 go 1.18
-</code></pre><cmd data-go-version="go.test" exec="go doc -cmd -u -src -short main" hide-cmd="" language="go" run="main.go" src="greet" sym="main"><pre><code class="language-go" language="go">func main() {
+</code></pre><cmd exec="go doc -cmd -u -src -short main" hide-cmd="" language="go" run="main.go" src="greet" sym="main"><pre><code class="language-go" language="go">func main() {
 	// snippet: example
 	fmt.Println(&#34;Hello, World!&#34;)
 	// snippet: example
-}
-
---------------------------------------------------------------------------------
-Go Version: go.test
-</code></pre></cmd><cmd data-go-version="go.test" exec="go run main.go" hide-cmd="" language="go" run="main.go" src="greet" sym="main"><pre><code class="language-go" language="go">Hello, World!
-
---------------------------------------------------------------------------------
-Go Version: go.test
-</code></pre></cmd>
+}</code></pre></cmd><cmd exec="go run main.go" hide-cmd="" language="go" run="main.go" src="greet" sym="main"><pre><code class="language-go" language="go">Hello, World!</code></pre></cmd>
 </page>
 </body></html>`
 
