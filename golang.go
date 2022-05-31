@@ -49,6 +49,8 @@ func NewGolangs(p *Parser, el *Element) (Nodes, error) {
 				if err := el.Set("hide-cmd", ""); err != nil {
 					return nil, err
 				}
+
+				el.Delete("data-go-version")
 			}
 
 			if len(gv) >= 0 {

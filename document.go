@@ -4,6 +4,7 @@ import (
 	"context"
 	"fmt"
 	"io/fs"
+	"strings"
 	"sync"
 
 	"github.com/gopherguides/hype/atomx"
@@ -114,11 +115,17 @@ func (doc *Document) processRefs() error {
 		}
 
 		if len(caps) == 0 {
-			return fmt.Errorf("no figcaption")
+			return fmt.Errorf("no figcaption: %s", fig.StartTag())
 		}
 
 		if len(caps) == 1 {
 			fc = caps[0]
+		}
+
+		fcb := fc.Nodes.String()
+		fcb = strings.TrimSpace(fcb)
+		if len(fcb) == 0 {
+			return fmt.Errorf("empty figcaption: %s", fig.StartTag())
 		}
 
 		em := NewEl(atomx.Em, fc)
