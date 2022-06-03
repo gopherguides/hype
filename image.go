@@ -14,9 +14,9 @@ func (i *Image) Execute(ctx context.Context, doc *Document) error {
 		return ErrIsNil("image")
 	}
 
-	src, ok := i.Get("src")
-	if !ok {
-		return ErrAttrNotFound("src")
+	src, err := i.ValidAttr("src")
+	if err != nil {
+		return err
 	}
 
 	if _, err := fs.Stat(doc.FS, src); err != nil {
@@ -35,13 +35,8 @@ func NewImage(el *Element) (*Image, error) {
 		Element: el,
 	}
 
-	src, ok := i.Get("src")
-	if !ok {
-		return nil, ErrAttrNotFound("src")
-	}
-
-	if len(src) == 0 {
-		return nil, ErrAttrEmpty("src")
+	if _, err := i.ValidAttr("src"); err != nil {
+		return nil, err
 	}
 
 	return i, nil

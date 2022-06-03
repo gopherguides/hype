@@ -61,7 +61,7 @@ func NewRef(el *Element) (*Ref, error) {
 	id = strings.TrimSpace(id)
 
 	if len(id) == 0 {
-		return nil, ErrAttrEmpty("id")
+		return nil, r.WrapErr(ErrAttrEmpty("id"))
 	}
 
 	// set the id back on the element

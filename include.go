@@ -78,9 +78,9 @@ func NewInclude(p *Parser, el *Element) (*Include, error) {
 	inc.Nodes = body.Nodes
 
 	fn := func(fig *Figure) (string, error) {
-		id, ok := fig.Get("id")
-		if !ok || len(id) == 0 {
-			return "", ErrAttrEmpty("id")
+		id, err := fig.ValidAttr("id")
+		if err != nil {
+			return "", err
 		}
 
 		return fmt.Sprintf("%s#%s", src, id), nil

@@ -121,6 +121,27 @@ func (el *Element) Attrs() *Attributes {
 	return el.Attributes
 }
 
+func (el *Element) ValidAttr(k string) (string, error) {
+	if el == nil {
+		return "", ErrIsNil("element")
+	}
+
+	v, ok := el.Get(k)
+	if !ok {
+		return "", el.WrapErr(ErrAttrNotFound(k))
+	}
+
+	if len(v) == 0 {
+		return "", el.WrapErr(ErrAttrEmpty(k))
+	}
+
+	return v, nil
+}
+
+func (el *Element) WrapErr(err error) error {
+	return WrapNodeErr(el, err)
+}
+
 func NewEl[T ~string](at T, parent Node) *Element {
 	return &Element{
 		Attributes: &Attributes{},

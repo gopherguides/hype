@@ -84,3 +84,15 @@ type PreParseError struct {
 func (e PreParseError) Error() string {
 	return fmt.Sprintf("pre parse error: [%T]: %v", e.PreParser, e.Err)
 }
+
+func WrapNodeErr(n Node, err error) error {
+	if err == nil {
+		return nil
+	}
+
+	if h, ok := n.(Tag); ok {
+		return fmt.Errorf("%T: %s: %w", h, h.StartTag(), err)
+	}
+
+	return fmt.Errorf("%T: %w", n, err)
+}

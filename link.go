@@ -6,12 +6,12 @@ type Link struct {
 	*Element
 }
 
-func (l *Link) Href() (string, bool) {
+func (l *Link) Href() (string, error) {
 	if l == nil {
-		return "", false
+		return "", ErrIsNil("link")
 	}
 
-	return l.Get("href")
+	return l.ValidAttr("href")
 }
 
 func NewLink(el *Element) (*Link, error) {
@@ -23,13 +23,9 @@ func NewLink(el *Element) (*Link, error) {
 		Element: el,
 	}
 
-	h, ok := l.Href()
-	if !ok {
-		return nil, ErrAttrNotFound("href")
-	}
-
-	if len(h) == 0 {
-		return nil, ErrAttrEmpty("href")
+	h, err := l.Href()
+	if err != nil {
+		return nil, err
 	}
 
 	if !strings.HasPrefix(h, "http") {
@@ -37,7 +33,9 @@ func NewLink(el *Element) (*Link, error) {
 	}
 
 	if _, ok := l.Get("target"); !ok {
-		l.Set("target", "_blank")
+		if err := l.Set("target", "_blank"); err != nil {
+			return nil, err
+		}
 	}
 
 	return l, nil

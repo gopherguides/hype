@@ -91,9 +91,9 @@ func NewCmd(el *Element) (*Cmd, error) {
 		Timeout: time.Second * 30,
 	}
 
-	ex, ok := el.Get("exec")
-	if !ok {
-		return nil, ErrAttrNotFound("exec")
+	ex, err := el.ValidAttr("exec")
+	if err != nil {
+		return nil, err
 	}
 
 	args, err := shellwords.Parse(ex)
@@ -102,7 +102,7 @@ func NewCmd(el *Element) (*Cmd, error) {
 	}
 
 	if len(args) == 0 {
-		return nil, ErrAttrEmpty("exec")
+		return nil, c.WrapErr(fmt.Errorf("no command specified"))
 	}
 
 	c.Args = args
@@ -139,6 +139,7 @@ func NewAttrCode(p *Parser, el *Element) (Nodes, error) {
 	if !ok {
 		return nodes, nil
 	}
+
 	el.Delete("code")
 
 	src, ok := el.Get("src")

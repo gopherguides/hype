@@ -185,13 +185,9 @@ func NewSourceCodeNodes(p *Parser, el *Element) (Nodes, error) {
 
 	var codes Nodes
 
-	src, ok := el.Get("src")
-	if !ok {
-		return nil, ErrAttrNotFound("src")
-	}
-
-	if len(src) == 0 {
-		return nil, ErrAttrEmpty("src")
+	src, err := el.ValidAttr("src")
+	if err != nil {
+		return nil, err
 	}
 
 	srcs := strings.Split(src, ",")

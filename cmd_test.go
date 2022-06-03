@@ -2,6 +2,7 @@ package hype
 
 import (
 	"context"
+	"errors"
 	"os"
 	"strings"
 	"testing"
@@ -36,7 +37,7 @@ func Test_NewCmd_Errors(t *testing.T) {
 
 			_, err := NewCmd(tt.el)
 			r.Error(err)
-			r.Equal(tt.e, err)
+			r.True(errors.Is(err, tt.e))
 		})
 	}
 }

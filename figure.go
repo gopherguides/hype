@@ -56,13 +56,8 @@ func NewFigure(p *Parser, el *Element) (*Figure, error) {
 		Element: el,
 	}
 
-	id, ok := f.Get("id")
-	if !ok {
-		return nil, ErrAttrNotFound("id")
-	}
-
-	if len(id) == 0 {
-		return nil, ErrAttrEmpty("id")
+	if _, err := f.ValidAttr("id"); err != nil {
+		return nil, err
 	}
 
 	f.style = "figure"
@@ -130,9 +125,9 @@ func RestripeFigureIDs(nodes Nodes, fn IDGenerator) error {
 
 	for _, fig := range figs {
 
-		fid, ok := fig.Get("id")
-		if !ok {
-			return ErrAttrNotFound("id")
+		fid, err := fig.ValidAttr("id")
+		if err != nil {
+			return err
 		}
 
 		uid, err := fn(fig)
@@ -146,9 +141,9 @@ func RestripeFigureIDs(nodes Nodes, fn IDGenerator) error {
 
 		refs := ByType[*Ref](nodes)
 		for _, ref := range refs {
-			rid, ok := ref.Get("id")
-			if !ok {
-				return ErrAttrNotFound("id")
+			rid, err := ref.ValidAttr("id")
+			if err != nil {
+				return err
 			}
 
 			if rid != fid {
