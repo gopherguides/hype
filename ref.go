@@ -4,7 +4,6 @@ import (
 	"context"
 	"fmt"
 	"strings"
-	"sync"
 
 	"github.com/gopherguides/hype/atomx"
 )
@@ -12,7 +11,6 @@ import (
 type Ref struct {
 	*Element
 	*Figure
-	once sync.Once
 }
 
 func (r *Ref) PostExecute(ctx context.Context, doc *Document, err error) error {

@@ -43,7 +43,6 @@ func NewCmdResult(p *Parser, c *Cmd, res *clam.Result) (*CmdResult, error) {
 
 	_, hcmd := c.Get("hide-cmd")
 	if !hcmd {
-		// lines = append(lines, fmt.Sprintf("```%s\n%s", lang, res.CmdString()))
 		lines = append(lines, res.CmdString())
 	}
 
@@ -68,8 +67,14 @@ func NewCmdResult(p *Parser, c *Cmd, res *clam.Result) (*CmdResult, error) {
 
 	pre := NewEl(atomx.Pre, cmd)
 	cel := NewEl(atomx.Code, pre)
-	cel.Set("language", lang)
-	cel.Set("class", "language-"+lang)
+	if err := cel.Set("language", lang); err != nil {
+		return nil, err
+	}
+
+	if err := cel.Set("class", "language-"+lang); err != nil {
+		return nil, err
+	}
+
 	cel.Nodes = append(cel.Nodes, Text(body))
 
 	type dt struct {
