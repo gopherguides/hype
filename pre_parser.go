@@ -1,6 +1,7 @@
 package hype
 
 import (
+	"fmt"
 	"io"
 )
 
@@ -30,4 +31,13 @@ type PreParseFn func(p *Parser, r io.Reader) (io.Reader, error)
 
 func (fn PreParseFn) PreParse(p *Parser, r io.Reader) (io.Reader, error) {
 	return fn(p, r)
+}
+
+type PreParseError struct {
+	Err       error
+	PreParser PreParser
+}
+
+func (e PreParseError) Error() string {
+	return fmt.Sprintf("pre parse error: [%T]: %v", e.PreParser, e.Err)
 }

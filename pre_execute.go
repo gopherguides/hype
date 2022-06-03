@@ -2,6 +2,7 @@ package hype
 
 import (
 	"context"
+	"fmt"
 )
 
 type PreExecuter interface {
@@ -44,4 +45,13 @@ type PreExecuteFn func(ctx context.Context, d *Document) error
 
 func (fn PreExecuteFn) PreExecute(ctx context.Context, d *Document) error {
 	return fn(ctx, d)
+}
+
+type PreExecuteError struct {
+	Err         error
+	PreExecuter PreExecuter
+}
+
+func (e PreExecuteError) Error() string {
+	return fmt.Sprintf("pre execute error: [%T]: %v", e.PreExecuter, e.Err)
 }

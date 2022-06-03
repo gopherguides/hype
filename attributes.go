@@ -1,6 +1,7 @@
 package hype
 
 import (
+	"fmt"
 	"regexp"
 	"strings"
 
@@ -99,4 +100,16 @@ func Language(ats *Attributes, lang string) string {
 	}
 
 	return lang
+}
+
+type ErrAttrNotFound string
+
+func (e ErrAttrNotFound) Error() string {
+	return fmt.Sprintf("attribute %q not found", string(e))
+}
+
+type ErrAttrEmpty string
+
+func (e ErrAttrEmpty) Error() string {
+	return fmt.Sprintf("attribute %q is empty", string(e))
 }
