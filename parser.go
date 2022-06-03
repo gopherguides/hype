@@ -174,7 +174,7 @@ func (p *Parser) ParseHTMLNode(node *html.Node, parent Node) (Node, error) {
 	case html.ErrorNode:
 		return nil, fmt.Errorf(node.Data)
 	case html.TextNode:
-		return TextNode(node.Data), nil
+		return Text(node.Data), nil
 	}
 
 	return nil, fmt.Errorf("unknown node type %v", node.Data)

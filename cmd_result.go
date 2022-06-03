@@ -70,7 +70,7 @@ func NewCmdResult(p *Parser, c *Cmd, res *clam.Result) (*CmdResult, error) {
 	cel := NewEl(atomx.Code, pre)
 	cel.Set("language", lang)
 	cel.Set("class", "language-"+lang)
-	cel.Nodes = append(cel.Nodes, TextNode(body))
+	cel.Nodes = append(cel.Nodes, Text(body))
 
 	type dt struct {
 		key string
@@ -122,7 +122,7 @@ func NewCmdResult(p *Parser, c *Cmd, res *clam.Result) (*CmdResult, error) {
 		}
 
 		text := fmt.Sprintf("\n\n%s", bb.String())
-		cel.Nodes = append(cel.Nodes, TextNode(text))
+		cel.Nodes = append(cel.Nodes, Text(text))
 	}
 
 	pre.Nodes = append(pre.Nodes, cel)

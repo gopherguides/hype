@@ -1,22 +1,22 @@
 package hype
 
-type TextOnlyNode interface {
+type TextNode interface {
 	Node
 	Text() string
 }
 
-var _ TextOnlyNode = TextNode("")
+var _ TextNode = Text("")
 
-type TextNode string
+type Text string
 
-func (tn TextNode) Children() Nodes {
+func (tn Text) Children() Nodes {
 	return Nodes{}
 }
 
-func (tn TextNode) String() string {
+func (tn Text) String() string {
 	return string(tn)
 }
 
-func (tn TextNode) Text() string {
+func (tn Text) Text() string {
 	return string(tn)
 }

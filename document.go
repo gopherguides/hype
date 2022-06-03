@@ -130,10 +130,10 @@ func (doc *Document) processRefs() error {
 
 		em := NewEl(atomx.Em, fc)
 		em.Set("class", "figure-name")
-		em.Nodes = append(em.Nodes, TextNode(fmt.Sprintf("%s:", fig.Name())))
+		em.Nodes = append(em.Nodes, Text(fmt.Sprintf("%s:", fig.Name())))
 
 		fcns := fc.Nodes
-		fc.Nodes = Nodes{em, TextNode(" ")}
+		fc.Nodes = Nodes{em, Text(" ")}
 		fc.Nodes = append(fc.Nodes, fcns...)
 
 	}

@@ -37,7 +37,7 @@ func (r *Ref) PostExecute(ctx context.Context, doc *Document, err error) error {
 		return err
 	}
 
-	href.Nodes = append(href.Nodes, TextNode(r.Figure.Name()))
+	href.Nodes = append(href.Nodes, Text(r.Figure.Name()))
 	r.Nodes = append(r.Nodes, href)
 
 	return nil

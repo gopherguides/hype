@@ -41,12 +41,12 @@ func Test_Document_Execute(t *testing.T) {
 			time.Sleep(time.Millisecond * 10)
 
 			x.Lock()
-			x.Nodes = append(x.Nodes, TextNode("baz"))
+			x.Nodes = append(x.Nodes, Text("baz"))
 			x.Unlock()
 			return nil
 		}
 
-		x.Nodes = append(x.Nodes, TextNode("bar"))
+		x.Nodes = append(x.Nodes, Text("bar"))
 
 		return Nodes{x}, nil
 	}

@@ -41,7 +41,7 @@ func NewGoDocLinkNodes(p *Parser, el *Element) (Nodes, error) {
 	}
 
 	cel := NewEl(atomx.Code, el)
-	cel.Nodes = append(cel.Nodes, TextNode(dt))
+	cel.Nodes = append(cel.Nodes, Text(dt))
 	af.Nodes = append(af.Nodes, cel)
 
 	l, err := NewLink(af)

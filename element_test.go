@@ -97,7 +97,7 @@ func Test_Element_String(t *testing.T) {
 		}, exp: `<div class="foo" id="bar"></div>`},
 		{name: "with kids", e: &Element{
 			HTMLNode: hn,
-			Nodes:    Nodes{TextNode("hello")},
+			Nodes:    Nodes{Text("hello")},
 		}, exp: "<div>hello</div>"},
 	}
 

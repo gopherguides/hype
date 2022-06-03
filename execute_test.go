@@ -31,14 +31,14 @@ func Test_Nodes_Execute(t *testing.T) {
 
 	n1 := newExecuteNode(t, func(ctx context.Context, d *Document) error {
 		d.Lock()
-		d.Nodes = append(d.Nodes, TextNode("foo"))
+		d.Nodes = append(d.Nodes, Text("foo"))
 		d.Unlock()
 		return nil
 	})
 
 	n1.Nodes = append(n1.Nodes, newExecuteNode(t, func(ctx context.Context, d *Document) error {
 		d.Lock()
-		d.Nodes = append(d.Nodes, TextNode("bar"))
+		d.Nodes = append(d.Nodes, Text("bar"))
 		d.Unlock()
 		return nil
 	}))
