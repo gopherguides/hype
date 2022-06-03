@@ -1,6 +1,7 @@
 package hype
 
 import (
+	"fmt"
 	"strconv"
 	"strings"
 )
@@ -12,6 +13,18 @@ type Heading struct {
 
 func (h Heading) Level() int {
 	return h.level
+}
+
+func (h Heading) Format(f fmt.State, verb rune) {
+	switch verb {
+	case 'v':
+		if len(h.FileName) > 0 {
+			fmt.Fprintf(f, "file://%s: ", h.FileName)
+		}
+		fmt.Fprintf(f, "%s\n", h.String())
+	default:
+		fmt.Fprintf(f, "%s", h.String())
+	}
 }
 
 func NewHeading(el *Element) (*Heading, error) {

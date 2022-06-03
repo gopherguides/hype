@@ -3,6 +3,7 @@ package hype
 import (
 	"bytes"
 	"fmt"
+	"path/filepath"
 	"sort"
 	"strings"
 	"sync"
@@ -20,6 +21,30 @@ type Element struct {
 	HTMLNode *html.Node
 	Nodes    Nodes
 	Parent   Node
+	FileName string // only set when Parser.ParseFile() is used
+}
+
+func (el *Element) Format(f fmt.State, verb rune) {
+	if el == nil {
+		return
+	}
+
+	switch verb {
+	case 'v':
+		st := el.StartTag()
+		if len(st) == 0 {
+			return
+		}
+
+		if len(el.FileName) > 0 {
+			fmt.Fprintf(f, "file://%s: ", el.FileName)
+		}
+
+		fmt.Fprintf(f, "%s\n", st)
+
+	default:
+		fmt.Fprintf(f, "%s", el.String())
+	}
 }
 
 func (el *Element) Clone() (*Element, error) {
@@ -41,8 +66,9 @@ func (el *Element) Clone() (*Element, error) {
 			Namespace: el.HTMLNode.Namespace,
 			Type:      el.HTMLNode.Type,
 		},
-		Nodes:  el.Nodes,
-		Parent: el.Parent,
+		Nodes:    el.Nodes,
+		Parent:   el.Parent,
+		FileName: el.FileName,
 	}
 
 	return nel, nil
@@ -143,6 +169,12 @@ func (el *Element) WrapErr(err error) error {
 }
 
 func NewEl[T ~string](at T, parent Node) *Element {
+	var fn string
+
+	if e, ok := parent.(*Element); ok {
+		fn = e.FileName
+	}
+
 	return &Element{
 		Attributes: &Attributes{},
 		HTMLNode: &html.Node{
@@ -150,6 +182,21 @@ func NewEl[T ~string](at T, parent Node) *Element {
 			Data:     string(at),
 			DataAtom: atom.Lookup([]byte(string(at))),
 		},
-		Parent: parent,
+		Parent:   parent,
+		FileName: fn,
 	}
+}
+
+func (el *Element) updateFileName(dir string) {
+	if el == nil {
+		return
+	}
+
+	if strings.HasPrefix(el.FileName, dir) {
+		return
+	}
+
+	el.Lock()
+	defer el.Unlock()
+	el.FileName = filepath.Join(dir, el.FileName)
 }

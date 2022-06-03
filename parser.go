@@ -23,7 +23,8 @@ type Parser struct {
 	Snippets     *Snippets
 	Section      int
 
-	mu sync.RWMutex
+	fileName string
+	mu       sync.RWMutex
 }
 
 func (p *Parser) ParseFile(name string) (*Document, error) {
@@ -31,13 +32,22 @@ func (p *Parser) ParseFile(name string) (*Document, error) {
 		return nil, ErrIsNil("parser")
 	}
 
+	p.mu.Lock()
+	p.fileName = name
+	p.mu.Unlock()
+
 	f, err := p.Open(name)
 	if err != nil {
 		return nil, err
 	}
 	defer f.Close()
 
-	return p.Parse(f)
+	doc, err := p.Parse(f)
+	if err != nil {
+		return nil, fmt.Errorf("%s: %s", name, err)
+	}
+
+	return doc, nil
 }
 
 func (p *Parser) Parse(r io.Reader) (*Document, error) {
@@ -185,6 +195,7 @@ func (p *Parser) element(node *html.Node, parent Node) (Node, error) {
 		Attributes: ConvertHTMLAttrs(node.Attr),
 		HTMLNode:   node,
 		Parent:     parent,
+		FileName:   p.fileName,
 	}
 
 	var nodes Nodes

@@ -64,6 +64,19 @@ func (doc *Document) Children() Nodes {
 	return doc.Nodes
 }
 
+func (doc *Document) Format(f fmt.State, verb rune) {
+	if doc == nil {
+		return
+	}
+
+	switch verb {
+	case 'v':
+		fmt.Fprintf(f, "%v", doc.Children())
+	default:
+		fmt.Fprintf(f, "%s", doc.String())
+	}
+}
+
 func (doc *Document) String() string {
 	return doc.Children().String()
 }

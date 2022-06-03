@@ -110,6 +110,7 @@ func (inc *Include) setSources() error {
 
 	var err error
 	inc.pp.Do(func() {
+		inc.Nodes.updateFileName(inc.dir)
 		kids := ByAttrs(inc.Children(), map[string]string{
 			"src": "*",
 		})

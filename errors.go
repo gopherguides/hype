@@ -20,7 +20,7 @@ func WrapNodeErr(n Node, err error) error {
 	}
 
 	if h, ok := n.(Tag); ok {
-		return fmt.Errorf("%T: %s: %w", h, h.StartTag(), err)
+		return fmt.Errorf("%T: %v: %w", h, h, err)
 	}
 
 	return fmt.Errorf("%T: %w", n, err)

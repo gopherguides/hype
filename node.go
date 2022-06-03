@@ -50,6 +50,19 @@ func (list Nodes) Delete(node Node) Nodes {
 	return nodes
 }
 
+func (list Nodes) updateFileName(dir string) {
+	type namer interface {
+		updateFileName(dir string)
+	}
+
+	for _, n := range list {
+		if n, ok := n.(namer); ok {
+			n.updateFileName(dir)
+		}
+		n.Children().updateFileName(dir)
+	}
+}
+
 func ToNodes[T Node](list []T) Nodes {
 	nodes := make(Nodes, len(list))
 	for i, n := range list {
@@ -57,4 +70,16 @@ func ToNodes[T Node](list []T) Nodes {
 	}
 
 	return nodes
+}
+
+func (list Nodes) Format(f fmt.State, verb rune) {
+	switch verb {
+	case 'v':
+		for _, n := range list {
+			fmt.Fprintf(f, "%v", n)
+			n.Children().Format(f, verb)
+		}
+	default:
+		fmt.Fprintf(f, "%s", list.String())
+	}
 }
