@@ -24,7 +24,7 @@ type CmdResult struct {
 
 func NewCmdResult(p *Parser, c *Cmd, res *clam.Result) (*CmdResult, error) {
 	if res == nil {
-		return nil, ErrIsNil("result")
+		return nil, c.WrapErr(ErrIsNil("result"))
 	}
 
 	cmd := &CmdResult{
@@ -62,7 +62,7 @@ func NewCmdResult(p *Parser, c *Cmd, res *clam.Result) (*CmdResult, error) {
 	body := strings.Join(lines, "\n\n")
 	body, err := resultBody(res, c.Attrs(), body)
 	if err != nil {
-		return nil, err
+		return nil, c.WrapErr(err)
 	}
 
 	pre := NewEl(atomx.Pre, cmd)
@@ -123,7 +123,7 @@ func NewCmdResult(p *Parser, c *Cmd, res *clam.Result) (*CmdResult, error) {
 		}
 
 		if err := tw.Flush(); err != nil {
-			return nil, err
+			return nil, cmd.WrapErr(err)
 		}
 
 		text := fmt.Sprintf("\n\n%s", bb.String())

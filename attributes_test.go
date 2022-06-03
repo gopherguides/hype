@@ -9,14 +9,16 @@ import (
 func Test_Language(t *testing.T) {
 	t.Parallel()
 
+	r := require.New(t)
+
 	good := &Attributes{}
-	good.Set("language", "go")
+	r.NoError(good.Set("language", "go"))
 
 	class := &Attributes{}
-	class.Set("class", "language-go")
+	r.NoError(class.Set("class", "language-go"))
 
 	short := &Attributes{}
-	short.Set("lang", "go")
+	r.NoError(short.Set("lang", "go"))
 
 	table := []struct {
 		name string

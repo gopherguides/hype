@@ -40,7 +40,7 @@ func (el *Element) Format(f fmt.State, verb rune) {
 			fmt.Fprintf(f, "file://%s: ", el.FileName)
 		}
 
-		fmt.Fprintf(f, "%s\n", st)
+		fmt.Fprintf(f, "%s", st)
 
 	default:
 		fmt.Fprintf(f, "%s", el.String())
@@ -199,4 +199,14 @@ func (el *Element) updateFileName(dir string) {
 	el.Lock()
 	defer el.Unlock()
 	el.FileName = filepath.Join(dir, el.FileName)
+}
+
+func (el *Element) Set(k string, v string) error {
+	err := el.Attributes.Set(k, v)
+
+	if err != nil {
+		return el.WrapErr(err)
+	}
+
+	return nil
 }

@@ -22,7 +22,9 @@ func NewGolangs(p *Parser, el *Element) (Nodes, error) {
 
 	ats := el.Attrs()
 
-	setGolangAtrs(ats)
+	if err := setGolangAtrs(ats); err != nil {
+		return nil, err
+	}
 
 	var cmds []string
 
@@ -100,13 +102,13 @@ func NewGolangNodes(p *Parser, el *Element) (Nodes, error) {
 	return NewGolangs(p, el)
 }
 
-func setGolangAtrs(ats *Attributes) {
+func setGolangAtrs(ats *Attributes) error {
 	if ats == nil {
-		return
+		return nil
 	}
 
 	if err := ats.Set("data-go-version", GoVersion()); err != nil {
-		return
+		return err
 	}
 
 	env := []string{}
@@ -125,9 +127,12 @@ func setGolangAtrs(ats *Attributes) {
 
 	ev := strings.Join(env, ",")
 	if len(ev) > 0 {
-		ats.Set("environ", ev)
+		if err := ats.Set("environ", ev); err != nil {
+			return err
+		}
 	}
 
+	return nil
 }
 
 var goCmds = map[string]string{

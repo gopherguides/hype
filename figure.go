@@ -4,7 +4,6 @@ import (
 	"errors"
 	"fmt"
 	"strings"
-	"sync"
 
 	"github.com/gobuffalo/flect"
 )
@@ -16,7 +15,6 @@ type Figure struct {
 	SectionID int
 
 	style string
-	once  sync.Once
 }
 
 func (f *Figure) Name() string {
@@ -28,8 +26,6 @@ func (f *Figure) Name() string {
 		style = "figure"
 	}
 
-	// f.RLock()
-	// defer f.RUnlock()
 	style = flect.Titleize(style)
 	return fmt.Sprintf("%s %d.%d", style, f.SectionID, f.Pos)
 }
@@ -70,19 +66,20 @@ func NewFigure(p *Parser, el *Element) (*Figure, error) {
 
 	body := f.Nodes.String()
 	body = strings.TrimSpace(body)
+
 	if len(body) == 0 {
 		return f, nil
 	}
 
 	p2, err := p.Sub(".")
 	if err != nil {
-		return nil, err
+		return nil, f.WrapErr(err)
 	}
 
 	nodes, err := p2.ParseFragment(strings.NewReader(body))
 	if err != nil {
 		if !errors.Is(err, ErrNilFigure) {
-			return nil, err
+			return nil, f.WrapErr(err)
 		}
 	}
 
@@ -109,12 +106,15 @@ func NewFigureNodes(p *Parser, el *Element) (Nodes, error) {
 	if err != nil {
 		return nil, err
 	}
+
+	f.Lock()
 	f.SectionID = p.Section
+	f.Unlock()
 
 	return Nodes{f}, nil
 }
 
-type IDGenerator func(fig *Figure) (string, error)
+type IDGenerator func(i int, fig *Figure) (string, error)
 
 func RestripeFigureIDs(nodes Nodes, fn IDGenerator) error {
 	if fn == nil {
@@ -123,14 +123,14 @@ func RestripeFigureIDs(nodes Nodes, fn IDGenerator) error {
 
 	figs := ByType[*Figure](nodes)
 
-	for _, fig := range figs {
+	for i, fig := range figs {
 
 		fid, err := fig.ValidAttr("id")
 		if err != nil {
 			return err
 		}
 
-		uid, err := fn(fig)
+		uid, err := fn(i, fig)
 		if err != nil {
 			return err
 		}

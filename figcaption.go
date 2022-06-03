@@ -6,7 +6,7 @@ type Figcaption struct {
 
 func NewFigcaption(el *Element) (*Figcaption, error) {
 	if el == nil {
-		return nil, ErrIsNil("element")
+		return nil, el.WrapErr(ErrIsNil("element"))
 	}
 
 	f := &Figcaption{

@@ -77,13 +77,13 @@ func NewInclude(p *Parser, el *Element) (*Include, error) {
 
 	inc.Nodes = body.Nodes
 
-	fn := func(fig *Figure) (string, error) {
+	fn := func(i int, fig *Figure) (string, error) {
 		id, err := fig.ValidAttr("id")
 		if err != nil {
 			return "", err
 		}
 
-		return fmt.Sprintf("%s#%s", src, id), nil
+		return fmt.Sprintf("%s.%d#%s", src, i, id), nil
 	}
 
 	if err := RestripeFigureIDs(inc.Nodes, fn); err != nil {
@@ -111,6 +111,7 @@ func (inc *Include) setSources() error {
 	var err error
 	inc.pp.Do(func() {
 		inc.Nodes.updateFileName(inc.dir)
+
 		kids := ByAttrs(inc.Children(), map[string]string{
 			"src": "*",
 		})

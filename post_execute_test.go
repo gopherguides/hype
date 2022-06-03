@@ -39,7 +39,7 @@ func Test_Nodes_PostExecute(t *testing.T) {
 
 	doc := &Document{}
 
-	err := nodes.PostExecute(nil, doc, nil)
+	err := nodes.PostExecute(context.Background(), doc, nil)
 	r.NoError(err)
 
 	act := doc.Title
@@ -76,7 +76,7 @@ func Test_Nodes_PostExecute_Errors(t *testing.T) {
 
 			nodes := Nodes{tc.node}
 
-			err := nodes.PostExecute(nil, nil, fmt.Errorf("original"))
+			err := nodes.PostExecute(context.Background(), nil, fmt.Errorf("original"))
 			r.Error(err)
 
 			r.Contains(err.Error(), "boom")

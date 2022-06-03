@@ -15,7 +15,7 @@ func (b *Body) AsPage() *Page {
 // NewBody creates a new Body.
 func NewBody(el *Element) (*Body, error) {
 	if el == nil {
-		return nil, ErrIsNil("element")
+		return nil, el.WrapErr(ErrIsNil("element"))
 	}
 
 	body := &Body{

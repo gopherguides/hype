@@ -114,11 +114,18 @@ func (doc *Document) Execute(ctx context.Context) error {
 }
 
 func (doc *Document) processRefs() error {
+
 	figs := ByType[*Figure](doc.Nodes)
+
 	for i, fig := range figs {
+
+		fig.Lock()
 		fig.SectionID = doc.SectionID
 		fig.Pos = i + 1
+		fig.Unlock()
+
 		caps := ByType[*Figcaption](fig.Nodes)
+
 		if len(caps) > 1 {
 			return fmt.Errorf("more than one figcaption")
 		}
@@ -137,12 +144,17 @@ func (doc *Document) processRefs() error {
 
 		fcb := fc.Nodes.String()
 		fcb = strings.TrimSpace(fcb)
+
 		if len(fcb) == 0 {
 			return fmt.Errorf("empty figcaption: %s", fig.StartTag())
 		}
 
 		em := NewEl(atomx.Em, fc)
-		em.Set("class", "figure-name")
+
+		if err := em.Set("class", "figure-name"); err != nil {
+			return err
+		}
+
 		em.Nodes = append(em.Nodes, Text(fmt.Sprintf("%s:", fig.Name())))
 
 		fcns := fc.Nodes
@@ -151,7 +163,7 @@ func (doc *Document) processRefs() error {
 
 	}
 
-	fn := func(fig *Figure) (string, error) {
+	fn := func(i int, fig *Figure) (string, error) {
 		return fmt.Sprintf("fig-%d-%d", fig.SectionID, fig.Pos), nil
 	}
 

@@ -53,7 +53,9 @@ func marked() error {
 	pwd := os.Getenv("MARKED_ORIGIN")
 
 	if len(pwd) > 0 {
-		os.Chdir(pwd)
+		if err := os.Chdir(pwd); err != nil {
+			return err
+		}
 	}
 
 	cab := os.DirFS(".")
@@ -138,7 +140,9 @@ func vscode(name string) error {
 
 	dir := filepath.Dir(name)
 	if len(dir) > 0 {
-		os.Chdir(dir)
+		if err := os.Chdir(dir); err != nil {
+			return err
+		}
 	}
 	cab := os.DirFS(".")
 

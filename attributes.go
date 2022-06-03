@@ -18,14 +18,16 @@ type Attributes = syncx.Map[string, string]
 
 // ConvertHTMLAttrs converts a slice of HTML attributes
 // to a new Attributes type.
-func ConvertHTMLAttrs(attrs []html.Attribute) *Attributes {
+func ConvertHTMLAttrs(attrs []html.Attribute) (*Attributes, error) {
 	ats := &Attributes{}
 
 	for _, a := range attrs {
-		ats.Set(a.Key, a.Val)
+		if err := ats.Set(a.Key, a.Val); err != nil {
+			return nil, err
+		}
 	}
 
-	return ats
+	return ats, nil
 }
 
 // AttrMatches returns true if the given keys and values in the

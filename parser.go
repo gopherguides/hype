@@ -191,8 +191,13 @@ func (p *Parser) ParseHTMLNode(node *html.Node, parent Node) (Node, error) {
 }
 
 func (p *Parser) element(node *html.Node, parent Node) (Node, error) {
+	ats, err := ConvertHTMLAttrs(node.Attr)
+	if err != nil {
+		return nil, err
+	}
+
 	el := &Element{
-		Attributes: ConvertHTMLAttrs(node.Attr),
+		Attributes: ats,
 		HTMLNode:   node,
 		Parent:     parent,
 		FileName:   p.fileName,

@@ -17,7 +17,6 @@ const extensions = blackfriday.CommonExtensions | blackfriday.LaxHTMLBlocks
 type Parser struct {
 	*sync.RWMutex
 	DisablePages bool
-	cur          int
 	lines        []string
 }
 
@@ -113,21 +112,4 @@ func (p *Parser) Parse(src []byte) ([]byte, error) {
 	p.Unlock()
 
 	return p.parse(p.lines)
-}
-
-// next returns the next line in the Markdown.
-func (p *Parser) next() (string, bool) {
-	p.Lock()
-	ll := len(p.lines)
-	cur := p.cur
-	p.cur = p.cur + 1
-	p.Unlock()
-
-	if ll == 0 || cur >= ll {
-		return "", false
-	}
-
-	// p.cur = p.cur + 1
-
-	return p.lines[cur], true
 }

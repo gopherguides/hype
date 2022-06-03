@@ -40,7 +40,7 @@ func Test_Nodes_PreExecute(t *testing.T) {
 
 	nodes := Nodes{n1}
 
-	err := nodes.PreExecute(nil, doc)
+	err := nodes.PreExecute(context.Background(), doc)
 	r.NoError(err)
 
 	act := doc.Title
@@ -76,7 +76,7 @@ func Test_Nodes_PreExecute_Errors(t *testing.T) {
 
 			nodes := Nodes{tc.node}
 
-			err := nodes.PreExecute(nil, nil)
+			err := nodes.PreExecute(context.Background(), nil)
 			r.Error(err)
 
 			r.Contains(err.Error(), "boom")
