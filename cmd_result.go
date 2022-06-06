@@ -145,7 +145,8 @@ func resultBody(res *clam.Result, ats *Attributes, body string) (string, error) 
 	}
 
 	if pwd, err := os.Getwd(); err == nil {
-		body = strings.ReplaceAll(body, fmt.Sprintf("%s%s", pwd, string(filepath.Separator)), "")
+		fp := fmt.Sprintf("%s%s", pwd, string(filepath.Separator))
+		body = strings.ReplaceAll(body, fp, "")
 	}
 
 	body = html.EscapeString(body)

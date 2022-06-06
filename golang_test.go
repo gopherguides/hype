@@ -41,13 +41,13 @@ func Test_Golang_Multiple(t *testing.T) {
 	t.Parallel()
 	r := require.New(t)
 
-	root := "testdata/commands"
+	root := "testdata/auto/commands"
 	cab := os.DirFS(root)
 
 	p := NewParser(cab)
 	p.Root = root
 
-	in := strings.NewReader(`<go doc="-short context,-short errors" run="." src="greet"></go>`)
+	in := strings.NewReader(`<go doc="-short context,-short errors" run="." src="greet/src"></go>`)
 	doc, err := p.Parse(in)
 	r.NoError(err)
 
@@ -109,7 +109,7 @@ func Foo() string {
 </body></html>`
 
 	// fmt.Println(act)
-	compareOutput(t, act, exp)
+	r.Equal(exp, act)
 
 }
 
@@ -145,6 +145,6 @@ func Test_Golang_Sym_main(t *testing.T) {
 </body></html>`
 
 	// fmt.Println(act)
-	compareOutput(t, act, exp)
+	r.Equal(exp, act)
 
 }

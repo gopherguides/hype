@@ -83,7 +83,7 @@ hello</code></pre></cmd>
 	act := doc.String()
 
 	// fmt.Println(act)
-	compareOutput(t, act, exp)
+	r.Equal(exp, act)
 }
 
 func helloCab(t testing.TB, names ...string) fstest.MapFS {

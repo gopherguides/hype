@@ -3,7 +3,6 @@ package hype
 import (
 	"context"
 	"errors"
-	"os"
 	"strings"
 	"testing"
 	"time"
@@ -71,7 +70,7 @@ func Test_Cmd_Execute(t *testing.T) {
 	exp := `<cmd exec="echo hello" hide-cmd=""><pre><code class="language-text" language="text">hello</code></pre></cmd>`
 
 	// fmt.Println(act)
-	compareOutput(t, act, exp)
+	r.Equal(exp, act)
 }
 
 func Test_Cmd_Execute_UnexpectedExit(t *testing.T) {
@@ -147,65 +146,4 @@ func Test_Cmd_Execute_Timeout(t *testing.T) {
 	err := c.Execute(ctx, doc)
 	r.Error(err)
 
-}
-
-func Test_NewCmdNodes_Code(t *testing.T) {
-	t.Parallel()
-	r := require.New(t)
-
-	in := `<go run="main.go" src="greet" code="go.mod" sym="main" language="go"></go>`
-
-	root := "testdata/commands"
-
-	cab := os.DirFS(root)
-
-	p := NewParser(cab)
-	p.Root = root
-
-	doc, err := p.Parse(strings.NewReader(in))
-	r.NoError(err)
-
-	err = doc.Execute(context.Background())
-
-	r.NoError(err)
-
-	act := doc.String()
-	act = strings.TrimSpace(act)
-
-	exp := `<html><head></head><body><page>
-<pre><code class="language-go" language="go" src="greet/go.mod">module demo
-
-go 1.18
-</code></pre><cmd exec="go doc -cmd -u -src -short main" hide-cmd="" language="go" run="main.go" src="greet" sym="main"><pre><code class="language-go" language="go">func main() {
-	// snippet: example
-	fmt.Println(&#34;Hello, World!&#34;)
-	// snippet: example
-}</code></pre></cmd><cmd exec="go run main.go" hide-cmd="" language="go" run="main.go" src="greet" sym="main"><pre><code class="language-go" language="go">Hello, World!</code></pre></cmd>
-</page>
-</body></html>`
-
-	// fmt.Println(act)
-	compareOutput(t, act, exp)
-}
-
-func Test_Cmd_SideBySide_Include(t *testing.T) {
-	t.Parallel()
-	r := require.New(t)
-
-	root := "testdata/commands/side-by-side"
-	r.DirExists(root)
-
-	cab := os.DirFS(root)
-
-	p := NewParser(cab)
-	p.Root = root
-
-	doc, err := p.ParseExecuteFile(context.Background(), "module.md")
-	r.NoError(err)
-
-	act := doc.String()
-	act = strings.TrimSpace(act)
-
-	// fmt.Println(act)
-	compareOutputFile(t, cab, act, "module.gold")
 }

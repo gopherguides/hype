@@ -1,9 +1,13 @@
 package hype
 
 import (
+	"context"
 	"fmt"
 	"io/fs"
+	"os"
+	"path/filepath"
 	"testing"
+	"time"
 
 	"github.com/stretchr/testify/require"
 )
@@ -20,43 +24,84 @@ func (brokenReader) Read(p []byte) (n int, err error) {
 	return 0, fmt.Errorf("broken reader")
 }
 
-func compareOutputFile(t testing.TB, cab fs.FS, act string, expFile string) {
+func testParser(t testing.TB, root string) *Parser {
+	t.Helper()
+
+	cab := os.DirFS(root)
+
+	p := NewParser(cab)
+	p.Root = root
+
+	return p
+}
+
+func testModule(t testing.TB, root string) {
 	t.Helper()
 
 	r := require.New(t)
 
-	b, err := fs.ReadFile(cab, expFile)
+	p := testParser(t, root)
+
+	ctx, cancel := context.WithTimeout(context.Background(), 5*time.Second)
+	defer cancel()
+
+	doc, err := p.ParseExecuteFile(ctx, "module.md")
+	r.NoError(err)
+
+	act := doc.String()
+
+	// fmt.Println(act)
+
+	b, err := fs.ReadFile(p.FS, "module.gold")
 	r.NoError(err)
 
 	exp := string(b)
 
-	compareOutput(t, act, exp)
+	if exp != act {
+		fmt.Println(act)
+		fp := filepath.Join("tmp", root)
+		err = os.MkdirAll(fp, 0755)
+		r.NoError(err)
+
+		f, err := os.Create(filepath.Join(fp, "output.html"))
+		r.NoError(err)
+		defer f.Close()
+
+		_, err = f.Write([]byte(act))
+		r.NoError(err)
+
+		err = f.Close()
+		r.NoError(err)
+
+		r.Equal(exp, act)
+	}
 }
 
-func compareOutput(t testing.TB, act string, exp string) {
-	t.Helper()
+func Test_Testdata_Auto_Modules(t *testing.T) {
+	t.Parallel()
 
 	r := require.New(t)
 
-	// fn := func(s string) string {
+	root := "testdata/auto"
 
-	// 	// rx, err := regexp.Compile(`[0-9a-fA-F]{8}\b-[0-9a-fA-F]{4}\b-[0-9a-fA-F]{4}\b-[0-9a-fA-F]{4}\b-[0-9a-fA-F]{12}`)
+	err := fs.WalkDir(os.DirFS(root), ".", func(path string, d fs.DirEntry, err error) error {
+		if err != nil {
+			return err
+		}
 
-	// 	// r.NoError(err)
+		base := filepath.Base(path)
+		if base != "module.md" {
+			return nil
+		}
 
-	// 	// uuids := rx.FindAllString(s, -1)
-	// 	// for i, u := range uuids {
-	// 	// 	s = strings.Replace(s, u, fmt.Sprintf("uuid-%d", i), -1)
-	// 	// }
+		t.Run(path, func(t *testing.T) {
+			dir := filepath.Dir(path)
 
-	// 	return strings.TrimSpace(s)
-	// }
+			testModule(t, filepath.Join(root, dir))
+		})
 
-	// act = fn(act)
+		return filepath.SkipDir
+	})
 
-	// exp = fn(exp)
-
-	// fmt.Println(act)
-	r.Equal(exp, act)
-
+	r.NoError(err)
 }

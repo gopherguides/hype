@@ -1,0 +1,19 @@
+<html><head></head><body><page>
+<h1>Commands with Data</h1>
+
+<p>This is a command with data attrs.</p>
+
+<cmd data-go-version="go.test" exec="go run ." run="." src="src" truncate="5"><pre><code class="language-text" language="text">$ go run .
+
+0
+1
+2
+...
+
+--------------------------------------------------------------------------------
+Go Version: go.test
+</code></pre></cmd>
+
+<p>Hopefully this works.</p>
+</page>
+</body></html>
