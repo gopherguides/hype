@@ -4,7 +4,6 @@ import (
 	"bytes"
 	"context"
 	_ "embed"
-	"encoding/json"
 	"fmt"
 	"html/template"
 	"io"
@@ -21,7 +20,8 @@ import (
 func main() {
 	args := os.Args[1:]
 
-	var fn func() error
+	var fn func([]string) error
+
 	if len(args) == 0 {
 		fn = marked
 	}
@@ -32,24 +32,59 @@ func main() {
 	switch cmd {
 	case "marked", "preview":
 		fn = marked
-	case "vscode":
-		if len(args) == 0 {
-			log.Fatal("missing file")
+		if len(args) > 0 {
+			fn = file
 		}
-		fn = func() error {
-			return vscode(args[0])
-		}
+	// case "vscode":
+	// 	if len(args) == 0 {
+	// 		log.Fatal("missing file")
+	// 	}
+	// 	fn = func() error {
+	// 		return vscode(args[0])
+	// 	}
 	default:
 		log.Fatalf("unknown command: %s", cmd)
 	}
 
-	if err := fn(); err != nil {
+	if err := fn(args); err != nil {
 		log.Fatal(err)
 	}
 
 }
 
-func marked() error {
+func file(args []string) error {
+	if len(args) == 0 {
+		return fmt.Errorf("missing file")
+	}
+
+	name := args[0]
+
+	dir := filepath.Dir(name)
+	cab := os.DirFS(dir)
+	p := hype.NewParser(cab)
+
+	p.Section = 1
+
+	if sec, err := SectionFromPath(dir); err == nil {
+		p.Section = sec
+	}
+
+	p.PreParsers = append(p.PreParsers, &Binding{
+		Binder: flect.New("book"),
+		Ident:  flect.New("chapter"),
+	})
+
+	doc, err := p.ParseExecuteFile(context.Background(), filepath.Base(name))
+	if err != nil {
+		return err
+	}
+
+	fmt.Println(doc.String())
+
+	return nil
+}
+
+func marked(args []string) error {
 	pwd := os.Getenv("MARKED_ORIGIN")
 
 	if len(pwd) > 0 {
@@ -65,22 +100,13 @@ func marked() error {
 	p.Section = 1
 
 	if mp := os.Getenv("MARKED_PATH"); len(mp) > 0 {
-		dir := filepath.Dir(mp)
-		base := filepath.Base(dir)
-		rx, err := regexp.Compile(`^(\d+)-.+`)
+		sec, err := SectionFromPath(mp)
 		if err != nil {
 			return err
 		}
-
-		match := rx.FindStringSubmatch(base)
-		if len(match) >= 2 {
-			sec, err := strconv.Atoi(match[1])
-			if err != nil {
-				log.Fatal(err)
-			}
-			p.Section = sec
-		}
+		p.Section = sec
 	}
+
 	p.PreParsers = append(p.PreParsers, &Binding{
 		Binder: flect.New("book"),
 		Ident:  flect.New("chapter"),
@@ -94,6 +120,26 @@ func marked() error {
 	fmt.Println(doc.String())
 
 	return nil
+}
+
+func SectionFromPath(mp string) (int, error) {
+	dir := filepath.Dir(mp)
+	base := filepath.Base(dir)
+	rx, err := regexp.Compile(`^(\d+)-.+`)
+	if err != nil {
+		return 0, err
+	}
+
+	match := rx.FindStringSubmatch(base)
+	if len(match) < 2 {
+		return 0, fmt.Errorf("could not find section: %q", mp)
+	}
+
+	sec, err := strconv.Atoi(match[1])
+	if err != nil {
+		return 0, err
+	}
+	return sec, nil
 }
 
 type Binding struct {
@@ -136,36 +182,36 @@ func (bind *Binding) PreParse(p *hype.Parser, r io.Reader) (io.Reader, error) {
 	return bb, nil
 }
 
-func vscode(name string) error {
+// func vscode(name string) error {
 
-	dir := filepath.Dir(name)
-	if len(dir) > 0 {
-		if err := os.Chdir(dir); err != nil {
-			return err
-		}
-	}
-	cab := os.DirFS(".")
+// 	dir := filepath.Dir(name)
+// 	if len(dir) > 0 {
+// 		if err := os.Chdir(dir); err != nil {
+// 			return err
+// 		}
+// 	}
+// 	cab := os.DirFS(".")
 
-	p := hype.NewParser(cab)
+// 	p := hype.NewParser(cab)
 
-	p.Section = 1
-	p.PreParsers = append(p.PreParsers, &Binding{
-		Binder: flect.New("book"),
-		Ident:  flect.New("chapter"),
-	})
+// 	p.Section = 1
+// 	p.PreParsers = append(p.PreParsers, &Binding{
+// 		Binder: flect.New("book"),
+// 		Ident:  flect.New("chapter"),
+// 	})
 
-	doc, err := p.ParseExecuteFile(context.Background(), filepath.Base(name))
-	if err != nil {
-		return err
-	}
+// 	doc, err := p.ParseExecuteFile(context.Background(), filepath.Base(name))
+// 	if err != nil {
+// 		return err
+// 	}
 
-	body, err := doc.Body()
-	if err != nil {
-		return err
-	}
+// 	body, err := doc.Body()
+// 	if err != nil {
+// 		return err
+// 	}
 
-	return json.NewEncoder(os.Stdout).Encode(map[string]any{
-		"body":  body.Nodes.String(),
-		"title": doc.Title,
-	})
-}
+// 	return json.NewEncoder(os.Stdout).Encode(map[string]any{
+// 		"body":  body.Nodes.String(),
+// 		"title": doc.Title,
+// 	})
+// }

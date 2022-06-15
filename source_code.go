@@ -190,6 +190,10 @@ func NewSourceCodeNodes(p *Parser, el *Element) (Nodes, error) {
 		return nil, err
 	}
 
+	if sec, ok := el.Get("section"); ok {
+		return nil, el.WrapErr(fmt.Errorf("`section` is no longer supported, use `snippet` instead: %q", sec))
+	}
+
 	srcs := strings.Split(src, ",")
 
 	for _, src := range srcs {
