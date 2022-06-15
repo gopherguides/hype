@@ -5,6 +5,7 @@ go 1.18
 require (
 	github.com/gobuffalo/flect v0.2.5
 	github.com/markbates/clam v0.0.0-20220522031332-01a04f03fce1
+	github.com/markbates/cleo v0.0.0-20220609224829-dd86cce21bea
 	github.com/markbates/sweets v0.0.0-20210926032915-062eb9bcc0e5
 	github.com/markbates/syncx v1.4.0
 	github.com/mattn/go-shellwords v1.0.12
