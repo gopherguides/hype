@@ -9,46 +9,64 @@ import (
 	"io"
 	"log"
 	"os"
+	"os/signal"
 	"path/filepath"
 	"regexp"
 	"strconv"
 
 	"github.com/gobuffalo/flect"
 	"github.com/gopherguides/hype"
+	"github.com/gopherguides/hype/cmd/hype/cli"
 )
 
 func main() {
 	args := os.Args[1:]
 
-	var fn func([]string) error
+	app := cli.New()
 
-	if len(args) == 0 {
-		fn = marked
-	}
-
-	cmd := args[0]
-	args = args[1:]
-
-	switch cmd {
-	case "marked", "preview":
-		fn = marked
-		if len(args) > 0 {
-			fn = file
-		}
-	// case "vscode":
-	// 	if len(args) == 0 {
-	// 		log.Fatal("missing file")
-	// 	}
-	// 	fn = func() error {
-	// 		return vscode(args[0])
-	// 	}
-	default:
-		log.Fatalf("unknown command: %s", cmd)
-	}
-
-	if err := fn(args); err != nil {
+	pwd, err := os.Getwd()
+	if err != nil {
 		log.Fatal(err)
 	}
+
+	ctx := context.Background()
+	ctx, cancel := signal.NotifyContext(ctx, os.Interrupt)
+	defer cancel()
+
+	err = app.Main(ctx, pwd, args)
+	if err != nil {
+		log.Fatal(err)
+	}
+
+	// var fn func([]string) error
+
+	// if len(args) == 0 {
+	// 	fn = marked
+	// }
+
+	// cmd := args[0]
+	// args = args[1:]
+
+	// switch cmd {
+	// case "marked", "preview":
+	// 	fn = marked
+	// 	if len(args) > 0 {
+	// 		fn = file
+	// 	}
+	// // case "vscode":
+	// // 	if len(args) == 0 {
+	// // 		log.Fatal("missing file")
+	// // 	}
+	// // 	fn = func() error {
+	// // 		return vscode(args[0])
+	// // 	}
+	// default:
+	// 	log.Fatalf("unknown command: %s", cmd)
+	// }
+
+	// if err := fn(args); err != nil {
+	// 	log.Fatal(err)
+	// }
 
 }
 

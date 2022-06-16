@@ -61,6 +61,10 @@ func (doc *Document) Body() (*Body, error) {
 }
 
 func (doc *Document) Children() Nodes {
+	if doc == nil {
+		return nil
+	}
+
 	return doc.Nodes
 }
 
