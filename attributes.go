@@ -67,9 +67,9 @@ func AttrMatches(ats *Attributes, query map[string]string) bool {
 
 // Language tries to determine the language of the given
 // set of attributes.
-// 	- "language" is the first attr tested.
-// 	- "language-*" is the second attr tested. (e.g. "language-go", "language-js")
-//  - "lang" is the third attr tested.
+//   - "language" is the first attr tested.
+//   - "language-*" is the second attr tested. (e.g. "language-go", "language-js")
+//   - "lang" is the third attr tested.
 func Language(ats *Attributes, lang string) string {
 	if ats == nil {
 		return lang

@@ -1,0 +1,8 @@
+<html><head></head><body><page>
+<h1>Lone Ranger</h1>
+
+<pre><code class="language-go" language="go" range=":3" src="src/main.go">package main
+
+import "fmt"</code></pre>
+</page>
+</body></html>

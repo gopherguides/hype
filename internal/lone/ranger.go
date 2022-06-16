@@ -1,4 +1,4 @@
-package hype
+package lone
 
 import (
 	"fmt"
@@ -17,6 +17,46 @@ type Ranger struct {
 	rxErr error
 }
 
+func (r *Ranger) String() string {
+	if r == nil {
+		return "0:0"
+	}
+
+	return fmt.Sprintf("%d:%d", r.Start, r.End)
+}
+
+// Unsigned returns an error if the range
+// contains a negative number.
+func (r *Ranger) Unsigned() error {
+	if r == nil {
+		return fmt.Errorf("ranger is nil")
+	}
+
+	if r.Start < 0 {
+		return fmt.Errorf("start must be positive")
+	}
+
+	if r.End < 0 {
+		return fmt.Errorf("end must be positive")
+	}
+
+	return nil
+}
+
+// Validate returns an error if
+// start > end.
+func (r *Ranger) Validate() error {
+	if r == nil {
+		return fmt.Errorf("ranger is nil")
+	}
+
+	if r.Start > r.End {
+		return fmt.Errorf("start (%d) cannot be greater than end (%d)", r.Start, r.End)
+	}
+
+	return nil
+}
+
 func (r *Ranger) IsRange(s string) bool {
 	rx, err := r.Regexp()
 	if err != nil {
@@ -33,7 +73,7 @@ func (r *Ranger) Regexp() (*regexp.Regexp, error) {
 
 	r.once.Do(func() {
 		r.mu.Lock()
-		r.rx, r.rxErr = regexp.Compile(`(\d?):(\d?)`)
+		r.rx, r.rxErr = regexp.Compile(`([\+|\-]?\d*):([\+|\-]?\d*)`)
 		r.mu.Unlock()
 	})
 
@@ -74,4 +114,15 @@ func (r *Ranger) Parse(s string) error {
 	}
 
 	return nil
+}
+
+func Range(s string) (start int, end int, err error) {
+	r := &Ranger{}
+	err = r.Parse(s)
+	return r.Start, r.End, err
+}
+
+func IsRange(s string) bool {
+	r := &Ranger{}
+	return r.IsRange(s)
 }

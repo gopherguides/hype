@@ -11,6 +11,23 @@ import (
 	"github.com/markbates/sweets"
 )
 
+type Snippet struct {
+	Content string // The content of the snippet
+	File    string // the file name of the snippet
+	Lang    string // the language of the snippet
+	Name    string // the name of the snippet
+	Start   int    // the start line of the snippet
+	End     int    // the end line of the snippet
+}
+
+func (snip Snippet) String() string {
+	return snip.Content
+}
+
+func (snip Snippet) IsZero() bool {
+	return snip.Content == ""
+}
+
 type Snippets struct {
 	snippets map[string]map[string]Snippet
 	rules    map[string]string
@@ -71,24 +88,6 @@ func (sm *Snippets) Get(name string) (map[string]Snippet, bool) {
 	}
 
 	return nil, false
-}
-
-// Snippet
-type Snippet struct {
-	Content string // The content of the snippet
-	File    string // the file name of the snippet
-	Lang    string // the language of the snippet
-	Name    string // the name of the snippet
-	Start   int    // the start line of the snippet
-	End     int    // the end line of the snippet
-}
-
-func (snip Snippet) String() string {
-	return snip.Content
-}
-
-func (snip Snippet) IsZero() bool {
-	return snip.Content == ""
 }
 
 func (sm *Snippets) TrimComments(path string, src []byte) ([]byte, error) {
@@ -168,6 +167,7 @@ func (sm *Snippets) Parse(path string, src []byte) (map[string]Snippet, error) {
 		if names := rx.FindStringSubmatch(sl); len(names) > 1 {
 			name := names[1]
 			name = strings.TrimSpace(name)
+
 			snip, ok := open[name]
 			if ok {
 				snip.End = i + 1
@@ -178,8 +178,7 @@ func (sm *Snippets) Parse(path string, src []byte) (map[string]Snippet, error) {
 				snip.Content = strings.TrimSpace(snip.Content)
 				snips[name] = snip
 				delete(open, name)
-			}
-			if !ok {
+			} else {
 				snip.File = path
 				snip.Lang = strings.TrimPrefix(ext, ".")
 				snip.Name = name
