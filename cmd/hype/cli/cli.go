@@ -32,7 +32,7 @@ func SectionFromPath(mp string) (int, error) {
 
 	match := rx.FindStringSubmatch(base)
 	if len(match) < 2 {
-		return 0, fmt.Errorf("could not find section: %q", mp)
+		return 0, sectionPathError(mp)
 	}
 
 	sec, err := strconv.Atoi(match[1])
@@ -40,4 +40,10 @@ func SectionFromPath(mp string) (int, error) {
 		return 0, err
 	}
 	return sec, nil
+}
+
+type sectionPathError string
+
+func (e sectionPathError) Error() string {
+	return fmt.Sprintf("could not parse section from: %q", string(e))
 }

@@ -122,11 +122,9 @@ func (cmd *Marked) execute(ctx context.Context, pwd string) error {
 	p.Section = 1
 
 	if mp, ok := os.LookupEnv("MARKED_PATH"); ok {
-		sec, err := SectionFromPath(mp)
-		if err != nil {
-			return err
+		if sec, err := SectionFromPath(mp); err == nil {
+			p.Section = sec
 		}
-		p.Section = sec
 	}
 
 	p.PreParsers = append(p.PreParsers, &Binding{

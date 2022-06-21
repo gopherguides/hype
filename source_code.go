@@ -14,7 +14,7 @@ import (
 
 type SourceCode struct {
 	*Element
-	Snippet
+	Lang string
 }
 
 func (code *SourceCode) StartTag() string {
@@ -36,13 +36,7 @@ func (code *SourceCode) EndTag() string {
 func (code *SourceCode) String() string {
 	bb := &bytes.Buffer{}
 	bb.WriteString(code.StartTag())
-
-	if !code.Snippet.IsZero() {
-		bb.WriteString(code.Snippet.String())
-	} else {
-		bb.WriteString(code.Children().String())
-	}
-
+	bb.WriteString(code.Children().String())
 	bb.WriteString(code.EndTag())
 
 	return bb.String()
@@ -114,9 +108,9 @@ func (code *SourceCode) Execute(ctx context.Context, d *Document) error {
 		return fmt.Errorf("failed to trim comments from file %q: %w", src, err)
 	}
 
-	code.Content = string(b)
-
-	code.Nodes = Nodes{}
+	code.Nodes = Nodes{
+		Text(string(b)),
+	}
 
 	return nil
 }
@@ -139,9 +133,10 @@ func (code *SourceCode) parseRange(d *Document, src string, name string) error {
 	}
 
 	lines := bytes.Split(b, []byte("\n"))
+	ll := len(lines)
 
 	ranger := lone.Ranger{
-		End: len(lines),
+		End: ll,
 	}
 
 	if err := ranger.Parse(name); err != nil {
@@ -156,8 +151,8 @@ func (code *SourceCode) parseRange(d *Document, src string, name string) error {
 		return code.WrapErr(fmt.Errorf("failed to validate range %q: %w", name, err))
 	}
 
-	if ranger.End > len(lines) {
-		return code.WrapErr(fmt.Errorf("range %q extends past end %d of file %q", name, len(lines), src))
+	if ranger.End > ll {
+		return code.WrapErr(fmt.Errorf("range %q extends past end %d of file %q", name, ll, src))
 	}
 
 	b = bytes.Join(lines[ranger.Start:ranger.End], []byte("\n"))
@@ -171,7 +166,7 @@ func (code *SourceCode) parseRange(d *Document, src string, name string) error {
 		End:     ranger.End,
 	}
 
-	code.Snippet = snip
+	code.Nodes = Nodes{snip}
 
 	return nil
 }
@@ -229,8 +224,8 @@ func (code *SourceCode) setSnippet(snippet Snippet) error {
 		return err
 	}
 
-	code.Snippet = snippet
 	code.Lang = snippet.Lang
+	code.Nodes = Nodes{snippet}
 
 	if err := code.Set("language", code.Lang); err != nil {
 		return err

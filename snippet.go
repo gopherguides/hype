@@ -28,6 +28,10 @@ func (snip Snippet) IsZero() bool {
 	return snip.Content == ""
 }
 
+func (snip Snippet) Children() Nodes {
+	return nil
+}
+
 type Snippets struct {
 	snippets map[string]map[string]Snippet
 	rules    map[string]string
