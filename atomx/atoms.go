@@ -196,6 +196,7 @@ const (
 	Menu                      Atom = "menu"
 	Menuitem                  Atom = "menuitem"
 	Meta                      Atom = "meta"
+	Metadata                  Atom = "metadata"
 	Meter                     Atom = "meter"
 	Method                    Atom = "method"
 	Mglyph                    Atom = "mglyph"

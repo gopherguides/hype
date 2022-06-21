@@ -5,6 +5,7 @@ import (
 	"fmt"
 	"path/filepath"
 	"regexp"
+	"sort"
 	"strings"
 	"sync"
 
@@ -201,7 +202,14 @@ func (sm *Snippets) Parse(path string, src []byte) (map[string]Snippet, error) {
 	}
 
 	if len(open) > 0 {
-		return nil, fmt.Errorf("unclosed snippet: %s#%s", path, open)
+		keys := make([]string, 0, len(open))
+		for k := range open {
+			keys = append(keys, k)
+		}
+
+		sort.Strings(keys)
+
+		return nil, fmt.Errorf("unclosed snippet: %s: %q", path, keys)
 	}
 
 	sm.snippets[path] = snips

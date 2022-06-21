@@ -26,6 +26,7 @@ var hype = []string{
 	"filegroup",
 	"go",
 	"include",
+	"metadata",
 	"page",
 	"ref",
 	"unknown",
