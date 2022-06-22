@@ -1,5 +1,7 @@
 package hype
 
+import "fmt"
+
 type Page struct {
 	Title string
 	*Element
@@ -16,6 +18,11 @@ func (page *Page) PostParse(p *Parser, d *Document, err error) error {
 
 	if len(page.Title) == 0 {
 		page.Title = FindTitle(page.Nodes)
+	}
+
+	mds := ByType[*Metadata](page.Children())
+	if len(mds) > 1 {
+		return fmt.Errorf("page has more than one metadata")
 	}
 
 	return nil

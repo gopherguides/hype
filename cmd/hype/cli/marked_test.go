@@ -4,7 +4,6 @@ import (
 	"bytes"
 	"context"
 	"errors"
-	"fmt"
 	"strings"
 	"testing"
 	"time"
@@ -46,7 +45,7 @@ func Test_Marked_Errors(t *testing.T) {
 
 			act := out.String()
 
-			fmt.Println(act)
+			// fmt.Println(act)
 
 			if tc.err {
 				r.Error(err)

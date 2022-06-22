@@ -1,51 +1,114 @@
 package cli
 
 import (
-	"bytes"
 	"fmt"
-	"html/template"
-	"io"
 
-	"github.com/gobuffalo/flect"
 	"github.com/gopherguides/hype"
 )
 
 type Binding struct {
-	Binder flect.Ident // book
-	Ident  flect.Ident // chapter
+	*hype.Element
+
+	Whole *Whole
 }
 
-func (bind *Binding) String() string {
-	if bind == nil {
+func (b *Binding) String() string {
+	if b == nil {
 		return ""
 	}
 
-	return bind.Ident.String()
+	return b.Children().String()
 }
 
-func (bind *Binding) PreParse(p *hype.Parser, r io.Reader) (io.Reader, error) {
-	if r == nil {
-		return r, nil
+func NewBindingNode(el *hype.Element, whole *Whole) (hype.Node, error) {
+	if el == nil {
+		return nil, fmt.Errorf("element is nil")
 	}
 
-	b, err := io.ReadAll(r)
-	if err != nil {
-		return nil, err
+	if whole == nil {
+		return nil, fmt.Errorf("whole is nil")
 	}
 
-	in := string(b)
-
-	tmpl, err := template.New("").Parse(in)
-	if err != nil {
-		return nil, fmt.Errorf("parse: %w: %s", err, in)
+	b := &Binding{
+		Element: el,
+		Whole:   whole,
 	}
 
-	bb := &bytes.Buffer{}
+	if p, ok := b.Get("part"); ok {
+		err := b.parseParts(p)
+		if err != nil {
+			return nil, err
+		}
 
-	err = tmpl.Execute(bb, bind)
-	if err != nil {
-		return nil, fmt.Errorf("execute: %w: %s", err, in)
+		return b, nil
 	}
 
-	return bb, nil
+	if p, ok := b.Get("whole"); ok {
+		err := b.parseWholes(p)
+		if err != nil {
+			return nil, err
+		}
+
+		return b, nil
+	}
+
+	return b, b.WrapErr(fmt.Errorf("binding is empty"))
+}
+
+func (b *Binding) parseWholes(p string) error {
+	if b == nil {
+		return b.WrapErr(hype.ErrIsNil("binding"))
+	}
+
+	whole := b.Whole
+
+	if whole == nil {
+		return b.WrapErr(hype.ErrIsNil("whole"))
+	}
+
+	switch p {
+	case "title":
+		b.Nodes = append(b.Nodes, hype.Text(whole.Name.Titleize().String()))
+	case "":
+		b.Nodes = append(b.Nodes, hype.Text(whole.Ident.String()))
+	}
+
+	return nil
+}
+
+func (b *Binding) parseParts(p string) error {
+
+	if b == nil {
+		return b.WrapErr(hype.ErrIsNil("binding"))
+	}
+
+	whole := b.Whole
+
+	if whole == nil {
+		return b.WrapErr(hype.ErrIsNil("whole"))
+	}
+
+	if len(p) == 0 {
+		b.Nodes = append(b.Nodes, hype.Text(whole.PartIdent.String()))
+		return nil
+	}
+
+	part, ok := whole.Parts[p]
+	if !ok {
+		return b.WrapErr(fmt.Errorf("part %q not found", p))
+	}
+	b.Nodes = append(b.Nodes, part)
+
+	return nil
+}
+
+func NewBindingNodes(whole *Whole) hype.ParseElementFn {
+	return func(p *hype.Parser, el *hype.Element) (hype.Nodes, error) {
+		b, err := NewBindingNode(el, whole)
+		if err != nil {
+			return nil, err
+		}
+
+		return hype.Nodes{b}, nil
+	}
 }

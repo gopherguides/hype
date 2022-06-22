@@ -30,6 +30,10 @@ func Markdown() PreParseFn {
 			return nil, err
 		}
 
+		b = bytes.ReplaceAll(b, []byte("&rsquo;"), []byte("'"))
+		b = bytes.ReplaceAll(b, []byte("&ldquo;"), []byte("\""))
+		b = bytes.ReplaceAll(b, []byte("&rdquo;"), []byte("\""))
+
 		return bytes.NewReader(b), nil
 	}
 

@@ -8,13 +8,15 @@ import (
 	"os"
 	"time"
 
-	"github.com/gobuffalo/flect"
 	"github.com/gopherguides/hype"
 	"github.com/markbates/cleo"
 )
 
 type Marked struct {
 	cleo.Cmd
+
+	// a folder containing all chapters of a book, for example
+	ContextPath string
 
 	Timeout time.Duration // default: 5s
 
@@ -36,27 +38,13 @@ func (cmd *Marked) Flags() (*flag.FlagSet, error) {
 	cmd.flags = flag.NewFlagSet("marked", flag.ContinueOnError)
 	cmd.flags.SetOutput(cmd.Stderr())
 	cmd.flags.DurationVar(&cmd.Timeout, "timeout", cmd.DefaultTimeout(), "timeout for execution")
+	cmd.flags.StringVar(&cmd.ContextPath, "context", cmd.ContextPath, "a folder containing all chapters of a book, for example")
 
 	return cmd.flags, nil
 }
 
-func (cmd *Marked) validate() error {
-	if cmd == nil {
-		return fmt.Errorf("cmd is nil")
-	}
-
-	cmd.Lock()
-	defer cmd.Unlock()
-
-	if cmd.FS == nil {
-		cmd.FS = os.DirFS(".")
-	}
-
-	if cmd.Timeout == 0 {
-		cmd.Timeout = cmd.DefaultTimeout()
-	}
-
-	return nil
+func (cmd *Marked) DefaultTimeout() time.Duration {
+	return time.Second * 5
 }
 
 func (cmd *Marked) Main(ctx context.Context, pwd string, args []string) error {
@@ -122,15 +110,19 @@ func (cmd *Marked) execute(ctx context.Context, pwd string) error {
 	p.Section = 1
 
 	if mp, ok := os.LookupEnv("MARKED_PATH"); ok {
-		if sec, err := SectionFromPath(mp); err == nil {
-			p.Section = sec
+		if sec, err := PartFromPath(mp); err == nil {
+			p.Section = sec.Number
 		}
 	}
 
-	p.PreParsers = append(p.PreParsers, &Binding{
-		Binder: flect.New("book"),
-		Ident:  flect.New("chapter"),
-	})
+	if len(cmd.ContextPath) > 0 {
+		w, err := WholeFromPath(cmd.ContextPath, "book", "chapter")
+		if err != nil {
+			return err
+		}
+		p.NodeParsers[hype.Atom("binding")] = NewBindingNodes(w)
+
+	}
 
 	doc, err := p.ParseExecute(ctx, cmd.Stdin())
 	if err != nil {
@@ -143,6 +135,21 @@ func (cmd *Marked) execute(ctx context.Context, pwd string) error {
 
 }
 
-func (cmd *Marked) DefaultTimeout() time.Duration {
-	return time.Second * 5
+func (cmd *Marked) validate() error {
+	if cmd == nil {
+		return fmt.Errorf("cmd is nil")
+	}
+
+	cmd.Lock()
+	defer cmd.Unlock()
+
+	if cmd.FS == nil {
+		cmd.FS = os.DirFS(".")
+	}
+
+	if cmd.Timeout == 0 {
+		cmd.Timeout = cmd.DefaultTimeout()
+	}
+
+	return nil
 }

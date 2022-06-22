@@ -20,6 +20,7 @@ func DefaultElements() map[Atom]ParseElementFn {
 		atomx.Img:        NewImageNodes,
 		atomx.Include:    NewIncludeNodes,
 		atomx.Link:       NewLinkNodes,
+		atomx.Metadata:   NewMetadataNodes,
 		atomx.Page:       NewPageNodes,
 		atomx.Ref:        NewRefNodes,
 	}
