@@ -17,16 +17,23 @@ type Figure struct {
 	style string
 }
 
+// Type returns type of the figure.
+// ex: "figure", "table", "listing", ...
+func (f *Figure) Type() string {
+	if f == nil || len(f.style) == 0 {
+		return "figure"
+	}
+
+	return f.style
+}
+
 func (f *Figure) Name() string {
 	if f == nil {
 		return ""
 	}
-	style := f.style
-	if len(style) == 0 {
-		style = "figure"
-	}
 
-	style = flect.Titleize(style)
+	style := flect.Titleize(f.Type())
+
 	return fmt.Sprintf("%s %d.%d", style, f.SectionID, f.Pos)
 }
 
@@ -112,52 +119,4 @@ func NewFigureNodes(p *Parser, el *Element) (Nodes, error) {
 	f.Unlock()
 
 	return Nodes{f}, nil
-}
-
-type IDGenerator func(i int, fig *Figure) (string, error)
-
-func RestripeFigureIDs(nodes Nodes, fn IDGenerator) error {
-	if fn == nil {
-		return ErrIsNil("IDGenerator")
-	}
-
-	figs := ByType[*Figure](nodes)
-
-	for i, fig := range figs {
-
-		fid, err := fig.ValidAttr("id")
-		if err != nil {
-			return err
-		}
-
-		uid, err := fn(i, fig)
-		if err != nil {
-			return err
-		}
-
-		if err := fig.Set("id", uid); err != nil {
-			return err
-		}
-
-		refs := ByType[*Ref](nodes)
-		for _, ref := range refs {
-			rid, err := ref.ValidAttr("id")
-			if err != nil {
-				return err
-			}
-
-			if rid != fid {
-				continue
-			}
-
-			ref.Figure = fig
-			if err := ref.Set("id", uid); err != nil {
-				return err
-			}
-
-		}
-
-	}
-
-	return nil
 }

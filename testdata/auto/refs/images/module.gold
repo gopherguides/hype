@@ -1,7 +1,7 @@
 <html><head></head><body><page>
 <h1>Image in a figure</h1>
 
-<figure id="fig-1-1">
+<figure id="figure-1-1">
 <img alt="1" src="assets/nodes.svg"></img>
 
 <img alt="2" src="assets/nodes.svg"></img>

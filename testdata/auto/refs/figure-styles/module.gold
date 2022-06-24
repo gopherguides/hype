@@ -1,0 +1,54 @@
+<html><head></head><body><page>
+<h1>Figure Styles</h1>
+
+<figure id="figure-1-1">
+<figcaption><em class="figure-name">Figure 1.1:</em> caption</figcaption>
+</figure>
+
+<figure id="listing-1-1" type="listing">
+<figcaption><em class="figure-name">Listing 1.1:</em> caption</figcaption>
+</figure>
+
+<figure id="table-1-1" type="table">
+<figcaption><em class="figure-name">Table 1.1:</em> caption</figcaption>
+</figure>
+
+<figure id="listing-1-2" type="listing">
+<figcaption><em class="figure-name">Listing 1.2:</em> caption</figcaption>
+</figure>
+
+<figure id="figure-1-2">
+<figcaption><em class="figure-name">Figure 1.2:</em> caption</figcaption>
+</figure>
+
+<figure id="table-1-2" type="table">
+<figcaption><em class="figure-name">Table 1.2:</em> caption</figcaption>
+</figure>
+
+<figure id="listing-1-3" type="listing">
+<figcaption><em class="figure-name">Listing 1.3:</em> caption</figcaption>
+</figure>
+
+<h2>Figure Refs</h2>
+
+<ul>
+<li><ref id="figure-1-1"><a href="#figure-1-1">Figure 1.1</a></ref></li>
+<li><ref id="figure-1-2"><a href="#figure-1-2">Figure 1.2</a></ref></li>
+</ul>
+
+<h2>Listing Refs</h2>
+
+<ul>
+<li><ref id="listing-1-1"><a href="#listing-1-1">Listing 1.1</a></ref></li>
+<li><ref id="listing-1-2"><a href="#listing-1-2">Listing 1.2</a></ref></li>
+<li><ref id="listing-1-3"><a href="#listing-1-3">Listing 1.3</a></ref></li>
+</ul>
+
+<h2>Table Refs</h2>
+
+<ul>
+<li><ref id="table-1-1"><a href="#table-1-1">Table 1.1</a></ref></li>
+<li><ref id="table-1-2"><a href="#table-1-2">Table 1.2</a></ref></li>
+</ul>
+</page>
+</body></html>

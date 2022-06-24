@@ -4,10 +4,8 @@ import (
 	"context"
 	"fmt"
 	"io/fs"
-	"strings"
 	"sync"
 
-	"github.com/gopherguides/hype/atomx"
 	"golang.org/x/sync/errgroup"
 )
 
@@ -106,8 +104,8 @@ func (doc *Document) Execute(ctx context.Context) error {
 
 	err = wg.Wait()
 
-	if err == nil {
-		err = doc.processRefs()
+	if err := doc.processRefs(err); err != nil {
+		return err
 	}
 
 	if perr := doc.Children().PostExecute(ctx, doc, err); perr != nil {
@@ -117,59 +115,21 @@ func (doc *Document) Execute(ctx context.Context) error {
 	return err
 }
 
-func (doc *Document) processRefs() error {
-
-	figs := ByType[*Figure](doc.Nodes)
-
-	for i, fig := range figs {
-
-		fig.Lock()
-		fig.SectionID = doc.SectionID
-		fig.Pos = i + 1
-		fig.Unlock()
-
-		caps := ByType[*Figcaption](fig.Nodes)
-
-		if len(caps) > 1 {
-			return fmt.Errorf("more than one figcaption")
-		}
-
-		fc := &Figcaption{
-			Element: NewEl(atomx.Figcaption, fig),
-		}
-
-		if len(caps) == 0 {
-			return fmt.Errorf("no figcaption: %s", fig.StartTag())
-		}
-
-		if len(caps) == 1 {
-			fc = caps[0]
-		}
-
-		fcb := fc.Nodes.String()
-		fcb = strings.TrimSpace(fcb)
-
-		if len(fcb) == 0 {
-			return fmt.Errorf("empty figcaption: %s", fig.StartTag())
-		}
-
-		em := NewEl(atomx.Em, fc)
-
-		if err := em.Set("class", "figure-name"); err != nil {
-			return err
-		}
-
-		em.Nodes = append(em.Nodes, Text(fmt.Sprintf("%s:", fig.Name())))
-
-		fcns := fc.Nodes
-		fc.Nodes = Nodes{em, Text(" ")}
-		fc.Nodes = append(fc.Nodes, fcns...)
-
+func (doc *Document) processRefs(err error) error {
+	if err != nil {
+		return nil
 	}
 
-	fn := func(i int, fig *Figure) (string, error) {
-		return fmt.Sprintf("fig-%d-%d", fig.SectionID, fig.Pos), nil
+	if doc == nil {
+		return ErrIsNil("document")
 	}
 
-	return RestripeFigureIDs(doc.Nodes, fn)
+	rp := &RefProcessor{}
+
+	err = rp.Process(doc)
+	if err != nil {
+		return err
+	}
+
+	return nil
 }
