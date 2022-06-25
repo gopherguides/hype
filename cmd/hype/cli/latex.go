@@ -61,11 +61,8 @@ func (cmd *Latex) Flags() (flags *flag.FlagSet, err error) {
 	cmd.flags.SetOutput(cmd.Stderr())
 
 	cmd.flags.DurationVar(&cmd.Timeout, "t", DefaultTimeout(), "timeout for execution")
-	cmd.flags.DurationVar(&cmd.Timeout, "timeout", DefaultTimeout(), "timeout for execution")
 	cmd.flags.StringVar(&cmd.ContextPath, "c", cmd.ContextPath, "a folder containing all chapters of a book, for example")
-	cmd.flags.StringVar(&cmd.ContextPath, "context", cmd.ContextPath, "a folder containing all chapters of a book, for example")
 	cmd.flags.StringVar(&cmd.OutputPath, "o", "latex", "the output path")
-	cmd.flags.StringVar(&cmd.OutputPath, "output", "latex", "the output path")
 
 	return cmd.flags, nil
 }
