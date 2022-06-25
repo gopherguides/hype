@@ -2,13 +2,11 @@ package cli
 
 import (
 	"context"
-	"errors"
 	"flag"
 	"fmt"
 	"os"
 	"time"
 
-	"github.com/gopherguides/hype"
 	"github.com/markbates/cleo"
 )
 
@@ -17,8 +15,7 @@ type Marked struct {
 
 	// a folder containing all chapters of a book, for example
 	ContextPath string
-
-	Timeout time.Duration // default: 5s
+	Timeout     time.Duration // default: 5s
 
 	flags *flag.FlagSet
 }
@@ -37,14 +34,10 @@ func (cmd *Marked) Flags() (*flag.FlagSet, error) {
 
 	cmd.flags = flag.NewFlagSet("marked", flag.ContinueOnError)
 	cmd.flags.SetOutput(cmd.Stderr())
-	cmd.flags.DurationVar(&cmd.Timeout, "timeout", cmd.DefaultTimeout(), "timeout for execution")
+	cmd.flags.DurationVar(&cmd.Timeout, "timeout", DefaultTimeout(), "timeout for execution")
 	cmd.flags.StringVar(&cmd.ContextPath, "context", cmd.ContextPath, "a folder containing all chapters of a book, for example")
 
 	return cmd.flags, nil
-}
-
-func (cmd *Marked) DefaultTimeout() time.Duration {
-	return time.Second * 5
 }
 
 func (cmd *Marked) Main(ctx context.Context, pwd string, args []string) error {
@@ -61,23 +54,17 @@ func (cmd *Marked) Main(ctx context.Context, pwd string, args []string) error {
 		return err
 	}
 
-	cltx, cancel := cleo.ContextWithTimeout(ctx, cmd.Timeout)
-	defer cancel()
-
-	go func() {
-		defer cancel()
-
-		err := cmd.execute(cltx, pwd)
-		if err != nil {
-			cltx.SetErr(err)
+	err = WithTimeout(ctx, cmd.Timeout, func(ctx context.Context) error {
+		if mo, ok := os.LookupEnv("MARKED_ORIGIN"); ok {
+			pwd = mo
 		}
 
-	}()
+		return WithinDir(pwd, func() error {
+			return cmd.execute(ctx, pwd)
+		})
+	})
 
-	<-cltx.Done()
-
-	err = cltx.Err()
-	if !errors.Is(err, context.Canceled) {
+	if err != nil {
 		return err
 	}
 
@@ -89,39 +76,15 @@ func (cmd *Marked) execute(ctx context.Context, pwd string) error {
 		return err
 	}
 
-	if mo, ok := os.LookupEnv("MARKED_ORIGIN"); ok {
-		pwd = mo
+	if cmd.FS == nil {
+		cmd.FS = os.DirFS(pwd)
 	}
 
-	if len(pwd) > 0 {
-		opwd, err := os.Getwd()
-		if err != nil {
-			return err
-		}
-		defer os.Chdir(opwd)
+	mp := os.Getenv("MARKED_PATH")
 
-		if err := os.Chdir(pwd); err != nil {
-			return err
-		}
-	}
-
-	p := hype.NewParser(cmd.FS)
-
-	p.Section = 1
-
-	if mp, ok := os.LookupEnv("MARKED_PATH"); ok {
-		if sec, err := PartFromPath(mp); err == nil {
-			p.Section = sec.Number
-		}
-	}
-
-	if len(cmd.ContextPath) > 0 {
-		w, err := WholeFromPath(cmd.ContextPath, "book", "chapter")
-		if err != nil {
-			return err
-		}
-		p.NodeParsers[hype.Atom("binding")] = NewBindingNodes(w)
-
+	p, err := NewParser(cmd.FS, cmd.ContextPath, mp)
+	if err != nil {
+		return err
 	}
 
 	doc, err := p.ParseExecute(ctx, cmd.Stdin())
@@ -148,7 +111,7 @@ func (cmd *Marked) validate() error {
 	}
 
 	if cmd.Timeout == 0 {
-		cmd.Timeout = cmd.DefaultTimeout()
+		cmd.Timeout = DefaultTimeout()
 	}
 
 	return nil

@@ -4,7 +4,7 @@ In <ref id="ref1"></ref> we see the reference.
 
 <figure id="ref1">
 
-<code src="src/greet/main.go#example"></code>
+<go run="." src="src/greet"></go>
 
 <img src="assets/foo.png">
 

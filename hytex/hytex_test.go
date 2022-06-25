@@ -1,7 +1,10 @@
 package hytex
 
 import (
+	"bytes"
 	"context"
+	"fmt"
+	"io/fs"
 	"os"
 	"testing"
 	"time"
@@ -13,7 +16,6 @@ import (
 func Test_Covert(t *testing.T) {
 	t.Parallel()
 
-	t.Skip()
 	r := require.New(t)
 
 	const root = "testdata/convert"
@@ -27,8 +29,31 @@ func Test_Covert(t *testing.T) {
 	doc, err := p.ParseExecuteFile(ctx, "module.md")
 	r.NoError(err)
 
-	fs, err := Convert(ctx, doc)
+	tex, err := Convert(ctx, doc)
+	r.NoError(err)
+	r.NotNil(tex)
+
+	act, err := fs.ReadFile(tex, "module.tex")
 	r.NoError(err)
 
-	r.NotNil(fs)
+	act = bytes.TrimSpace(act)
+
+	fmt.Println(string(act))
+
+	exp, err := fs.ReadFile(cab, "module.tex.gold")
+	r.NoError(err)
+
+	exp = bytes.TrimSpace(exp)
+	r.Equal(string(exp), string(act))
+
+	assets := []string{
+		"assets/foo.png",
+		"simple/assets/foo.png",
+	}
+
+	for _, asset := range assets {
+		_, err = fs.Stat(tex, asset)
+		r.NoError(err)
+	}
+
 }
