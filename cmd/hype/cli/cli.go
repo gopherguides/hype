@@ -23,7 +23,7 @@ func New() *App {
 }
 
 func DefaultTimeout() time.Duration {
-	return time.Second * 5
+	return time.Second * 10
 }
 
 func WithinDir(dir string, f func() error) error {
