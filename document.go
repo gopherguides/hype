@@ -133,3 +133,22 @@ func (doc *Document) processRefs(err error) error {
 
 	return nil
 }
+
+type Documents []*Document
+
+func (docs Documents) Execute(ctx context.Context) error {
+	if docs == nil {
+		return ErrIsNil("documents")
+	}
+
+	wg := &errgroup.Group{}
+
+	for _, doc := range docs {
+		doc := doc
+		wg.Go(func() error {
+			return doc.Execute(ctx)
+		})
+	}
+
+	return wg.Wait()
+}

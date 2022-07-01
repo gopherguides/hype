@@ -77,6 +77,14 @@ func NewCmdResult(p *Parser, c *Cmd, res *clam.Result) (*CmdResult, error) {
 
 	cel.Nodes = append(cel.Nodes, Text(body))
 
+	if _, ok := c.Get("hide-data"); ok {
+		pre.Nodes = append(pre.Nodes, cel)
+
+		cmd.Nodes = Nodes{pre}
+
+		return cmd, nil
+	}
+
 	type dt struct {
 		key string
 		val string

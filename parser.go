@@ -7,9 +7,12 @@ import (
 	"io"
 	"io/fs"
 	"path/filepath"
+	"sort"
 	"sync"
 
+	"github.com/gopherguides/hype/binding"
 	"golang.org/x/net/html"
+	"golang.org/x/sync/errgroup"
 )
 
 type ParseElementFn func(p *Parser, el *Element) (Nodes, error)
@@ -106,6 +109,100 @@ func (p *Parser) ParseExecuteFile(ctx context.Context, name string) (*Document, 
 	return doc, nil
 }
 
+func (p *Parser) ParseFolder(name string) (Documents, error) {
+	if p == nil {
+		return nil, ErrIsNil("parser")
+	}
+
+	var docs Documents
+	var wg errgroup.Group
+	var mu sync.Mutex
+
+	whole, err := binding.WholeFromPath(p.FS, name, "book", "chapter")
+	if err != nil && !errors.Is(err, binding.ErrPath("")) {
+		return nil, p.wrapErr(err)
+	}
+
+	err = fs.WalkDir(p.FS, ".", func(path string, d fs.DirEntry, err error) error {
+		if err != nil {
+			return err
+		}
+
+		base := filepath.Base(path)
+
+		if base != "module.md" {
+			return nil
+		}
+
+		wg.Go(func() error {
+			dir := filepath.Dir(path)
+
+			var part binding.Part
+			for _, v := range whole.Parts {
+				db := filepath.Base(dir)
+				pb := filepath.Base(v.Path)
+				if db == pb {
+					part = v
+					break
+				}
+			}
+
+			p, err := p.Sub(dir)
+			if err != nil {
+				return fmt.Errorf("error getting sub fs: %q: %w", dir, err)
+			}
+
+			p.Section = part.Number
+
+			doc, err := p.ParseFile(base)
+			if err != nil {
+				return fmt.Errorf("error parsing: %q: %w", path, err)
+			}
+
+			mu.Lock()
+			docs = append(docs, doc)
+			mu.Unlock()
+
+			return nil
+		})
+
+		return filepath.SkipDir
+	})
+
+	if err != nil {
+		err = fmt.Errorf("error walking: %q: %w", name, err)
+		return nil, p.wrapErr(err)
+	}
+
+	if err := wg.Wait(); err != nil {
+		return nil, p.wrapErr(err)
+	}
+
+	sort.Slice(docs, func(i, j int) bool {
+		return docs[i].SectionID < docs[j].SectionID
+	})
+
+	return docs, nil
+}
+
+func (p *Parser) ParseExecuteFolder(ctx context.Context, name string) (Documents, error) {
+	if p == nil {
+		return nil, ErrIsNil("parser")
+	}
+
+	docs, err := p.ParseFolder(name)
+	if err != nil {
+		return nil, p.wrapErr(err)
+	}
+
+	err = docs.Execute(ctx)
+	if err != nil {
+		return nil, p.wrapErr(err)
+	}
+
+	return docs, nil
+}
+
 func (p *Parser) ParseExecuteFragment(ctx context.Context, r io.Reader) (Nodes, error) {
 	if p == nil {
 		return nil, ErrIsNil("parser")
@@ -195,6 +292,26 @@ func (p *Parser) ParseHTMLNode(node *html.Node, parent Node) (Node, error) {
 	return nil, p.wrapErr(fmt.Errorf("unknown node type %v", node.Data))
 }
 
+func (p *Parser) Sub(dir string) (*Parser, error) {
+	if p == nil {
+		return nil, ErrIsNil("parser")
+	}
+
+	cab, err := fs.Sub(p.FS, dir)
+	if err != nil {
+		return nil, p.wrapErr(err)
+	}
+
+	p2 := &Parser{
+		FS:          cab,
+		Root:        filepath.Join(p.Root, dir),
+		PreParsers:  p.PreParsers,
+		NodeParsers: p.NodeParsers,
+	}
+
+	return p2, nil
+}
+
 func (p *Parser) element(node *html.Node, parent Node) (Node, error) {
 	ats, err := ConvertHTMLAttrs(node.Attr)
 	if err != nil {
@@ -228,26 +345,6 @@ func (p *Parser) element(node *html.Node, parent Node) (Node, error) {
 	}
 
 	return el, nil
-}
-
-func (p *Parser) Sub(dir string) (*Parser, error) {
-	if p == nil {
-		return nil, ErrIsNil("parser")
-	}
-
-	cab, err := fs.Sub(p.FS, dir)
-	if err != nil {
-		return nil, p.wrapErr(err)
-	}
-
-	p2 := &Parser{
-		FS:          cab,
-		Root:        filepath.Join(p.Root, dir),
-		PreParsers:  p.PreParsers,
-		NodeParsers: p.NodeParsers,
-	}
-
-	return p2, nil
 }
 
 func NewParser(cab fs.FS) *Parser {
@@ -285,15 +382,20 @@ func (p *Parser) wrapErr(err error) error {
 		return err
 	}
 
+	p.mu.RLock()
+	defer p.mu.RUnlock()
+
 	return parserErr{
-		p:   p,
-		err: err,
+		fileName: p.fileName,
+		root:     p.Root,
+		err:      err,
 	}
 }
 
 type parserErr struct {
-	p   *Parser
-	err error
+	err      error
+	fileName string
+	root     string
 }
 
 func (pe parserErr) Error() string {
@@ -303,18 +405,12 @@ func (pe parserErr) Error() string {
 
 	err := pe.err
 
-	p := pe.p
-
-	if p == nil {
-		return err.Error()
+	if len(pe.fileName) > 0 {
+		err = fmt.Errorf("file: %q: %s", pe.fileName, err)
 	}
 
-	if len(p.fileName) > 0 {
-		err = fmt.Errorf("file: %q: %s", p.fileName, err)
-	}
-
-	if len(p.Root) > 0 {
-		err = fmt.Errorf("root: %q: %s", p.Root, err)
+	if len(pe.root) > 0 {
+		err = fmt.Errorf("root: %q: %s", pe.root, err)
 	}
 
 	return err.Error()

@@ -1,7 +1,8 @@
-package cli
+package binding
 
 import (
 	"testing"
+	"testing/fstest"
 
 	"github.com/stretchr/testify/require"
 )
@@ -44,7 +45,9 @@ func Test_PartFromPath(t *testing.T) {
 
 			r := require.New(t)
 
-			sec, err := PartFromPath(tc.in)
+			cab := fstest.MapFS{}
+
+			sec, err := PartFromPath(cab, tc.in)
 			if tc.err {
 				r.Error(err)
 				return

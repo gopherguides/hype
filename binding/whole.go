@@ -1,18 +1,17 @@
-package cli
+package binding
 
 import (
 	"encoding/json"
 	"fmt"
 	"io/fs"
-	"os"
 	"path/filepath"
 
 	"github.com/gobuffalo/flect"
 )
 
 type Whole struct {
-	flect.Ident             // book
-	PartIdent   flect.Ident // chapter
+	Ident     flect.Ident // book
+	PartIdent flect.Ident // chapter
 
 	Name  flect.Ident // "My Big Book"
 	Parts Parts       // chapters of the book
@@ -39,7 +38,7 @@ func (w *Whole) UpdatePartIdent(ident flect.Ident) {
 	w.Parts.UpdateIdent(ident)
 }
 
-func WholeFromPath(root string, wholeName string, partName string) (*Whole, error) {
+func WholeFromPath(cab fs.FS, root string, wholeName string, partName string) (*Whole, error) {
 	if len(root) == 0 {
 		return nil, fmt.Errorf("dir is empty")
 	}
@@ -51,8 +50,6 @@ func WholeFromPath(root string, wholeName string, partName string) (*Whole, erro
 		Parts:     Parts{},
 		Path:      root,
 	}
-
-	cab := os.DirFS(root)
 
 	err := fs.WalkDir(cab, ".", func(path string, d fs.DirEntry, err error) error {
 		if err != nil {
@@ -73,7 +70,12 @@ func WholeFromPath(root string, wholeName string, partName string) (*Whole, erro
 			return nil
 		}
 
-		part, err := PartFromPath(filepath.Join(root, dir))
+		cab, err := fs.Sub(cab, dir)
+		if err != nil {
+			return fmt.Errorf("error getting sub fs: %q: %w", dir, err)
+		}
+
+		part, err := PartFromPath(cab, dir)
 		if err != nil {
 			return err
 		}
@@ -86,6 +88,7 @@ func WholeFromPath(root string, wholeName string, partName string) (*Whole, erro
 	})
 
 	if err != nil {
+		panic(err)
 		return w, err
 	}
 

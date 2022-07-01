@@ -3,13 +3,15 @@ package cli
 import (
 	"fmt"
 
+	"github.com/gobuffalo/flect"
 	"github.com/gopherguides/hype"
+	"github.com/gopherguides/hype/binding"
 )
 
 type Binding struct {
 	*hype.Element
 
-	Whole *Whole
+	Whole *binding.Whole
 }
 
 func (b *Binding) String() string {
@@ -20,7 +22,7 @@ func (b *Binding) String() string {
 	return b.Children().String()
 }
 
-func NewBindingNode(el *hype.Element, whole *Whole) (hype.Node, error) {
+func NewBindingNode(p *hype.Parser, el *hype.Element, whole *binding.Whole) (hype.Node, error) {
 	if el == nil {
 		return nil, fmt.Errorf("element is nil")
 	}
@@ -34,8 +36,8 @@ func NewBindingNode(el *hype.Element, whole *Whole) (hype.Node, error) {
 		Whole:   whole,
 	}
 
-	if p, ok := b.Get("part"); ok {
-		err := b.parseParts(p)
+	if x, ok := b.Get("part"); ok {
+		err := b.parseParts(p, x)
 		if err != nil {
 			return nil, err
 		}
@@ -55,7 +57,7 @@ func NewBindingNode(el *hype.Element, whole *Whole) (hype.Node, error) {
 	return b, b.WrapErr(fmt.Errorf("binding is empty"))
 }
 
-func (b *Binding) parseWholes(p string) error {
+func (b *Binding) parseWholes(arg string) error {
 	if b == nil {
 		return b.WrapErr(hype.ErrIsNil("binding"))
 	}
@@ -66,7 +68,7 @@ func (b *Binding) parseWholes(p string) error {
 		return b.WrapErr(hype.ErrIsNil("whole"))
 	}
 
-	switch p {
+	switch arg {
 	case "title":
 		b.Nodes = append(b.Nodes, hype.Text(whole.Name.Titleize().String()))
 	case "":
@@ -76,7 +78,7 @@ func (b *Binding) parseWholes(p string) error {
 	return nil
 }
 
-func (b *Binding) parseParts(p string) error {
+func (b *Binding) parseParts(p *hype.Parser, key string) error {
 
 	if b == nil {
 		return b.WrapErr(hype.ErrIsNil("binding"))
@@ -88,27 +90,52 @@ func (b *Binding) parseParts(p string) error {
 		return b.WrapErr(hype.ErrIsNil("whole"))
 	}
 
-	if len(p) == 0 {
+	if len(key) == 0 {
 		b.Nodes = append(b.Nodes, hype.Text(whole.PartIdent.String()))
 		return nil
 	}
 
-	part, ok := whole.Parts[p]
+	part, ok := whole.Parts[key]
 	if !ok {
-		return b.WrapErr(fmt.Errorf("part %q not found", p))
+		return b.WrapErr(fmt.Errorf("part %q not found", key))
 	}
-	b.Nodes = append(b.Nodes, part)
+
+	p, err := p.Sub(part.Path)
+	if err != nil {
+		return b.WrapErr(err)
+	}
+
+	doc, err := p.ParseFile("module.md")
+	if err != nil {
+		return b.WrapErr(err)
+	}
+
+	part.Name = flect.New(doc.Title)
+
+	whole.Parts[key] = part
+
+	b.Nodes = append(b.Nodes, Part(part))
 
 	return nil
 }
 
-func NewBindingNodes(whole *Whole) hype.ParseElementFn {
+func NewBindingNodes(whole *binding.Whole) hype.ParseElementFn {
 	return func(p *hype.Parser, el *hype.Element) (hype.Nodes, error) {
-		b, err := NewBindingNode(el, whole)
+		b, err := NewBindingNode(p, el, whole)
 		if err != nil {
 			return nil, err
 		}
 
 		return hype.Nodes{b}, nil
 	}
+}
+
+type Part binding.Part
+
+func (p Part) String() string {
+	return fmt.Sprintf("\"%s %d: %s\"", p.Ident.Titleize(), p.Number, p.Name.Titleize())
+}
+
+func (p Part) Children() hype.Nodes {
+	return nil
 }

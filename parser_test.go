@@ -3,9 +3,7 @@ package hype
 import (
 	"context"
 	"fmt"
-	"io/fs"
 	"os"
-	"strings"
 	"testing"
 	"testing/fstest"
 
@@ -122,29 +120,29 @@ func main() {
 	fmt.Println("Hello %s!")
 }`
 
-func Test_Full_Module(t *testing.T) {
+func Test_Parser_ParseFolder(t *testing.T) {
 	t.Parallel()
-	t.Skip()
 	r := require.New(t)
 
-	cab := os.DirFS("testdata/full")
+	root := "testdata/parser/folder"
+	cab := os.DirFS(root)
 
-	p := &Parser{
-		FS: cab,
+	p := NewParser(cab)
+	p.Root = root
+
+	docs, err := p.ParseExecuteFolder(context.Background(), root)
+	r.NoError(err)
+
+	r.Len(docs, 3)
+
+	exp := `var Canceled = errors.New`
+
+	titles := []string{"ONE", "TWO", "THREE"}
+
+	for i, doc := range docs {
+		r.Equal(titles[i], doc.Title)
+		act := doc.String()
+		r.Contains(act, exp)
 	}
-
-	doc, err := p.ParseExecuteFile(context.Background(), "module.md")
-	r.NoError(err)
-
-	act := doc.String()
-	act = strings.TrimSpace(act)
-
-	b, err := fs.ReadFile(cab, "output.txt")
-	r.NoError(err)
-
-	exp := string(b)
-	exp = strings.TrimSpace(exp)
-
-	r.Equal(exp, act)
 
 }

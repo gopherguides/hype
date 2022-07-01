@@ -25,6 +25,7 @@ type Latex struct {
 	ContextPath string
 	OutputPath  string
 	Timeout     time.Duration // default: 5s
+	FolderName  bool
 
 	flags *flag.FlagSet
 }
@@ -60,6 +61,7 @@ func (cmd *Latex) Flags() (flags *flag.FlagSet, err error) {
 	cmd.flags = flag.NewFlagSet("latex", flag.ContinueOnError)
 	cmd.flags.SetOutput(cmd.Stderr())
 
+	cmd.flags.BoolVar(&cmd.FolderName, "f", cmd.FolderName, "use the folder name as the output file name")
 	cmd.flags.DurationVar(&cmd.Timeout, "t", DefaultTimeout(), "timeout for execution")
 	cmd.flags.StringVar(&cmd.ContextPath, "c", cmd.ContextPath, "a folder containing all chapters of a book, for example")
 	cmd.flags.StringVar(&cmd.OutputPath, "o", "latex", "the output path")
@@ -150,6 +152,7 @@ func (cmd *Latex) executeFolder(ctx context.Context, cab fs.FS, pwd string) erro
 			return nil
 		}
 
+		fmt.Fprintln(cmd.Stdout(), "Processing: ", path)
 		dir := filepath.Dir(path)
 
 		cab, err := fs.Sub(cab, dir)
@@ -171,7 +174,7 @@ func (cmd *Latex) executeFolder(ctx context.Context, cab fs.FS, pwd string) erro
 			return cmd.executeFile(ctx, man)
 		})
 
-		return nil
+		return filepath.SkipDir
 	})
 
 	if err != nil {
@@ -276,7 +279,12 @@ func (cmd *Latex) dumpFile(cab fs.FS, op string, file string) error {
 
 	defer src.Close()
 
+	if file == "module.tex" && cmd.FolderName {
+		file = filepath.Base(op) + ".tex"
+	}
+
 	fp := filepath.Join(op, file)
+
 	err = os.MkdirAll(filepath.Dir(fp), 0755)
 	if err != nil {
 		return err

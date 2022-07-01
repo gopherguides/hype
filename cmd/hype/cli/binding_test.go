@@ -8,6 +8,7 @@ import (
 
 	"github.com/gobuffalo/flect"
 	"github.com/gopherguides/hype"
+	"github.com/gopherguides/hype/binding"
 	"github.com/stretchr/testify/require"
 )
 
@@ -19,7 +20,7 @@ func Test_NewBindingNode(t *testing.T) {
 	root := "testdata/whole/simple"
 	cab := os.DirFS(root)
 
-	whole, err := WholeFromPath(root, "book", "chapter")
+	whole, err := binding.WholeFromPath(cab, root, "book", "chapter")
 	whole.Name = flect.New("My Big Book")
 
 	r.NoError(err)
