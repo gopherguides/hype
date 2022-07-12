@@ -24,6 +24,7 @@ func Markdown() PreParseFn {
 		if err != nil {
 			return nil, err
 		}
+		b = bytes.ReplaceAll(b, []byte("\\n"), []byte("  \n"))
 
 		b, err = md.Parse(b)
 		if err != nil {

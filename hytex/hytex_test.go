@@ -6,6 +6,7 @@ import (
 	"fmt"
 	"io/fs"
 	"os"
+	"runtime"
 	"testing"
 	"time"
 
@@ -44,6 +45,8 @@ func Test_Covert(t *testing.T) {
 	r.NoError(err)
 
 	exp = bytes.TrimSpace(exp)
+	exp = bytes.ReplaceAll(exp, []byte("GO_VERSION"), []byte(runtime.Version()))
+
 	r.Equal(string(exp), string(act))
 
 	assets := []string{

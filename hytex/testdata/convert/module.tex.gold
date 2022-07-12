@@ -22,7 +22,7 @@ This \protect\hyperlink{figure-1-1}{Figure 1.1} is in an included file.
 \NormalTok{    Canceled is the error returned by Context.Err when the context is canceled.}
 
 \NormalTok{{-}{-}{-}{-}{-}{-}{-}{-}{-}{-}{-}{-}{-}{-}{-}{-}{-}{-}{-}{-}{-}{-}{-}{-}{-}{-}{-}{-}{-}{-}{-}{-}{-}{-}{-}{-}{-}{-}{-}{-}{-}{-}{-}{-}{-}{-}{-}{-}{-}{-}{-}{-}{-}{-}{-}{-}{-}{-}{-}{-}{-}{-}{-}{-}{-}{-}{-}{-}{-}{-}{-}{-}{-}{-}{-}{-}{-}{-}{-}{-}}
-\NormalTok{Go Version: go1.19beta1}
+\NormalTok{Go Version: GO_VERSION}
 \end{Highlighting}
 \end{Shaded}
 

@@ -15,6 +15,7 @@ type Marked struct {
 
 	// a folder containing all chapters of a book, for example
 	ContextPath string
+	File        string        // optional file name to preview
 	Timeout     time.Duration // default: 5s
 
 	flags *flag.FlagSet
@@ -36,6 +37,7 @@ func (cmd *Marked) Flags() (*flag.FlagSet, error) {
 	cmd.flags.SetOutput(cmd.Stderr())
 	cmd.flags.DurationVar(&cmd.Timeout, "timeout", DefaultTimeout(), "timeout for execution")
 	cmd.flags.StringVar(&cmd.ContextPath, "context", cmd.ContextPath, "a folder containing all chapters of a book, for example")
+	cmd.flags.StringVar(&cmd.File, "f", cmd.File, "optional file name to preview")
 
 	return cmd.flags, nil
 }
@@ -85,6 +87,16 @@ func (cmd *Marked) execute(ctx context.Context, pwd string) error {
 	p, err := NewParser(cmd.FS, cmd.ContextPath, mp)
 	if err != nil {
 		return err
+	}
+
+	if len(cmd.File) > 0 {
+		f, err := cmd.FS.Open(cmd.File)
+		if err != nil {
+			return err
+		}
+		defer f.Close()
+
+		cmd.IO.In = f
 	}
 
 	doc, err := p.ParseExecute(ctx, cmd.Stdin())

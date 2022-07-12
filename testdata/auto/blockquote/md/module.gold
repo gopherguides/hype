@@ -1,0 +1,10 @@
+<html><head></head><body><page>
+<h1>Blockquote</h1>
+
+<blockquote>
+<p>You're gonna <strong>shine</strong></p>
+
+<p>You're gonna <pre><code class="language-txt" language="txt" src="shine.txt">shine</code></pre></p>
+</blockquote>
+</page>
+</body></html>

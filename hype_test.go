@@ -6,6 +6,8 @@ import (
 	"io/fs"
 	"os"
 	"path/filepath"
+	"runtime"
+	"strings"
 	"testing"
 	"time"
 
@@ -56,6 +58,7 @@ func testModule(t testing.TB, root string) {
 	r.NoError(err)
 
 	exp := string(b)
+	exp = strings.ReplaceAll(exp, "GO_VERSION", runtime.Version())
 
 	if exp != act {
 		fmt.Println(act)
