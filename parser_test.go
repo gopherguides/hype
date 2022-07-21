@@ -62,10 +62,10 @@ more words`)
 
 <pre><code class="language-go" language="go" src="second/src/main.go">package main
 
-import "fmt"
+import &#34;fmt&#34;
 
 func main() {
-	fmt.Println("Hello second!")
+	fmt.Println(&#34;Hello second!&#34;)
 }</code></pre>
 </page>
 
@@ -80,7 +80,7 @@ hello</code></pre></cmd>
 
 	act := doc.String()
 
-	// fmt.Println(act)
+	fmt.Println(act)
 	r.Equal(exp, act)
 }
 

@@ -4,6 +4,7 @@ import (
 	"bytes"
 	"context"
 	"fmt"
+	"html"
 	"io/fs"
 	"path/filepath"
 	"strings"
@@ -108,8 +109,10 @@ func (code *SourceCode) Execute(ctx context.Context, d *Document) error {
 		return fmt.Errorf("failed to trim comments from file %q: %w", src, err)
 	}
 
+	s := html.EscapeString(string(b))
+
 	code.Nodes = Nodes{
-		Text(string(b)),
+		Text(s),
 	}
 
 	return nil
