@@ -2,6 +2,7 @@ package binding
 
 import (
 	"encoding/json"
+	"errors"
 	"fmt"
 	"io/fs"
 	"path/filepath"
@@ -87,8 +88,7 @@ func WholeFromPath(cab fs.FS, root string, wholeName string, partName string) (*
 		return nil
 	})
 
-	if err != nil {
-		panic(err)
+	if err != nil && !errors.Is(err, ErrPath("")) {
 		return w, err
 	}
 
