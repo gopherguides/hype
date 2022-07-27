@@ -83,6 +83,9 @@ func (doc *Document) String() string {
 	return doc.Children().String()
 }
 
+// Execute the Document with the given context.
+// Any child nodes that implement the PreExecuter,
+// ExecutableNode, or PostExecuter interfaces will be executed.
 func (doc *Document) Execute(ctx context.Context) error {
 	if doc == nil {
 		return ErrIsNil("document")

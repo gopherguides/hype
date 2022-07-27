@@ -31,6 +31,9 @@ type Parser struct {
 	mu       sync.RWMutex
 }
 
+// ParseFile parses the given file from Parser.FS.
+// If successful a *Document is returned. The returned
+// *Document is NOT yet executed.
 func (p *Parser) ParseFile(name string) (*Document, error) {
 	if p == nil {
 		return nil, ErrIsNil("parser")
