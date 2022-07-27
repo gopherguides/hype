@@ -163,6 +163,8 @@ func NewAttrCode(p *Parser, el *Element) (Nodes, error) {
 
 	nodes = append(nodes, codes...)
 
+	nodes = append(nodes, NewEl("hr", nil))
+
 	return nodes, nil
 }
 

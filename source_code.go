@@ -35,9 +35,20 @@ func (code *SourceCode) EndTag() string {
 }
 
 func (code *SourceCode) String() string {
+	if code == nil {
+		return ""
+	}
+
 	bb := &bytes.Buffer{}
 	bb.WriteString(code.StartTag())
-	bb.WriteString(code.Children().String())
+
+	s := code.Children().String()
+
+	if _, ok := code.Get("esc"); ok {
+		s = html.EscapeString(s)
+	}
+
+	bb.WriteString(s)
 	bb.WriteString(code.EndTag())
 
 	return bb.String()

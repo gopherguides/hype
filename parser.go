@@ -347,6 +347,9 @@ func (p *Parser) element(node *html.Node, parent Node) (Node, error) {
 	return el, nil
 }
 
+// NewParser returns a fully initialized Parser.
+// This includes the Markdown pre-parser and the
+// default node parsers.
 func NewParser(cab fs.FS) *Parser {
 	return &Parser{
 		FS:          cab,

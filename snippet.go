@@ -58,7 +58,7 @@ func (sm *Snippets) init() {
 			sm.rules = map[string]string{
 				".go":   "// %s",
 				".html": "<!-- %s -->",
-				".md":   "// %s",
+				".md":   "<!-- %s -->",
 				".rb":   "# %s",
 			}
 		}
