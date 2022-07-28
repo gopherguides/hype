@@ -7,6 +7,7 @@ import (
 	"os"
 	"time"
 
+	"github.com/gopherguides/hype"
 	"github.com/markbates/cleo"
 )
 
@@ -17,6 +18,7 @@ type Marked struct {
 	ContextPath string
 	File        string        // optional file name to preview
 	Timeout     time.Duration // default: 5s
+	Parser      *hype.Parser  // If nil, a default parser is used.
 
 	flags *flag.FlagSet
 }
@@ -74,7 +76,8 @@ func (cmd *Marked) Main(ctx context.Context, pwd string, args []string) error {
 }
 
 func (cmd *Marked) execute(ctx context.Context, pwd string) error {
-	if err := cmd.validate(); err != nil {
+	err := cmd.validate()
+	if err != nil {
 		return err
 	}
 
@@ -84,9 +87,13 @@ func (cmd *Marked) execute(ctx context.Context, pwd string) error {
 
 	mp := os.Getenv("MARKED_PATH")
 
-	p, err := NewParser(cmd.FS, cmd.ContextPath, mp)
-	if err != nil {
-		return err
+	p := cmd.Parser
+
+	if p == nil {
+		p, err = NewParser(cmd.FS, cmd.ContextPath, mp)
+		if err != nil {
+			return err
+		}
 	}
 
 	if len(cmd.File) > 0 {
