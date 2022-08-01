@@ -111,6 +111,15 @@ func (cmd *Marked) execute(ctx context.Context, pwd string) error {
 		return err
 	}
 
+	pages, err := doc.Pages()
+	if err != nil {
+		return err
+	}
+
+	for _, page := range pages {
+		page.Nodes = append(page.Nodes, hype.Text("\n<!--BREAK-->\n"))
+	}
+
 	fmt.Fprintln(cmd.Stdout(), doc.String())
 
 	return nil
