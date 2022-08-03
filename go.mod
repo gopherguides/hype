@@ -12,7 +12,7 @@ require (
 	github.com/mattn/go-shellwords v1.0.12
 	github.com/russross/blackfriday/v2 v2.1.0
 	github.com/stretchr/testify v1.7.4
-	golang.org/x/net v0.0.0-20220728211354-c7608f3a8462
+	golang.org/x/net v0.0.0-20220802222814-0bcc04d9c69b
 	golang.org/x/sync v0.0.0-20220722155255-886fb9371eb4
 )
 
