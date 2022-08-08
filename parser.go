@@ -300,17 +300,23 @@ func (p *Parser) Sub(dir string) (*Parser, error) {
 		return nil, ErrIsNil("parser")
 	}
 
+	p2 := &Parser{
+		FS:          p.FS,
+		Root:        filepath.Join(p.Root, dir),
+		PreParsers:  p.PreParsers,
+		NodeParsers: p.NodeParsers,
+	}
+
+	if len(dir) == 0 || dir == "." {
+		return p2, nil
+	}
+
 	cab, err := fs.Sub(p.FS, dir)
 	if err != nil {
 		return nil, p.wrapErr(err)
 	}
 
-	p2 := &Parser{
-		FS:          cab,
-		Root:        filepath.Join(p.Root, dir),
-		PreParsers:  p.PreParsers,
-		NodeParsers: p.NodeParsers,
-	}
+	p2.FS = cab
 
 	return p2, nil
 }

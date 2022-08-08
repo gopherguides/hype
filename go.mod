@@ -4,7 +4,7 @@ go 1.19
 
 require (
 	github.com/gobuffalo/flect v0.2.5
-	github.com/markbates/clam v0.0.0-20220522031332-01a04f03fce1
+	github.com/markbates/clam v0.0.0-20220808175708-ef60f46826fb
 	github.com/markbates/cleo v0.0.0-20220728215459-2649bfb4e1c2
 	github.com/markbates/fsx v1.2.0
 	github.com/markbates/sweets v0.0.0-20210926032915-062eb9bcc0e5
@@ -12,7 +12,7 @@ require (
 	github.com/mattn/go-shellwords v1.0.12
 	github.com/russross/blackfriday/v2 v2.1.0
 	github.com/stretchr/testify v1.7.4
-	golang.org/x/net v0.0.0-20220802222814-0bcc04d9c69b
+	golang.org/x/net v0.0.0-20220805013720-a33c5aa5df48
 	golang.org/x/sync v0.0.0-20220722155255-886fb9371eb4
 )
 

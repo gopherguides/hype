@@ -91,6 +91,14 @@ func NewCmdResult(p *Parser, c *Cmd, res *clam.Result) (*CmdResult, error) {
 	}
 
 	datum := []dt{}
+
+	if _, ok := c.Get("show-duration"); ok {
+		datum = append(datum, dt{
+			key: "Duration",
+			val: res.Duration.String(),
+		})
+	}
+
 	ats.Range(func(k string, v string) bool {
 		if !strings.HasPrefix(k, "data-") {
 			return true

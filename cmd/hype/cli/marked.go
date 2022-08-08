@@ -116,7 +116,11 @@ func (cmd *Marked) execute(ctx context.Context, pwd string) error {
 		return err
 	}
 
-	for _, page := range pages {
+	for i, page := range pages {
+		if i+1 == len(pages) {
+			break
+		}
+
 		page.Nodes = append(page.Nodes, hype.Text("\n<!--BREAK-->\n"))
 	}
 
