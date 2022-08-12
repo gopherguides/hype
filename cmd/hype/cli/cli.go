@@ -19,6 +19,7 @@ func New() *App {
 	app.Add("preview", &Marked{})
 	app.Add("marked", &Marked{})
 	app.Add("latex", &Latex{})
+	app.Add("vscode", &VSCode{})
 	return app
 }
 
