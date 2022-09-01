@@ -303,3 +303,13 @@ func (code *SourceCode) validate() error {
 
 	return nil
 }
+
+func (code *SourceCode) updateFileName(dir string) {
+	src, _ := code.Get("src")
+	if strings.HasPrefix(src, dir) {
+		return
+	}
+
+	src = filepath.Join(dir, src)
+	code.Set("src", src)
+}

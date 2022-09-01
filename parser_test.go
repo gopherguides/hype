@@ -80,7 +80,7 @@ hello</code></pre></cmd>
 
 	act := doc.String()
 
-	fmt.Println(act)
+	// fmt.Println(act)
 	r.Equal(exp, act)
 }
 

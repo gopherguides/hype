@@ -1,16 +1,17 @@
 package cli
 
 import (
-	"bytes"
 	"context"
 	"encoding/json"
 	"flag"
 	"fmt"
 	"os"
 	"path/filepath"
+	"strings"
 	"time"
 
 	"github.com/gopherguides/hype"
+	"github.com/gopherguides/hype/atomx"
 	"github.com/markbates/cleo"
 )
 
@@ -63,6 +64,10 @@ func (cmd *VSCode) Main(ctx context.Context, pwd string, args []string) error {
 		return fmt.Errorf("no filename specified")
 	}
 
+	if len(cmd.Host) == 0 {
+		return fmt.Errorf("no host specified")
+	}
+
 	path := args[0]
 
 	pwd = filepath.Dir(path)
@@ -90,17 +95,41 @@ func (cmd *VSCode) execute(ctx context.Context, pwd string, name string) error {
 
 	p := hype.NewParser(cmd.FS)
 
+	ncn := p.NodeParsers[atomx.Code]
+	if ncn == nil {
+		ncn = hype.NewCodeNodes
+	}
+
+	p.NodeParsers[atomx.Code] = func(p *hype.Parser, el *hype.Element) (hype.Nodes, error) {
+		nodes, err := ncn(p, el)
+		if err != nil {
+			return nil, err
+		}
+
+		src, ok := el.Get("src")
+		if !ok {
+			return nodes, nil
+		}
+
+		vel := hype.NewEl("vscode", nil)
+		vs := &vscode{
+			Element: vel,
+		}
+
+		vs.Set("src", src)
+
+		nodes = append(nodes, vs)
+
+		return nodes, nil
+
+	}
+
 	doc, err := p.ParseExecuteFile(ctx, name)
 	if err != nil {
 		return err
 	}
 
 	body, err := doc.Body()
-	if err != nil {
-		return err
-	}
-
-	toc, err := cmd.toc(p, body)
 	if err != nil {
 		return err
 	}
@@ -114,10 +143,15 @@ func (cmd *VSCode) execute(ctx context.Context, pwd string, name string) error {
 		}
 	}
 
+	tc, err := cmd.toc(p, body)
+	if err != nil {
+		return err
+	}
+
 	data := map[string]any{
 		"title": doc.Title,
 		"body":  body.Children().String(),
-		"toc":   toc.String(),
+		"toc":   tc,
 	}
 
 	if err := json.NewEncoder(cmd.Stdout()).Encode(data); err != nil {
@@ -127,25 +161,23 @@ func (cmd *VSCode) execute(ctx context.Context, pwd string, name string) error {
 	return nil
 }
 
-func (cmd *VSCode) toc(p *hype.Parser, body *hype.Body) (hype.Nodes, error) {
+func (cmd *VSCode) toc(p *hype.Parser, body *hype.Body) (string, error) {
+	toc, err := hype.GenerateToC(p, body.Children())
+	if err != nil {
+		return "", err
+	}
+
 	headings := hype.ByType[*hype.Heading](body.Children())
 
-	bb := &bytes.Buffer{}
-
 	for i, h := range headings {
-		t := h.Children().String()
-
-		for i := 1; i < h.Level(); i++ {
-			fmt.Fprint(bb, "\t")
-		}
-
-		fmt.Fprintf(bb, "1. <a href=\"#heading-%d\">%s</a>\n", i, t)
-
-		link := hype.Text(fmt.Sprintf("<a id=\"heading-%d\"></a>%s", i, t))
+		x := h.Children().String()
+		link := hype.Text(fmt.Sprintf("<a id=\"heading-%d\"></a>%s", i, x))
 		h.Nodes = hype.Nodes{link}
 	}
 
-	return p.ParseFragment(bb)
+	tc := fmt.Sprintf("<div id=\"menu\">\n%s\n</div>\n", toc.String())
+
+	return tc, nil
 }
 
 func (cmd *VSCode) validate() error {
@@ -164,5 +196,21 @@ func (cmd *VSCode) validate() error {
 		cmd.Timeout = DefaultTimeout()
 	}
 
+	return nil
+}
+
+type vscode struct {
+	*hype.Element
+}
+
+func (v *vscode) PostExecute(ctx context.Context, doc *hype.Document, err error) error {
+	if err != nil {
+		return nil
+	}
+
+	src, _ := v.Get("src")
+
+	src = strings.Split(src, "#")[0]
+	v.Nodes = append(v.Nodes, hype.Text(fmt.Sprintf("<a href=\"%s\">OPEN %s</a>", src, src)))
 	return nil
 }

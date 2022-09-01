@@ -23,6 +23,7 @@ func DefaultElements() map[Atom]ParseElementFn {
 		atomx.Metadata:   NewMetadataNodes,
 		atomx.Page:       NewPageNodes,
 		atomx.Ref:        NewRefNodes,
+		"toc":            NewToCNodes,
 	}
 
 	for _, h := range atomx.Headings() {

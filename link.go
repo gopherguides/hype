@@ -23,9 +23,9 @@ func NewLink(el *Element) (*Link, error) {
 		Element: el,
 	}
 
-	h, err := l.Href()
-	if err != nil {
-		return nil, err
+	h, ok := l.Get("href")
+	if !ok {
+		return l, nil
 	}
 
 	if !strings.HasPrefix(h, "http") {
