@@ -179,7 +179,8 @@ func (cmd *VSCode) toc(p *hype.Parser, body *hype.Body) (string, error) {
 		h.Nodes = hype.Nodes{link}
 	}
 
-	tc := fmt.Sprintf("<div id=\"menu\">\n%s\n</div>\n", toc.String())
+	// tc := fmt.Sprintf("<div id=\"menu\">\n%s\n</div>\n", toc.String())
+	tc := toc.String()
 
 	return tc, nil
 }
