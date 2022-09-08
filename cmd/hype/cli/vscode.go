@@ -175,7 +175,12 @@ func (cmd *VSCode) toc(p *hype.Parser, body *hype.Body) (string, error) {
 
 	for i, h := range headings {
 		x := h.Children().String()
-		link := hype.Text(fmt.Sprintf("<a id=\"heading-%d\"></a>%s", i, x))
+		class := ""
+		if h.Level() == 1 {
+			class = "toc-h1"
+		}
+
+		link := hype.Text(fmt.Sprintf("<a id=\"heading-%d\" class=\"%s\"></a>%s", i, class, x))
 		h.Nodes = hype.Nodes{link}
 	}
 
