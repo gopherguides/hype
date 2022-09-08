@@ -1,4 +1,4 @@
-Simple References
+# Simple References
 
 In <ref id="ref1"></ref> we see the reference.
 

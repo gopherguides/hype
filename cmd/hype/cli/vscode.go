@@ -215,6 +215,6 @@ func (v *vscode) PostExecute(ctx context.Context, doc *hype.Document, err error)
 	src, _ := v.Get("src")
 
 	src = strings.Split(src, "#")[0]
-	v.Nodes = append(v.Nodes, hype.Text(fmt.Sprintf("<a href=\"%s\">OPEN %s</a>", src, src)))
+	v.Nodes = append(v.Nodes, hype.Text(fmt.Sprintf("<a href=\"%s\" class=\"file-open\"><i class=\"fa-duotone fa-file-pen\"></i> %s</a>", src, src)))
 	return nil
 }
