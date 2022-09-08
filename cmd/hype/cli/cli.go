@@ -46,6 +46,10 @@ func WithinDir(dir string, f func() error) error {
 }
 
 func WithTimeout(ctx context.Context, timeout time.Duration, f func(context.Context) error) error {
+	if timeout == 0 {
+		timeout = DefaultTimeout()
+	}
+
 	cltx, cancel := cleo.ContextWithTimeout(ctx, timeout)
 	defer cancel()
 

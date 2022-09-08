@@ -43,11 +43,13 @@ func (c *Cmd) Execute(ctx context.Context, doc *Document) error {
 		return ErrIsNil("document")
 	}
 
-	if c.Timeout > 0 {
-		var cancel context.CancelFunc
-		ctx, cancel = context.WithTimeout(ctx, c.Timeout)
-		defer cancel()
+	if c.Timeout == 0 {
+		c.Timeout = time.Second * 30
 	}
+
+	var cancel context.CancelFunc
+	ctx, cancel = context.WithTimeout(ctx, c.Timeout)
+	defer cancel()
 
 	cmd := &clam.Cmd{
 		Env: c.Env,
