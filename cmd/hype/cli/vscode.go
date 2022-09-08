@@ -20,6 +20,7 @@ type VSCode struct {
 
 	Timeout time.Duration
 	Host    string
+	Parser  *hype.Parser // If nil, a default parser is used.
 
 	flags *flag.FlagSet
 }
@@ -93,7 +94,10 @@ func (cmd *VSCode) execute(ctx context.Context, pwd string, name string) error {
 		return err
 	}
 
-	p := hype.NewParser(cmd.FS)
+	p := cmd.Parser
+	if p == nil {
+		p = hype.NewParser(cmd.FS)
+	}
 
 	ncn := p.NodeParsers[atomx.Code]
 	if ncn == nil {
