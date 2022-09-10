@@ -1,0 +1,9 @@
+<html><head></head><body><page>
+<h1>Now Tag</h1>
+
+<p>Formatted: <now gofmt="02 Jan 06 15:04 MST">24 Aug 76 12:34 UTC</now>.
+Unformatted: <now>1976-08-24 12:34:00 +0000 UTC</now>.</p>
+
+<p>Kitchen: <now gofmt="Kitchen">12:34PM</now>.</p>
+</page>
+</body></html>

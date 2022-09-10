@@ -9,6 +9,7 @@ import (
 	"path/filepath"
 	"sort"
 	"sync"
+	"time"
 
 	"github.com/gopherguides/hype/binding"
 	"golang.org/x/net/html"
@@ -26,9 +27,18 @@ type Parser struct {
 	PreParsers   PreParsers
 	Snippets     *Snippets
 	Section      int
+	NowFn        func() time.Time // default: time.Now()
 
 	fileName string
 	mu       sync.RWMutex
+}
+
+func (p *Parser) Now() time.Time {
+	if p == nil || p.NowFn == nil {
+		return time.Now()
+	}
+
+	return p.NowFn()
 }
 
 // ParseFile parses the given file from Parser.FS.
