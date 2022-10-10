@@ -16,10 +16,29 @@ func New() *App {
 		FS: os.DirFS("."),
 	}
 
-	app.Add("preview", &Marked{})
-	app.Add("marked", &Marked{})
-	app.Add("latex", &Latex{})
-	app.Add("vscode", &VSCode{})
+	app.Plugins = append(app.Plugins,
+		&Marked{
+			Cmd: cleo.Cmd{
+				Name: "marked",
+			},
+		},
+		&Marked{
+			Cmd: cleo.Cmd{
+				Name: "preview",
+			},
+		},
+		&Latex{
+			Cmd: cleo.Cmd{
+				Name: "latex",
+			},
+		},
+		&VSCode{
+			Cmd: cleo.Cmd{
+				Name: "vscode",
+			},
+		},
+	)
+
 	return app
 }
 

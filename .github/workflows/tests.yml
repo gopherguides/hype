@@ -6,13 +6,13 @@ jobs:
     runs-on: ${{ matrix.os }}
     strategy:
       matrix:
-        go-version: [1.18.x]
+        go-version: [1.19.x]
         os: [macos-latest, ubuntu-latest]
     steps:
       - name: Set up Go
         uses: actions/setup-go@v2
         with:
-          go-version: 1.18.x
+          go-version: 1.19.x
       - name: Configure git for private modules
         env:
           GOPRIVATE: "github.com"
