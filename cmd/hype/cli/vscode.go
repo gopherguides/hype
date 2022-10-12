@@ -5,6 +5,7 @@ import (
 	"encoding/json"
 	"flag"
 	"fmt"
+	"io"
 	"os"
 	"path/filepath"
 	"strings"
@@ -13,6 +14,7 @@ import (
 	"github.com/gopherguides/hype"
 	"github.com/gopherguides/hype/atomx"
 	"github.com/markbates/cleo"
+	"github.com/markbates/plugins"
 )
 
 type VSCode struct {
@@ -38,7 +40,7 @@ func (cmd *VSCode) Flags() (*flag.FlagSet, error) {
 	}
 
 	cmd.flags = flag.NewFlagSet("vscode", flag.ContinueOnError)
-	cmd.flags.SetOutput(cmd.Stderr())
+	cmd.flags.SetOutput(io.Discard)
 	cmd.flags.DurationVar(&cmd.Timeout, "timeout", DefaultTimeout(), "timeout for execution")
 	cmd.flags.StringVar(&cmd.Host, "host", "", "host to serve on")
 
@@ -47,26 +49,28 @@ func (cmd *VSCode) Flags() (*flag.FlagSet, error) {
 
 func (cmd *VSCode) Main(ctx context.Context, pwd string, args []string) error {
 	if err := cmd.validate(); err != nil {
-		return err
+		return plugins.Wrap(cmd, err)
 	}
 
 	flags, err := cmd.Flags()
 	if err != nil {
-		return err
+		return plugins.Wrap(cmd, err)
 	}
 
 	if err := flags.Parse(args); err != nil {
-		return err
+		return plugins.Wrap(cmd, err)
 	}
 
 	args = flags.Args()
 
 	if len(args) < 1 {
-		return fmt.Errorf("no filename specified")
+		err = fmt.Errorf("no filename specified")
+		return plugins.Wrap(cmd, err)
 	}
 
 	if len(cmd.Host) == 0 {
-		return fmt.Errorf("no host specified")
+		err = fmt.Errorf("no host specified")
+		return plugins.Wrap(cmd, err)
 	}
 
 	path := args[0]
@@ -83,7 +87,7 @@ func (cmd *VSCode) Main(ctx context.Context, pwd string, args []string) error {
 	})
 
 	if err != nil {
-		return err
+		return plugins.Wrap(cmd, err)
 	}
 	return nil
 }

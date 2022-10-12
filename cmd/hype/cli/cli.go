@@ -7,34 +7,80 @@ import (
 	"time"
 
 	"github.com/markbates/cleo"
+	"github.com/markbates/plugins"
+	"github.com/markbates/plugins/plugcmd"
 )
 
-type App = cleo.Cmd
+type App struct {
+	cleo.Cmd
+}
+
+func (cmd *App) Main(ctx context.Context, pwd string, args []string) error {
+	// if err := cmd.init(pwd); err != nil {
+	// 	return err
+	// }
+
+	if len(args) == 0 {
+		return cleo.ErrNoCommand
+	}
+
+	if len(pwd) == 0 {
+		wd, err := os.Getwd()
+		if err != nil {
+			return plugins.Wrap(cmd, err)
+		}
+		pwd = wd
+	}
+
+	plugs := cmd.ScopedPlugins()
+
+	if len(plugs) == 0 {
+		return plugins.Wrap(cmd, cleo.ErrNoCommands)
+	}
+
+	c := plugcmd.FindFromArgs(args, plugs)
+
+	if c == nil {
+		return plugins.Wrap(cmd, cleo.ErrNoCommands)
+	}
+
+	ctx, cancel := cleo.NewContext(ctx)
+	defer cancel()
+
+	return c.Main(ctx, pwd, args[1:])
+}
 
 func New() *App {
 	app := &App{
-		FS: os.DirFS("."),
+		Cmd: cleo.Cmd{
+			Name: "hype",
+			FS:   os.DirFS("."),
+		},
 	}
 
 	app.Plugins = append(app.Plugins,
 		&Marked{
 			Cmd: cleo.Cmd{
-				Name: "marked",
+				Name:    "marked",
+				Aliases: []string{"m", "md"},
 			},
 		},
 		&Marked{
 			Cmd: cleo.Cmd{
-				Name: "preview",
+				Name:    "preview",
+				Aliases: []string{"p"},
 			},
 		},
 		&Latex{
 			Cmd: cleo.Cmd{
-				Name: "latex",
+				Name:    "latex",
+				Aliases: []string{"l"},
 			},
 		},
 		&VSCode{
 			Cmd: cleo.Cmd{
-				Name: "vscode",
+				Name:    "vscode",
+				Aliases: []string{"code"},
 			},
 		},
 	)

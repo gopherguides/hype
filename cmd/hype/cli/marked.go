@@ -4,11 +4,13 @@ import (
 	"context"
 	"flag"
 	"fmt"
+	"io"
 	"os"
 	"time"
 
 	"github.com/gopherguides/hype"
 	"github.com/markbates/cleo"
+	"github.com/markbates/plugins"
 )
 
 type Marked struct {
@@ -36,7 +38,7 @@ func (cmd *Marked) Flags() (*flag.FlagSet, error) {
 	}
 
 	cmd.flags = flag.NewFlagSet("marked", flag.ContinueOnError)
-	cmd.flags.SetOutput(cmd.Stderr())
+	cmd.flags.SetOutput(io.Discard)
 	cmd.flags.DurationVar(&cmd.Timeout, "timeout", DefaultTimeout(), "timeout for execution")
 	cmd.flags.StringVar(&cmd.ContextPath, "context", cmd.ContextPath, "a folder containing all chapters of a book, for example")
 	cmd.flags.StringVar(&cmd.File, "f", cmd.File, "optional file name to preview")
@@ -46,16 +48,16 @@ func (cmd *Marked) Flags() (*flag.FlagSet, error) {
 
 func (cmd *Marked) Main(ctx context.Context, pwd string, args []string) error {
 	if err := cmd.validate(); err != nil {
-		return err
+		return plugins.Wrap(cmd, err)
 	}
 
 	flags, err := cmd.Flags()
 	if err != nil {
-		return err
+		return plugins.Wrap(cmd, err)
 	}
 
 	if err := flags.Parse(args); err != nil {
-		return err
+		return plugins.Wrap(cmd, err)
 	}
 
 	err = WithTimeout(ctx, cmd.Timeout, func(ctx context.Context) error {
@@ -69,7 +71,7 @@ func (cmd *Marked) Main(ctx context.Context, pwd string, args []string) error {
 	})
 
 	if err != nil {
-		return err
+		return plugins.Wrap(cmd, err)
 	}
 
 	return nil

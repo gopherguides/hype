@@ -15,6 +15,7 @@ import (
 
 	"github.com/gopherguides/hype/hytex"
 	"github.com/markbates/cleo"
+	"github.com/markbates/plugins"
 	"golang.org/x/sync/errgroup"
 )
 
@@ -28,6 +29,10 @@ type Latex struct {
 	FolderName  bool
 
 	flags *flag.FlagSet
+}
+
+func (cmd *Latex) Description() string {
+	return "converts markdown to latex"
 }
 
 func (cmd *Latex) Flags() (flags *flag.FlagSet, err error) {
@@ -59,7 +64,7 @@ func (cmd *Latex) Flags() (flags *flag.FlagSet, err error) {
 	}
 
 	cmd.flags = flag.NewFlagSet("latex", flag.ContinueOnError)
-	cmd.flags.SetOutput(cmd.Stderr())
+	cmd.flags.SetOutput(io.Discard)
 
 	cmd.flags.BoolVar(&cmd.FolderName, "f", cmd.FolderName, "use the folder name as the output file name")
 	cmd.flags.DurationVar(&cmd.Timeout, "t", DefaultTimeout(), "timeout for execution")
@@ -86,16 +91,16 @@ func (cmd *Latex) validate() error {
 
 func (cmd *Latex) Main(ctx context.Context, pwd string, args []string) error {
 	if err := cmd.validate(); err != nil {
-		return err
+		return plugins.Wrap(cmd, err)
 	}
 
 	flags, err := cmd.Flags()
 	if err != nil {
-		return err
+		return plugins.Wrap(cmd, err)
 	}
 
 	if err := flags.Parse(args); err != nil {
-		return err
+		return plugins.Wrap(cmd, err)
 	}
 
 	var fn string
@@ -117,21 +122,30 @@ func (cmd *Latex) Main(ctx context.Context, pwd string, args []string) error {
 		cab = os.DirFS(pwd)
 	}
 
-	return WithTimeout(ctx, cmd.Timeout, func(ctx context.Context) error {
+	err = WithTimeout(ctx, cmd.Timeout, func(ctx context.Context) error {
 
-		if len(fn) > 0 {
-			man := manifest{
-				cab: cab,
-				pwd: pwd,
-				op:  cmd.OutputPath,
-				fn:  fn,
+		if len(fn) == 0 {
+			if err := cmd.executeFolder(ctx, cab, pwd); err != nil {
+				return plugins.Wrap(cmd, err)
 			}
-			return cmd.executeFile(ctx, man)
+			return nil
 		}
 
-		return cmd.executeFolder(ctx, cab, pwd)
+		man := manifest{
+			cab: cab,
+			pwd: pwd,
+			op:  cmd.OutputPath,
+			fn:  fn,
+		}
+
+		return cmd.executeFile(ctx, man)
 	})
 
+	if err != nil {
+		return plugins.Wrap(cmd, err)
+	}
+
+	return nil
 }
 
 func (cmd *Latex) executeFolder(ctx context.Context, cab fs.FS, pwd string) error {

@@ -20,6 +20,7 @@ func main() {
 	args := os.Args[1:]
 
 	app := cli.New()
+	app.Name = "hype"
 
 	pwd, err := os.Getwd()
 	if err != nil {
@@ -32,7 +33,7 @@ func main() {
 
 	err = app.Main(ctx, pwd, args)
 	if err != nil {
-		log.Fatal(err)
+		app.Exit(1, err)
 	}
 }
 
