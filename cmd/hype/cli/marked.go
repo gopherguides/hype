@@ -25,6 +25,38 @@ type Marked struct {
 	flags *flag.FlagSet
 }
 
+func (cmd *Marked) WithPlugins(fn plugins.Feeder) {
+	if cmd == nil {
+		return
+	}
+
+	cmd.Lock()
+	defer cmd.Unlock()
+	cmd.Plugins = fn()
+}
+
+func (cmd *Marked) ScopedPlugins() plugins.Plugins {
+	if cmd == nil {
+		return nil
+	}
+
+	type marker interface {
+		MarkedPlugin()
+	}
+
+	plugs := cmd.Cmd.ScopedPlugins()
+
+	res := make(plugins.Plugins, 0, len(plugs))
+	for _, p := range plugs {
+		if _, ok := p.(marker); ok {
+			fmt.Printf("TODO >> marked.go:42 p %[1]T %+[1]v\n", p)
+			res = append(res, p)
+		}
+	}
+
+	return res
+}
+
 func (cmd *Marked) Flags() (*flag.FlagSet, error) {
 	if err := cmd.validate(); err != nil {
 		return nil, err
@@ -49,6 +81,16 @@ func (cmd *Marked) Flags() (*flag.FlagSet, error) {
 func (cmd *Marked) Main(ctx context.Context, pwd string, args []string) error {
 	if err := cmd.validate(); err != nil {
 		return plugins.Wrap(cmd, err)
+	}
+
+	fmt.Printf("TODO >> marked.go:54 pwd %[1]T %+[1]v\n", pwd)
+	mp := os.Getenv("MARKED_PATH")
+	fmt.Printf("TODO >> marked.go:56 mp %[1]T %+[1]v\n", mp)
+
+	pwd = mp
+
+	if err := cleo.Init(&cmd.Cmd, pwd); err != nil {
+		return err
 	}
 
 	flags, err := cmd.Flags()
@@ -139,10 +181,6 @@ func (cmd *Marked) validate() error {
 
 	cmd.Lock()
 	defer cmd.Unlock()
-
-	if cmd.FS == nil {
-		cmd.FS = os.DirFS(".")
-	}
 
 	if cmd.Timeout == 0 {
 		cmd.Timeout = DefaultTimeout()

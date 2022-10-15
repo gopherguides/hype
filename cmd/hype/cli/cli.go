@@ -3,6 +3,7 @@ package cli
 import (
 	"context"
 	"errors"
+	"flag"
 	"os"
 	"time"
 
@@ -16,45 +17,41 @@ type App struct {
 }
 
 func (cmd *App) Main(ctx context.Context, pwd string, args []string) error {
-	// if err := cmd.init(pwd); err != nil {
-	// 	return err
-	// }
-
 	if len(args) == 0 {
 		return cleo.ErrNoCommand
 	}
 
-	if len(pwd) == 0 {
-		wd, err := os.Getwd()
-		if err != nil {
-			return plugins.Wrap(cmd, err)
-		}
-		pwd = wd
+	if err := cleo.Init(&cmd.Cmd, pwd); err != nil {
+		return err
 	}
 
-	plugs := cmd.ScopedPlugins()
-
-	if len(plugs) == 0 {
-		return plugins.Wrap(cmd, cleo.ErrNoCommands)
-	}
-
-	c := plugcmd.FindFromArgs(args, plugs)
+	c := plugcmd.FindFromArgs(args, cmd.ScopedPlugins())
 
 	if c == nil {
 		return plugins.Wrap(cmd, cleo.ErrNoCommands)
 	}
 
-	ctx, cancel := cleo.NewContext(ctx)
-	defer cancel()
+	err := c.Main(ctx, pwd, args[1:])
+	if err == nil {
+		return nil
+	}
 
-	return c.Main(ctx, pwd, args[1:])
+	if errors.Is(err, flag.ErrHelp) {
+		return nil
+	}
+
+	if errors.Is(err, cleo.ErrNoCommand) {
+		return nil
+	}
+
+	return err
 }
 
-func New() *App {
+func New(root string) *App {
 	app := &App{
 		Cmd: cleo.Cmd{
 			Name: "hype",
-			FS:   os.DirFS("."),
+			FS:   os.DirFS(root),
 		},
 	}
 
@@ -86,6 +83,10 @@ func New() *App {
 	)
 
 	return app
+}
+
+func Garlic(root string) (*App, error) {
+	return New(root), nil
 }
 
 func DefaultTimeout() time.Duration {

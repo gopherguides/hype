@@ -94,6 +94,15 @@ func (cmd *Latex) Main(ctx context.Context, pwd string, args []string) error {
 		return plugins.Wrap(cmd, err)
 	}
 
+	pwd, err := cleo.PWD(pwd)
+	if err != nil {
+		return plugins.Wrap(cmd, err)
+	}
+
+	if err := cleo.Init(&cmd.Cmd, pwd); err != nil {
+		return err
+	}
+
 	flags, err := cmd.Flags()
 	if err != nil {
 		return plugins.Wrap(cmd, err)
