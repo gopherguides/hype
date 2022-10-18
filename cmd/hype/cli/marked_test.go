@@ -79,14 +79,14 @@ func Test_Marked_Path_Env(t *testing.T) {
 
 	r := require.New(t)
 
-	t.Setenv("MARKED_PATH", "42-foo/module.md")
+	t.Setenv("MARKED_PATH", "testdata/whole/simple/01-one/module.md")
 
 	cmd := &Marked{}
 
 	out := &bytes.Buffer{}
 	cmd.Out = out
 
-	cmd.In = strings.NewReader(`<figure id="foo"><figcaption>hello</figcaption></figure>`)
+	cmd.In = strings.NewReader(`<figure id="foo"><figcaption>Hello, Marked!</figcaption></figure>`)
 
 	err := cmd.Main(context.Background(), "", []string{})
 
@@ -95,5 +95,5 @@ func Test_Marked_Path_Env(t *testing.T) {
 	act := out.String()
 
 	// fmt.Println(act)
-	r.Contains(act, `Figure 42.1`)
+	r.Contains(act, `Hello, Marked!`)
 }

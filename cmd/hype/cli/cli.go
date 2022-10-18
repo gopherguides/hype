@@ -47,6 +47,23 @@ func (cmd *App) Main(ctx context.Context, pwd string, args []string) error {
 	return err
 }
 
+func (cmd *App) ScopedPlugins() plugins.Plugins {
+	if cmd == nil {
+		return nil
+	}
+
+	plugs := cmd.Cmd.ScopedPlugins()
+
+	res := make(plugins.Plugins, 0, len(plugs))
+	for _, p := range plugs {
+		if p != cmd {
+			res = append(res, p)
+		}
+	}
+
+	return res
+}
+
 func New(root string) *App {
 	app := &App{
 		Cmd: cleo.Cmd{
@@ -55,32 +72,34 @@ func New(root string) *App {
 		},
 	}
 
-	app.Plugins = append(app.Plugins,
-		&Marked{
-			Cmd: cleo.Cmd{
-				Name:    "marked",
-				Aliases: []string{"m", "md"},
+	app.Feeder = func() plugins.Plugins {
+		return plugins.Plugins{
+			&Marked{
+				Cmd: cleo.Cmd{
+					Name:    "marked",
+					Aliases: []string{"m", "md"},
+				},
 			},
-		},
-		&Marked{
-			Cmd: cleo.Cmd{
-				Name:    "preview",
-				Aliases: []string{"p"},
+			&Marked{
+				Cmd: cleo.Cmd{
+					Name:    "preview",
+					Aliases: []string{"p"},
+				},
 			},
-		},
-		&Latex{
-			Cmd: cleo.Cmd{
-				Name:    "latex",
-				Aliases: []string{"l"},
+			&Latex{
+				Cmd: cleo.Cmd{
+					Name:    "latex",
+					Aliases: []string{"l"},
+				},
 			},
-		},
-		&VSCode{
-			Cmd: cleo.Cmd{
-				Name:    "vscode",
-				Aliases: []string{"code"},
+			&VSCode{
+				Cmd: cleo.Cmd{
+					Name:    "vscode",
+					Aliases: []string{"code"},
+				},
 			},
-		},
-	)
+		}
+	}
 
 	return app
 }

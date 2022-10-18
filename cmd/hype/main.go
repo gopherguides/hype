@@ -3,8 +3,10 @@ package main
 import (
 	"context"
 	_ "embed"
+	"errors"
 	"log"
 	"os"
+	"os/exec"
 	"os/signal"
 	"path/filepath"
 
@@ -32,11 +34,18 @@ func main() {
 	defer cancel()
 
 	garlic := &garlic.Garlic{
-		Cmd: app,
+		Cmd:  app,
+		Name: app.Name,
+		IO:   app.Stdio(),
 	}
 
 	err = garlic.Main(ctx, pwd, args)
 	if err != nil {
+		var ex *exec.ExitError
+		if ok := errors.As(err, &ex); ok {
+			os.Exit(ex.ExitCode())
+		}
+
 		os.Exit(1)
 		// if errors.Is(err, flag.ErrHelp) || errors.Is(err, cleo.ErrNoCommand) {
 		// 	app.Exit(-1, nil)

@@ -6,6 +6,7 @@ import (
 	"fmt"
 	"io"
 	"os"
+	"path/filepath"
 	"time"
 
 	"github.com/gopherguides/hype"
@@ -32,7 +33,7 @@ func (cmd *Marked) WithPlugins(fn plugins.Feeder) {
 
 	cmd.Lock()
 	defer cmd.Unlock()
-	cmd.Plugins = fn()
+	cmd.Feeder = fn
 }
 
 func (cmd *Marked) ScopedPlugins() plugins.Plugins {
@@ -49,7 +50,6 @@ func (cmd *Marked) ScopedPlugins() plugins.Plugins {
 	res := make(plugins.Plugins, 0, len(plugs))
 	for _, p := range plugs {
 		if _, ok := p.(marker); ok {
-			fmt.Printf("TODO >> marked.go:42 p %[1]T %+[1]v\n", p)
 			res = append(res, p)
 		}
 	}
@@ -83,11 +83,9 @@ func (cmd *Marked) Main(ctx context.Context, pwd string, args []string) error {
 		return plugins.Wrap(cmd, err)
 	}
 
-	fmt.Printf("TODO >> marked.go:54 pwd %[1]T %+[1]v\n", pwd)
 	mp := os.Getenv("MARKED_PATH")
-	fmt.Printf("TODO >> marked.go:56 mp %[1]T %+[1]v\n", mp)
 
-	pwd = mp
+	pwd = filepath.Dir(mp)
 
 	if err := cleo.Init(&cmd.Cmd, pwd); err != nil {
 		return err
@@ -107,6 +105,7 @@ func (cmd *Marked) Main(ctx context.Context, pwd string, args []string) error {
 			pwd = mo
 		}
 
+		// panic(pwd)
 		return WithinDir(pwd, func() error {
 			return cmd.execute(ctx, pwd)
 		})
