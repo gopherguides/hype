@@ -4,11 +4,12 @@ import (
 	"context"
 	"errors"
 	"io/fs"
-	"io/ioutil"
 	"os"
 	"testing"
 	"testing/fstest"
 
+	"github.com/markbates/cleo"
+	"github.com/markbates/iox"
 	"github.com/stretchr/testify/require"
 )
 
@@ -39,8 +40,13 @@ func Test_Latex_Main(t *testing.T) {
 	r.NoError(err)
 	defer os.RemoveAll(op)
 
-	cmd := &Latex{}
-	cmd.Out = ioutil.Discard
+	oi := iox.Discard()
+
+	cmd := &Latex{
+		Cmd: cleo.Cmd{
+			IO: oi,
+		},
+	}
 
 	root := "testdata/latex/simple"
 	cab := os.DirFS(root)
@@ -89,8 +95,12 @@ func Test_Latex_Main_File(t *testing.T) {
 	r.NoError(err)
 	defer os.RemoveAll(op)
 
-	cmd := &Latex{}
-	cmd.Out = ioutil.Discard
+	cmd := &Latex{
+		Cmd: cleo.Cmd{
+			IO: iox.Discard(),
+		},
+	}
+
 	root := "testdata/latex/file"
 	cab := os.DirFS(root)
 	cmd.FS = cab
@@ -138,8 +148,12 @@ func Test_Latex_Main_Multiple(t *testing.T) {
 	r.NoError(err)
 	defer os.RemoveAll(op)
 
-	cmd := &Latex{}
-	cmd.Out = ioutil.Discard
+	cmd := &Latex{
+		Cmd: cleo.Cmd{
+			IO: iox.Discard(),
+		},
+	}
+
 	root := "testdata/latex/multi"
 
 	args := []string{"-o", op, root}
@@ -197,8 +211,12 @@ func Test_Latex_FolderName(t *testing.T) {
 	r.NoError(err)
 	defer os.RemoveAll(op)
 
-	cmd := &Latex{}
-	cmd.Out = ioutil.Discard
+	cmd := &Latex{
+		Cmd: cleo.Cmd{
+			IO: iox.Discard(),
+		},
+	}
+
 	cmd.FS = cab
 
 	args := []string{"-o", op, "-f"}
