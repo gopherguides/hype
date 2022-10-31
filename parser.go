@@ -25,7 +25,7 @@ type Parser struct {
 	DisablePages bool
 	NodeParsers  map[Atom]ParseElementFn
 	PreParsers   PreParsers
-	Snippets     *Snippets
+	Snippets     Snippets
 	Section      int
 	NowFn        func() time.Time // default: time.Now()
 
@@ -375,7 +375,6 @@ func NewParser(cab fs.FS) *Parser {
 		NodeParsers: DefaultElements(),
 		PreParsers:  PreParsers{Markdown()},
 		Section:     1,
-		Snippets:    &Snippets{},
 	}
 }
 

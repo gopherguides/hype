@@ -7,6 +7,22 @@ type Page struct {
 	*Element
 }
 
+func (page *Page) Body() (*Body, error) {
+	if page == nil {
+		return nil, ErrIsNil("document")
+	}
+
+	bodies := ByType[*Body](page.Nodes)
+
+	if len(bodies) == 0 {
+		return nil, ErrIsNil("body")
+	}
+
+	body := bodies[0]
+
+	return body, nil
+}
+
 func (page *Page) PostParse(p *Parser, d *Document, err error) error {
 	if err != nil {
 		return nil

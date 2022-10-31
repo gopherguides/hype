@@ -19,7 +19,7 @@ type Document struct {
 	Parser    *Parser // Parser used to create the document
 	Root      string
 	SectionID int
-	Snippets  *Snippets
+	Snippets  Snippets
 	Title     string
 }
 
