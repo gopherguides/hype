@@ -9,6 +9,8 @@ func DefaultElements() map[Atom]ParseElementFn {
 	m := map[Atom]ParseElementFn{
 		"godoc":          NewGoDocLinkNodes,
 		"godoc#a":        NewGoDocLinkNodes,
+		"now":            NewNowNodes,
+		"toc":            NewToCNodes,
 		atomx.A:          NewLinkNodes,
 		atomx.Body:       NewBodyNodes,
 		atomx.Cmd:        NewCmdNodes,
@@ -21,10 +23,9 @@ func DefaultElements() map[Atom]ParseElementFn {
 		atomx.Include:    NewIncludeNodes,
 		atomx.Link:       NewLinkNodes,
 		atomx.Metadata:   NewMetadataNodes,
+		atomx.P:          NewParagraphNodes,
 		atomx.Page:       NewPageNodes,
 		atomx.Ref:        NewRefNodes,
-		"toc":            NewToCNodes,
-		"now":            NewNowNodes,
 	}
 
 	for _, h := range atomx.Headings() {

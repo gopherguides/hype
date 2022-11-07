@@ -5,6 +5,8 @@ import (
 	"time"
 )
 
+var _ ExecutableNode = &Now{}
+
 type Now struct {
 	*Element
 }

@@ -2,7 +2,6 @@ package hype
 
 import (
 	"context"
-	"fmt"
 	"io/fs"
 	"strings"
 	"testing"
@@ -34,7 +33,7 @@ func Test_NowNodes(t *testing.T) {
 	act := doc.String()
 	act = strings.TrimSpace(act)
 
-	fmt.Println(act)
+	// fmt.Println(act)
 
 	b, err := fs.ReadFile(p.FS, "module.gold")
 	r.NoError(err)

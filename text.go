@@ -1,6 +1,9 @@
 package hype
 
-import "fmt"
+import (
+	"fmt"
+	"strings"
+)
 
 type Text string
 
@@ -22,4 +25,8 @@ func (tn Text) Format(f fmt.State, verb rune) {
 	default:
 		fmt.Fprintf(f, "%s", tn.String())
 	}
+}
+
+func (tn Text) IsEmptyNode() bool {
+	return len(strings.TrimSpace(string(tn))) == 0
 }

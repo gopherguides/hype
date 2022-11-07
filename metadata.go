@@ -12,6 +12,10 @@ type Metadata struct {
 	syncx.Map[string, string]
 }
 
+func (md *Metadata) IsEmptyNode() bool {
+	return false
+}
+
 func (md *Metadata) Children() Nodes {
 	if md == nil || md.Element == nil {
 		return nil
@@ -31,7 +35,6 @@ func NewMetadata(el *Element) (*Metadata, error) {
 	}
 
 	body := m.Children().String()
-
 	for _, line := range strings.Split(body, "\n") {
 		line = strings.TrimSpace(line)
 		if len(line) == 0 {
