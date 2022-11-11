@@ -34,12 +34,6 @@ func main() {
 	err = app.Main(ctx, pwd, args)
 	if err != nil {
 		cleo.Exit(app, 1, err)
-
-		// if errors.Is(err, flag.ErrHelp) || errors.Is(err, cleo.ErrNoCommand) {
-		// 	app.Exit(-1, nil)
-		// 	return
-		// }
-
-		// app.Exit(1, err)
+		os.Exit(1)
 	}
 }
