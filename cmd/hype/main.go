@@ -3,14 +3,13 @@ package main
 import (
 	"context"
 	_ "embed"
-	"fmt"
 	"log"
 	"os"
 	"os/signal"
 	"path/filepath"
 
 	"github.com/gopherguides/hype/cmd/hype/cli"
-	"github.com/markbates/garlic"
+	"github.com/markbates/cleo"
 )
 
 func main() {
@@ -32,16 +31,9 @@ func main() {
 	ctx, cancel := signal.NotifyContext(ctx, os.Interrupt)
 	defer cancel()
 
-	g := &garlic.Garlic{
-		Cmd:  app,
-		Name: app.Name,
-		IO:   app.Stdio(),
-	}
-
-	err = g.Main(ctx, pwd, args)
+	err = app.Main(ctx, pwd, args)
 	if err != nil {
-		fmt.Fprintln(app.Stderr(), err)
-		os.Exit(g.Exit)
+		cleo.Exit(app, 1, err)
 
 		// if errors.Is(err, flag.ErrHelp) || errors.Is(err, cleo.ErrNoCommand) {
 		// 	app.Exit(-1, nil)

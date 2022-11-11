@@ -21,6 +21,13 @@ func (cmd *App) Main(ctx context.Context, pwd string, args []string) error {
 		return cleo.ErrNoCommand
 	}
 
+	if len(args) == 1 {
+		switch args[0] {
+		case "help", "-h", "--help":
+			return flag.ErrHelp
+		}
+	}
+
 	if err := cleo.Init(&cmd.Cmd, pwd); err != nil {
 		return err
 	}
@@ -36,13 +43,13 @@ func (cmd *App) Main(ctx context.Context, pwd string, args []string) error {
 		return nil
 	}
 
-	if errors.Is(err, flag.ErrHelp) {
-		return nil
-	}
+	// if errors.Is(err, flag.ErrHelp) {
+	// 	return nil
+	// }
 
-	if errors.Is(err, cleo.ErrNoCommand) {
-		return nil
-	}
+	// if errors.Is(err, cleo.ErrNoCommand) {
+	// 	return nil
+	// }
 
 	return err
 }
