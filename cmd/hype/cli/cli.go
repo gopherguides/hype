@@ -72,6 +72,7 @@ func (cmd *App) ScopedPlugins() plugins.Plugins {
 }
 
 func New(root string) *App {
+	// panic(root)
 	app := &App{
 		Cmd: cleo.Cmd{
 			Name: "hype",
@@ -93,18 +94,18 @@ func New(root string) *App {
 					Aliases: []string{"p"},
 				},
 			},
-			&Latex{
-				Cmd: cleo.Cmd{
-					Name:    "latex",
-					Aliases: []string{"l"},
-				},
-			},
-			&VSCode{
-				Cmd: cleo.Cmd{
-					Name:    "vscode",
-					Aliases: []string{"code"},
-				},
-			},
+			// &Latex{
+			// 	Cmd: cleo.Cmd{
+			// 		Name:    "latex",
+			// 		Aliases: []string{"l"},
+			// 	},
+			// },
+			// &VSCode{
+			// 	Cmd: cleo.Cmd{
+			// 		Name:    "vscode",
+			// 		Aliases: []string{"code"},
+			// 	},
+			// },
 		}
 	}
 

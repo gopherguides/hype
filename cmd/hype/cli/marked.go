@@ -77,10 +77,19 @@ func (cmd *Marked) Flags() (*flag.FlagSet, error) {
 
 	return cmd.flags, nil
 }
-
 func (cmd *Marked) Main(ctx context.Context, pwd string, args []string) error {
+	err := cmd.main(ctx, pwd, args)
+	if err == nil {
+		return nil
+	}
+
+	err = plugins.Wrap(cmd, err)
+	return err
+}
+
+func (cmd *Marked) main(ctx context.Context, pwd string, args []string) error {
 	if err := cmd.validate(); err != nil {
-		return plugins.Wrap(cmd, err)
+		return err
 	}
 
 	mp := os.Getenv("MARKED_PATH")
@@ -93,11 +102,11 @@ func (cmd *Marked) Main(ctx context.Context, pwd string, args []string) error {
 
 	flags, err := cmd.Flags()
 	if err != nil {
-		return plugins.Wrap(cmd, err)
+		return err
 	}
 
 	if err := flags.Parse(args); err != nil {
-		return plugins.Wrap(cmd, err)
+		return err
 	}
 
 	err = WithTimeout(ctx, cmd.Timeout, func(ctx context.Context) error {
@@ -112,7 +121,7 @@ func (cmd *Marked) Main(ctx context.Context, pwd string, args []string) error {
 	})
 
 	if err != nil {
-		return plugins.Wrap(cmd, err)
+		return err
 	}
 
 	return nil
@@ -133,11 +142,9 @@ func (cmd *Marked) execute(ctx context.Context, pwd string) error {
 	p := cmd.Parser
 
 	if p == nil {
-		p, err = NewParser(cmd.FS, cmd.ContextPath, mp)
-		if err != nil {
-			return err
-		}
+		p = hype.NewParser(cmd.FS)
 	}
+	p.Root = filepath.Dir(mp)
 
 	if len(cmd.File) > 0 {
 		f, err := cmd.FS.Open(cmd.File)

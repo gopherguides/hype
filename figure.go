@@ -83,6 +83,29 @@ func NewFigure(p *Parser, el *Element) (*Figure, error) {
 		return nil, f.WrapErr(err)
 	}
 
+	// p2.NodeParsers[atomx.P] = func(p *Parser, el *Element) (Nodes, error) {
+	// 	nodes, err := NewParagraphNodes(p, el)
+	// 	if err != nil {
+	// 		return nil, err
+	// 	}
+
+	// 	if len(nodes) == 0 {
+	// 		fmt.Println("no p nodes")
+	// 		return nil, nil
+	// 	}
+
+	// 	x := nodes.String()
+	// 	x = strings.TrimSpace(x)
+	// 	if len(x) == 0 {
+	// 		fmt.Println("no p nodes")
+	// 		return nil, nil
+	// 	}
+
+	// 	fmt.Printf("TODO >> figure.go:93 nodes.String() %[1]T %+[1]v\n", nodes.String())
+
+	// 	return nodes, nil
+	// }
+
 	nodes, err := p2.ParseFragment(strings.NewReader(body))
 	if err != nil {
 		if !errors.Is(err, ErrNilFigure) {
