@@ -12,6 +12,7 @@ import (
 
 	"github.com/gopherguides/hype/cmd/hype/cli"
 	"github.com/markbates/cleo"
+	"github.com/markbates/garlic"
 )
 
 func main() {
@@ -47,7 +48,13 @@ func main() {
 	ctx, cancel := signal.NotifyContext(ctx, os.Interrupt)
 	defer cancel()
 
-	err = app.Main(ctx, pwd, args)
+	clove := &garlic.Garlic{
+		Name: "hype",
+		Cmd:  app,
+		FS:   os.DirFS(pwd),
+	}
+
+	err = clove.Main(ctx, pwd, args)
 	if err != nil {
 		err = fmt.Errorf("%w: PATH: %q", err, xp)
 		cleo.Exit(app, 1, err)
