@@ -26,6 +26,7 @@ func DefaultElements() map[Atom]ParseElementFn {
 		atomx.P:          NewParagraphNodes,
 		atomx.Page:       NewPageNodes,
 		atomx.Ref:        NewRefNodes,
+		atomx.Table:      NewTableNodes,
 	}
 
 	for _, h := range atomx.Headings() {
