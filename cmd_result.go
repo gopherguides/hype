@@ -66,7 +66,10 @@ func NewCmdResult(p *Parser, c *Cmd, res *clam.Result) (*CmdResult, error) {
 	}
 
 	pre := NewEl(atomx.Pre, cmd)
-	cel := NewEl(atomx.Code, pre)
+	cel := &FencedCode{
+		Element: NewEl(atomx.Code, pre),
+	}
+
 	if err := cel.Set("language", lang); err != nil {
 		return nil, err
 	}
