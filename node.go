@@ -17,6 +17,16 @@ type HTMLNode interface {
 	HTML() *html.Node
 }
 
+type StartTagNode interface {
+	Node
+	StartTag() string
+}
+
+type EndTagNode interface {
+	Node
+	EndTag() string
+}
+
 func (list Nodes) String() string {
 	var s string
 	for _, n := range list {
