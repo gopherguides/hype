@@ -17,7 +17,6 @@ func NewTable(el *Element) (*Table, error) {
 }
 
 func NewTableNodes(p *Parser, el *Element) (Nodes, error) {
-	panic(el)
 	h, err := NewTable(el)
 	if err != nil {
 		return nil, err
