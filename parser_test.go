@@ -4,11 +4,47 @@ import (
 	"context"
 	"fmt"
 	"os"
+	"strings"
 	"testing"
 	"testing/fstest"
+	"time"
 
 	"github.com/stretchr/testify/require"
 )
+
+func Test_Parser_UnknownAtom(t *testing.T) {
+	// t.Skip()
+	t.Parallel()
+	r := require.New(t)
+
+	in := `# Hello
+
+<notes>
+
+<figure id="x">
+<go doc="io.EOF"></go>
+<figcaption>Docs for <godoc>io#EOF</godoc></figcaption>
+</figure>
+
+
+</notes>`
+
+	p := NewParser(nil)
+
+	ctx := context.Background()
+	ctx, cancel := context.WithTimeout(ctx, time.Second)
+	defer cancel()
+
+	doc, err := p.ParseExecute(ctx, strings.NewReader(in))
+	r.NoError(err)
+
+	exp := `<a for="io#EOF" href="https://pkg.go.dev/io#EOF" target="_blank"><code>io.EOF</code></a>`
+
+	act := doc.String()
+	act = strings.TrimSpace(act)
+
+	r.Contains(act, exp)
+}
 
 func Test_Parser(t *testing.T) {
 	t.Parallel()

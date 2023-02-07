@@ -4,6 +4,7 @@ import (
 	"fmt"
 	"strings"
 
+	"github.com/gopherguides/hype/atomx"
 	"github.com/markbates/syncx"
 )
 
@@ -22,6 +23,37 @@ func (md *Metadata) Children() Nodes {
 	}
 
 	return md.Element.Children()
+}
+
+func (md *Metadata) PostParse(p *Parser, d *Document, err error) error {
+	if md == nil {
+		return fmt.Errorf("metadata is nil")
+	}
+
+	if d == nil {
+		return fmt.Errorf("document is nil")
+	}
+
+	heads := ByAtom(d.Nodes, atomx.Head)
+	if len(heads) == 0 {
+		return nil
+	}
+
+	hd := heads[0]
+
+	head, ok := hd.(*Element)
+	if !ok {
+		return fmt.Errorf("head is not an element: %T", hd)
+	}
+
+	md.Map.Range(func(key, value string) bool {
+		el := NewEl(atomx.Meta, head)
+		el.Set(key, value)
+		head.Nodes = append(head.Nodes, el)
+		return true
+	})
+
+	return nil
 }
 
 func NewMetadata(el *Element) (*Metadata, error) {

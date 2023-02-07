@@ -346,6 +346,7 @@ func (p *Parser) element(node *html.Node, parent Node) (Node, error) {
 
 	var nodes Nodes
 	c := node.FirstChild
+
 	for c != nil {
 		kid, err := p.ParseHTMLNode(c, el)
 		if err != nil {

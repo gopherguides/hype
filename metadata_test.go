@@ -2,36 +2,10 @@ package hype
 
 import (
 	"os"
-	"strings"
 	"testing"
 
 	"github.com/stretchr/testify/require"
 )
-
-func Test_NewMetadata(t *testing.T) {
-	t.Parallel()
-	r := require.New(t)
-
-	cab := os.DirFS("testdata/metadata/simple")
-
-	p := NewParser(cab)
-	doc, err := p.ParseFile("module.md")
-	r.NoError(err)
-
-	mds := ByType[*Metadata](doc.Children())
-	r.Len(mds, 1)
-
-	md := mds[0]
-	class, ok := md.Get("class")
-	r.True(ok)
-	r.Equal("center, middle, inverse", class)
-
-	act := doc.String()
-	act = strings.TrimSpace(act)
-
-	r.NotContains(act, `<metadata>`)
-	r.NotContains(act, `duration: 45m`)
-}
 
 func Test_NewMetadata_Pages(t *testing.T) {
 	t.Parallel()
