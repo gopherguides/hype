@@ -1,8 +1,8 @@
 github.com/davecgh/go-spew v1.1.0/go.mod h1:J7Y8YcW2NihsgmVo/mv3lAwl/skON4iLHjSsI+c5H38=
 github.com/davecgh/go-spew v1.1.1 h1:vj9j/u1bqnvCEfJOwUhtlOARqs3+rkHYY13jYWTU97c=
 github.com/davecgh/go-spew v1.1.1/go.mod h1:J7Y8YcW2NihsgmVo/mv3lAwl/skON4iLHjSsI+c5H38=
-github.com/gobuffalo/flect v1.0.0 h1:eBFmskjXZgAOagiTXJH25Nt5sdFwNRcb8DKZsIsAUQI=
-github.com/gobuffalo/flect v1.0.0/go.mod h1:l9V6xSb4BlXwsxEMj3FVEub2nkdQjWhPvD8XTTlHPQc=
+github.com/gobuffalo/flect v1.0.2 h1:eqjPGSo2WmjgY2XlpGwo2NXgL3RucAKo4k4qQMNA5sA=
+github.com/gobuffalo/flect v1.0.2/go.mod h1:A5msMlrHtLqh9umBSnvabjsMrCcCpAyzglnDvkbYKHs=
 github.com/kr/text v0.2.0 h1:5Nx0Ya0ZqY2ygV366QzturHI13Jq95ApcVaJBhpS+AY=
 github.com/markbates/clam v0.0.0-20220808175708-ef60f46826fb h1:9V50gZSw997pZqgLCjhyApFsS8JA1sIZmD+3+MLJcl4=
 github.com/markbates/clam v0.0.0-20220808175708-ef60f46826fb/go.mod h1:5bD7elUD4b404zK6eOn4Q0wKJYb0mxL6yDeQZSRn9Hk=
@@ -20,8 +20,8 @@ github.com/markbates/sweets v0.0.0-20210926032915-062eb9bcc0e5 h1:od8GvggTptD2HU
 github.com/markbates/sweets v0.0.0-20210926032915-062eb9bcc0e5/go.mod h1:NMNrJiINR9aeBgn5wfzZMJOnwWnDaj4hDOGpGoVV3XE=
 github.com/markbates/syncx v1.4.0 h1:mnnQiWBUPUACTowVeadf79UlpXDSKfiq9XXqFva0r2g=
 github.com/markbates/syncx v1.4.0/go.mod h1:9q1HC6tMaCgDH1rKVQGmMXvY2t8NIbG0qaH+QBrLn9A=
-github.com/markbates/table v0.0.0-20220727202000-1be6f0158613 h1:Ag9krNyy7AFZ/6h4Kz/AeZXMMd6597fFsZRIdiJi+no=
-github.com/markbates/table v0.0.0-20220727202000-1be6f0158613/go.mod h1:w+XoVJIaGXn7NRX2+LeKgyGNhgb28h6fk1/+YZGXNY0=
+github.com/markbates/table v0.0.0-20230314205021-441ed58296d1 h1:pai/4PecxeuRlO1Nyljteq/vH02eVoLrlx4UwEucBSE=
+github.com/markbates/table v0.0.0-20230314205021-441ed58296d1/go.mod h1:j43uhc/bgGCB5WR8/r0ta0GL/PgRXKvoBl3bXnsX7AE=
 github.com/mattn/go-shellwords v1.0.12 h1:M2zGm7EW6UQJvDeQxo4T51eKPurbeFbe8WtebGE2xrk=
 github.com/mattn/go-shellwords v1.0.12/go.mod h1:EZzvwXDESEeg03EKmM+RmDnNOPKG4lLtQsUlTZDWQ8Y=
 github.com/niemeyer/pretty v0.0.0-20200227124842-a10e7caefd8e h1:fD57ERR4JtEqsWbfPhv4DMiApHyliiK5xCTNVSPiaAs=
@@ -37,10 +37,10 @@ github.com/stretchr/testify v1.7.1/go.mod h1:6Fq8oRcR53rry900zMqJjRRixrwX3KX962/
 github.com/stretchr/testify v1.8.0/go.mod h1:yNjHg4UonilssWZ8iaSj1OCr/vHnekPRkoO+kdMU+MU=
 github.com/stretchr/testify v1.8.1 h1:w7B6lhMri9wdJUVmEZPGGhZzrYTPvgJArz7wNPgYKsk=
 github.com/stretchr/testify v1.8.1/go.mod h1:w2LPCIKwWwSfY2zedu0+kehJoqGctiVI29o6fzry7u4=
-golang.org/x/exp v0.0.0-20230206171751-46f607a40771 h1:xP7rWLUr1e1n2xkK5YB4LI0hPEy3LJC6Wk+D4pGlOJg=
-golang.org/x/exp v0.0.0-20230206171751-46f607a40771/go.mod h1:CxIveKay+FTh1D0yPZemJVgC/95VzuuOLq5Qi4xnoYc=
-golang.org/x/net v0.5.0 h1:GyT4nK/YDHSqa1c4753ouYCDajOYKTja9Xb/OHtgvSw=
-golang.org/x/net v0.5.0/go.mod h1:DivGGAXEgPSlEBzxGzZI+ZLohi+xUj054jfeKui00ws=
+golang.org/x/exp v0.0.0-20230314191032-db074128a8ec h1:pAv+d8BM2JNnNctsLJ6nnZ6NqXT8N4+eauvZSb3P0I0=
+golang.org/x/exp v0.0.0-20230314191032-db074128a8ec/go.mod h1:CxIveKay+FTh1D0yPZemJVgC/95VzuuOLq5Qi4xnoYc=
+golang.org/x/net v0.8.0 h1:Zrh2ngAOFYneWTAIAPethzeaQLuHwhuBkuV6ZiRnUaQ=
+golang.org/x/net v0.8.0/go.mod h1:QVkue5JL9kW//ek3r6jTKnTFis1tRmNAW2P1shuFdJc=
 golang.org/x/sync v0.1.0 h1:wsuoTGHzEhffawBOhz5CYhcrV4IdKZbEyZjBMuTp12o=
 golang.org/x/sync v0.1.0/go.mod h1:RxMgew5VJxzue5/jJTE5uejpjVlOe/izrB70Jof72aM=
 gopkg.in/check.v1 v0.0.0-20161208181325-20d25e280405/go.mod h1:Co6ibVJAznAaIkqp8huTwlJQCZ016jof/cbN4VW5Yz0=
