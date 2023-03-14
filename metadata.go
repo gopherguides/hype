@@ -46,12 +46,14 @@ func (md *Metadata) PostParse(p *Parser, d *Document, err error) error {
 		return fmt.Errorf("head is not an element: %T", hd)
 	}
 
-	md.Map.Range(func(key, value string) bool {
+	keys := md.Map.Keys()
+
+	for _, key := range keys {
 		el := NewEl(atomx.Meta, head)
-		el.Set(key, value)
+		val, _ := md.Map.Get(key)
+		el.Set(key, val)
 		head.Nodes = append(head.Nodes, el)
-		return true
-	})
+	}
 
 	return nil
 }

@@ -23,6 +23,11 @@ func main() {
 		log.Fatal(err)
 	}
 
+	usr, err := os.UserHomeDir()
+	if err != nil {
+		log.Fatal(err)
+	}
+
 	xp := os.Getenv("PATH")
 	paths := []string{
 		xp,
@@ -32,6 +37,7 @@ func main() {
 		"/bin",
 		"/usr/sbin",
 		"/sbin",
+		filepath.Join(usr, "go", "bin"),
 	}
 
 	xp = strings.Join(paths, ":")

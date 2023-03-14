@@ -1,12 +1,40 @@
 package hype
 
 import (
+	"context"
+	"fmt"
 	"io"
 	"strings"
 	"testing"
+	"time"
 
 	"github.com/stretchr/testify/require"
 )
+
+func Test_Markdown_UnknownAtom(t *testing.T) {
+	t.Skip()
+	t.Parallel()
+	r := require.New(t)
+
+	root := "testdata/markdown/unknown-atom"
+
+	p := testParser(t, root)
+
+	ctx := context.Background()
+	ctx, cancel := context.WithTimeout(ctx, time.Second)
+	defer cancel()
+
+	doc, err := p.ParseExecuteFile(ctx, "module.md")
+	r.NoError(err)
+
+	exp := `<a for="io#EOF" href="https://pkg.go.dev/io#EOF" target="_blank"><code>io.EOF</code></a>`
+
+	act := doc.String()
+	act = strings.TrimSpace(act)
+
+	fmt.Println(act)
+	r.Equal(act, exp)
+}
 
 func Test_Markdown(t *testing.T) {
 	t.Parallel()

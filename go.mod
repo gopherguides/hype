@@ -21,6 +21,7 @@ require (
 
 require (
 	github.com/davecgh/go-spew v1.1.1 // indirect
+	github.com/markbates/table v0.0.0-20220727202000-1be6f0158613 // indirect
 	github.com/pmezard/go-difflib v1.0.0 // indirect
 	golang.org/x/exp v0.0.0-20230206171751-46f607a40771 // indirect
 	gopkg.in/yaml.v3 v3.0.1 // indirect

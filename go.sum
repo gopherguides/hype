@@ -20,6 +20,8 @@ github.com/markbates/sweets v0.0.0-20210926032915-062eb9bcc0e5 h1:od8GvggTptD2HU
 github.com/markbates/sweets v0.0.0-20210926032915-062eb9bcc0e5/go.mod h1:NMNrJiINR9aeBgn5wfzZMJOnwWnDaj4hDOGpGoVV3XE=
 github.com/markbates/syncx v1.4.0 h1:mnnQiWBUPUACTowVeadf79UlpXDSKfiq9XXqFva0r2g=
 github.com/markbates/syncx v1.4.0/go.mod h1:9q1HC6tMaCgDH1rKVQGmMXvY2t8NIbG0qaH+QBrLn9A=
+github.com/markbates/table v0.0.0-20220727202000-1be6f0158613 h1:Ag9krNyy7AFZ/6h4Kz/AeZXMMd6597fFsZRIdiJi+no=
+github.com/markbates/table v0.0.0-20220727202000-1be6f0158613/go.mod h1:w+XoVJIaGXn7NRX2+LeKgyGNhgb28h6fk1/+YZGXNY0=
 github.com/mattn/go-shellwords v1.0.12 h1:M2zGm7EW6UQJvDeQxo4T51eKPurbeFbe8WtebGE2xrk=
 github.com/mattn/go-shellwords v1.0.12/go.mod h1:EZzvwXDESEeg03EKmM+RmDnNOPKG4lLtQsUlTZDWQ8Y=
 github.com/niemeyer/pretty v0.0.0-20200227124842-a10e7caefd8e h1:fD57ERR4JtEqsWbfPhv4DMiApHyliiK5xCTNVSPiaAs=
