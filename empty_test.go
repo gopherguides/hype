@@ -9,6 +9,20 @@ import (
 
 func Test_IsEmptyNode(t *testing.T) {
 	t.Parallel()
+	// r := require.New(t)
+
+	// 	p := testParser(t, "testdata")
+
+	// 	const frag = `<table>
+	// <thead>
+	// <tr>
+	// <th></th>
+	// <th></th>
+	// </tr>
+	// </thead>`
+
+	// 	table, err := p.ParseFragment(strings.NewReader(frag))
+	// 	r.NoError(err)
 
 	fullP := NewEl(atomx.P, nil)
 	fullP.Nodes = append(fullP.Nodes, Text("Hello World"))
@@ -25,6 +39,7 @@ func Test_IsEmptyNode(t *testing.T) {
 		{name: "empty text", node: Text(""), exp: true},
 		{name: "empty paragraph", node: emptyP, exp: true},
 		{name: "full paragraph", node: fullP, exp: false},
+		// {name: "empty table", node: table, exp: true},
 	}
 
 	for _, tc := range tcs {

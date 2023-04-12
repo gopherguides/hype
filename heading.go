@@ -11,6 +11,12 @@ type Heading struct {
 	level int
 }
 
+func (h Heading) MD() string {
+	x := strings.Repeat("#", h.level)
+
+	return fmt.Sprintf("%s %s", x, h.Children().MD())
+}
+
 func (h Heading) Level() int {
 	return h.level
 }

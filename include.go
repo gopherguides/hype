@@ -31,7 +31,18 @@ func (inc *Include) PostParse(p *Parser, d *Document, err error) error {
 }
 
 func (inc *Include) String() string {
+	if inc == nil {
+		return ""
+	}
 	return inc.Children().String()
+}
+
+func (inc *Include) MD() string {
+	if inc == nil {
+		return ""
+	}
+
+	return inc.Children().MD()
 }
 
 func NewInclude(p *Parser, el *Element) (*Include, error) {

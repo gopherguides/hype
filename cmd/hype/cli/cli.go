@@ -7,6 +7,7 @@ import (
 	"os"
 	"time"
 
+	"github.com/gopherguides/hype"
 	"github.com/markbates/cleo"
 	"github.com/markbates/plugins"
 	"github.com/markbates/plugins/plugcmd"
@@ -14,6 +15,8 @@ import (
 
 type App struct {
 	cleo.Cmd
+
+	Parser *hype.Parser
 }
 
 func (cmd *App) Main(ctx context.Context, pwd string, args []string) error {
@@ -93,6 +96,7 @@ func New(root string) *App {
 					Name:    "preview",
 					Aliases: []string{"p"},
 				},
+				Parser: app.Parser,
 			},
 			// &Latex{
 			// 	Cmd: cleo.Cmd{

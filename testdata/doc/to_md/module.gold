@@ -1,0 +1,1993 @@
+# Context
+
+Introduced in Go 1.7, the [`context`](https://pkg.go.dev/context) package was introduced to provide a cleaner way, than the use of channels, of managing cancellation and timeouts across goroutines.
+
+While the scope, and API footprint of the package is pretty small, it was a welcome addition to the language when introduced.
+
+The [`context`](https://pkg.go.dev/context) package, [Listing 1.1](#listing-1-1), defines the [`context.Context`](https://pkg.go.dev/context#Context) type, which carries deadlines, cancellation signals, and other request-scoped values across API boundaries and between processes.
+
+Context is, mostly, used for controlling concurrent subsystems in your application. This week we will cover the different kinds of behavior with contexts including canceling, timeouts, and values. We'll also see how we can clean up a lot of code involving channels by using contexts.
+
+<figure id="listing-1-1" type="listing">
+
+```shell
+$ go doc -short context
+
+var Canceled = errors.New("context canceled")
+var DeadlineExceeded error = deadlineExceededError{}
+func Cause(c Context) error
+func WithCancel(parent Context) (ctx Context, cancel CancelFunc)
+func WithCancelCause(parent Context) (ctx Context, cancel CancelCauseFunc)
+func WithDeadline(parent Context, d time.Time) (Context, CancelFunc)
+func WithTimeout(parent Context, timeout time.Duration) (Context, CancelFunc)
+type CancelCauseFunc func(cause error)
+type CancelFunc func()
+type Context interface{ ... }
+    func Background() Context
+    func TODO() Context
+    func WithValue(parent Context, key, val any) Context
+
+--------------------------------------------------------------------------------
+Go Version: go.test
+
+```
+
+<figcaption>_Listing 1.1:_ The [`context`](https://pkg.go.dev/context) package.</figcaption>
+</figure>
+
+---
+
+# The Context Interface
+
+The [`context.Context`](https://pkg.go.dev/context#Context) interface, [Listing 1.2](#listing-1-2), consists of four methods. These methods provide us the ability to listen for cancellation and timeout events, retrieve values from the context hierarchy, and finally, a way to check what `error`, if any, caused the context to be canceled.
+
+<figure id="listing-1-2" type="listing">
+
+```godoc
+type Context interface {
+  Deadline() (deadline time.Time, ok bool)
+  Done() <-chan struct{}
+  Err() error
+  Value(key interface{}) interface{}
+}
+
+```
+
+<figcaption>_Listing 1.2:_ The [`context.Context`](https://pkg.go.dev/context#Context) interface.</figcaption>
+</figure>
+
+We can see, in [Listing 1.2](#listing-1-2), that the [`context.Context`](https://pkg.go.dev/context#Context) interface implements several of the channel patterns we have already seen, such as have a `Done` channel that can be listened to for cancellation.
+
+We will cover each of these methods in more detail later. For now, let's briefly look at each one of them.
+
+## Context#Deadline
+
+The [`context.Context.Deadline`](https://pkg.go.dev/context#Context.Deadline) method, [Listing 1.3](#listing-1-3), can be used to check if a context has a cancellation deadline set, and if so, what that deadline is.
+
+<figure id="listing-1-3" type="listing">
+
+```shell
+$ go doc context.Context.Deadline
+
+package context // import "context"
+
+type Context interface {
+	// Deadline returns the time when work done on behalf of this context
+	// should be canceled. Deadline returns ok==false when no deadline is
+	// set. Successive calls to Deadline return the same results.
+	Deadline() (deadline time.Time, ok bool)
+}
+
+--------------------------------------------------------------------------------
+Go Version: go.test
+
+```
+
+<figcaption>_Listing 1.3:_ The [`context.Context.Deadline`](https://pkg.go.dev/context#Context.Deadline) method.</figcaption>
+</figure>
+
+## Context#Done
+
+The [`context.Context.Done`](https://pkg.go.dev/context#Context.Done) method, [Listing 1.4](#listing-1-4), can be used to listen for cancellation events. This is similar to how we can listen for a channel being closed, but it is more flexible.
+
+<figure id="listing-1-4" type="listing">
+
+```shell
+$ go doc context.Context.Done
+
+package context // import "context"
+
+type Context interface {
+
+	// Done returns a channel that's closed when work done on behalf of this
+	// context should be canceled. Done may return nil if this context can
+	// never be canceled. Successive calls to Done return the same value.
+	// The close of the Done channel may happen asynchronously,
+	// after the cancel function returns.
+	//
+	// WithCancel arranges for Done to be closed when cancel is called;
+	// WithDeadline arranges for Done to be closed when the deadline
+	// expires; WithTimeout arranges for Done to be closed when the timeout
+	// elapses.
+	//
+	// Done is provided for use in select statements:
+	//
+	//  // Stream generates values with DoSomething and sends them to out
+	//  // until DoSomething returns an error or ctx.Done is closed.
+	//  func Stream(ctx context.Context, out chan<- Value) error {
+	//  	for {
+	//  		v, err := DoSomething(ctx)
+	//  		if err != nil {
+	//  			return err
+	//  		}
+	//  		select {
+	//  		case <-ctx.Done():
+	//  			return ctx.Err()
+	//  		case out <- v:
+	//  		}
+	//  	}
+	//  }
+	//
+	// See https://blog.golang.org/pipelines for more examples of how to use
+	// a Done channel for cancellation.
+	Done() <-chan struct{}
+}
+
+--------------------------------------------------------------------------------
+Go Version: go.test
+
+```
+
+<figcaption>_Listing 1.4:_ The [`context.Context.Done`](https://pkg.go.dev/context#Context.Done) method.</figcaption>
+</figure>
+
+## Context#Err
+
+The [`context.Context.Err`](https://pkg.go.dev/context#Context.Err) method, [Listing 1.5](#listing-1-5), can be used to check if a context has been canceled.
+
+<figure id="listing-1-5" type="listing">
+
+```shell
+$ go doc context.Context.Err
+
+package context // import "context"
+
+type Context interface {
+
+	// If Done is not yet closed, Err returns nil.
+	// If Done is closed, Err returns a non-nil error explaining why:
+	// Canceled if the context was canceled
+	// or DeadlineExceeded if the context's deadline passed.
+	// After Err returns a non-nil error, successive calls to Err return the same error.
+	Err() error
+}
+
+--------------------------------------------------------------------------------
+Go Version: go.test
+
+```
+
+<figcaption>_Listing 1.5:_ The [`context.Context.Err`](https://pkg.go.dev/context#Context.Err) method.</figcaption>
+</figure>
+
+## Context#Value
+
+The [`context.Context.Value`](https://pkg.go.dev/context#Context.Value) method, [Listing 1.6](#listing-1-6), can be used to retrieve values from the context hierarchy.
+
+<figure id="listing-1-6" type="listing">
+
+```shell
+$ go doc context.Context.Value
+
+package context // import "context"
+
+type Context interface {
+
+	// Value returns the value associated with this context for key, or nil
+	// if no value is associated with key. Successive calls to Value with
+	// the same key returns the same result.
+	//
+	// Use context values only for request-scoped data that transits
+	// processes and API boundaries, not for passing optional parameters to
+	// functions.
+	//
+	// A key identifies a specific value in a Context. Functions that wish
+	// to store values in Context typically allocate a key in a global
+	// variable then use that key as the argument to context.WithValue and
+	// Context.Value. A key can be any type that supports equality;
+	// packages should define keys as an unexported type to avoid
+	// collisions.
+	//
+	// Packages that define a Context key should provide type-safe accessors
+	// for the values stored using that key:
+	//
+	// 	// Package user defines a User type that's stored in Contexts.
+	// 	package user
+	//
+	// 	import "context"
+	//
+	// 	// User is the type of value stored in the Contexts.
+	// 	type User struct {...}
+	//
+	// 	// key is an unexported type for keys defined in this package.
+	// 	// This prevents collisions with keys defined in other packages.
+	// 	type key int
+	//
+	// 	// userKey is the key for user.User values in Contexts. It is
+	// 	// unexported; clients use user.NewContext and user.FromContext
+	// 	// instead of using this key directly.
+	// 	var userKey key
+	//
+	// 	// NewContext returns a new Context that carries value u.
+	// 	func NewContext(ctx context.Context, u *User) context.Context {
+	// 		return context.WithValue(ctx, userKey, u)
+	// 	}
+	//
+	// 	// FromContext returns the User value stored in ctx, if any.
+	// 	func FromContext(ctx context.Context) (*User, bool) {
+	// 		u, ok := ctx.Value(userKey).(*User)
+	// 		return u, ok
+	// 	}
+	Value(key any) any
+}
+
+--------------------------------------------------------------------------------
+Go Version: go.test
+
+```
+
+<figcaption>_Listing 1.6:_ The [`context.Context.Value`](https://pkg.go.dev/context#Context.Value) method.</figcaption>
+</figure>
+
+## Helper Functions
+
+As we will see the [`context`](https://pkg.go.dev/context) package provides a number of useful helper functions for wrapping a [`context.Context`](https://pkg.go.dev/context#Context) making the need for custom implementations of the [`context.Context`](https://pkg.go.dev/context#Context) interface less common.
+
+<figure id="listing-1-7" type="listing">
+
+```shell
+$ go doc -short context
+
+var Canceled = errors.New("context canceled")
+var DeadlineExceeded error = deadlineExceededError{}
+func Cause(c Context) error
+func WithCancel(parent Context) (ctx Context, cancel CancelFunc)
+func WithCancelCause(parent Context) (ctx Context, cancel CancelCauseFunc)
+func WithDeadline(parent Context, d time.Time) (Context, CancelFunc)
+func WithTimeout(parent Context, timeout time.Duration) (Context, CancelFunc)
+type CancelCauseFunc func(cause error)
+type CancelFunc func()
+type Context interface{ ... }
+    func Background() Context
+    func TODO() Context
+    func WithValue(parent Context, key, val any) Context
+
+--------------------------------------------------------------------------------
+Go Version: go.test
+
+```
+
+<figcaption>_Listing 1.7:_ The [`context`](https://pkg.go.dev/context) package.</figcaption>
+</figure>
+
+## The Background Context
+
+While often we might be given a [`context.Context`](https://pkg.go.dev/context#Context), we might also be the one start a [`context.Context`](https://pkg.go.dev/context#Context). The most common way to provide a quick and easy way to start a [`context.Context`](https://pkg.go.dev/context#Context) is to use the [`context.Background`](https://pkg.go.dev/context#Background) function, [Listing 1.8](#listing-1-8).
+
+<figure id="listing-1-8" type="listing">
+
+```shell
+$ go doc context.Background
+
+package context // import "context"
+
+func Background() Context
+    Background returns a non-nil, empty Context. It is never canceled, has no
+    values, and has no deadline. It is typically used by the main function,
+    initialization, and tests, and as the top-level Context for incoming
+    requests.
+
+--------------------------------------------------------------------------------
+Go Version: go.test
+
+```
+
+<figcaption>_Listing 1.8:_ The [`context.Background`](https://pkg.go.dev/context#Background) function.</figcaption>
+</figure>
+
+In, [Listing 1.9](#listing-1-9), we print the [`context.Context`](https://pkg.go.dev/context#Context) returned by [`context.Background`](https://pkg.go.dev/context#Background). As we can see from the output, the context is empty.
+
+<figure id="listing-1-9" type="listing">
+
+```go
+func main() {
+	ctx := context.Background()
+
+	// print the current value
+	// of the context
+	fmt.Printf("%v\n", ctx)
+
+	// print Go-syntax representation of the value
+	fmt.Printf("\t%#v\n", ctx)
+}
+```
+
+---
+
+```shell
+$ go run main.go
+
+context.Background
+	(*context.emptyCtx)(0x140000a2000)
+
+--------------------------------------------------------------------------------
+Go Version: go.test
+
+```
+
+<figcaption>_Listing 1.9:_ The [`context.Background`](https://pkg.go.dev/context#Background) function.</figcaption>
+</figure>
+
+## Default Implementations
+
+The [`context.Background`](https://pkg.go.dev/context#Background) interface, while empty, does provide default implementations of the [`context.Context`](https://pkg.go.dev/context#Context) interface. Because of this the [`context.Background`](https://pkg.go.dev/context#Background) context is almost always used as the base of a new [`context.Context`](https://pkg.go.dev/context#Context) hierarchy.
+
+<figure id="listing-1-10" type="listing">
+
+```go
+func main() {
+	ctx := context.Background()
+
+	// print the current value
+	// of the context
+	fmt.Printf("%v\n", ctx)
+
+	// print Go-syntax representation of the value
+	fmt.Printf("\t%#v\n", ctx)
+
+	// print the value of the Done channel
+	// does not block because we are not
+	// trying to read/write to the channel
+	fmt.Printf("\tDone:\t%#v\n", ctx.Done())
+
+	// print the value of the Err
+	fmt.Printf("\tErr:\t%#v\n", ctx.Err())
+
+	// print the value of "KEY"
+	fmt.Printf("\tValue:\t%#v\n", ctx.Value("KEY"))
+
+	// print the deadline time
+	// and true/false if there is no deadline
+	deadline, ok := ctx.Deadline()
+	fmt.Printf("\tDeadline:\t%s (%t)\n", deadline, ok)
+}
+```
+
+---
+
+```shell
+$ go run main.go
+
+context.Background
+	(*context.emptyCtx)(0x14000112000)
+	Done:	(<-chan struct {})(nil)
+	Err:	<nil>
+	Value:	<nil>
+	Deadline:	0001-01-01 00:00:00 +0000 UTC (false)
+
+--------------------------------------------------------------------------------
+Go Version: go.test
+
+```
+
+<figcaption>_Listing 1.10:_ The [`context.Background`](https://pkg.go.dev/context#Background) function provides default implementation of the [`context.Context`](https://pkg.go.dev/context#Context) interface.</figcaption>
+</figure>
+
+---
+
+# Context Rules
+
+According the [`context`](https://pkg.go.dev/context) documentation there are rules that must be followed when using the [`context`](https://pkg.go.dev/context) package, [Listing 1.11](#listing-1-11).
+
+<figure id="listing-1-11" type="listing">
+
+- Programs that use Contexts should follow these rules to keep interfaces consistent across packages and enable static analysis tools to check context propagation.
+
+- Do not store Contexts inside a struct type; instead, pass a Context explicitly to each function that needs it. The Context should be the first parameter, typically named ctx.
+
+- Do not pass a `nil` Context, even if a function permits it. Pass [`context.TODO`](https://pkg.go.dev/context#TODO) if you are unsure about which Context to use.
+
+- Use context Values only for request-scoped data that transits processes and APIs, not for passing optional parameters to functions.
+
+- The same Context may be passed to functions running in different goroutines; Contexts are safe for simultaneous use by multiple goroutines.
+
+<figcaption>_Listing 1.11:_ Rules for using contexts.</figcaption>
+</figure>
+
+---
+
+# Context Nodal Hierarchy
+
+As the [`context`](https://pkg.go.dev/context) documentation states, a [`context.Context`](https://pkg.go.dev/context#Context) is not meant to be stored and held onto, but should be passed at "runtime".
+
+Consider an HTTP request. An HTTP request is a **runtime** value that gets passed along through the application until eventually the response is returned. We would not want to store, or hold on to, the request for future use as it would be of no benefit once the response is returned.
+
+Using [`context.Context`](https://pkg.go.dev/context#Context) in our code behaves like the HTTP request. We pass a [`context.Context`](https://pkg.go.dev/context#Context) through the application where they can be listened to for cancellation, or for other purposes, at "runtime".
+
+As a [`context.Context`](https://pkg.go.dev/context#Context) is passed through the application, a receiving method may wrap the context with their cancellation functionality or with [`context.WithValue`](https://pkg.go.dev/context#WithValue) to add a value, such as a "request id", before passing the [`context.Context`](https://pkg.go.dev/context#Context) along to any functions, or methods, that it may call.
+
+The result is a nodal hierarchy of [`context.Context`](https://pkg.go.dev/context#Context) values that starts at the beginning of the request, or the start of the application, and spiders out throughout the application.
+
+## Understanding the Nodal Hierarchy
+
+Consider [Listing 1.12](#listing-1-12). We start with a [`context.Background`](https://pkg.go.dev/context#Background) context and pass it the `A` and `B` functions. Each function wraps the given [`context.Context`](https://pkg.go.dev/context#Context), prints that new [`context.Context`](https://pkg.go.dev/context#Context) with a new one before either passing it along to the next function or returning.
+
+<figure id="listing-1-12" type="listing">
+
+```go
+func main() {
+	// create a background context
+	bg := context.Background()
+
+	// pass the background context to the A function
+	A(bg)
+
+	// pass the background context to the B function
+	B(bg)
+}
+```
+
+<figcaption>_Listing 1.12:_ Wrapping contexts creates nodal hierarchies.</figcaption>
+</figure>
+
+## Wrapping with Context Values
+
+To wrap the [`context.Context`](https://pkg.go.dev/context#Context) with a new one, we will use [`context.WithValue`](https://pkg.go.dev/context#WithValue). The [`context.WithValue`](https://pkg.go.dev/context#WithValue) function takes a [`context.Context`](https://pkg.go.dev/context#Context) and a key and value, and returns a new [`context.Context`](https://pkg.go.dev/context#Context) with the given key and value that wraps the original [`context.Context`](https://pkg.go.dev/context#Context). We will learn more about [`context.WithValue`](https://pkg.go.dev/context#WithValue) later.
+
+## Following the Context Nodes
+
+In [Listing 1.13](#listing-1-13), we define the functions used in [Listing 1.12](#listing-1-12). Each of these functions takes a [`context.Context`](https://pkg.go.dev/context#Context) as an argument. They then wrap the [`context.Context`](https://pkg.go.dev/context#Context) with a new one, print the new [`context.Context`](https://pkg.go.dev/context#Context) with a new one, and pass it along to the next function.
+
+<figure id="listing-1-13" type="listing">
+
+```go
+func A(ctx context.Context) {
+	// wrap ctx with a new context
+	// with the ID set to "A"
+	A := context.WithValue(ctx, ID, "A")
+	print("A", A)
+
+	// pass the A context to the A1 function
+	A1(A)
+}
+
+func A1(ctx context.Context) {
+	A1 := context.WithValue(ctx, ID, "A1")
+	print("A1", A1)
+}
+
+func B(ctx context.Context) {
+	// wrap ctx with a new context
+	// with the ID set to "B"
+	B := context.WithValue(ctx, ID, "B")
+	print("B", B)
+
+	// pass the B context to the B1 function
+	B1(B)
+}
+
+func B1(ctx context.Context) {
+	// wrap ctx with a new context
+	// with the ID set to "B1"
+	B1 := context.WithValue(ctx, ID, "B1")
+	print("B1", B1)
+
+	// pass the B1 context to the B1a function
+	B1a(B1)
+}
+
+func B1a(ctx context.Context) {
+	// wrap ctx with a new context
+	// with the ID set to "B1a"
+	B1a := context.WithValue(ctx, ID, "B1a")
+	print("B1a", B1a)
+}
+```
+
+<figcaption>_Listing 1.13:_ The example application.</figcaption>
+</figure>
+
+When we look at the output of the program, [Listing 1.14](#listing-1-14), we can see that when we print out any given [`context.Context`](https://pkg.go.dev/context#Context) we see that is at the bottom of the node tree and the [`context.Background`](https://pkg.go.dev/context#Background) context is at the top of the node tree hierarchy.
+
+<figure id="listing-1-14" type="listing">
+
+```shell
+$ go run main.go
+
+A.WithValue(key: ctx_id, value: A)
+	--> Background
+
+A1.WithValue(key: ctx_id, value: A1)
+	--> WithValue(key: ctx_id, value: A)
+		--> Background
+
+B.WithValue(key: ctx_id, value: B)
+	--> Background
+
+B1.WithValue(key: ctx_id, value: B1)
+	--> WithValue(key: ctx_id, value: B)
+		--> Background
+
+B1a.WithValue(key: ctx_id, value: B1a)
+	--> WithValue(key: ctx_id, value: B1)
+		--> WithValue(key: ctx_id, value: B)
+			--> Background
+
+--------------------------------------------------------------------------------
+Go Version: go.test
+
+```
+
+<figcaption>_Listing 1.14:_ Printing the node tree.</figcaption>
+</figure>
+
+In [Listing 1.15](#listing-1-15), we see that the `B1a` [`context.Context`](https://pkg.go.dev/context#Context) is a child of the `B1` [`context.Context`](https://pkg.go.dev/context#Context) and the `B1` [`context.Context`](https://pkg.go.dev/context#Context) is a child of the `B` [`context.Context`](https://pkg.go.dev/context#Context) and the `B` [`context.Context`](https://pkg.go.dev/context#Context) is a child of the original background [`context.Context`](https://pkg.go.dev/context#Context).
+
+<figure id="listing-1-15" type="listing">
+
+<img src="nodes/assets/nodes.svg"></img>
+
+<figcaption>_Listing 1.15:_ Visualizing the node tree.</figcaption>
+</figure>
+
+---
+
+# Context Values
+
+As we have seen one feature of the [`context`](https://pkg.go.dev/context) package is that it allows you to pass request specific values to the next function in the chain.
+
+This provide a lot of useful benefits, such as passing request or session specific values, such as the request id, user id of the requestor, etc. to the next function in the chain.
+
+Using values, however, has its disadvantages, as we will see shortly.
+
+## Understanding Context Values
+
+The [`context.WithValue`](https://pkg.go.dev/context#WithValue) function can be used to wrap a given [`context.Context`](https://pkg.go.dev/context#Context) with a new [`context.Context`](https://pkg.go.dev/context#Context) that contains the given key/value pair.
+
+```shell
+$ go doc context.WithValue
+
+package context // import "context"
+
+func WithValue(parent Context, key, val any) Context
+    WithValue returns a copy of parent in which the value associated with key is
+    val.
+
+    Use context Values only for request-scoped data that transits processes and
+    APIs, not for passing optional parameters to functions.
+
+    The provided key must be comparable and should not be of type string or any
+    other built-in type to avoid collisions between packages using context.
+    Users of WithValue should define their own types for keys. To avoid
+    allocating when assigning to an interface{}, context keys often have
+    concrete type struct{}. Alternatively, exported context key variables'
+    static type should be a pointer or interface.
+
+--------------------------------------------------------------------------------
+Go Version: go.test
+
+```
+
+The [`context.WithValue`](https://pkg.go.dev/context#WithValue) function takes a [`context.Context`](https://pkg.go.dev/context#Context) as its first argument, and a key and a value as its second and third arguments.
+
+Both the key and value are `any` values. While this may seem like you can use any type for the key, this is not the case. Like maps, keys must be comparable, so complex types like maps or functions are not allowed.
+
+```go
+ctx := context.Background()
+
+// strings shouldn't be used as keys
+// because they can easily collide
+// with other functions, libraries, etc.
+// that set that same key.
+// instead strings should wrapped in their
+// own type.
+ctx = context.WithValue(ctx, "key", "value")
+
+// keys must be comparable.
+// maps, and other complex types,
+// are not comparable and can't be used
+// used as keys.
+ctx = context.WithValue(ctx, map[string]int{}, "another value")
+```
+
+---
+
+```shell
+$ go run main.go
+
+panic: key is not comparable
+
+goroutine 1 [running]:
+context.WithValue({0x10451c390, 0x14000094060}, {0x104512f80?, 0x14000094090}, {0x1045115e0?, 0x10451c1b8})
+	/usr/local/go/src/context/context.go:591 +0x140
+main.main()
+	/Users/markbates/Library/CloudStorage/Dropbox/dev/guides/hype/./main.go:24 +0x7c
+exit status 2
+
+--------------------------------------------------------------------------------
+Go Version: go.test
+
+```
+
+## Key Resolution
+
+When we ask for a key through the [`context.Context.Value`](https://pkg.go.dev/context#Context.Value) function, the [`context.Context`](https://pkg.go.dev/context#Context) will first check if the key is present in the current [`context.Context`](https://pkg.go.dev/context#Context). If the key is present, the value is returned. If the key is not present, the [`context.Context`](https://pkg.go.dev/context#Context) will then check if the key is present in the parent [`context.Context`](https://pkg.go.dev/context#Context). If the key is present, the value is returned. If the key is not present, the [`context.Context`](https://pkg.go.dev/context#Context) will then check if the key is present in the [`context.Context`](https://pkg.go.dev/context#Context)'s parent's parent, and so on.
+
+Consider the following example. We wrap a [`context.Context`](https://pkg.go.dev/context#Context) multiple times with different key/values.
+
+```go
+func main() {
+
+	// create a new background context
+	ctx := context.Background()
+
+	// wrap the context with a new context
+	// that has the key "A" and the value "a",
+	ctx = context.WithValue(ctx, CtxKey("A"), "a")
+
+	// wrap the context with a new context
+	// that has the key "B" and the value "b",
+	ctx = context.WithValue(ctx, CtxKey("B"), "b")
+
+	// wrap the context with a new context
+	// that has the key "C" and the value "c",
+	ctx = context.WithValue(ctx, CtxKey("C"), "c")
+
+	// print the final context
+	print("ctx", ctx)
+
+	// retreive and print the value
+	// for the key "A"
+	a := ctx.Value(CtxKey("A"))
+	fmt.Println("A:", a)
+
+	// retreive and print the value
+	// for the key "B"
+	b := ctx.Value(CtxKey("B"))
+	fmt.Println("B:", b)
+
+	// retreive and print the value
+	// for the key "C"
+	c := ctx.Value(CtxKey("C"))
+	fmt.Println("C:", c)
+
+}
+```
+
+From the output we see that the final [`context.Context`](https://pkg.go.dev/context#Context) has a parentage that includes all of the values added with [`context.WithValue`](https://pkg.go.dev/context#WithValue). We can also see that we are able to find all of the keys, including the very first one that we set.
+
+```shell
+$ go run main.go
+
+ctx.WithValue(key: C, value: c)
+	--> WithValue(key: B, value: b)
+		--> WithValue(key: A, value: a)
+			--> Background
+
+A: a
+B: b
+C: c
+
+--------------------------------------------------------------------------------
+Go Version: go.test
+
+```
+
+---
+
+# Problems with String Keys
+
+As is mentioned in the [`context`](https://pkg.go.dev/context) documentation using string keys is not recommended. As we just saw when [`context.Context.Value`](https://pkg.go.dev/context#Context.Value) tries to resolve a key it finds the first, if any, [`context.Context`](https://pkg.go.dev/context#Context) that contains the key and returns that value.
+
+<figure id="listing-1-16" type="listing">
+
+```shell
+$ go doc context.WithValue
+
+package context // import "context"
+
+func WithValue(parent Context, key, val any) Context
+    WithValue returns a copy of parent in which the value associated with key is
+    val.
+
+    Use context Values only for request-scoped data that transits processes and
+    APIs, not for passing optional parameters to functions.
+
+    The provided key must be comparable and should not be of type string or any
+    other built-in type to avoid collisions between packages using context.
+    Users of WithValue should define their own types for keys. To avoid
+    allocating when assigning to an interface{}, context keys often have
+    concrete type struct{}. Alternatively, exported context key variables'
+    static type should be a pointer or interface.
+
+--------------------------------------------------------------------------------
+Go Version: go.test
+
+```
+
+<figcaption>_Listing 1.16:_ Using strings as context keys is not recommended per the documentation.</figcaption>
+</figure>
+
+When we use the [`context.Context.Value`](https://pkg.go.dev/context#Context.Value) function, we get the last value that was set for the given key. Each time we use [`context.WithValue`](https://pkg.go.dev/context#WithValue) to wrap a [`context.Context`](https://pkg.go.dev/context#Context) with a new [`context.Context`](https://pkg.go.dev/context#Context), the new [`context.Context`](https://pkg.go.dev/context#Context) will have, essentially, replaced the previous value for the given key.
+
+<img alt="string-keys" src="values/assets/string-keys.svg"></img>
+
+## Key Collisions
+
+Consider the following example. We wrap a [`context.Context`](https://pkg.go.dev/context#Context) multiple times, each time with a different value, but the same key, `request_id`, which is of type `string`.
+
+```go
+func main() {
+	// create a new background context
+	ctx := context.Background()
+
+	// call the A function
+	// passing in the background context
+	A(ctx)
+}
+
+func A(ctx context.Context) {
+	// wrap the context with a request_id
+	// to represent this specific A request
+	ctx = context.WithValue(ctx, "request_id", "123")
+
+	// call the B function
+	// passing in the wrapped context
+	B(ctx)
+}
+
+func B(ctx context.Context) {
+	// wrap the context with a request_id
+	// to represent this specific B request
+	ctx = context.WithValue(ctx, "request_id", "456")
+	Logger(ctx)
+}
+
+// Logger logs the webs request_id
+// as well as the request_id from the B
+func Logger(ctx context.Context) {
+	a := ctx.Value("request_id")
+	fmt.Println("A\t", "request_id:", a)
+
+	b := ctx.Value("request_id")
+	fmt.Println("B\t", "request_id:", b)
+}
+```
+
+When we try to log both the `request_id` for both `A` and `A` we see that they are both set to the same value.
+
+```shell
+$ go run main.go
+
+A	 request_id: 456
+B	 request_id: 456
+
+--------------------------------------------------------------------------------
+Go Version: go.test
+
+```
+
+One way to solve this problem would be try and "namespace" your `string` keys, `myapp.request_id`. While you may never get into a collision scenario, the possibility of someone else using the same key is there.
+
+## Custom String Key Types
+
+Because Go is a typed language, we can leverage the type system to solve the problem of key collisions. We can create a new type based on `string` that we can use as the key.
+
+```go
+// CtxKeyA is used to wrap keys
+// associated with a A request
+// 	CtxKeyA("request_id")
+// 	CtxKeyA("user_id")
+type CtxKeyA string
+
+// CtxKeyB is used to wrap keys
+// associated with a B request
+// 	CtxKeyB("request_id")
+// 	CtxKeyB("user_id")
+type CtxKeyB string
+```
+
+```go
+func A(ctx context.Context) {
+	// wrap the context with a request_id
+	// to represent this specific A request
+	key := CtxKeyA("request_id")
+	ctx = context.WithValue(ctx, key, "123")
+
+	// call B with the wrapped context
+	B(ctx)
+}
+
+func B(ctx context.Context) {
+	// wrap the context with a request_id
+	// to represent this specific B request
+	key := CtxKeyB("request_id")
+	ctx = context.WithValue(ctx, key, "456")
+
+	Logger(ctx)
+}
+```
+
+```go
+// Logger logs the webs request_id
+// as well as the request_id from the B
+func Logger(ctx context.Context) {
+	// retreive the request_id from the A request
+	aKey := CtxKeyA("request_id")
+	aVal := ctx.Value(aKey)
+
+	// print the request_id from the A request
+	print("A", aKey, aVal)
+
+	// retreive the request_id from the B request
+	bKey := CtxKeyB("request_id")
+	bVal := ctx.Value(bKey)
+
+	// print the request_id from the B request
+	print("B", bKey, bVal)
+}
+```
+
+The `Logger` is now properly able to retrieve the two different `request_id` values because they are no longer of the same type.
+
+```shell
+$ go run main.go
+
+A: main.CtxKeyA(request_id): 123
+B: main.CtxKeyB(request_id): 456
+
+--------------------------------------------------------------------------------
+Go Version: go.test
+
+```
+
+This code can be further cleaned up by using constants for the keys that our package, or application, uses. This allows for cleaner code and makes it easier to document the potential keys that may be in a [`context.Context`](https://pkg.go.dev/context#Context).
+
+```go
+const (
+	// A_RequestID can be used to
+	// retreive the request_id for
+	// the A request
+	A_RequestID CtxKeyA = "request_id"
+	// 	A_SESSION_ID CtxKeyA = "session_id"
+	// 	A_SERVER_ID CtxKeyA = "server_id"
+	// 	other keys...
+
+	// B_RequestID can be used to
+	// retreive the request_id for
+	// the B request
+	B_RequestID CtxKeyB = "request_id"
+)
+```
+
+```go
+// Logger logs the webs request_id
+// as well as the request_id from the B
+func Logger(ctx context.Context) {
+	// retreive the request_id from the A request
+	aKey := A_RequestID
+	aVal := ctx.Value(aKey)
+
+	// print the request_id from the A request
+	print("A", aKey, aVal)
+
+	// retreive the request_id from the B request
+	bKey := B_RequestID
+	bVal := ctx.Value(bKey)
+
+	// print the request_id from the B request
+	print("B", bKey, bVal)
+}
+```
+
+---
+
+# Securing Context Keys and Values
+
+If we export, make public, the types, and names, of the [`context.Context`](https://pkg.go.dev/context#Context) keys our package or application uses, we run the risk of a malicious agent stealing, or modifying our values. For example, in a web request we might set a `request_id` at the beginning of the request, but a piece of middleware later in the chain might modify that value to something else.
+
+```go
+type CtxKey string
+
+const (
+	RequestID CtxKey = "request_id"
+)
+```
+
+```go
+func WithBar(ctx context.Context) context.Context {
+	// wrap the context with a request_id
+	// to represent this specific bar request
+	ctx = context.WithValue(ctx, RequestID, "456")
+
+	// maliciously replace the request_id
+	// set by foo
+	ctx = context.WithValue(ctx, foo.RequestID, "???")
+
+	// return the wrapped context
+	return ctx
+}
+```
+
+```go
+func main() {
+	// create a background context
+	ctx := context.Background()
+
+	// wrap the context with foo
+	ctx = foo.WithFoo(ctx)
+
+	// wrap the context with bar
+	ctx = bar.WithBar(ctx)
+
+	// retrieve the foo.RequestID
+	// value from the context
+	id := ctx.Value(foo.RequestID)
+
+	// print the value
+	fmt.Println("foo.RequestID: ", id)
+}
+```
+
+```go
+func WithFoo(ctx context.Context) context.Context {
+	// wrap the context with a request_id
+	// to represent this specific foo request
+	ctx = context.WithValue(ctx, RequestID, "123")
+
+	// return the wrapped context
+	return ctx
+}
+```
+
+```shell
+$ go run main.go
+
+foo.RequestID:  ???
+
+--------------------------------------------------------------------------------
+Go Version: go.test
+
+```
+
+## Securing by Not Exporting
+
+The best way to secure your that your key/value pairs aren't maliciously overwritten, or accessed, is by not exporting the types, and any constants, used for keys.
+
+```go
+type ctxKey string
+
+const (
+	requestID ctxKey = "request_id"
+)
+```
+
+Now, you are in control of what values from the context you wish to make public. For example, we can add a helper function to allow others to get access to the `request_id` value.
+
+Because the return value from [`context.Context.Value`](https://pkg.go.dev/context#Context.Value) is an empty interface, `interface{}`, we can use these helper functions to, not just retrieve access to the value, but also type assert the value to the type we want, or return an error if it doesn't.
+
+```go
+func RequestIDFrom(ctx context.Context) (string, error) {
+	// get the request_id from the context
+	s, ok := ctx.Value(requestID).(string)
+	if !ok {
+		return "", fmt.Errorf("request_id not found in context")
+	}
+	return s, nil
+}
+```
+
+Our application can be updated to use the new helper function to print the `request_id` or exit if there was a problem getting the value.
+
+```go
+func main() {
+	// create a background context
+	ctx := context.Background()
+
+	// wrap the context with foo
+	ctx = foo.WithFoo(ctx)
+
+	// wrap the context with bar
+	ctx = bar.WithBar(ctx)
+
+	// retrieve the foo.RequestID
+	// value from the context
+	id, err := foo.RequestIDFrom(ctx)
+	if err != nil {
+		log.Fatal(err)
+	}
+
+	// print the value
+	fmt.Println("foo.RequestID: ", id)
+}
+```
+
+The malicious `bar` package can no longer set, or retrieve, the `request_id` value set by the `foo` package. The `bar` package does not have the ability to create a new type of value `foo.ctxKey` because the type is un-exported can be accessed outside of the `foo` package.
+
+```go
+func WithBar(ctx context.Context) context.Context {
+	// wrap the context with a request_id
+	// to represent this specific bar request
+	ctx = context.WithValue(ctx, requestID, "456")
+
+	// no longer able to set the foo request id
+	// it does not have access to the foo.ctxKey type
+	// as it is not exported, so bar can not create
+	// a new key of that type.
+	// ctx = context.WithValue(ctx, foo.ctxKey("request_id"), "???")
+
+	// return the wrapped context
+	return ctx
+}
+```
+
+As a result of securing our [`context.Context`](https://pkg.go.dev/context#Context) values, the application now correctly retrieves the `request_id` value set by the `foo` package.
+
+```shell
+$ go run main.go
+
+foo.RequestID:  123
+
+--------------------------------------------------------------------------------
+Go Version: go.test
+
+```
+
+---
+
+# Cancellation Propagation with Contexts
+
+While having the ability to pass contextual information via the [`context.Context`](https://pkg.go.dev/context#Context) is useful, the real benefit, and design of the [`context`](https://pkg.go.dev/context) package, is that it can be used to propagate cancellation events to those listening to the context. When a parent [`context.Context`](https://pkg.go.dev/context#Context) is canceled, all its children are also canceled.
+
+## Creating a Cancellable Context
+
+In order to cancel a [`context.Context`](https://pkg.go.dev/context#Context), we must have a way of cancelling it. The [`context.WithCancel`](https://pkg.go.dev/context#WithCancel) function, [Listing 1.17](#listing-1-17), wraps a given [`context.Context`](https://pkg.go.dev/context#Context) with a [`context.Context`](https://pkg.go.dev/context#Context) that can be cancelled.
+
+<figure id="listing-1-17" type="listing">
+
+```shell
+$ go doc context.WithCancel
+
+package context // import "context"
+
+func WithCancel(parent Context) (ctx Context, cancel CancelFunc)
+    WithCancel returns a copy of parent with a new Done channel. The returned
+    context's Done channel is closed when the returned cancel function is called
+    or when the parent context's Done channel is closed, whichever happens
+    first.
+
+    Canceling this context releases resources associated with it, so code should
+    call cancel as soon as the operations running in this Context complete.
+
+--------------------------------------------------------------------------------
+Go Version: go.test
+
+```
+
+<figcaption>_Listing 1.17:_ The [`context.WithCancel`](https://pkg.go.dev/context#WithCancel) function.</figcaption>
+</figure>
+
+The [`context.WithCancel`](https://pkg.go.dev/context#WithCancel) function returns a second argument, that of a [`context.CancelFunc`](https://pkg.go.dev/context#CancelFunc) function, which can be used to cancel the [`context.Context`](https://pkg.go.dev/context#Context).
+
+### The Cancel Function
+
+There a few things that need to be noted about the [`context.CancelFunc`](https://pkg.go.dev/context#CancelFunc) function, [Listing 1.18](#listing-1-18). So let's examine each in more detail.
+
+<figure id="listing-1-18" type="listing">
+
+```shell
+$ go doc context.CancelFunc
+
+package context // import "context"
+
+type CancelFunc func()
+    A CancelFunc tells an operation to abandon its work. A CancelFunc does not
+    wait for the work to stop. A CancelFunc may be called by multiple goroutines
+    simultaneously. After the first call, subsequent calls to a CancelFunc do
+    nothing.
+
+--------------------------------------------------------------------------------
+Go Version: go.test
+
+```
+
+<figcaption>_Listing 1.18:_ The [`context.CancelFunc`](https://pkg.go.dev/context#CancelFunc) function.</figcaption>
+</figure>
+
+#### Idempotent Behavior
+
+> "After the first call, subsequent calls to a CancelFunc do nothing".
+
+According to the [`context.CancelFunc`](https://pkg.go.dev/context#CancelFunc) documentation, the [`context.CancelFunc`](https://pkg.go.dev/context#CancelFunc) function is [idempotent](https://en.wikipedia.org/wiki/Idempotence), [Listing 1.19](#listing-1-19). That is, calling it multiple times has no effect beyond the first call.
+
+<figure id="listing-1-19" type="listing">
+
+```go
+ctx, cancel := context.WithCancel(context.Background())
+cancel() // cancels the context
+cancel() // has no effect
+cancel() // has no effect
+
+```
+
+<figcaption>_Listing 1.19:_ The idempotent behavior of the [`context.CancelFunc`](https://pkg.go.dev/context#CancelFunc) function.</figcaption>
+</figure>
+
+#### Leaking Resources
+
+> "Canceling this context releases resources associated with it, so code should call cancel as soon as the operations running in this Context complete."
+
+Often you will want to defer execution of the [`context.CancelFunc`](https://pkg.go.dev/context#CancelFunc) function until the function, or application, exits. This ensure proper shutdown of the [`context.Context`](https://pkg.go.dev/context#Context) and prevents the [`context.Context`](https://pkg.go.dev/context#Context) from leaking resources.
+
+<figure id="listing-1-20" type="listing">
+
+```go
+ctx, cancel := context.WithCancel(context.Background())
+// ensure the cancel function is called at least once
+// to avoid leaking resources
+defer cancel()
+
+```
+
+<figcaption>_Listing 1.20:_ Prevent leaking goroutines by calling the [`context.CancelFunc`](https://pkg.go.dev/context#CancelFunc)</figcaption>
+</figure>
+
+> **ALWAYS** call the [`context.CancelFunc`](https://pkg.go.dev/context#CancelFunc) function when you no longer need the [`context.Context`](https://pkg.go.dev/context#Context). Failure to do so may cause your program to leak resources.
+
+## Cancelling a Context
+
+Consider [Listing 1.21](#listing-1-21). The `listener` function takes a [`context.Context`](https://pkg.go.dev/context#Context) as its first argument and an `int` representing the goroutine id as its second argument.
+
+The `listener` function will block until the [`context.Context`](https://pkg.go.dev/context#Context) is cancelled, which close the channel behind [`context.Context.Done`](https://pkg.go.dev/context#Context.Done) method. This will unblock the `listener` function and allow it to exit.
+
+<figure id="listing-1-21" type="listing">
+
+```go
+func listener(ctx context.Context, i int) {
+	fmt.Printf("listener %d is waiting\n", i)
+
+	// this will block until the context
+	// given context is canceled
+	<-ctx.Done()
+
+	fmt.Printf("listener %d is exiting\n", i)
+}
+```
+
+<figcaption>_Listing 1.21:_ Blocking on [`context.Context.Done`](https://pkg.go.dev/context#Context.Done).</figcaption>
+</figure>
+
+wThe application creates a [`context.Background`](https://pkg.go.dev/context#Background) context and then wraps it with a cancellable [`context.Context`](https://pkg.go.dev/context#Context). The [`context.CancelFunc`](https://pkg.go.dev/context#CancelFunc) returned by is immediately deferred to ensure the application doesn't leak any resources.
+
+In [Listing 1.22](#listing-1-22) we create several goroutines that will listen for the [`context.Context`](https://pkg.go.dev/context#Context) to be cancelled.
+
+<figure id="listing-1-22" type="listing">
+
+```go
+func main() {
+
+	// create a background context
+	ctx := context.Background()
+
+	// wrap the context with the ability
+	// to cancel it
+	ctx, cancel := context.WithCancel(ctx)
+
+	// defer cancellation of the context
+	// to ensure that any resources are
+	// cleaned up regardless of how the
+	// function exits
+	defer cancel()
+
+	// create 5 listeners
+	for i := 0; i < 5; i++ {
+
+		// launch listener in a goroutine
+		go listener(ctx, i)
+
+	}
+
+	// allow the listeners to start
+	time.Sleep(time.Millisecond * 500)
+
+	fmt.Println("canceling the context")
+
+	// cancel the context and tell the
+	// listeners to exit
+	cancel()
+
+	// allow the listeners to exit
+	time.Sleep(time.Millisecond * 500)
+}
+```
+
+<figcaption>_Listing 1.22:_ Using context cancellation.</figcaption>
+</figure>
+
+As we can see from the output, [Listing 1.23](#listing-1-23), the `listener` function unblocks and exits when the [`context.CancelFunc`](https://pkg.go.dev/context#CancelFunc) is called, `cancel()`.
+
+<figure id="listing-1-23" type="listing">
+
+```shell
+$ go run main.go
+
+listener 0 is waiting
+listener 3 is waiting
+listener 4 is waiting
+listener 2 is waiting
+listener 1 is waiting
+canceling the context
+listener 0 is exiting
+listener 4 is exiting
+listener 3 is exiting
+listener 1 is exiting
+listener 2 is exiting
+
+--------------------------------------------------------------------------------
+Go Version: go.test
+
+```
+
+<figcaption>_Listing 1.23:_ The output of the application.</figcaption>
+</figure>
+
+### Only Child Nodes of the Context are Cancelled
+
+The illustration in [Listing 1.24](#listing-1-24) shows that by cancelling a node in the hierarchy, all its child nodes are also cancelled. Other nodes, such as parent and sibling nodes, in the hierarchy are unaffected.
+
+<figure id="listing-1-24" type="listing">
+
+<img src="cancellation/assets/cancellation.svg"></img>
+
+<figcaption>_Listing 1.24:_ Cancellation propagation.</figcaption>
+</figure>
+
+## Listening for Cancellation Confirmation
+
+Previously, we have use [`time.Sleep`](https://pkg.go.dev/time#Sleep) to block the execution of the program. This is not a good practice, as it can lead to deadlocks and other problems. Instead, the application should receive a [`context.Context`](https://pkg.go.dev/context#Context) cancellation confirmation.
+
+### Starting a Concurrent Monitor
+
+Consider [Listing 1.25](#listing-1-25). To start a `Monitor` we must use the `Start` method giving it a [`context.Context`](https://pkg.go.dev/context#Context). In return, the `Start` method returns a [`context.Context`](https://pkg.go.dev/context#Context) that can be listened to by the application to confirm the shutdown of the `Monitor` later on.
+
+<figure id="listing-1-25" type="listing">
+
+```go
+type Monitor struct {
+	cancel context.CancelFunc
+}
+
+func (m *Monitor) Start(ctx context.Context) context.Context {
+
+	// start the monitor with the given context
+	go m.listen(ctx)
+
+	// create a new context that will be canceled
+	// when the monitor is shut down
+	ctx, cancel := context.WithCancel(context.Background())
+
+	// hold on to the cancellation function
+	// when context that started the manager is canceled
+	// this cancellation function will be called.
+	m.cancel = cancel
+
+	// return the new, cancellable, context.
+	// clients can listen to this context
+	// for cancellation to ensure the
+	// monitor is properly shut down.
+	return ctx
+}
+```
+
+<figcaption>_Listing 1.25:_ Accepting a [`context.Context`](https://pkg.go.dev/context#Context) and returning a new one.</figcaption>
+</figure>
+
+To prevent the application from blocking, we launch a the `listen` method in a goroutine with the given [`context.Context`](https://pkg.go.dev/context#Context). Unless this [`context.Context`](https://pkg.go.dev/context#Context) is cancelled, the `listen` method will never stop and will continue to leak resources until the application exits.
+
+The [`context.CancelFunc`](https://pkg.go.dev/context#CancelFunc) is held onto by the `Manager` so when the `Manager` is told to cancel by the client, it will also cancel the `Monitor` context. This will tell the client that the `Monitor` has been shutdown, confirming the cancellation of the `Monitor`.
+
+### Monitor Checking
+
+The `listen` method will block until the given [`context.Context`](https://pkg.go.dev/context#Context), given by the application, is cancelled, [Listing 1.26](#listing-1-26). We first make sure to defer the [`context.CancelFunc`](https://pkg.go.dev/context#CancelFunc) in the `Monitor` to ensure that if any the `listen` method exits for any reason, clients will be notified that the `Monitor` has been shutdown.
+
+<figure id="listing-1-26" type="listing">
+
+```go
+func (m *Monitor) listen(ctx context.Context) {
+	defer m.cancel()
+
+	// create a new ticker channel to listen to
+	tick := time.NewTicker(time.Millisecond * 10)
+	defer tick.Stop()
+
+	// use an infinite loop to continue to listen
+	// to new messages after the select statement
+	// has been executed
+	for {
+		select {
+		case <-ctx.Done(): // listen for context cancellation
+			// shut down if the context is canceled
+			fmt.Println("shutting down monitor")
+
+			// if the monitor was told to shut down
+			// then it should call its cancel function
+			// so the client will know that the monitor
+			// has properly shut down.
+			m.cancel()
+
+			// return from the function
+			return
+		case <-tick.C: // listen to the ticker channel
+			// and print a message every time it ticks
+			fmt.Println("monitor check")
+		}
+	}
+
+}
+```
+
+<figcaption>_Listing 1.26:_ the `Monitor` will call its [`context.CancelFunc`](https://pkg.go.dev/context#CancelFunc) if external [`context.Context`](https://pkg.go.dev/context#Context) is cancelled.</figcaption>
+</figure>
+
+### Using the Cancellation Confirmation
+
+In [Listing 1.27](#listing-1-27), the application starts with a [`context.Background`](https://pkg.go.dev/context#Background) context and then wraps that with a cancellable [`context.Context`](https://pkg.go.dev/context#Context). The [`context.CancelFunc`](https://pkg.go.dev/context#CancelFunc) returned by is immediately deferred to ensure the application doesn't leak any resources. After a short while, in a goroutine, the `cancel` function is called, the [`context.Context`](https://pkg.go.dev/context#Context) is cancelled.
+
+The `Monitor` is then started our cancellable [`context.Context`](https://pkg.go.dev/context#Context). The [`context.Context`](https://pkg.go.dev/context#Context) returned by the `Start` method is listened to by the application. When the `Monitor` is cancelled, the application will be unblocked and can exit. Alternatively, if the application is still running after a couple of seconds the application is forcibly terminated.
+
+<figure id="listing-1-27" type="listing">
+
+```go
+func main() {
+
+	// create a new background context
+	ctx := context.Background()
+
+	// wrap the background context with a
+	// cancellable context.
+	// this context can be listened to any
+	// children of this context for notification
+	// of application shutdown/cancellation.
+	ctx, cancel := context.WithCancel(ctx)
+
+	// ensure the cancel function is called
+	// to shut down the monitor when the program
+	// is exits
+	defer cancel()
+
+	// launch a goroutine to cancel the application
+	// context after a short while.
+	go func() {
+		time.Sleep(time.Millisecond * 50)
+
+		// cancel the application context
+		// this will shut the monitor down
+		cancel()
+	}()
+
+	// create a new monitor
+	mon := Monitor{}
+
+	// start the monitor with the application context
+	// this will return a context that can be listened to
+	// for cancellation signaling the monitor has shut down.
+	ctx = mon.Start(ctx)
+
+	// block the application until either the context
+	// is canceled or the application times out
+	select {
+	case <-ctx.Done(): // listen for context cancellation
+		// success shutdown
+		os.Exit(0)
+	case <-time.After(time.Second * 2): // timeout after 2 second
+		fmt.Println("timed out while trying to shut down the monitor")
+
+		// check if there was an error from the
+		// monitor's context
+		if err := ctx.Err(); err != nil {
+			fmt.Printf("error: %s\n", err)
+		}
+
+		// non-successful shutdown
+		os.Exit(1)
+	}
+}
+```
+
+<figcaption>_Listing 1.27:_ Using the cancellation confirmation.</figcaption>
+</figure>
+
+As we can see from the output, in [Listing 1.28](#listing-1-28), the application waits for the `Monitor` to properly shutdown before exiting. We were also able to remove the use of [`time.Sleep`](https://pkg.go.dev/time#Sleep) to allow the monitor to finish.
+
+<figure id="listing-1-28" type="listing">
+
+```shell
+$ go run main.go
+
+monitor check
+monitor check
+monitor check
+monitor check
+monitor check
+shutting down monitor
+
+--------------------------------------------------------------------------------
+Go Version: go.test
+
+```
+
+<figcaption>_Listing 1.28:_ The output of the application.</figcaption>
+</figure>
+
+---
+
+# Timeouts and Deadlines
+
+In addition to allowing us to manually cancel a [`context.Context`](https://pkg.go.dev/context#Context), the [`context`](https://pkg.go.dev/context) package also provides mechanisms for creating a [`context.Context`](https://pkg.go.dev/context#Context) that will self-cancel after, or at, a given time. Using these mechanics allows us to control how long to run some before we give up and assume that the operation has failed.
+
+## Cancelling at a Specific Time
+
+The [`context`](https://pkg.go.dev/context) package provides two functions for creating time based, self-cancelling, a [`context.Context`](https://pkg.go.dev/context#Context); [`context.WithTimeout`](https://pkg.go.dev/context#WithTimeout) and [`context.WithDeadline`](https://pkg.go.dev/context#WithDeadline).
+
+<figure id="listing-1-29" type="listing">
+
+```shell
+$ go doc context.WithDeadline
+
+package context // import "context"
+
+func WithDeadline(parent Context, d time.Time) (Context, CancelFunc)
+    WithDeadline returns a copy of the parent context with the deadline
+    adjusted to be no later than d. If the parent's deadline is already earlier
+    than d, WithDeadline(parent, d) is semantically equivalent to parent.
+    The returned context's Done channel is closed when the deadline expires,
+    when the returned cancel function is called, or when the parent context's
+    Done channel is closed, whichever happens first.
+
+    Canceling this context releases resources associated with it, so code should
+    call cancel as soon as the operations running in this Context complete.
+
+--------------------------------------------------------------------------------
+Go Version: go.test
+
+```
+
+<figcaption>_Listing 1.29:_ The [`context.WithDeadline`](https://pkg.go.dev/context#WithDeadline) function.</figcaption>
+</figure>
+
+When using [`context.WithDeadline`](https://pkg.go.dev/context#WithDeadline), [Listing 1.29](#listing-1-29), we need to provide an **absolute** time at which the [`context.Context`](https://pkg.go.dev/context#Context) should be cancelled. That means we need an exact date/time we want this [`context.Context`](https://pkg.go.dev/context#Context) to be cancelled, for example `March 14, 2029 3:45pm`.
+
+Consider [Listing 1.30](#listing-1-30). In it, we create a new [`time.Time`](https://pkg.go.dev/time#Time) for `January 1, 2030 00:00:00` and use it to create a [`context.Context`](https://pkg.go.dev/context#Context) that will self-cancel at that date and time.
+
+<figure id="listing-1-30" type="listing">
+
+```go
+func main() {
+
+	// create a background context
+	ctx := context.Background()
+
+	// create an absolute date/time (January 1, 2030)
+	deadline := time.Date(2030, 1, 1, 0, 0, 0, 0, time.UTC)
+	fmt.Println("deadline:", deadline.Format(time.RFC3339))
+
+	// create a new context with a deadline
+	// that will cancel at January 1, 2030 00:00:00.
+	ctx, cancel := context.WithDeadline(ctx, deadline)
+	defer cancel()
+
+	print(ctx)
+}
+```
+
+---
+
+```shell
+$ go run .
+
+deadline: 2030-01-01T00:00:00Z
+WithTimeout(deadline: {wall:0 ext:64029052800 loc:<nil>})
+	--> Background
+
+--------------------------------------------------------------------------------
+Go Version: go.test
+
+```
+
+<figcaption>_Listing 1.30:_ Using [`context.WithDeadline`](https://pkg.go.dev/context#WithDeadline).</figcaption>
+</figure>
+
+## Cancelling After a Duration
+
+While being able to cancel a [`context.Context`](https://pkg.go.dev/context#Context) at a particular time is useful, more often than not we want to cancel a [`context.Context`](https://pkg.go.dev/context#Context) after a certain amount of time has passed.
+
+<figure id="listing-1-31" type="listing">
+
+```shell
+$ go doc context.WithTimeout
+
+package context // import "context"
+
+func WithTimeout(parent Context, timeout time.Duration) (Context, CancelFunc)
+    WithTimeout returns WithDeadline(parent, time.Now().Add(timeout)).
+
+    Canceling this context releases resources associated with it, so code should
+    call cancel as soon as the operations running in this Context complete:
+
+        func slowOperationWithTimeout(ctx context.Context) (Result, error) {
+        	ctx, cancel := context.WithTimeout(ctx, 100*time.Millisecond)
+        	defer cancel()  // releases resources if slowOperation completes before timeout elapses
+        	return slowOperation(ctx)
+        }
+
+--------------------------------------------------------------------------------
+Go Version: go.test
+
+```
+
+<figcaption>_Listing 1.31:_ The [`context.WithTimeout`](https://pkg.go.dev/context#WithTimeout) function.</figcaption>
+</figure>
+
+When using [`context.WithTimeout`](https://pkg.go.dev/context#WithTimeout), [Listing 1.31](#listing-1-31)a, we need to provide an **relative** [`time.Duration`](https://pkg.go.dev/time#Duration) at which the [`context.Context`](https://pkg.go.dev/context#Context) should be cancelled.
+
+Consider [Listing 1.32](#listing-1-32). In it, we create a new self-cancelling [`context.Context`](https://pkg.go.dev/context#Context) that will self-cancel after 5 seconds using [`context.WithTimeout`](https://pkg.go.dev/context#WithTimeout).
+
+<figure id="listing-1-32" type="listing">
+
+```go
+func main() {
+
+	// create a background context
+	ctx := context.Background()
+
+	// create a new context with a timeout
+	// that will cancel the context after 10ms
+	// 	equivalent to:
+	//		context.WithDeadline(ctx, time.Now().Add(10 *time.Millisecond))
+	ctx, cancel := context.WithTimeout(ctx, 10*time.Millisecond)
+	defer cancel()
+
+	print(ctx)
+}
+```
+
+---
+
+```shell
+$ go run .
+
+WithTimeout(deadline: {wall:13906264017496691992 ext:13164668 loc:0x1007a86c0})
+	--> Background
+
+--------------------------------------------------------------------------------
+Go Version: go.test
+
+```
+
+<figcaption>_Listing 1.32:_ Using [`context.WithTimeout`](https://pkg.go.dev/context#WithTimeout).</figcaption>
+</figure>
+
+Functionally, we could have used [`context.WithDeadline`](https://pkg.go.dev/context#WithDeadline) instead, but [`context.WithTimeout`](https://pkg.go.dev/context#WithTimeout) is more convenient when we want to cancel a [`context.Context`](https://pkg.go.dev/context#Context) after a certain amount of time has passed.
+
+---
+
+# Context Errors
+
+In a complex system, or even in a small one, when a [`context.Context`](https://pkg.go.dev/context#Context) is cancelled, we need a way to know what caused the cancellation. It is possible that [`context.Context`](https://pkg.go.dev/context#Context) was cancelled by a [`context.CancelFunc`](https://pkg.go.dev/context#CancelFunc) successfully, if it was cancelled because it timed out, or some other reason.
+
+The [`context.Context.Err`](https://pkg.go.dev/context#Context.Err) method, [Listing 1.33](#listing-1-33) returns the error that caused the context to be cancelled.
+
+<figure id="listing-1-33" type="listing">
+
+```shell
+$ go doc context.Context.Err
+
+package context // import "context"
+
+type Context interface {
+
+	// If Done is not yet closed, Err returns nil.
+	// If Done is closed, Err returns a non-nil error explaining why:
+	// Canceled if the context was canceled
+	// or DeadlineExceeded if the context's deadline passed.
+	// After Err returns a non-nil error, successive calls to Err return the same error.
+	Err() error
+}
+
+--------------------------------------------------------------------------------
+Go Version: go.test
+
+```
+
+<figcaption>_Listing 1.33:_ The [`context.Context.Err`](https://pkg.go.dev/context#Context.Err) method.</figcaption>
+</figure>
+
+## Context Cancelled Error
+
+The [`context`](https://pkg.go.dev/context) package defines two different [`error`](https://pkg.go.dev/builtin#error) variables that can be used to check an [`error`](https://pkg.go.dev/builtin#error) that was returned from [`context.Context.Err`](https://pkg.go.dev/context#Context.Err) method.
+
+The first is [`context.Canceled`](https://pkg.go.dev/context#Canceled), [Listing 1.34](#listing-1-34), which is returned when the context is cancelled through the use of a [`context.CancelFunc`](https://pkg.go.dev/context#CancelFunc) function. This [`error`](https://pkg.go.dev/builtin#error) is considered to indicate a "successful" cancellation.
+
+<figure id="listing-1-34" type="listing">
+
+```shell
+$ go doc context.Canceled
+
+package context // import "context"
+
+var Canceled = errors.New("context canceled")
+    Canceled is the error returned by Context.Err when the context is canceled.
+
+--------------------------------------------------------------------------------
+Go Version: go.test
+
+```
+
+<figcaption>_Listing 1.34:_ The [`context.Canceled`](https://pkg.go.dev/context#Canceled) [`error`](https://pkg.go.dev/builtin#error).</figcaption>
+</figure>
+
+Consider [Listing 1.35](#listing-1-35). When we first check the [`context.Context.Err`](https://pkg.go.dev/context#Context.Err) method, it returns `nil`. After we call the [`context.CancelFunc`](https://pkg.go.dev/context#CancelFunc) function provided by [`context.WithCancel`](https://pkg.go.dev/context#WithCancel), the [`context.Context.Err`](https://pkg.go.dev/context#Context.Err) method returns a [`context.Canceled`](https://pkg.go.dev/context#Canceled) error.
+
+<figure id="listing-1-35" type="listing">
+
+```go
+func main() {
+
+	// create a background context
+	ctx := context.Background()
+
+	// wrap the context with a
+	// cancellable context
+	ctx, cancel := context.WithCancel(ctx)
+
+	// check the error:
+	//	<nil>
+	fmt.Println("ctx.Err()", ctx.Err())
+
+	// cancel the context
+	cancel()
+
+	// check the error:
+	//	context.Canceled
+	fmt.Println("ctx.Err()", ctx.Err())
+
+	// check the error again:
+	//	context.Canceled
+	fmt.Println("ctx.Err()", ctx.Err())
+}
+```
+
+---
+
+```shell
+$ go run .
+
+ctx.Err() <nil>
+ctx.Err() context canceled
+ctx.Err() context canceled
+
+--------------------------------------------------------------------------------
+Go Version: go.test
+
+```
+
+<figcaption>_Listing 1.35:_ Checking for cancellation errors.</figcaption>
+</figure>
+
+As we can see from the output in [Listing 1.35](#listing-1-35), repeated calls to the [`context.Context.Err`](https://pkg.go.dev/context#Context.Err) method return the same [`context.Canceled`](https://pkg.go.dev/context#Canceled) error.
+
+## Context Deadline Exceeded Error
+
+When a [`context.Context`](https://pkg.go.dev/context#Context) is cancelled due to a deadline, or timeout, being exceeded, the [`context.Context.Err`](https://pkg.go.dev/context#Context.Err) method returns a [`context.DeadlineExceeded`](https://pkg.go.dev/context#DeadlineExceeded) error, [Listing 1.36](#listing-1-36).
+
+<figure id="listing-1-36" type="listing">
+
+```shell
+$ go doc context.DeadlineExceeded
+
+package context // import "context"
+
+var DeadlineExceeded error = deadlineExceededError{}
+    DeadlineExceeded is the error returned by Context.Err when the context's
+    deadline passes.
+
+--------------------------------------------------------------------------------
+Go Version: go.test
+
+```
+
+<figcaption>_Listing 1.36:_ The [`context.DeadlineExceeded`](https://pkg.go.dev/context#DeadlineExceeded) [`error`](https://pkg.go.dev/builtin#error).</figcaption>
+</figure>
+
+Consider [Listing 1.37](#listing-1-37). We create a [`context.Context`](https://pkg.go.dev/context#Context) that will self cancel after 1 second. When we check [`context.Context.Err`](https://pkg.go.dev/context#Context.Err) method, before the [`context.Context`](https://pkg.go.dev/context#Context) times out, it returns `nil`.
+
+<figure id="listing-1-37" type="listing">
+
+```go
+func main() {
+
+	// create a background context
+	ctx := context.Background()
+
+	// wrap the context that will
+	// self cancel after 10 milliseconds
+	ctx, cancel := context.WithTimeout(ctx, 10*time.Millisecond)
+	defer cancel()
+
+	// check the error:
+	//	<nil>
+	fmt.Println("ctx.Err()", ctx.Err())
+
+	// wait for the context to self cancel
+	<-ctx.Done()
+
+	// check the error:
+	//	context.Canceled
+	fmt.Println("ctx.Err()", ctx.Err())
+
+	// check the error again:
+	//	context.DeadlineExceeded
+	fmt.Println("ctx.Err()", ctx.Err())
+}
+```
+
+---
+
+```shell
+$ go run .
+
+ctx.Err() <nil>
+ctx.Err() context deadline exceeded
+ctx.Err() context deadline exceeded
+
+--------------------------------------------------------------------------------
+Go Version: go.test
+
+```
+
+<figcaption>_Listing 1.37:_ Checking for deadline exceeded errors.</figcaption>
+</figure>
+
+As we can see from the output, the [`context.Context`](https://pkg.go.dev/context#Context) times out after the specified time, and the [`context.Context.Err`](https://pkg.go.dev/context#Context.Err) method returns a [`context.DeadlineExceeded`](https://pkg.go.dev/context#DeadlineExceeded) error.
+
+---
+
+# Listening for System Signals with Context
+
+Previously, when discussing channels, we saw how to capture system signals, such as `ctrl-c`, using [`signal.Notify`](https://pkg.go.dev/os/signal#Notify). The [`signal.NotifyContext`](https://pkg.go.dev/os/signal#NotifyContext) function, [Listing 1.38](#listing-1-38), is a variant of [`signal.Notify`](https://pkg.go.dev/os/signal#Notify) that takes a [`context.Context`](https://pkg.go.dev/context#Context) as an argument. In return, we are given a [`context.Context`](https://pkg.go.dev/context#Context) that will be canceled when the signal is received.
+
+<figure id="listing-1-38" type="listing">
+
+```shell
+$ go doc os/signal.NotifyContext
+
+package signal // import "os/signal"
+
+func NotifyContext(parent context.Context, signals ...os.Signal) (ctx context.Context, stop context.CancelFunc)
+    NotifyContext returns a copy of the parent context that is marked done (its
+    Done channel is closed) when one of the listed signals arrives, when the
+    returned stop function is called, or when the parent context's Done channel
+    is closed, whichever happens first.
+
+    The stop function unregisters the signal behavior, which, like signal.Reset,
+    may restore the default behavior for a given signal. For example,
+    the default behavior of a Go program receiving os.Interrupt is to exit.
+    Calling NotifyContext(parent, os.Interrupt) will change the behavior to
+    cancel the returned context. Future interrupts received will not trigger the
+    default (exit) behavior until the returned stop function is called.
+
+    The stop function releases resources associated with it, so code should call
+    stop as soon as the operations running in this Context complete and signals
+    no longer need to be diverted to the context.
+
+--------------------------------------------------------------------------------
+Go Version: go.test
+
+```
+
+<figcaption>_Listing 1.38:_ The [`signal.NotifyContext`](https://pkg.go.dev/os/signal#NotifyContext) function.</figcaption>
+</figure>
+
+Consider [Listing 1.39](#listing-1-39). We use [`signal.NotifyContext`](https://pkg.go.dev/os/signal#NotifyContext) to listen for `ctrl-c`. This function returns a wrapped [`context.Context`](https://pkg.go.dev/context#Context) that will cancel when the signal is received. It also returns a [`context.CancelFunc`](https://pkg.go.dev/context#CancelFunc) that can be used to cancel [`context.Context`](https://pkg.go.dev/context#Context) when needed.
+
+<figure id="listing-1-39" type="listing">
+
+```go
+func main() {
+
+	// create a background context
+	ctx := context.Background()
+
+	// wrap the context with a timeout
+	// of 50 milliseconds to ensure the application
+	// will eventually exit
+	ctx, cancel := context.WithTimeout(ctx, 50*time.Millisecond)
+	defer cancel()
+
+	// wrap the context with a context
+	// that will be cancelled when an
+	// interrupt signal is received (ctrl-c)
+	ctx, cancel = signal.NotifyContext(ctx, os.Interrupt)
+	defer cancel()
+
+	// lauch a goroutine that will
+	// trigger an interrupt signal
+	// after 10 milliseconds (ctrl-c)
+	go func() {
+		time.Sleep(10 * time.Millisecond)
+
+		fmt.Println("sending ctrl-c")
+
+		// send the interrupt signal
+		// to the current process
+		syscall.Kill(syscall.Getpid(), syscall.SIGINT)
+	}()
+
+	fmt.Println("waiting for context to finish")
+
+	// wait for the context to finish
+	<-ctx.Done()
+
+	fmt.Printf("context finished: %v\n", ctx.Err())
+
+}
+```
+
+<figcaption>_Listing 1.39:_ Listening for system signals.</figcaption>
+</figure>
+
+## Testing Signals
+
+Testing system signals is tricky and care must be taken not to accidentally exit your running tests. Unfortunately, the [`syscall`](https://pkg.go.dev/syscall) package does not provide a "test" signal, or a way to implement a test signal.
+
+We can use [`syscall.SIGUSR1`](https://pkg.go.dev/syscall#SIGUSR1) or [`syscall.SIGUSR2`](https://pkg.go.dev/syscall#SIGUSR2) in our tests as these are allocated to the developer to use for their own purposes.
+
+When we are testing signals, we are testing a **global** signal, that will caught by anyone else who is listening to that signal. Because of this we want to make that when testing signals we aren't running the tests in parallel and that we don't have other tests also listening to the same signal.
+
+Consider [Listing 1.40](#listing-1-40). How do we test that the `Listener` function will respond properly to a signal? We don't want to make that the responsibility of the `Listener` function, it already has a [`context.Context`](https://pkg.go.dev/context#Context) that it can listen to for cancellation. The `Listener` function doesn't care why it was told to stop listening, it just needs to stop listening. This could be because we receive an interrupt signal, because a deadline has passed, or because the application no longer needs the `Lister` function to keep running.
+
+<figure id="listing-1-40" type="listing">
+
+```go
+func Listener(ctx context.Context, t testing.TB) {
+	t.Log("waiting for context to finish")
+
+	// wait for the context to finish
+	<-ctx.Done()
+
+}
+```
+
+<figcaption>_Listing 1.40:_ The `Listener` function.</figcaption>
+</figure>
+
+In, [Listing 1.41](#listing-1-41), before we call the `Listener` function, we first create a [`context.Context`](https://pkg.go.dev/context#Context) that will self-cancel after 5 seconds if nothing else happens. We then wrap that [`context.Context`](https://pkg.go.dev/context#Context) with one received from the [`signal.NotifyContext`](https://pkg.go.dev/os/signal#NotifyContext) function, that will self-cancel when the system receives a `TEST_SIGNAL` signal.
+
+Our test blocks with a `select` waiting for either [`context.Context`](https://pkg.go.dev/context#Context) to be cancelled, and then respond accordingly.
+
+<figure id="listing-1-41" type="listing">
+
+```go
+// use syscall.SIGUSR2 to test
+const TEST_SIGNAL = syscall.SIGUSR2
+
+func Test_Signals(t *testing.T) {
+
+	// create a background context
+	ctx := context.Background()
+
+	// wrap the context with a context
+	// that will self cancel after 5 seconds
+	// if the context is not finished
+	ctx, cancel := context.WithTimeout(ctx, 5*time.Second)
+	defer cancel()
+
+	// wrap the context with a context
+	// that will self cancel if the system
+	// receives a TEST_SIGNAL
+	sigCtx, cancel := signal.NotifyContext(ctx, TEST_SIGNAL)
+	defer cancel()
+
+	print(t, sigCtx)
+
+	// launch a goroutine to wait for the context
+	// to finish
+	go Listener(sigCtx, t)
+
+	// launch a goroutine to send a TEST_SIGNAL
+	// to the system after 1 second
+	go func() {
+		time.Sleep(time.Second)
+
+		t.Log("sending test signal")
+
+		// send the TEST_SIGNAL to the system
+		syscall.Kill(syscall.Getpid(), TEST_SIGNAL)
+	}()
+
+	// wait for the context to finish
+	select {
+	case <-ctx.Done():
+		t.Log("context finished")
+	case <-sigCtx.Done():
+		t.Log("signal received")
+		t.Log("successfully completed")
+		return
+	}
+
+	err := ctx.Err()
+	if err == nil {
+		return
+	}
+
+	// if we receive a DeadlineExceeded error then
+	// the context timed out and the signal was never
+	// received.
+	if err == context.DeadlineExceeded {
+		t.Fatal("unexpected error", err)
+	}
+
+}
+```
+
+<figcaption>_Listing 1.41:_ Testing the `Listener` function.</figcaption>
+</figure>
+
+Inside the test, in a goroutine, we can trigger the `TEST_SIGNAL` signal by sending it to the current process, [`syscall.Getpid`](https://pkg.go.dev/syscall#Getpid), with the [`syscall.Kill`](https://pkg.go.dev/syscall#Kill) function.
+
+<figure id="listing-1-42" type="listing">
+
+```go
+// launch a goroutine to send a TEST_SIGNAL
+// to the system after 1 second
+go func() {
+	time.Sleep(time.Second)
+
+	t.Log("sending test signal")
+
+	// send the TEST_SIGNAL to the system
+	syscall.Kill(syscall.Getpid(), TEST_SIGNAL)
+}()
+```
+
+---
+
+```shell
+$ go test -v
+
+=== RUN   Test_Signals
+    signals_test.go:46: SignalCtx([]os.Signal{31})
+        	--> WithCancel
+        		--> WithTimeout(deadline: {wall:13906264022995341112 ext:5000771376 loc:0x10049a7c0})
+        			--> Background
+    signals_test.go:15: waiting for context to finish
+    signals_test.go:58: sending test signal
+    signals_test.go:70: signal received
+    signals_test.go:71: successfully completed
+--- PASS: Test_Signals (1.00s)
+PASS
+ok  	demo	1.772s
+
+--------------------------------------------------------------------------------
+Go Version: go.test
+
+```
+
+<figcaption>_Listing 1.42:_ Sending a `TEST_SIGNAL` signal.</figcaption>
+</figure>
+
+---
+
+# Summary
+
+In this chapter we explore the concept of contexts in Go. We learn that contexts are a way to manage cancellation, timeouts, and other request-scoped values across API boundaries and between processes. We also learn how to use contexts to clean up a lot of code involving channels, such as listening for system signals. We discussed the nodal hierarchy of how the [`context`](https://pkg.go.dev/context) package wraps a new [`context.Context`](https://pkg.go.dev/context#Context) around a parent [`context.Context`](https://pkg.go.dev/context#Context). We learned the different was to cancel a [`context.Context`](https://pkg.go.dev/context#Context) and how to use multiple [`context.Context`](https://pkg.go.dev/context#Context)s to confirm shutdown behavior. The [`context`](https://pkg.go.dev/context) package, while small, is a very powerful tool for managing concurrency in your application.

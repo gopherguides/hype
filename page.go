@@ -44,6 +44,14 @@ func (page *Page) PostParse(p *Parser, d *Document, err error) error {
 	return nil
 }
 
+func (page *Page) MD() string {
+	if page == nil {
+		return ""
+	}
+
+	return page.Children().MD()
+}
+
 func NewPage(el *Element) (*Page, error) {
 	if el == nil {
 		return nil, ErrIsNil("el")

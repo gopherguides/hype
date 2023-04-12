@@ -2,7 +2,6 @@ package hype
 
 import (
 	"context"
-	"fmt"
 	"io"
 	"strings"
 	"testing"
@@ -32,7 +31,7 @@ func Test_Markdown_UnknownAtom(t *testing.T) {
 	act := doc.String()
 	act = strings.TrimSpace(act)
 
-	fmt.Println(act)
+	// fmt.Println(act)
 	r.Equal(act, exp)
 }
 

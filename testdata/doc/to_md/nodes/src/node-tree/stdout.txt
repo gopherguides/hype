@@ -1,0 +1,18 @@
+A.WithValue(key: ctx_id, value: A)
+	--> Background
+
+A1.WithValue(key: ctx_id, value: A1)
+	--> WithValue(key: ctx_id, value: A)
+		--> Background
+
+B.WithValue(key: ctx_id, value: B)
+	--> Background
+
+B1.WithValue(key: ctx_id, value: B1)
+	--> WithValue(key: ctx_id, value: B)
+		--> Background
+
+B1a.WithValue(key: ctx_id, value: B1a)
+	--> WithValue(key: ctx_id, value: B1)
+		--> WithValue(key: ctx_id, value: B)
+			--> Background

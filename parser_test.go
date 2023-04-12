@@ -70,7 +70,7 @@ func main() {
 </page>
 
 <page>
-<cmd exec="echo hello"><pre><code class="language-text" language="text">$ echo hello
+<cmd exec="echo hello"><pre><code class="language-shell" language="shell">$ echo hello
 
 hello</code></pre></cmd>
 

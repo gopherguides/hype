@@ -1,6 +1,9 @@
 package hype
 
-import "strings"
+import (
+	"fmt"
+	"strings"
+)
 
 type Link struct {
 	*Element
@@ -12,6 +15,19 @@ func (l *Link) Href() (string, error) {
 	}
 
 	return l.ValidAttr("href")
+}
+
+func (l *Link) MD() string {
+	if l == nil {
+		return ""
+	}
+
+	h, err := l.Href()
+	if err != nil {
+		return ""
+	}
+
+	return fmt.Sprintf("[%s](%s)", l.Children().MD(), h)
 }
 
 func NewLink(el *Element) (*Link, error) {

@@ -1,0 +1,6 @@
+main.go:12:31: SA1029: should not use built-in type string as key for value; define your own type to avoid collisions (staticcheck)
+	ctx = context.WithValue(ctx, "key", "value")
+	                             ^
+main.go:13:31: SA1029: keys used with context.WithValue must be comparable, but type map[string]int is not comparable (staticcheck)
+	ctx = context.WithValue(ctx, map[string]int{}, []fmt.Stringer{})
+	                             ^

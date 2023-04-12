@@ -1,0 +1,12 @@
+=== RUN   Test_Signals
+    signals_test.go:46: SignalCtx([]os.Signal{31})
+        	--> WithCancel
+        		--> WithTimeout(deadline: {wall:13860444037902683024 ext:5000441750 loc:0x1204700})
+        			--> Background
+    signals_test.go:15: waiting for context to finish
+    signals_test.go:58: sending test signal
+    signals_test.go:70: signal received
+    signals_test.go:71: successfully completed
+--- PASS: Test_Signals (1.00s)
+PASS
+ok  	demo	1.273s

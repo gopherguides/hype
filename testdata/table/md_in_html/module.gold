@@ -1,0 +1,38 @@
+<html><head></head><body><page>
+<h1>Table Data</h1>
+
+<table>
+<thead>
+<tr>
+<th>
+<a href="example.com">Name</a>
+</th>
+<th>Age</th>
+</tr>
+</thead>
+
+<tbody>
+<tr>
+<td>Alice</td>
+<td>
+<strong>42</strong>
+</td>
+</tr>
+
+<tr>
+<td>Bob</td>
+<td>13</td>
+</tr>
+
+<tr>
+<td>Kurt</td>
+<td>
+<em>27</em>
+</td>
+</tr>
+</tbody>
+</table>
+
+<p>More text</p>
+</page>
+</body></html>

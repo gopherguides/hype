@@ -3,7 +3,7 @@
 
 <p>This is a command with data attrs.</p>
 
-<cmd data-extremes="joel" data-foo="bar" exec="echo 'hello'"><pre><code class="language-text" language="text">$ echo hello
+<cmd data-extremes="joel" data-foo="bar" exec="echo 'hello'"><pre><code class="language-shell" language="shell">$ echo hello
 
 hello
 

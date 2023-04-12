@@ -3,6 +3,7 @@ package hype
 import (
 	"bytes"
 	"fmt"
+	"html"
 	"path/filepath"
 	"regexp"
 	"sort"
@@ -23,6 +24,10 @@ type Snippet struct {
 
 func (snip Snippet) String() string {
 	return snip.Content
+}
+
+func (snip Snippet) MD() string {
+	return html.UnescapeString(snip.Content)
 }
 
 func (snip Snippet) IsZero() bool {

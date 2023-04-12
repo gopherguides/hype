@@ -4,6 +4,7 @@ import (
 	"context"
 	"fmt"
 	"io/fs"
+	"strings"
 	"sync"
 
 	"golang.org/x/sync/errgroup"
@@ -154,4 +155,24 @@ func (docs Documents) Execute(ctx context.Context) error {
 	}
 
 	return wg.Wait()
+}
+
+func (doc *Document) MD() string {
+	if doc == nil {
+		return ""
+	}
+
+	pages, err := doc.Pages()
+
+	if err != nil {
+		return ""
+	}
+
+	bodies := make([]string, 0, len(pages))
+
+	for _, page := range pages {
+		bodies = append(bodies, page.MD())
+	}
+
+	return strings.Join(bodies, "\n---\n")
 }

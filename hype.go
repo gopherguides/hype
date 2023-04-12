@@ -21,12 +21,19 @@ func DefaultElements() map[Atom]ParseElementFn {
 		atomx.Image:      NewImageNodes,
 		atomx.Img:        NewImageNodes,
 		atomx.Include:    NewIncludeNodes,
+		atomx.Li:         NewLINodes,
 		atomx.Link:       NewLinkNodes,
 		atomx.Metadata:   NewMetadataNodes,
+		atomx.Ol:         NewOLNodes,
 		atomx.P:          NewParagraphNodes,
 		atomx.Page:       NewPageNodes,
 		atomx.Ref:        NewRefNodes,
 		atomx.Table:      NewTableNodes,
+		atomx.Td:         NewTDNodes,
+		atomx.Th:         NewTHNodes,
+		atomx.Thead:      NewTHeadNodes,
+		atomx.Tr:         NewTRNodes,
+		atomx.Ul:         NewULNodes,
 	}
 
 	for _, h := range atomx.Headings() {

@@ -17,6 +17,11 @@ type HTMLNode interface {
 	HTML() *html.Node
 }
 
+type MDNode interface {
+	Node
+	MD() string
+}
+
 func (list Nodes) String() string {
 	var s string
 	for _, n := range list {
@@ -25,6 +30,20 @@ func (list Nodes) String() string {
 			continue
 		}
 		s += n.Children().String()
+	}
+
+	return s
+}
+
+func (list Nodes) MD() string {
+	var s string
+	for _, n := range list {
+		if st, ok := n.(MDNode); ok {
+			s += st.MD()
+			continue
+		}
+
+		panic(fmt.Sprintf("node %T does not implement MDNode", n))
 	}
 
 	return s

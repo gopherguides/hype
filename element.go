@@ -8,6 +8,7 @@ import (
 	"strings"
 	"sync"
 
+	"github.com/gopherguides/hype/atomx"
 	"golang.org/x/net/html"
 	"golang.org/x/net/html/atom"
 )
@@ -209,4 +210,35 @@ func (el *Element) Set(k string, v string) error {
 	}
 
 	return nil
+}
+
+func (el *Element) MD() string {
+	if el == nil {
+		return ""
+	}
+
+	switch el.Atom() {
+	case atomx.Strong, atomx.B:
+		return fmt.Sprintf("**%s**", el.Children().MD())
+	case atomx.Em, atomx.I:
+		return fmt.Sprintf("_%s_", el.Children().MD())
+	case atomx.Pre:
+		return el.Children().MD()
+	case atomx.Hr:
+		return "\n\n---\n\n"
+	case atomx.Blockquote:
+		b := el.Children().MD()
+		b = strings.TrimSpace(b)
+		// panic(b)
+		return fmt.Sprintf("> %s", b)
+	default:
+		fmt.Printf("TODO: Element.MD(): %q\n", el.Atom())
+	}
+
+	bb := &bytes.Buffer{}
+	bb.WriteString(el.StartTag())
+	bb.WriteString(el.Children().MD())
+	bb.WriteString(el.EndTag())
+
+	return bb.String()
 }

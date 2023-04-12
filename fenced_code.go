@@ -1,5 +1,11 @@
 package hype
 
+import (
+	"bytes"
+	"fmt"
+	"html"
+)
+
 type FencedCode struct {
 	*Element
 }
@@ -22,6 +28,25 @@ func (code *FencedCode) EndTag() string {
 
 func (code *FencedCode) String() string {
 	return code.StartTag() + code.Children().String() + code.EndTag()
+}
+
+func (code *FencedCode) MD() string {
+	if code == nil {
+		return ""
+	}
+
+	bb := &bytes.Buffer{}
+
+	fmt.Fprintf(bb, "```%s\n", code.Lang())
+
+	body := code.Children().MD()
+	body = html.UnescapeString(body)
+
+	fmt.Fprintln(bb, body)
+
+	fmt.Fprint(bb, "```")
+
+	return bb.String()
 }
 
 func (code *FencedCode) Lang() string {

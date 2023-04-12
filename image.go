@@ -9,6 +9,14 @@ type Image struct {
 	*Element
 }
 
+func (i *Image) MD() string {
+	if i == nil {
+		return ""
+	}
+
+	return i.Element.String()
+}
+
 func (i *Image) Execute(ctx context.Context, doc *Document) error {
 	if i == nil {
 		return ErrIsNil("image")

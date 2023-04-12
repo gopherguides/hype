@@ -67,7 +67,7 @@ func Test_Cmd_Execute(t *testing.T) {
 	act := c.String()
 	act = strings.TrimSpace(act)
 
-	exp := `<cmd exec="echo hello" hide-cmd=""><pre><code class="language-text" language="text">hello</code></pre></cmd>`
+	exp := `<cmd exec="echo hello" hide-cmd=""><pre><code class="language-shell" language="shell">hello</code></pre></cmd>`
 
 	// fmt.Println(act)
 	r.Equal(exp, act)

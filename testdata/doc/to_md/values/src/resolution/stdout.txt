@@ -1,0 +1,8 @@
+ctx.WithValue(key: C, value: c)
+	--> WithValue(key: B, value: b)
+		--> WithValue(key: A, value: a)
+			--> Background
+
+A: a
+B: b
+C: c

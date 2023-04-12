@@ -3,7 +3,7 @@
 
 <p>This is a command with data attrs.</p>
 
-<cmd data-go-version="go.test" exec="go run ." run="." src="src" truncate="5"><pre><code class="language-text" language="text">$ go run .
+<cmd data-go-version="go.test" exec="go run ." run="." src="src" truncate="5"><pre><code class="language-shell" language="shell">$ go run .
 
 0
 1

@@ -1,0 +1,23 @@
+<html><head></head><body><page>
+<h1>Table Data</h1>
+
+<tbody>
+<tr>
+<td>Alice</td>
+<td>42</td>
+</tr>
+
+<tr>
+<td>Bob</td>
+<td>13</td>
+</tr>
+
+<tr>
+<td>Kurt</td>
+<td>27</td>
+</tr>
+</tbody>
+</table>
+<p>More text</p>
+</page>
+</body></html>

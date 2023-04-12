@@ -1,7 +1,6 @@
 package hype
 
 import (
-	"fmt"
 	"os"
 	"testing"
 
@@ -22,7 +21,7 @@ func Test_Table_Data(t *testing.T) {
 	doc, err := p.ParseFile("module.md")
 	r.NoError(err)
 
-	fmt.Println(doc.String())
+	// fmt.Println(doc.String())
 	r.NotNil(doc)
 
 	tables := ByType[*Table](doc.Children())
@@ -50,4 +49,28 @@ func Test_Table_Data(t *testing.T) {
 	r.Equal(table.Row{"Alice", "42"}, rows[0])
 	r.Equal(table.Row{"Bob", "13"}, rows[1])
 	r.Equal(table.Row{"Kurt", "27"}, rows[2])
+}
+
+func Test_Table_MD_in_MD(t *testing.T) {
+	t.Parallel()
+
+	root := "testdata/table/md_in_md"
+
+	testModule(t, root)
+}
+
+func Test_Table_MD_in_HTML(t *testing.T) {
+	t.Parallel()
+
+	root := "testdata/table/md_in_html"
+
+	testModule(t, root)
+}
+
+func Test_Table_No_THEAD(t *testing.T) {
+	t.Parallel()
+	t.Skip()
+	root := "testdata/table/headless"
+
+	testModule(t, root)
 }

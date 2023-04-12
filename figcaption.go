@@ -1,7 +1,22 @@
 package hype
 
+import "strings"
+
 type Figcaption struct {
 	*Element
+}
+
+func (fc *Figcaption) MD() string {
+	if fc == nil {
+		return ""
+	}
+
+	bb := &strings.Builder{}
+	bb.WriteString(fc.StartTag())
+	bb.WriteString(fc.Nodes.MD())
+	bb.WriteString(fc.EndTag())
+
+	return bb.String()
 }
 
 func NewFigcaption(el *Element) (*Figcaption, error) {

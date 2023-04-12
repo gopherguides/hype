@@ -262,18 +262,20 @@ func (p *Parser) ParseFragment(r io.Reader) (Nodes, error) {
 		return nil, p.wrapErr(err)
 	}
 
-	pages := ByType[*Page](doc.Nodes)
+	nodes := doc.Nodes
+
+	pages := ByType[*Page](nodes)
 
 	if len(pages) > 0 {
-		return pages[0].Nodes, nil
+		nodes = pages[0].Nodes
 	}
 
-	body, err := doc.Body()
-	if err != nil {
-		return nil, p.wrapErr(err)
+	pg, ok := FirstByType[*Paragraph](nodes)
+	if ok {
+		return pg.Nodes, nil
 	}
 
-	return body.Nodes, nil
+	return nodes, nil
 }
 
 func (p *Parser) ParseHTMLNode(node *html.Node, parent Node) (Node, error) {

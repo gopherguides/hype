@@ -13,6 +13,14 @@ type Ref struct {
 	*Figure
 }
 
+func (r *Ref) MD() string {
+	if r == nil || r.Element == nil {
+		return ""
+	}
+
+	return r.Children().MD()
+}
+
 func (r *Ref) PostExecute(ctx context.Context, doc *Document, err error) error {
 	if err != nil {
 		return nil
@@ -30,7 +38,10 @@ func (r *Ref) PostExecute(ctx context.Context, doc *Document, err error) error {
 		return fmt.Errorf("%w: %s", ErrIsNil("figure"), r.StartTag())
 	}
 
-	href := NewEl(atomx.A, r)
+	href := &Link{
+		Element: NewEl(atomx.A, r),
+	}
+
 	if err := href.Set("href", r.Link()); err != nil {
 		return err
 	}

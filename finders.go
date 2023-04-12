@@ -51,3 +51,30 @@ func ByAtom[T ~string](nodes Nodes, want ...T) []AtomableNode {
 	}
 	return res
 }
+
+func FirstByType[T Node](nodes Nodes) (T, bool) {
+	res := ByType[T](nodes)
+	if len(res) == 0 {
+		return *new(T), false
+	}
+
+	return res[0], true
+}
+
+func FirstByAttrs(nodes Nodes, query map[string]string) (AttrNode, bool) {
+	res := ByAttrs(nodes, query)
+	if len(res) == 0 {
+		return nil, false
+	}
+
+	return res[0], true
+}
+
+func FirstByAtom[T ~string](nodes Nodes, want ...T) (AtomableNode, bool) {
+	res := ByAtom(nodes, want...)
+	if len(res) == 0 {
+		return nil, false
+	}
+
+	return res[0], true
+}

@@ -43,6 +43,14 @@ func (code *InlineCode) String() string {
 	return bb.String()
 }
 
+func (code *InlineCode) MD() string {
+	if code == nil || code.Element == nil {
+		return ""
+	}
+
+	return fmt.Sprintf("`%s`", code.Nodes.String())
+}
+
 func NewInlineCode(el *Element) (*InlineCode, error) {
 	if el == nil {
 		return nil, ErrIsNil("element")

@@ -15,6 +15,10 @@ func (tn Text) String() string {
 	return string(tn)
 }
 
+func (tn Text) MD() string {
+	return string(tn)
+}
+
 func (tn Text) Format(f fmt.State, verb rune) {
 	if len(tn) == 0 {
 		return

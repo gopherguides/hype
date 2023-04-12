@@ -2,6 +2,8 @@ package hype
 
 import (
 	"context"
+	"io/fs"
+	"strings"
 	"testing"
 	"testing/fstest"
 	"time"
@@ -86,4 +88,34 @@ func Test_Document_Execute(t *testing.T) {
 
 	r.Equal(exp, act)
 
+}
+
+func Test_Document_MD(t *testing.T) {
+	t.Skip("TODO: fix this test")
+	t.Parallel()
+	r := require.New(t)
+
+	root := "testdata/doc/to_md"
+
+	p := testParser(t, root)
+
+	ctx, cancel := context.WithTimeout(context.Background(), time.Second*30)
+	defer cancel()
+
+	doc, err := p.ParseExecuteFile(ctx, "module.md")
+	r.NoError(err)
+
+	s := doc.MD()
+	act := string(s)
+	act = strings.TrimSpace(act)
+
+	// fmt.Println(act)
+
+	b, err := fs.ReadFile(p.FS, "module.gold")
+	r.NoError(err)
+
+	exp := string(b)
+	exp = strings.TrimSpace(exp)
+
+	r.Equal(exp, act)
 }

@@ -54,6 +54,24 @@ func (code *SourceCode) String() string {
 	return bb.String()
 }
 
+func (code *SourceCode) MD() string {
+	if code == nil {
+		return ""
+	}
+
+	bb := &bytes.Buffer{}
+	fmt.Fprintf(bb, "```%s\n", code.Lang)
+
+	body := code.Children().MD()
+	body = html.UnescapeString(body)
+
+	fmt.Fprintln(bb, body)
+
+	fmt.Fprint(bb, "```")
+
+	return bb.String()
+}
+
 func (code *SourceCode) Execute(ctx context.Context, d *Document) error {
 	if d == nil {
 		return ErrIsNil("document")

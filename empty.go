@@ -1,6 +1,8 @@
 package hype
 
-import "strings"
+import (
+	"strings"
+)
 
 type EmptyableNode interface {
 	IsEmptyNode() bool

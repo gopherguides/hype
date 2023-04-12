@@ -6,7 +6,7 @@
 
 <img alt="2" src="assets/nodes.svg"></img>
 
-<cmd exec="echo 'Hello'"><pre><code class="language-text" language="text">$ echo Hello
+<cmd exec="echo 'Hello'"><pre><code class="language-shell" language="shell">$ echo Hello
 
 Hello</code></pre></cmd>
 

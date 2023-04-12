@@ -3,7 +3,6 @@ package hytex
 import (
 	"bytes"
 	"context"
-	"fmt"
 	"io/fs"
 	"os"
 	"runtime"
@@ -39,7 +38,7 @@ func Test_Covert(t *testing.T) {
 
 	act = bytes.TrimSpace(act)
 
-	fmt.Println(string(act))
+	// fmt.Println(string(act))
 
 	exp, err := fs.ReadFile(cab, "module.tex.gold")
 	r.NoError(err)

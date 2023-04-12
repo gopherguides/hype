@@ -24,8 +24,18 @@ type Cmd struct {
 	res *CmdResult
 }
 
+func (c *Cmd) MD() string {
+	if c == nil {
+		return ""
+	}
+
+	return c.Children().MD()
+}
+
 // Result returns the result of executing the command.
 func (c *Cmd) Result() *CmdResult {
+	c.RLock()
+	defer c.RUnlock()
 	return c.res
 }
 
