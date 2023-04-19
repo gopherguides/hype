@@ -75,12 +75,14 @@ func (cmd *App) ScopedPlugins() plugins.Plugins {
 }
 
 func New(root string) *App {
+	cab := os.DirFS(root)
+
 	app := &App{
 		Cmd: cleo.Cmd{
 			Name: "hype",
-			FS:   os.DirFS(root),
+			FS:   cab,
 		},
-		Parser: hype.NewParser(os.DirFS(root)),
+		Parser: hype.NewParser(cab),
 	}
 
 	app.Feeder = func() plugins.Plugins {
