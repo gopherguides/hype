@@ -75,12 +75,12 @@ func (cmd *App) ScopedPlugins() plugins.Plugins {
 }
 
 func New(root string) *App {
-	// panic(root)
 	app := &App{
 		Cmd: cleo.Cmd{
 			Name: "hype",
 			FS:   os.DirFS(root),
 		},
+		Parser: hype.NewParser(os.DirFS(root)),
 	}
 
 	app.Feeder = func() plugins.Plugins {
@@ -99,18 +99,6 @@ func New(root string) *App {
 				},
 				Parser: app.Parser,
 			},
-			// &Latex{
-			// 	Cmd: cleo.Cmd{
-			// 		Name:    "latex",
-			// 		Aliases: []string{"l"},
-			// 	},
-			// },
-			// &VSCode{
-			// 	Cmd: cleo.Cmd{
-			// 		Name:    "vscode",
-			// 		Aliases: []string{"code"},
-			// 	},
-			// },
 		}
 	}
 

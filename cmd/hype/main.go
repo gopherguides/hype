@@ -3,12 +3,9 @@ package main
 import (
 	"context"
 	_ "embed"
-	"fmt"
 	"log"
 	"os"
 	"os/signal"
-	"path/filepath"
-	"strings"
 
 	"github.com/gopherguides/hype/cmd/hype/cli"
 	"github.com/markbates/cleo"
@@ -18,33 +15,9 @@ import (
 func main() {
 	args := os.Args[1:]
 
-	pwd, err := os.Getwd()
+	pwd, err := cli.Getwd()
 	if err != nil {
 		log.Fatal(err)
-	}
-
-	usr, err := os.UserHomeDir()
-	if err != nil {
-		log.Fatal(err)
-	}
-
-	xp := os.Getenv("PATH")
-	paths := []string{
-		xp,
-		"/opt/homebrew/bin",
-		"/usr/local/bin",
-		"/usr/bin",
-		"/bin",
-		"/usr/sbin",
-		"/sbin",
-		filepath.Join(usr, "go", "bin"),
-	}
-
-	xp = strings.Join(paths, ":")
-	os.Setenv("PATH", xp)
-
-	if mp := os.Getenv("MARKED_PATH"); len(mp) > 0 {
-		pwd = filepath.Dir(mp)
 	}
 
 	app := cli.New(pwd)
@@ -62,7 +35,6 @@ func main() {
 
 	err = clove.Main(ctx, pwd, args)
 	if err != nil {
-		err = fmt.Errorf("%w: PATH: %q", err, xp)
 		cleo.Exit(app, 1, err)
 		os.Exit(1)
 	}
