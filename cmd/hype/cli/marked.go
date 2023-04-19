@@ -144,6 +144,7 @@ func (cmd *Marked) execute(ctx context.Context, pwd string) error {
 	if p == nil {
 		p = hype.NewParser(cmd.FS)
 	}
+
 	p.Root = filepath.Dir(mp)
 
 	if len(cmd.File) > 0 {

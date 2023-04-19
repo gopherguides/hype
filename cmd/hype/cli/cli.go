@@ -90,6 +90,7 @@ func New(root string) *App {
 					Name:    "marked",
 					Aliases: []string{"m", "md"},
 				},
+				Parser: app.Parser,
 			},
 			&Marked{
 				Cmd: cleo.Cmd{

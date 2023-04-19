@@ -42,8 +42,6 @@ func (list Nodes) MD() string {
 			s += st.MD()
 			continue
 		}
-
-		panic(fmt.Sprintf("node %T does not implement MDNode", n))
 	}
 
 	return s
