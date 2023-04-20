@@ -35,7 +35,12 @@ func (cmd *App) Main(ctx context.Context, pwd string, args []string) error {
 		return err
 	}
 
-	c := plugcmd.FindFromArgs(args, cmd.ScopedPlugins())
+	plugs := plugins.Plugins{}
+	for _, c := range cmd.SubCommands() {
+		plugs = append(plugs, c)
+	}
+
+	c := plugcmd.FindFromArgs(args, plugs)
 
 	if c == nil {
 		return plugins.Wrap(cmd, cleo.ErrNoCommands)
@@ -45,14 +50,6 @@ func (cmd *App) Main(ctx context.Context, pwd string, args []string) error {
 	if err == nil {
 		return nil
 	}
-
-	// if errors.Is(err, flag.ErrHelp) {
-	// 	return nil
-	// }
-
-	// if errors.Is(err, cleo.ErrNoCommand) {
-	// 	return nil
-	// }
 
 	return err
 }
@@ -77,31 +74,34 @@ func (cmd *App) ScopedPlugins() plugins.Plugins {
 func New(root string) *App {
 	cab := os.DirFS(root)
 
+	p := hype.NewParser(cab)
+
+	m := &Marked{
+		Cmd: cleo.Cmd{
+			Name:    "marked",
+			Aliases: []string{"m", "md"},
+		},
+		Parser: p,
+	}
+
+	mp := &Marked{
+		Cmd: cleo.Cmd{
+			Name:    "preview",
+			Aliases: []string{"p"},
+		},
+		Parser: p,
+	}
+
 	app := &App{
 		Cmd: cleo.Cmd{
 			Name: "hype",
 			FS:   cab,
+			Commands: map[string]cleo.Commander{
+				"marked":  m,
+				"preview": mp,
+			},
 		},
-		Parser: hype.NewParser(cab),
-	}
-
-	app.Feeder = func() plugins.Plugins {
-		return plugins.Plugins{
-			&Marked{
-				Cmd: cleo.Cmd{
-					Name:    "marked",
-					Aliases: []string{"m", "md"},
-				},
-				Parser: app.Parser,
-			},
-			&Marked{
-				Cmd: cleo.Cmd{
-					Name:    "preview",
-					Aliases: []string{"p"},
-				},
-				Parser: app.Parser,
-			},
-		}
+		Parser: p,
 	}
 
 	return app
