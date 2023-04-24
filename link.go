@@ -1,12 +1,38 @@
 package hype
 
 import (
+	"encoding/json"
 	"fmt"
 	"strings"
 )
 
 type Link struct {
 	*Element
+}
+
+func (l *Link) MarshalJSON() ([]byte, error) {
+	if l == nil {
+		return nil, ErrIsNil("link")
+	}
+
+	l.RLock()
+	defer l.RUnlock()
+
+	m, err := l.JSONMap()
+	if err != nil {
+		return nil, err
+	}
+
+	m["type"] = fmt.Sprintf("%T", l)
+
+	h, err := l.Href()
+	if err != nil {
+		return nil, err
+	}
+
+	m["url"] = h
+
+	return json.Marshal(m)
 }
 
 func (l *Link) Href() (string, error) {

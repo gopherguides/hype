@@ -1,5 +1,14 @@
 # Context
 
+<metadata>
+class: center, middle, inverse
+duration: 45m
+exercises: 2 Shared Lab, 1 Student Labs
+level: Intermediate
+name: gRPC Middleware
+topic: Distributed Computing
+</metadata>
+
 Introduced in Go 1.7, the <godoc>context</godoc> package was introduced to provide a cleaner way, than the use of channels, of managing cancellation and timeouts across goroutines.
 
 While the scope, and API footprint of the package is pretty small, it was a welcome addition to the language when introduced.

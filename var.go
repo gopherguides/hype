@@ -2,6 +2,7 @@ package hype
 
 import (
 	"context"
+	"encoding/json"
 	"fmt"
 	"strings"
 
@@ -13,6 +14,33 @@ type Var struct {
 	Data *syncx.Map[string, any]
 
 	value any
+}
+
+func (v *Var) MarshalJSON() ([]byte, error) {
+	if v == nil {
+		return nil, ErrIsNil("var")
+	}
+
+	v.RLock()
+	defer v.RUnlock()
+
+	m, err := v.JSONMap()
+	if err != nil {
+		return nil, err
+	}
+
+	m["type"] = fmt.Sprintf("%T", v)
+
+	if v.value != nil {
+		m["value"] = v.value
+	}
+
+	data := v.Data
+	if data != nil && data.Len() > 0 {
+		m["data"] = data
+	}
+
+	return json.Marshal(m)
 }
 
 func (v *Var) String() string {

@@ -2,6 +2,7 @@ package hype
 
 import (
 	"bytes"
+	"encoding/json"
 	"fmt"
 	"html"
 	"path/filepath"
@@ -14,12 +15,12 @@ import (
 )
 
 type Snippet struct {
-	Content string // The content of the snippet
-	File    string // the file name of the snippet
-	Lang    string // the language of the snippet
-	Name    string // the name of the snippet
-	Start   int    // the start line of the snippet
-	End     int    // the end line of the snippet
+	Content string `json:"content,omitempty"` // The content of the snippet
+	File    string `json:"file,omitempty"`    // the file name of the snippet
+	Lang    string `json:"lang,omitempty"`    // the language of the snippet
+	Name    string `json:"name,omitempty"`    // the name of the snippet
+	Start   int    `json:"start,omitempty"`   // the start line of the snippet
+	End     int    `json:"end,omitempty"`     // the end line of the snippet
 }
 
 func (snip Snippet) String() string {
@@ -44,6 +45,42 @@ type Snippets struct {
 
 	once sync.Once
 	mu   sync.RWMutex
+}
+
+func (sm *Snippets) MarshalJSON() ([]byte, error) {
+	if sm == nil {
+		return nil, ErrIsNil("snippets")
+	}
+
+	m := struct {
+		Rules    map[string]string             `json:"rules,omitempty"`
+		Snippets map[string]map[string]Snippet `json:"snippets,omitempty"`
+	}{
+		Rules:    sm.rules,
+		Snippets: sm.snippets,
+	}
+
+	return json.Marshal(m)
+}
+
+func (sm *Snippets) UnmarshalJSON(data []byte) error {
+	m := struct {
+		Rules    map[string]string             `json:"rules,omitempty"`
+		Snippets map[string]map[string]Snippet `json:"snippets,omitempty"`
+	}{}
+
+	err := json.Unmarshal(data, &m)
+	if err != nil {
+		return err
+	}
+
+	sm.mu.Lock()
+	defer sm.mu.Unlock()
+
+	sm.snippets = m.Snippets
+	sm.rules = m.Rules
+
+	return nil
 }
 
 func (sm *Snippets) init() {

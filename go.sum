@@ -20,6 +20,8 @@ github.com/markbates/sweets v0.0.0-20210926032915-062eb9bcc0e5 h1:od8GvggTptD2HU
 github.com/markbates/sweets v0.0.0-20210926032915-062eb9bcc0e5/go.mod h1:NMNrJiINR9aeBgn5wfzZMJOnwWnDaj4hDOGpGoVV3XE=
 github.com/markbates/syncx v1.5.0 h1:4uMUWiwaSyAyCMJVMxXeI345wJuSb7L04w8xZ0f6gq0=
 github.com/markbates/syncx v1.5.0/go.mod h1:bOJr9+255qZxDuYK+YupRlTNDVZBJvcpuWRqomeM39o=
+github.com/markbates/syncx v1.5.1 h1:Kv0hrHUOU0FQ27QgiYf2SDo0JSQ04KcaLysyOtBYrcY=
+github.com/markbates/syncx v1.5.1/go.mod h1:bOJr9+255qZxDuYK+YupRlTNDVZBJvcpuWRqomeM39o=
 github.com/markbates/table v0.0.0-20230314205021-441ed58296d1 h1:pai/4PecxeuRlO1Nyljteq/vH02eVoLrlx4UwEucBSE=
 github.com/markbates/table v0.0.0-20230314205021-441ed58296d1/go.mod h1:j43uhc/bgGCB5WR8/r0ta0GL/PgRXKvoBl3bXnsX7AE=
 github.com/mattn/go-shellwords v1.0.12 h1:M2zGm7EW6UQJvDeQxo4T51eKPurbeFbe8WtebGE2xrk=

@@ -35,7 +35,9 @@ In <ref>example</ref>, we define the functions used in <ref>tree</ref>. Each of 
 When we look at the output of the program, <ref>out</ref>, we can see that when we print out any given <godoc>context#Context</godoc> we see that is at the bottom of the node tree and the <godoc>context#Background</godoc> context is at the top of the node tree hierarchy.
 
 <figure id="out" type="listing">
+
 <go run="main.go" src="src/node-tree"></go>
+
 <figcaption>Printing the node tree.</figcaption>
 </figure>
 

@@ -37,7 +37,7 @@ func (rp *RefProcessor) ProcessFigure(sectionID int, fig *Figure) error {
 		return err
 	}
 
-	i := rp.NextIndex(fig.Type())
+	i := rp.NextIndex(fig.Style())
 
 	fig.Lock()
 	fig.SectionID = sectionID
@@ -136,7 +136,7 @@ func (rp *RefProcessor) validate() error {
 
 	if rp.IDGenerator == nil {
 		rp.IDGenerator = func(i int, fig *Figure) (string, error) {
-			return fmt.Sprintf("%s-%d-%d", fig.Type(), fig.SectionID, fig.Pos), nil
+			return fmt.Sprintf("%s-%d-%d", fig.Style(), fig.SectionID, fig.Pos), nil
 		}
 	}
 

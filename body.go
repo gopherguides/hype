@@ -1,8 +1,31 @@
 package hype
 
+import (
+	"encoding/json"
+	"fmt"
+)
+
 // Body is a container for all the elements in a document.
 type Body struct {
 	*Element
+}
+
+func (b *Body) MarshalJSON() ([]byte, error) {
+	if b == nil {
+		return nil, ErrIsNil("body")
+	}
+
+	b.RLock()
+	defer b.RUnlock()
+
+	m, err := b.JSONMap()
+	if err != nil {
+		return nil, err
+	}
+
+	m["type"] = fmt.Sprintf("%T", b)
+
+	return json.Marshal(m)
 }
 
 // AsPage returns the body as a Page.

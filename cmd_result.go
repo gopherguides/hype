@@ -2,6 +2,7 @@ package hype
 
 import (
 	"bytes"
+	"encoding/json"
 	"fmt"
 	"html"
 	"os"
@@ -20,6 +21,28 @@ import (
 type CmdResult struct {
 	*Element
 	*clam.Result
+}
+
+func (c *CmdResult) MarshalJSON() ([]byte, error) {
+	if c == nil {
+		return nil, ErrIsNil("cmd result")
+	}
+
+	c.RLock()
+	defer c.RUnlock()
+
+	m, err := c.JSONMap()
+	if err != nil {
+		return nil, err
+	}
+
+	m["type"] = fmt.Sprintf("%T", c)
+
+	if c.Result != nil {
+		m["result"] = c.Result
+	}
+
+	return json.Marshal(m)
 }
 
 func (c *CmdResult) MD() string {

@@ -4,7 +4,9 @@ import (
 	"context"
 	"errors"
 	"flag"
+	"fmt"
 	"os"
+	"sync"
 	"time"
 
 	"github.com/gopherguides/hype"
@@ -17,6 +19,9 @@ type App struct {
 	cleo.Cmd
 
 	Parser *hype.Parser
+
+	once    sync.Once
+	initErr error
 }
 
 func (cmd *App) Main(ctx context.Context, pwd string, args []string) error {
@@ -31,8 +36,33 @@ func (cmd *App) Main(ctx context.Context, pwd string, args []string) error {
 		}
 	}
 
-	if err := cleo.Init(&cmd.Cmd, pwd); err != nil {
+	if err := cmd.init(pwd, args); err != nil {
 		return err
+	}
+
+	return cmd.execute(ctx, pwd, args)
+}
+
+func (cmd *App) ScopedPlugins() plugins.Plugins {
+	if cmd == nil {
+		return nil
+	}
+
+	plugs := cmd.Cmd.ScopedPlugins()
+
+	res := make(plugins.Plugins, 0, len(plugs))
+	for _, p := range plugs {
+		if p != cmd {
+			res = append(res, p)
+		}
+	}
+
+	return res
+}
+
+func (cmd *App) execute(ctx context.Context, pwd string, args []string) error {
+	if cmd == nil {
+		return plugins.Wrap(cmd, fmt.Errorf("app is nil"))
 	}
 
 	plugs := plugins.Plugins{}
@@ -54,21 +84,27 @@ func (cmd *App) Main(ctx context.Context, pwd string, args []string) error {
 	return err
 }
 
-func (cmd *App) ScopedPlugins() plugins.Plugins {
+func (cmd *App) init(pwd string, args []string) error {
 	if cmd == nil {
-		return nil
+		return plugins.Wrap(cmd, fmt.Errorf("app is nil"))
 	}
 
-	plugs := cmd.Cmd.ScopedPlugins()
-
-	res := make(plugins.Plugins, 0, len(plugs))
-	for _, p := range plugs {
-		if p != cmd {
-			res = append(res, p)
+	cmd.once.Do(func() {
+		if err := cleo.Init(&cmd.Cmd, pwd); err != nil {
+			cmd.initErr = plugins.Wrap(cmd, err)
 		}
-	}
 
-	return res
+		for _, c := range cmd.SubCommands() {
+			if pc, ok := c.(ParserCommander); ok {
+				if err := pc.SetParser(cmd.Parser); err != nil {
+					cmd.initErr = plugins.Wrap(cmd, err)
+					break
+				}
+			}
+		}
+	})
+
+	return cmd.initErr
 }
 
 func New(root string) *App {
@@ -112,7 +148,7 @@ func Garlic(root string) (*App, error) {
 }
 
 func DefaultTimeout() time.Duration {
-	return time.Second * 30
+	return time.Second * 5
 }
 
 func WithinDir(dir string, f func() error) error {

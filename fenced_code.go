@@ -2,12 +2,36 @@ package hype
 
 import (
 	"bytes"
+	"encoding/json"
 	"fmt"
 	"html"
 )
 
 type FencedCode struct {
 	*Element
+}
+
+func (code *FencedCode) MarshalJSON() ([]byte, error) {
+	if code == nil {
+		return nil, ErrIsNil("fenced code")
+	}
+
+	code.RLock()
+	defer code.RUnlock()
+
+	m, err := code.JSONMap()
+	if err != nil {
+		return nil, err
+	}
+
+	lang := code.Lang()
+	if lang != "" {
+		m["lang"] = lang
+	}
+
+	m["type"] = fmt.Sprintf("%T", code)
+
+	return json.Marshal(m)
 }
 
 func (code *FencedCode) StartTag() string {

@@ -2,12 +2,31 @@ package hype
 
 import (
 	"bytes"
+	"encoding/json"
 	"fmt"
 	"html"
 )
 
 type InlineCode struct {
 	*Element
+}
+
+func (code *InlineCode) MarshalJSON() ([]byte, error) {
+	if code == nil {
+		return nil, ErrIsNil("inline code")
+	}
+
+	code.RLock()
+	defer code.RUnlock()
+
+	m, err := code.JSONMap()
+	if err != nil {
+		return nil, err
+	}
+
+	m["type"] = fmt.Sprintf("%T", code)
+
+	return json.Marshal(m)
 }
 
 func (code *InlineCode) StartTag() string {

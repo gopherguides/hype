@@ -1,6 +1,7 @@
 package hype
 
 import (
+	"encoding/json"
 	"errors"
 	"fmt"
 	"strings"
@@ -17,6 +18,27 @@ type Figure struct {
 	style string
 }
 
+func (f *Figure) MarshalJSON() ([]byte, error) {
+	if f == nil {
+		return nil, ErrIsNil("figure")
+	}
+
+	f.RLock()
+	defer f.RUnlock()
+
+	m, err := f.JSONMap()
+	if err != nil {
+		return nil, err
+	}
+
+	m["type"] = fmt.Sprintf("%T", f)
+	m["pos"] = f.Pos
+	m["section_id"] = f.SectionID
+	m["style"] = f.Style()
+
+	return json.Marshal(m)
+}
+
 func (f *Figure) MD() string {
 	if f == nil {
 		return ""
@@ -31,9 +53,9 @@ func (f *Figure) MD() string {
 	return bb.String()
 }
 
-// Type returns type of the figure.
+// Style returns type of the figure.
 // ex: "figure", "table", "listing", ...
-func (f *Figure) Type() string {
+func (f *Figure) Style() string {
 	if f == nil || len(f.style) == 0 {
 		return "figure"
 	}
@@ -46,7 +68,7 @@ func (f *Figure) Name() string {
 		return ""
 	}
 
-	style := flect.Titleize(f.Type())
+	style := flect.Titleize(f.Style())
 
 	return fmt.Sprintf("%s %d.%d", style, f.SectionID, f.Pos)
 }

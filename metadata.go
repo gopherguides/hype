@@ -1,6 +1,7 @@
 package hype
 
 import (
+	"encoding/json"
 	"fmt"
 	"strings"
 
@@ -11,6 +12,27 @@ import (
 type Metadata struct {
 	Element *Element
 	syncx.Map[string, string]
+}
+
+func (md *Metadata) MarshalJSON() ([]byte, error) {
+	if md == nil || md.Element == nil {
+		return nil, ErrIsNil("metadata")
+	}
+
+	el := md.Element
+
+	el.RLock()
+	defer el.RUnlock()
+
+	m, err := el.JSONMap()
+	if err != nil {
+		return nil, err
+	}
+
+	m["type"] = fmt.Sprintf("%T", md)
+	m["data"] = md.Map.Map()
+
+	return json.Marshal(m)
 }
 
 func (md *Metadata) IsEmptyNode() bool {

@@ -3,7 +3,9 @@
 Previously, when discussing channels, we saw how to capture system signals, such as `ctrl-c`, using <godoc>os/signal#Notify</godoc>. The <godoc>os/signal#NotifyContext</godoc> function, <ref>notify.doc</ref>, is a variant of <godoc>os/signal#Notify</godoc> that takes a <godoc>context#Context</godoc> as an argument. In return, we are given a <godoc>context#Context</godoc> that will be canceled when the signal is received.
 
 <figure id="notify.doc" type="listing">
+
 <go doc="os/signal.NotifyContext"></go>
+
 <figcaption>The <godoc>os/signal#NotifyContext</godoc> function.</figcaption>
 </figure>
 

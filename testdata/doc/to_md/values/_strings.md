@@ -3,7 +3,9 @@
 As is mentioned in the <godoc>context</godoc> documentation using string keys is not recommended. As we just saw when <godoc>context#Context.Value</godoc> tries to resolve a key it finds the first, if any, <godoc>context#Context</godoc> that contains the key and returns that value.
 
 <figure id="context.doc" type="listing">
+
 <go doc="context.WithValue"></go>
+
 <figcaption>Using strings as context keys is not recommended per the documentation.</figcaption>
 </figure>
 

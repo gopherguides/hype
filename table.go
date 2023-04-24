@@ -1,6 +1,7 @@
 package hype
 
 import (
+	"encoding/json"
 	"fmt"
 	"strings"
 
@@ -10,6 +11,24 @@ import (
 
 type Table struct {
 	*Element
+}
+
+func (tab *Table) MarshalJSON() ([]byte, error) {
+	if tab == nil {
+		return nil, ErrIsNil("table")
+	}
+
+	tab.RLock()
+	defer tab.RUnlock()
+
+	m, err := tab.JSONMap()
+	if err != nil {
+		return nil, err
+	}
+
+	m["type"] = fmt.Sprintf("%T", tab)
+
+	return json.Marshal(m)
 }
 
 func (tab *Table) IsEmptyNode() bool {

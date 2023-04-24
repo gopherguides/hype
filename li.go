@@ -1,10 +1,33 @@
 package hype
 
-import "bytes"
+import (
+	"bytes"
+	"encoding/json"
+	"fmt"
+)
 
 type LI struct {
 	Type string
 	*Element
+}
+
+func (li *LI) MarshalJSON() ([]byte, error) {
+	if li == nil {
+		return nil, ErrIsNil("li")
+	}
+
+	m, err := li.JSONMap()
+	if err != nil {
+		return nil, err
+	}
+
+	m["type"] = fmt.Sprintf("%T", li)
+
+	if li.Type != "" {
+		m["list-type"] = li.Type
+	}
+
+	return json.Marshal(m)
 }
 
 func (li *LI) MD() string {

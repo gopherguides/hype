@@ -1,7 +1,27 @@
 package hype
 
+import (
+	"encoding/json"
+	"fmt"
+)
+
 type Paragraph struct {
 	*Element
+}
+
+func (p *Paragraph) MarshalJSON() ([]byte, error) {
+	if p == nil {
+		return nil, ErrIsNil("p")
+	}
+
+	m, err := p.JSONMap()
+	if err != nil {
+		return nil, err
+	}
+
+	m["type"] = fmt.Sprintf("%T", p)
+
+	return json.Marshal(m)
 }
 
 func (p *Paragraph) IsEmptyNode() bool {

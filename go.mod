@@ -10,7 +10,7 @@ require (
 	github.com/markbates/garlic v0.0.0-20230114180117-2dc132acb41e
 	github.com/markbates/plugins v0.0.0-20230420184715-249b4e34fb1b
 	github.com/markbates/sweets v0.0.0-20210926032915-062eb9bcc0e5
-	github.com/markbates/syncx v1.5.0
+	github.com/markbates/syncx v1.5.1
 	github.com/markbates/table v0.0.0-20230314205021-441ed58296d1
 	github.com/mattn/go-shellwords v1.0.12
 	github.com/russross/blackfriday/v2 v2.1.0

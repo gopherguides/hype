@@ -7,6 +7,7 @@ import (
 	"io"
 	"os"
 	"path/filepath"
+	"sync"
 	"time"
 
 	"github.com/gopherguides/hype"
@@ -22,6 +23,7 @@ type Marked struct {
 	File        string        // optional file name to preview
 	Timeout     time.Duration // default: 5s
 	Parser      *hype.Parser  // If nil, a default parser is used.
+	ParseOnly   bool          // if true, only parse the file and exit
 
 	flags *flag.FlagSet
 }
@@ -57,6 +59,18 @@ func (cmd *Marked) ScopedPlugins() plugins.Plugins {
 	return res
 }
 
+func (cmd *Marked) SetParser(p *hype.Parser) error {
+	if cmd == nil {
+		return fmt.Errorf("marked is nil")
+	}
+
+	cmd.Lock()
+	defer cmd.Unlock()
+
+	cmd.Parser = p
+	return nil
+}
+
 func (cmd *Marked) Flags() (*flag.FlagSet, error) {
 	if err := cmd.validate(); err != nil {
 		return nil, err
@@ -71,6 +85,7 @@ func (cmd *Marked) Flags() (*flag.FlagSet, error) {
 
 	cmd.flags = flag.NewFlagSet("marked", flag.ContinueOnError)
 	cmd.flags.SetOutput(io.Discard)
+	cmd.flags.BoolVar(&cmd.ParseOnly, "p", cmd.ParseOnly, "if true, only parse the file and exit")
 	cmd.flags.DurationVar(&cmd.Timeout, "timeout", DefaultTimeout(), "timeout for execution")
 	cmd.flags.StringVar(&cmd.ContextPath, "context", cmd.ContextPath, "a folder containing all chapters of a book, for example")
 	cmd.flags.StringVar(&cmd.File, "f", cmd.File, "optional file name to preview")
@@ -83,7 +98,30 @@ func (cmd *Marked) Main(ctx context.Context, pwd string, args []string) error {
 		return nil
 	}
 
-	err = plugins.Wrap(cmd, err)
+	cmd.Lock()
+	to := cmd.Timeout
+	if to == 0 {
+		to = DefaultTimeout()
+		cmd.Timeout = to
+	}
+	cmd.Unlock()
+
+	ctx, cancel := cleo.ContextWithTimeout(ctx, to)
+	defer cancel()
+
+	var mu sync.Mutex
+
+	go func() {
+		mu.Lock()
+		err = plugins.Wrap(cmd, err)
+		mu.Unlock()
+		cancel()
+	}()
+
+	<-ctx.Done()
+
+	mu.Lock()
+	defer mu.Unlock()
 	return err
 }
 
@@ -157,9 +195,15 @@ func (cmd *Marked) execute(ctx context.Context, pwd string) error {
 		cmd.IO.In = f
 	}
 
-	doc, err := p.ParseExecute(ctx, cmd.Stdin())
+	doc, err := p.Parse(cmd.Stdin())
 	if err != nil {
 		return err
+	}
+
+	if !cmd.ParseOnly {
+		if err := doc.Execute(ctx); err != nil {
+			return err
+		}
 	}
 
 	pages, err := doc.Pages()

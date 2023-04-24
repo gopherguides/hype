@@ -2,6 +2,7 @@ package hype
 
 import (
 	"context"
+	"encoding/json"
 	"fmt"
 	"strings"
 
@@ -11,6 +12,24 @@ import (
 type Ref struct {
 	*Element
 	*Figure
+}
+
+func (r *Ref) MarshalJSON() ([]byte, error) {
+	if r == nil {
+		return nil, ErrIsNil("ref")
+	}
+
+	r.RLock()
+	defer r.RUnlock()
+
+	m, err := r.JSONMap()
+	if err != nil {
+		return nil, err
+	}
+
+	m["type"] = fmt.Sprintf("%T", r)
+
+	return json.Marshal(m)
 }
 
 func (r *Ref) MD() string {

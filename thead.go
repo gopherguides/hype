@@ -1,7 +1,24 @@
 package hype
 
+import "encoding/json"
+
 type THead struct {
 	*Element
+}
+
+func (th *THead) MarshalJSON() ([]byte, error) {
+	if th == nil {
+		return nil, ErrIsNil("thead")
+	}
+
+	m, err := th.JSONMap()
+	if err != nil {
+		return nil, err
+	}
+
+	m["type"] = "thead"
+
+	return json.Marshal(m)
 }
 
 func (th *THead) String() string {

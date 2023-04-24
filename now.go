@@ -2,6 +2,8 @@ package hype
 
 import (
 	"context"
+	"encoding/json"
+	"fmt"
 	"time"
 )
 
@@ -9,6 +11,21 @@ var _ ExecutableNode = &Now{}
 
 type Now struct {
 	*Element
+}
+
+func (now *Now) MarshalJSON() ([]byte, error) {
+	if now == nil {
+		return nil, ErrIsNil("now")
+	}
+
+	m, err := now.JSONMap()
+	if err != nil {
+		return nil, err
+	}
+
+	m["type"] = fmt.Sprintf("%T", now)
+
+	return json.Marshal(m)
 }
 
 func (now *Now) Execute(ctx context.Context, doc *Document) error {

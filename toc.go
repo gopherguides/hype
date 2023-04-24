@@ -3,12 +3,28 @@ package hype
 import (
 	"bytes"
 	"context"
+	"encoding/json"
 	"fmt"
 	"strings"
 )
 
 type ToC struct {
 	*Element
+}
+
+func (toc *ToC) MarshalJSON() ([]byte, error) {
+	if toc == nil {
+		return nil, ErrIsNil("toc")
+	}
+
+	m, err := toc.JSONMap()
+	if err != nil {
+		return nil, err
+	}
+
+	m["type"] = fmt.Sprintf("%T", toc)
+
+	return json.Marshal(m)
 }
 
 func (toc *ToC) PostExecute(ctx context.Context, doc *Document, err error) error {

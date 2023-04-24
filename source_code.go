@@ -3,6 +3,7 @@ package hype
 import (
 	"bytes"
 	"context"
+	"encoding/json"
 	"fmt"
 	"html"
 	"io/fs"
@@ -16,6 +17,28 @@ import (
 type SourceCode struct {
 	*Element
 	Lang string
+}
+
+func (code *SourceCode) MarshalJSON() ([]byte, error) {
+	if code == nil {
+		return nil, ErrIsNil("code")
+	}
+
+	code.RLock()
+	defer code.RUnlock()
+
+	m, err := code.JSONMap()
+	if err != nil {
+		return nil, err
+	}
+
+	m["type"] = fmt.Sprintf("%T", code)
+
+	if len(code.Lang) > 0 {
+		m["lang"] = code.Lang
+	}
+
+	return json.Marshal(m)
 }
 
 func (code *SourceCode) StartTag() string {

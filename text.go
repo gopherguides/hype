@@ -1,11 +1,19 @@
 package hype
 
 import (
+	"encoding/json"
 	"fmt"
 	"strings"
 )
 
 type Text string
+
+func (tn Text) MarshalJSON() ([]byte, error) {
+	return json.Marshal(map[string]any{
+		"type": fmt.Sprintf("%T", tn),
+		"text": string(tn),
+	})
+}
 
 func (tn Text) Children() Nodes {
 	return Nodes{}

@@ -2,6 +2,7 @@ package hype
 
 import (
 	"context"
+	"encoding/json"
 	"fmt"
 	"io/fs"
 	"strings"
@@ -13,15 +14,41 @@ import (
 var _ Node = &Document{}
 
 type Document struct {
-	fs.FS
-	sync.RWMutex
+	fs.FS        `json:"-"`
+	sync.RWMutex `json:"-"`
 
-	Nodes     Nodes
-	Parser    *Parser // Parser used to create the document
-	Root      string
-	SectionID int
-	Snippets  Snippets
-	Title     string
+	Nodes     Nodes    `json:"nodes,omitempty"`
+	Parser    *Parser  `json:"parser,omitempty"` // Parser used to create the document
+	Root      string   `json:"root,omitempty"`
+	SectionID int      `json:"section_id,omitempty"`
+	Snippets  Snippets `json:"snippets,omitempty"`
+	Title     string   `json:"title,omitempty"`
+}
+
+func (doc *Document) MarshalJSON() ([]byte, error) {
+	if doc == nil {
+		return nil, ErrIsNil("document")
+	}
+
+	x := struct {
+		Nodes     Nodes    `json:"nodes,omitempty"`
+		Parser    *Parser  `json:"parser,omitempty"` // Parser used to create the document
+		Root      string   `json:"root,omitempty"`
+		SectionID int      `json:"section_id,omitempty"`
+		Snippets  Snippets `json:"snippets,omitempty"`
+		Title     string   `json:"title,omitempty"`
+		Type      string   `json:"type"`
+	}{
+		Type:      fmt.Sprintf("%T", doc),
+		Parser:    doc.Parser,
+		Root:      doc.Root,
+		SectionID: doc.SectionID,
+		Snippets:  doc.Snippets,
+		Title:     doc.Title,
+		Nodes:     doc.Nodes,
+	}
+
+	return json.Marshal(x)
 }
 
 func (doc *Document) Pages() ([]*Page, error) {

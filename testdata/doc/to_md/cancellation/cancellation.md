@@ -7,7 +7,9 @@ While having the ability to pass contextual information via the <godoc>context#C
 In order to cancel a <godoc>context#Context</godoc>, we must have a way of cancelling it. The <godoc>context#WithCancel</godoc> function, <ref>withcancel.doc</ref>, wraps a given <godoc>context#Context</godoc> with a <godoc>context#Context</godoc> that can be cancelled.
 
 <figure id="withcancel.doc" type="listing">
+
 <go doc="context.WithCancel"></go>
+
 <figcaption>The <godoc>context#WithCancel</godoc> function.</figcaption>
 </figure>
 
@@ -18,7 +20,9 @@ The <godoc>context#WithCancel</godoc> function returns a second argument, that o
 There a few things that need to be noted about the <godoc>context#CancelFunc</godoc> function, <ref>cancelfunc.doc</ref>. So let's examine each in more detail.
 
 <figure id="cancelfunc.doc" type="listing">
+
 <go doc="context.CancelFunc"></go>
+
 <figcaption>The <godoc>context#CancelFunc</godoc> function.</figcaption>
 </figure>
 
@@ -83,7 +87,9 @@ In <ref>basic.main</ref> we create several goroutines that will listen for the <
 As we can see from the output, <ref>basic.out</ref>, the `listener` function unblocks and exits when the <godoc>context#CancelFunc</godoc> is called, `cancel()`.
 
 <figure id="basic.out" type="listing">
+
 <go run="main.go" src="./src/basic"></go>
+
 <figcaption>The output of the application.</figcaption>
 </figure>
 
@@ -92,7 +98,9 @@ As we can see from the output, <ref>basic.out</ref>, the `listener` function unb
 The illustration in <ref>cancellation.svg</ref> shows that by cancelling a node in the hierarchy, all its child nodes are also cancelled. Other nodes, such as parent and sibling nodes, in the hierarchy are unaffected.
 
 <figure id="cancellation.svg" type="listing">
+
 <img src="assets/cancellation.svg" />
+
 <figcaption>Cancellation propagation.</figcaption>
 </figure>
 

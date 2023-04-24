@@ -7,7 +7,9 @@ In addition to allowing us to manually cancel a <godoc>context#Context</godoc>, 
 The <godoc>context</godoc> package provides two functions for creating time based, self-cancelling, a <godoc>context#Context</godoc>; <godoc>context#WithTimeout</godoc> and <godoc>context#WithDeadline</godoc>.
 
 <figure id="withdeadline.doc" type="listing">
+
 <go doc="context.WithDeadline"></go>
+
 <figcaption>The <godoc>context#WithDeadline</godoc> function.</figcaption>
 </figure>
 
@@ -16,7 +18,9 @@ When using <godoc>context#WithDeadline</godoc>, <ref>withdeadline.doc</ref>, we 
 Consider <ref>deadline.example</ref>. In it, we create a new <godoc>time#Time</godoc> for `January 1, 2030 00:00:00` and use it to create a <godoc>context#Context</godoc> that will self-cancel at that date and time.
 
 <figure id="deadline.example" type="listing">
+
 <go src="src/with-deadline" run="." code="/main.go#example"></go>
+
 <figcaption>Using <godoc>context#WithDeadline</godoc>.</figcaption>
 </figure>
 
@@ -25,7 +29,9 @@ Consider <ref>deadline.example</ref>. In it, we create a new <godoc>time#Time</g
 While being able to cancel a <godoc>context#Context</godoc> at a particular time is useful, more often than not we want to cancel a <godoc>context#Context</godoc> after a certain amount of time has passed.
 
 <figure id="withtimeout.doc" type="listing">
+
 <go doc="context.WithTimeout"></go>
+
 <figcaption>The <godoc>context#WithTimeout</godoc> function.</figcaption>
 </figure>
 
@@ -34,7 +40,9 @@ When using <godoc>context#WithTimeout</godoc>, <ref>withtimeout.doc</ref>a, we n
 Consider <ref>timeout.example</ref>. In it, we create a new self-cancelling <godoc>context#Context</godoc> that will self-cancel after 5 seconds using <godoc>context#WithTimeout</godoc>.
 
 <figure id="timeout.example" type="listing">
+
 <go src="src/with-timeout" run="." code="/main.go#example"></go>
+
 <figcaption>Using <godoc>context#WithTimeout</godoc>.</figcaption>
 </figure>
 

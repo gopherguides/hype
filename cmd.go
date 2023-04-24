@@ -2,6 +2,7 @@ package hype
 
 import (
 	"context"
+	"encoding/json"
 	"fmt"
 	"path/filepath"
 	"strconv"
@@ -22,6 +23,38 @@ type Cmd struct {
 	Timeout      time.Duration
 
 	res *CmdResult
+}
+
+func (c *Cmd) MarshalJSON() ([]byte, error) {
+	if c == nil {
+		return nil, ErrIsNil("cmd")
+	}
+
+	c.RLock()
+	defer c.RUnlock()
+
+	m, err := c.JSONMap()
+	if err != nil {
+		return nil, err
+	}
+
+	m["type"] = fmt.Sprintf("%T", c)
+	m["expected_exit"] = c.ExpectedExit
+	m["timeout"] = c.Timeout.String()
+
+	if len(c.Args) > 0 {
+		m["args"] = c.Args
+	}
+
+	if len(c.Env) > 0 {
+		m["env"] = c.Env
+	}
+
+	if c.res != nil {
+		m["result"] = c.res
+	}
+
+	return json.Marshal(m)
 }
 
 func (c *Cmd) MD() string {

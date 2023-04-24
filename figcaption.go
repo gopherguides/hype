@@ -1,9 +1,31 @@
 package hype
 
-import "strings"
+import (
+	"encoding/json"
+	"fmt"
+	"strings"
+)
 
 type Figcaption struct {
 	*Element
+}
+
+func (fc *Figcaption) MarshalJSON() ([]byte, error) {
+	if fc == nil {
+		return nil, ErrIsNil("figcaption")
+	}
+
+	fc.RLock()
+	defer fc.RUnlock()
+
+	m, err := fc.JSONMap()
+	if err != nil {
+		return nil, err
+	}
+
+	m["type"] = fmt.Sprintf("%T", fc)
+
+	return json.Marshal(m)
 }
 
 func (fc *Figcaption) MD() string {

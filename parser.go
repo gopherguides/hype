@@ -19,15 +19,15 @@ import (
 type ParseElementFn func(p *Parser, el *Element) (Nodes, error)
 
 type Parser struct {
-	fs.FS
+	fs.FS `json:"-"`
 
-	Root         string
-	DisablePages bool
-	NodeParsers  map[Atom]ParseElementFn
-	PreParsers   PreParsers
-	Snippets     Snippets
-	Section      int
-	NowFn        func() time.Time // default: time.Now()
+	Root         string                  `json:"root,omitempty"`
+	DisablePages bool                    `json:"disable_pages,omitempty"`
+	NodeParsers  map[Atom]ParseElementFn `json:"-"`
+	PreParsers   PreParsers              `json:"-"`
+	Snippets     Snippets                `json:"snippets,omitempty"`
+	Section      int                     `json:"section,omitempty"`
+	NowFn        func() time.Time        `json:"-"` // default: time.Now()
 
 	fileName string
 	mu       sync.RWMutex

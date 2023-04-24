@@ -1,12 +1,32 @@
 package hype
 
 import (
+	"encoding/json"
 	"errors"
+	"fmt"
 	"strings"
 )
 
 type TD struct {
 	*Element
+}
+
+func (td *TD) MarshalJSON() ([]byte, error) {
+	if td == nil {
+		return nil, ErrIsNil("td")
+	}
+
+	td.RLock()
+	defer td.RUnlock()
+
+	m, err := td.JSONMap()
+	if err != nil {
+		return nil, err
+	}
+
+	m["type"] = fmt.Sprintf("%T", td)
+
+	return json.Marshal(m)
 }
 
 func (td *TD) IsEmptyNode() bool {

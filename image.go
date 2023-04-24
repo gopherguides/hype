@@ -2,11 +2,27 @@ package hype
 
 import (
 	"context"
+	"encoding/json"
 	"io/fs"
 )
 
 type Image struct {
 	*Element
+}
+
+func (i *Image) MarshalJSON() ([]byte, error) {
+	if i == nil {
+		return nil, ErrIsNil("image")
+	}
+
+	m, err := i.JSONMap()
+	if err != nil {
+		return nil, err
+	}
+
+	m["type"] = "hype.Image"
+
+	return json.Marshal(m)
 }
 
 func (i *Image) MD() string {

@@ -1,6 +1,7 @@
 package hype
 
 import (
+	"encoding/json"
 	"fmt"
 	"strconv"
 	"strings"
@@ -9,6 +10,21 @@ import (
 type Heading struct {
 	*Element
 	level int
+}
+
+func (h Heading) MarshalJSON() ([]byte, error) {
+	h.RLock()
+	defer h.RUnlock()
+
+	m, err := h.JSONMap()
+	if err != nil {
+		return nil, err
+	}
+
+	m["type"] = fmt.Sprintf("%T", h)
+	m["level"] = h.level
+
+	return json.Marshal(m)
 }
 
 func (h Heading) MD() string {

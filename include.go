@@ -1,6 +1,7 @@
 package hype
 
 import (
+	"encoding/json"
 	"fmt"
 	"path/filepath"
 	"strings"
@@ -12,6 +13,28 @@ type Include struct {
 
 	dir string
 	pp  sync.Once
+}
+
+func (inc *Include) MarshalJSON() ([]byte, error) {
+	if inc == nil {
+		return nil, ErrIsNil("include")
+	}
+
+	inc.RLock()
+	defer inc.RUnlock()
+
+	m, err := inc.JSONMap()
+	if err != nil {
+		return nil, err
+	}
+
+	m["type"] = fmt.Sprintf("%T", inc)
+
+	if inc.dir != "" {
+		m["dir"] = inc.dir
+	}
+
+	return json.Marshal(m)
 }
 
 func (inc *Include) PostParse(p *Parser, d *Document, err error) error {

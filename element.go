@@ -2,6 +2,7 @@ package hype
 
 import (
 	"bytes"
+	"encoding/json"
 	"fmt"
 	"path/filepath"
 	"sort"
@@ -23,6 +24,56 @@ type Element struct {
 	Nodes    Nodes
 	Parent   Node
 	FileName string // only set when Parser.ParseFile() is used
+}
+
+func (el *Element) JSONMap() (map[string]any, error) {
+	if el == nil {
+		return nil, ErrIsNil("element")
+	}
+
+	el.RLock()
+	defer el.RUnlock()
+
+	m := map[string]any{
+		"type": fmt.Sprintf("%T", el),
+	}
+
+	if len(el.FileName) > 0 {
+		m["file"] = el.FileName
+	}
+
+	if el.Attributes != nil && el.Attributes.Len() > 0 {
+		m["attributes"] = el.Attributes
+	}
+
+	nodes := el.Nodes
+
+	if len(nodes) > 0 {
+		m["nodes"] = nodes
+	}
+
+	hn := el.HTMLNode
+
+	if hn != nil {
+		if len(hn.Data) > 0 {
+			m["atom"] = hn.Data
+		}
+	}
+
+	return m, nil
+}
+
+func (el *Element) MarshalJSON() ([]byte, error) {
+	if el == nil {
+		return nil, ErrIsNil("element")
+	}
+
+	m, err := el.JSONMap()
+	if err != nil {
+		return nil, err
+	}
+
+	return json.Marshal(m)
 }
 
 func (el *Element) Format(f fmt.State, verb rune) {
