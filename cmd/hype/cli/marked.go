@@ -92,6 +92,7 @@ func (cmd *Marked) Flags() (*flag.FlagSet, error) {
 
 	return cmd.flags, nil
 }
+
 func (cmd *Marked) Main(ctx context.Context, pwd string, args []string) error {
 	err := cmd.main(ctx, pwd, args)
 	if err == nil {

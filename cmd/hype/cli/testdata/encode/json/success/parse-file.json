@@ -1,0 +1,95 @@
+{
+  "nodes": [
+    {
+      "file": "module.md",
+      "nodes": [
+        {
+          "atom": "html",
+          "file": "module.md",
+          "nodes": [
+            {
+              "atom": "head",
+              "file": "module.md",
+              "type": "*hype.Element"
+            },
+            [
+              {
+                "atom": "body",
+                "file": "module.md",
+                "nodes": [
+                  [
+                    {
+                      "atom": "page",
+                      "file": "module.md",
+                      "nodes": [
+                        {
+                          "text": "\n",
+                          "type": "hype.Text"
+                        },
+                        [
+                          {
+                            "atom": "h1",
+                            "file": "module.md",
+                            "level": 1,
+                            "nodes": [
+                              {
+                                "text": "JSON Encoding",
+                                "type": "hype.Text"
+                              }
+                            ],
+                            "type": "hype.Heading"
+                          }
+                        ],
+                        {
+                          "text": "\n\n",
+                          "type": "hype.Text"
+                        },
+                        [
+                          {
+                            "atom": "echo",
+                            "attributes": {
+                              "id": "123"
+                            },
+                            "file": "module.md",
+                            "nodes": [
+                              {
+                                "text": "Hello!",
+                                "type": "hype.Text"
+                              }
+                            ],
+                            "type": "*hype.Element"
+                          }
+                        ],
+                        {
+                          "text": "\n",
+                          "type": "hype.Text"
+                        }
+                      ],
+                      "title": "JSON Encoding",
+                      "type": "*hype.Page"
+                    }
+                  ],
+                  {
+                    "text": "\n",
+                    "type": "hype.Text"
+                  }
+                ],
+                "type": "*hype.Body"
+              }
+            ]
+          ],
+          "type": "*hype.Element"
+        }
+      ],
+      "type": "*hype.Element"
+    }
+  ],
+  "parser": {
+    "snippets": {},
+    "section": 1
+  },
+  "section_id": 1,
+  "snippets": {},
+  "title": "JSON Encoding",
+  "type": "*hype.Document"
+}
