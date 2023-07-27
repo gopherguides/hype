@@ -98,6 +98,11 @@ func Test_Cmd_Execute_UnexpectedExit(t *testing.T) {
 	err = c.Execute(ctx, doc)
 	r.NoError(err)
 
+	c.ExpectedExit = -1
+
+	err = c.Execute(ctx, doc)
+	r.NoError(err)
+
 }
 
 func Test_NewCmd(t *testing.T) {

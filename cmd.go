@@ -105,12 +105,17 @@ func (c *Cmd) Execute(ctx context.Context, doc *Document) error {
 	}
 
 	res, err := cmd.Run(ctx, c.Args...)
-	if err != nil && res.Exit != c.ExpectedExit {
-		return err
-	}
-
-	if res.Exit != c.ExpectedExit {
-		return fmt.Errorf("unexpected exit code: %d", res.Exit)
+	if err != nil {
+		switch c.ExpectedExit {
+		case -1:
+			if res.Exit == 0 {
+				return fmt.Errorf("unexpected exit code: %d: %w", res.Exit, err)
+			}
+		default:
+			if res.Exit != c.ExpectedExit {
+				return fmt.Errorf("unexpected exit code: %d: %w", res.Exit, err)
+			}
+		}
 	}
 
 	cres, err := NewCmdResult(doc.Parser, c, res)
