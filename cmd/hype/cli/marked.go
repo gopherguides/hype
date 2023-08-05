@@ -24,6 +24,7 @@ type Marked struct {
 	Timeout     time.Duration // default: 5s
 	Parser      *hype.Parser  // If nil, a default parser is used.
 	ParseOnly   bool          // if true, only parse the file and exit
+	Section     int           // default: 1
 
 	flags *flag.FlagSet
 }
@@ -89,6 +90,7 @@ func (cmd *Marked) Flags() (*flag.FlagSet, error) {
 	cmd.flags.DurationVar(&cmd.Timeout, "timeout", DefaultTimeout(), "timeout for execution")
 	cmd.flags.StringVar(&cmd.ContextPath, "context", cmd.ContextPath, "a folder containing all chapters of a book, for example")
 	cmd.flags.StringVar(&cmd.File, "f", cmd.File, "optional file name to preview")
+	cmd.flags.IntVar(&cmd.Section, "section", 0, "")
 
 	return cmd.flags, nil
 }
@@ -182,6 +184,14 @@ func (cmd *Marked) execute(ctx context.Context, pwd string) error {
 
 	if p == nil {
 		p = hype.NewParser(cmd.FS)
+	}
+
+	if p.Section == 0 {
+		p.Section = 1
+	}
+
+	if cmd.Section > 0 {
+		p.Section = cmd.Section
 	}
 
 	p.Root = filepath.Dir(mp)

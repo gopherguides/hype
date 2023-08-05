@@ -10,8 +10,6 @@ import (
 func NewParser(cab fs.FS, ctxPath string, pwd string) (*hype.Parser, error) {
 	p := hype.NewParser(cab)
 
-	p.Section = 1
-
 	if sec, err := binding.PartFromPath(cab, pwd); err == nil {
 		p.Section = sec.Number
 	}
