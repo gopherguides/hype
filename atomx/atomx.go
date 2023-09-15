@@ -13,7 +13,8 @@ type Atomable interface {
 
 // Atom is a string that is used to identify a specific element or attribute.
 // Example:
-// 	"a", "img", "div"
+//
+//	"a", "img", "div"
 type Atom string
 
 // String representation of an Atom.
@@ -46,6 +47,7 @@ type Atoms []Atom
 
 // String returns a string representation of the atoms.
 // Example:
+//
 //	"a, img, div"
 func (atoms Atoms) String() string {
 	ats := make([]string, 0, len(atoms))
