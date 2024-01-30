@@ -5,6 +5,7 @@ import (
 	"flag"
 	"fmt"
 	"io"
+	"log/slog"
 	"os"
 	"path/filepath"
 	"sync"
@@ -25,6 +26,7 @@ type Marked struct {
 	Parser      *hype.Parser  // If nil, a default parser is used.
 	ParseOnly   bool          // if true, only parse the file and exit
 	Section     int           // default: 1
+	Verbose     bool          // default: false
 
 	flags *flag.FlagSet
 }
@@ -89,8 +91,9 @@ func (cmd *Marked) Flags() (*flag.FlagSet, error) {
 	cmd.flags.BoolVar(&cmd.ParseOnly, "p", cmd.ParseOnly, "if true, only parse the file and exit")
 	cmd.flags.DurationVar(&cmd.Timeout, "timeout", DefaultTimeout(), "timeout for execution")
 	cmd.flags.StringVar(&cmd.ContextPath, "context", cmd.ContextPath, "a folder containing all chapters of a book, for example")
-	cmd.flags.StringVar(&cmd.File, "f", cmd.File, "optional file name to preview")
+	cmd.flags.StringVar(&cmd.File, "f", cmd.File, "optional file name to preview, if not provided, defaults to module.md")
 	cmd.flags.IntVar(&cmd.Section, "section", 0, "")
+	cmd.flags.BoolVar(&cmd.Verbose, "v", false, "enable verbose output for debugging")
 
 	return cmd.flags, nil
 }
@@ -149,13 +152,17 @@ func (cmd *Marked) main(ctx context.Context, pwd string, args []string) error {
 	if err := flags.Parse(args); err != nil {
 		return err
 	}
+	if cmd.Verbose {
+		// enable debugging
+		slog.SetDefault(slog.New(slog.NewTextHandler(os.Stderr, &slog.HandlerOptions{Level: slog.LevelDebug})))
+	}
 
 	err = WithTimeout(ctx, cmd.Timeout, func(ctx context.Context) error {
+		// TODO Document what this does
 		if mo, ok := os.LookupEnv("MARKED_ORIGIN"); ok {
 			pwd = mo
 		}
 
-		// panic(pwd)
 		return WithinDir(pwd, func() error {
 			return cmd.execute(ctx, pwd)
 		})
@@ -178,8 +185,10 @@ func (cmd *Marked) execute(ctx context.Context, pwd string) error {
 		cmd.FS = os.DirFS(pwd)
 	}
 
+	// TODO Document what this does
 	mp := os.Getenv("MARKED_PATH")
 
+	slog.Debug("execute", "pwd", pwd, "file", cmd.File, "MARKED_PATH", mp)
 	p := cmd.Parser
 
 	if p == nil {

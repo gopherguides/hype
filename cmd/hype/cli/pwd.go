@@ -11,6 +11,7 @@ func Getwd() (string, error) {
 		return "", err
 	}
 
+	// TODO Document what this does...
 	if mp := os.Getenv("MARKED_PATH"); len(mp) > 0 {
 		pwd = filepath.Dir(mp)
 	}
