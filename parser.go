@@ -12,6 +12,7 @@ import (
 	"time"
 
 	"github.com/gopherguides/hype/binding"
+	"github.com/markbates/syncx"
 	"golang.org/x/net/html"
 	"golang.org/x/sync/errgroup"
 )
@@ -28,6 +29,7 @@ type Parser struct {
 	Snippets     Snippets                `json:"snippets,omitempty"`
 	Section      int                     `json:"section,omitempty"`
 	NowFn        func() time.Time        `json:"-"` // default: time.Now()
+	Vars         syncx.Map[string, any]  `json:"-"`
 
 	fileName string
 	mu       sync.RWMutex
@@ -376,8 +378,9 @@ func NewParser(cab fs.FS) *Parser {
 	return &Parser{
 		FS:          cab,
 		NodeParsers: DefaultElements(),
-		PreParsers:  PreParsers{Markdown()},
+		PreParsers:  PreParsers{VarProcessor(), GoTemplates(), Markdown()},
 		Section:     1,
+		Vars:        syncx.Map[string, any]{},
 	}
 }
 
