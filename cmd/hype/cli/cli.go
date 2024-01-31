@@ -128,6 +128,14 @@ func New(root string) *App {
 		Parser: p,
 	}
 
+	sl := &Slides{
+		Cmd: cleo.Cmd{
+			Name:    "slides",
+			Aliases: []string{"s"},
+		},
+		Parser: p,
+	}
+
 	app := &App{
 		Cmd: cleo.Cmd{
 			Name: "hype",
@@ -135,6 +143,7 @@ func New(root string) *App {
 			Commands: map[string]cleo.Commander{
 				"marked":  m,
 				"preview": mp,
+				"slides":  sl,
 			},
 		},
 		Parser: p,

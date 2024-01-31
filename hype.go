@@ -34,6 +34,7 @@ func DefaultElements() map[Atom]ParseElementFn {
 		atomx.Thead:      NewTHeadNodes,
 		atomx.Tr:         NewTRNodes,
 		atomx.Ul:         NewULNodes,
+		atomx.Var:        NewVarNodes,
 	}
 
 	for _, h := range atomx.Headings() {

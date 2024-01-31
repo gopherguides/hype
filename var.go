@@ -1,115 +1,134 @@
 package hype
 
 import (
+	"bytes"
 	"context"
-	"encoding/json"
 	"fmt"
+	"io"
 	"strings"
-
-	"github.com/markbates/syncx"
 )
+
+func VarProcessor() PreParseFn {
+	fn := func(p *Parser, r io.Reader) (io.Reader, error) {
+		if p == nil {
+			return nil, ErrIsNil("parser")
+		}
+
+		if r == nil {
+			return nil, ErrIsNil("reader")
+		}
+
+		b, err := io.ReadAll(r)
+		if err != nil {
+			return nil, err
+		}
+
+		lines := strings.Split(string(b), "\n")
+
+		var inside bool
+
+		for _, line := range lines {
+			line = strings.TrimSpace(line)
+
+			ll := strings.ToLower(line)
+
+			switch ll {
+			case "<details>", "<metadata>", "<p><details>", "<p><metadata>":
+				inside = true
+			case "</details>", "</metadata>", "</p></details>", "</p></metadata>":
+				inside = false
+			default:
+				if !inside {
+					continue
+				}
+
+				x := strings.Split(line, ": ")
+				if len(x) != 2 {
+					return nil, fmt.Errorf("expected key:value got %q", line)
+				}
+
+				k := strings.TrimSpace(x[0])
+				v := strings.TrimSpace(x[1])
+
+				if _, ok := p.Vars.Get(k); ok {
+					continue
+				}
+
+				if err := p.Vars.Set(k, v); err != nil {
+					return nil, err
+				}
+
+			}
+		}
+		return bytes.NewReader(b), nil
+	}
+
+	return fn
+}
 
 type Var struct {
 	*Element
-	Data *syncx.Map[string, any]
 
 	value any
 }
 
-func (v *Var) MarshalJSON() ([]byte, error) {
-	if v == nil {
-		return nil, ErrIsNil("var")
-	}
-
-	v.RLock()
-	defer v.RUnlock()
-
-	m, err := v.JSONMap()
-	if err != nil {
-		return nil, err
-	}
-
-	m["type"] = fmt.Sprintf("%T", v)
-
-	if v.value != nil {
-		m["value"] = v.value
-	}
-
-	data := v.Data
-	if data != nil && data.Len() > 0 {
-		m["data"] = data
-	}
-
-	return json.Marshal(m)
-}
-
 func (v *Var) String() string {
-	const blank = "<var></var>"
 	if v == nil {
-		return blank
+		return ""
 	}
 
 	if v.value != nil {
 		return fmt.Sprintf("%v", v.value)
 	}
 
-	if v.Element == nil {
-		return blank
-	}
-
-	s := v.Children().String()
-	s = strings.TrimSpace(s)
-
-	return fmt.Sprintf("<var>%v</var>", s)
+	return v.Element.String()
 }
 
-func (v *Var) Execute(ctx context.Context, d *Document) error {
+func (v *Var) Execute(ctx context.Context, doc *Document) error {
 	if v == nil {
-		return ErrIsNil("var")
+		return v.WrapErr(ErrIsNil("var"))
 	}
 
-	s := v.Children().String()
-	s = strings.TrimSpace(s)
-
-	if IsEmptyNode(v) {
-		return v.WrapErr(fmt.Errorf("variable name is empty"))
+	if v.Element == nil {
+		return v.WrapErr(ErrIsNil("element"))
 	}
 
-	val, ok := v.Data.Get(s)
+	if doc == nil {
+		return v.WrapErr(ErrIsNil("document"))
+	}
+
+	key := v.Nodes.String()
+	key = strings.TrimSpace(key)
+
+	v.Lock()
+	defer v.Unlock()
+
+	var ok bool
+	v.value, ok = doc.Parser.Vars.Get(key)
 	if !ok {
-		return v.WrapErr(fmt.Errorf("variable %q not found", s))
+		return v.WrapErr(fmt.Errorf("unknown var key %q", key))
 	}
-
-	v.value = val
 
 	return nil
 }
 
-func NewVarParserFn(data map[string]any) (ParseElementFn, error) {
-	mm := syncx.NewMap(data)
-	return func(p *Parser, el *Element) (Nodes, error) {
-		if el == nil {
-			return nil, ErrIsNil("element")
-		}
+func NewVarNode(el *Element) (*Var, error) {
+	if el == nil {
+		return nil, ErrIsNil("element")
+	}
 
-		v := &Var{
-			Element: el,
-			Data:    mm,
-		}
+	v := &Var{
+		Element: el,
+	}
 
-		s := v.Children().String()
-		s = strings.TrimSpace(s)
+	return v, nil
+}
 
-		v.Nodes = Nodes{Text(s)}
+func NewVarNodes(p *Parser, el *Element) (Nodes, error) {
+	v, err := NewVarNode(el)
+	if err != nil {
+		return nil, err
+	}
 
-		if IsEmptyNode(v) {
-			return nil, v.WrapErr(fmt.Errorf("variable name is empty"))
-		}
-
-		if _, ok := v.Data.Get(s); !ok {
-			return nil, v.WrapErr(fmt.Errorf("variable %q not found", s))
-		}
-
-		return Nodes{v}, nil
-	}, nil
+	return Nodes{v}, nil
 }

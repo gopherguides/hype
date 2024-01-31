@@ -1,0 +1,13 @@
+<html><head></head><body><page>
+<h1>Go Templates!</h1>
+
+<details>
+title: Go Templates!
+slug: gotmpls
+</details>
+
+<h2>Introduction</h2>
+
+<p><a href="gotmpls">Go Templates!</a> is cool!</p>
+</page>
+</body></html>
