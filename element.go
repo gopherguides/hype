@@ -280,7 +280,6 @@ func (el *Element) MD() string {
 	case atomx.Blockquote:
 		b := el.Children().MD()
 		b = strings.TrimSpace(b)
-		// panic(b)
 		return fmt.Sprintf("> %s", b)
 	default:
 		fmt.Printf("TODO: Element.MD(): %q\n", el.Atom())
