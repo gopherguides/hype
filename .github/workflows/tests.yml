@@ -6,26 +6,16 @@ jobs:
     runs-on: ${{ matrix.os }}
     strategy:
       matrix:
-        go-version: [1.19.x]
+        go-version: [1.21.x]
         os: [macos-latest, ubuntu-latest]
     steps:
       - name: Set up Go
-        uses: actions/setup-go@v2
+        uses: actions/setup-go@v4
         with:
-          go-version: 1.19.x
-      - name: Configure git for private modules
-        env:
-          GOPRIVATE: "github.com"
-          REPO_TOKEN: ${{ secrets.REPO_TOKEN }}
-        run: git config --global url."https://markbates:${REPO_TOKEN}@github.com".insteadOf "https://github.com"
+          go-version: 1.21.x
       - name: Checkout Code
-        uses: actions/checkout@v1
-        with:
-          fetch-depth: 1
-      - name: Test
-        env:
-          GOPRIVATE: "github.com/gopherguides"
-          REPO_TOKEN: ${{ secrets.REPO_TOKEN }}
-        run: |
-          git config --global url."https://markbates:${REPO_TOKEN}@github.com".insteadOf "https://github.com"
-          make test
+        uses: actions/checkout@v4
+      - name: Run tests
+        run: go test --short ./...
+
+
