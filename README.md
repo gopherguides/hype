@@ -5,7 +5,7 @@
 [![Slack](https://img.shields.io/badge/Slack-hype-brightgreen)](https://gophers.slack.com/archives/C05SKNHQY3U)
  
 # Hype
-Hype is a content generation tool that use traditaion Markdown syntax, and allows it to be extended for almost any use to create dyanmic, rich, automated output that is easily maintainable and resulable.
+Hype is a content generation tool that use traditional Markdown syntax, and allows it to be extended for almost any use to create dynamic, rich, automated output that is easily maintainable and reusable.
 
 # What does that mean?
 TODO Show some quick MD to output examples
