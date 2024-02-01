@@ -22,7 +22,6 @@ func (cmd *TOC) Main(ctx context.Context, pwd string, args []string) error {
 
 	if len(args) > 0 {
 		path = args[0]
-		args = args[1:]
 	}
 
 	if cmd.FS == nil {

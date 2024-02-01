@@ -116,6 +116,16 @@ func New(root string) *App {
 		Cmd: cleo.Cmd{
 			Name:    "marked",
 			Aliases: []string{"m", "md"},
+			Desc:    "outputs for the Marked app (https://marked2app.com/)",
+		},
+		Parser: p,
+	}
+
+	e := &Export{
+		Cmd: cleo.Cmd{
+			Name:    "export",
+			Aliases: []string{"export", "e"},
+			Desc:    "export the document to a different format (markdown,json,html,etc...)",
 		},
 		Parser: p,
 	}
@@ -124,6 +134,7 @@ func New(root string) *App {
 		Cmd: cleo.Cmd{
 			Name:    "preview",
 			Aliases: []string{"p"},
+			Desc:    "outputs HTML for previwing document in a browser",
 		},
 		Parser: p,
 	}
@@ -132,6 +143,7 @@ func New(root string) *App {
 		Cmd: cleo.Cmd{
 			Name:    "slides",
 			Aliases: []string{"s"},
+			Desc:    "outputs slide format for presentation",
 		},
 		Parser: p,
 	}
@@ -144,6 +156,7 @@ func New(root string) *App {
 				"marked":  m,
 				"preview": mp,
 				"slides":  sl,
+				"export":  e,
 			},
 		},
 		Parser: p,

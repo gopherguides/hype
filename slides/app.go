@@ -3,12 +3,10 @@ package slides
 import (
 	"context"
 	"embed"
-	_ "embed"
 	"fmt"
 	"html/template"
 	"net/http"
 	"os"
-	"sync"
 	"time"
 
 	"github.com/gopherguides/hype"
@@ -43,8 +41,6 @@ type App struct {
 	PWD      string
 	Parser   *hype.Parser // If nil, a default parser is used.
 
-	mux  *http.ServeMux
-	once sync.Once
 }
 
 func (a *App) ServeHTTP(w http.ResponseWriter, r *http.Request) {
