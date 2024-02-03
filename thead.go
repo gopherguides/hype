@@ -16,7 +16,7 @@ func (th *THead) MarshalJSON() ([]byte, error) {
 		return nil, err
 	}
 
-	m["type"] = "thead"
+	// m["type"] = "thead"
 
 	return json.Marshal(m)
 }
