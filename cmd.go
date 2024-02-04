@@ -17,10 +17,10 @@ import (
 type Cmd struct {
 	*Element
 
-	Args         []string
-	Env          []string
-	ExpectedExit int
-	Timeout      time.Duration
+	Args         []string      `json:"args,omitempty"`
+	Env          []string      `json:"env,omitempty"`
+	ExpectedExit int           `json:"expected_exit,omitempty"`
+	Timeout      time.Duration `json:"timeout,omitempty"`
 
 	res *CmdResult
 }

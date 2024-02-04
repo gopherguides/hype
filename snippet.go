@@ -55,9 +55,14 @@ func (sm *Snippets) MarshalJSON() ([]byte, error) {
 	m := struct {
 		Rules    map[string]string             `json:"rules,omitempty"`
 		Snippets map[string]map[string]Snippet `json:"snippets,omitempty"`
+		Type     string                        `json:"type,omitempty"`
 	}{
 		Rules:    sm.rules,
 		Snippets: sm.snippets,
+	}
+
+	if len(sm.rules) > 0 || len(sm.snippets) > 0 {
+		m.Type = fmt.Sprintf("%T", sm)
 	}
 
 	return json.Marshal(m)

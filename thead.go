@@ -1,6 +1,9 @@
 package hype
 
-import "encoding/json"
+import (
+	"encoding/json"
+	"fmt"
+)
 
 type THead struct {
 	*Element
@@ -16,7 +19,7 @@ func (th *THead) MarshalJSON() ([]byte, error) {
 		return nil, err
 	}
 
-	// m["type"] = "thead"
+	m["type"] = fmt.Sprintf("%T", th)
 
 	return json.Marshal(m)
 }

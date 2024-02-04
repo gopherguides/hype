@@ -91,12 +91,7 @@ func Test_Encode_JSON(t *testing.T) {
 			act := bb.Out.String()
 			act = strings.TrimSpace(act)
 
-			// f, err := os.Create(filepath.Join(root, tc.exp))
-			// r.NoError(err)
-
-			// _, err = f.WriteString(act)
-			// r.NoError(err)
-			// r.NoError(f.Close())
+			// fmt.Println(act)
 
 			r.Equal(exp, act)
 

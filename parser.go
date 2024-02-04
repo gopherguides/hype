@@ -2,6 +2,7 @@ package hype
 
 import (
 	"context"
+	"encoding/json"
 	"errors"
 	"fmt"
 	"io"
@@ -29,10 +30,40 @@ type Parser struct {
 	Snippets     Snippets                `json:"snippets,omitempty"`
 	Section      int                     `json:"section,omitempty"`
 	NowFn        func() time.Time        `json:"-"` // default: time.Now()
-	Vars         syncx.Map[string, any]  `json:"-"`
+	Vars         syncx.Map[string, any]  `json:"vars,omitempty"`
 
 	fileName string
 	mu       sync.RWMutex
+}
+
+func (p *Parser) MarshalJSON() ([]byte, error) {
+	if p == nil {
+		return nil, ErrIsNil("parser")
+	}
+
+	p.mu.RLock()
+	defer p.mu.RUnlock()
+
+	// p.Vars.Map()
+
+	x := struct {
+		Type         string         `json:"type,omitempty"`
+		Root         string         `json:"root,omitempty"`
+		DisablePages bool           `json:"disable_pages,omitempty"`
+		Section      int            `json:"section,omitempty"`
+		Snippets     Snippets       `json:"snippets,omitempty"`
+		Vars         map[string]any `json:"vars,omitempty"`
+	}{
+		Type:         fmt.Sprintf("%T", p),
+		Root:         p.Root,
+		DisablePages: p.DisablePages,
+		Section:      p.Section,
+		Snippets:     p.Snippets,
+		Vars:         p.Vars.Map(),
+	}
+
+	return json.Marshal(x)
+
 }
 
 func (p *Parser) Now() time.Time {

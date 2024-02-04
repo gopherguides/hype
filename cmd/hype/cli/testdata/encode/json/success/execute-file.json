@@ -85,8 +85,9 @@
     }
   ],
   "parser": {
-    "snippets": {},
-    "section": 1
+    "type": "*hype.Parser",
+    "section": 1,
+    "snippets": {}
   },
   "section_id": 1,
   "snippets": {},
