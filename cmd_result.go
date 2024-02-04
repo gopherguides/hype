@@ -39,7 +39,14 @@ func (c *CmdResult) MarshalJSON() ([]byte, error) {
 	m["type"] = fmt.Sprintf("%T", c)
 
 	if c.Result != nil {
-		m["result"] = c.Result
+		y := struct {
+			*clam.Result
+			Type string `json:"type,omitempty"`
+		}{
+			Result: c.Result,
+			Type:   fmt.Sprintf("%T", c.Result),
+		}
+		m["result"] = y
 	}
 
 	return json.Marshal(m)
