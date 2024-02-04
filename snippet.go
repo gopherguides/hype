@@ -23,6 +23,31 @@ type Snippet struct {
 	End     int    `json:"end,omitempty"`     // the end line of the snippet
 }
 
+func (snip Snippet) MarshalJSON() ([]byte, error) {
+	m := struct {
+		Content string `json:"content,omitempty"`
+		File    string `json:"file,omitempty"`
+		Lang    string `json:"lang,omitempty"`
+		Name    string `json:"name,omitempty"`
+		Start   int    `json:"start,omitempty"`
+		End     int    `json:"end,omitempty"`
+		Type    string `json:"type,omitempty"`
+	}{
+		Content: snip.Content,
+		File:    snip.File,
+		Lang:    snip.Lang,
+		Name:    snip.Name,
+		Start:   snip.Start,
+		End:     snip.End,
+	}
+
+	if snip.Content != "" {
+		m.Type = fmt.Sprintf("%T", snip)
+	}
+
+	return json.Marshal(m)
+}
+
 func (snip Snippet) String() string {
 	return snip.Content
 }
