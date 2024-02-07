@@ -16,9 +16,9 @@ before:
     - go generate ./...
 
 builds:
-  - main: ./cmd/hype
   - env:
       - CGO_ENABLED=0
+    main: ./cmd/hype/main.go
     goos:
       - linux
       - windows
