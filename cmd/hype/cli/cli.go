@@ -170,7 +170,7 @@ func Garlic(root string) (*App, error) {
 }
 
 func DefaultTimeout() time.Duration {
-	return time.Second * 5
+	return time.Second * 30
 }
 
 func WithinDir(dir string, f func() error) error {

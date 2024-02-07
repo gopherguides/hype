@@ -20,13 +20,11 @@ type Export struct {
 	cleo.Cmd
 
 	// a folder containing all chapters of a book, for example
-	ContextPath string
-	File        string        // optional file name to preview
-	Timeout     time.Duration // default: 5s
-	Parser      *hype.Parser  // If nil, a default parser is used.
-	Section     int           // default: 1
-	Verbose     bool          // default: false
-	Format      string        // default:markdown
+	File    string        // optional file name to preview
+	Timeout time.Duration // default: 30s
+	Parser  *hype.Parser  // If nil, a default parser is used.
+	Verbose bool          // default: false
+	Format  string        // default:markdown
 
 	flags *flag.FlagSet
 }
@@ -74,7 +72,16 @@ func (cmd *Export) SetParser(p *hype.Parser) error {
 	return nil
 }
 
-func (cmd *Export) Flags() (*flag.FlagSet, error) {
+func (cmd *Export) Flags(stderr io.Writer) (*flag.FlagSet, error) {
+	usage := `
+Usage: hype export [options]
+
+Examples:
+	hype export -format html
+	hype export -f README.md -format html
+	hype export -f README.md -format markdown -timeout=10s
+`
+
 	if err := cmd.validate(); err != nil {
 		return nil, err
 	}
@@ -86,14 +93,18 @@ func (cmd *Export) Flags() (*flag.FlagSet, error) {
 		return cmd.flags, nil
 	}
 
-	cmd.flags = flag.NewFlagSet("marked", flag.ContinueOnError)
-	cmd.flags.SetOutput(io.Discard)
-	cmd.flags.DurationVar(&cmd.Timeout, "timeout", DefaultTimeout(), "timeout for execution")
-	cmd.flags.StringVar(&cmd.ContextPath, "context", cmd.ContextPath, "a folder containing all chapters of a book, for example")
+	cmd.flags = flag.NewFlagSet("export", flag.ContinueOnError)
+	cmd.flags.SetOutput(stderr)
+	cmd.flags.DurationVar(&cmd.Timeout, "timeout", DefaultTimeout(), "timeout for execution, defaults to 30 seconds (30s)")
 	cmd.flags.StringVar(&cmd.File, "f", "module.md", "optional file name to preview, if not provided, defaults to module.md")
-	cmd.flags.IntVar(&cmd.Section, "section", 0, "")
 	cmd.flags.BoolVar(&cmd.Verbose, "v", false, "enable verbose output for debugging")
-	cmd.flags.StringVar(&cmd.Format, "format", "markdown", "content type to export to (markdown, html, body, etc...)  See documentation for more options")
+	cmd.flags.StringVar(&cmd.Format, "format", "markdown", "content type to export to: markdown, html")
+
+	cmd.flags.Usage = func() {
+		fmt.Fprintf(stderr, "Usage of %s:\n", os.Args[0])
+		cmd.flags.PrintDefaults()
+		fmt.Fprintln(stderr, usage)
+	}
 
 	return cmd.flags, nil
 }
@@ -144,7 +155,7 @@ func (cmd *Export) main(ctx context.Context, pwd string, args []string) error {
 		return err
 	}
 
-	flags, err := cmd.Flags()
+	flags, err := cmd.Flags(cmd.Stderr())
 	if err != nil {
 		return err
 	}
@@ -195,28 +206,14 @@ func (cmd *Export) execute(ctx context.Context, pwd string) error {
 		p = hype.NewParser(cmd.FS)
 	}
 
-	if p.Section == 0 {
-		p.Section = 1
-	}
-
-	if cmd.Section > 0 {
-		p.Section = cmd.Section
-	}
-
 	p.Root = filepath.Dir(mp)
 
-	if len(cmd.File) > 0 {
-		f, err := cmd.FS.Open(cmd.File)
-		if err != nil {
-			return err
-		}
-		defer f.Close()
-
-		cmd.IO.In = f
+	doc, err := p.ParseFile(cmd.File)
+	if err != nil {
+		return err
 	}
 
-	doc, err := p.Parse(cmd.Stdin())
-	if err != nil {
+	if err := doc.Execute(ctx); err != nil {
 		return err
 	}
 
@@ -225,13 +222,10 @@ func (cmd *Export) execute(ctx context.Context, pwd string) error {
 		fmt.Fprintln(cmd.Stdout(), doc.MD())
 	case "html":
 		fmt.Fprintln(cmd.Stdout(), doc.String())
-
-	// TODO: Implement this
-	case "body":
-		//fmt.Fprintln(cmd.Stdout(), doc.Body())
-		return fmt.Errorf("body format not implemented")
+		return nil
+	default:
+		return fmt.Errorf("unsupported format: %s", cmd.Format)
 	}
-
 	return nil
 
 }

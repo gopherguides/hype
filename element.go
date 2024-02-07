@@ -277,10 +277,14 @@ func (el *Element) MD() string {
 		return el.Children().MD()
 	case atomx.Hr:
 		return "\n\n---\n\n"
+	case atomx.Br:
+		return "\n\n"
 	case atomx.Blockquote:
 		b := el.Children().MD()
 		b = strings.TrimSpace(b)
 		return fmt.Sprintf("> %s", b)
+	case atomx.Details:
+		return el.String()
 	default:
 		fmt.Printf("TODO: Element.MD(): %q\n", el.Atom())
 	}
