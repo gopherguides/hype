@@ -5,6 +5,7 @@ import (
 	"encoding/json"
 	"fmt"
 	"io/fs"
+	"strings"
 )
 
 type Image struct {
@@ -44,6 +45,10 @@ func (i *Image) Execute(ctx context.Context, doc *Document) error {
 		return err
 	}
 
+	// Check if the file exists (but only if it's local)
+	if strings.HasPrefix(src, "http") {
+		return nil
+	}
 	if _, err := fs.Stat(doc.FS, src); err != nil {
 		return err
 	}
