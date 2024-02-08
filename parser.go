@@ -12,6 +12,7 @@ import (
 	"sync"
 	"time"
 
+	"github.com/gofrs/uuid/v5"
 	"github.com/gopherguides/hype/binding"
 	"github.com/markbates/syncx"
 	"golang.org/x/net/html"
@@ -30,6 +31,7 @@ type Parser struct {
 	Snippets     Snippets                `json:"snippets,omitempty"`
 	Section      int                     `json:"section,omitempty"`
 	NowFn        func() time.Time        `json:"-"` // default: time.Now()
+	DocIDGen     func() (string, error)  `json:"-"` // default: uuid.NewV4().String()
 	Vars         syncx.Map[string, any]  `json:"vars,omitempty"`
 
 	fileName string
@@ -122,7 +124,11 @@ func (p *Parser) Parse(r io.Reader) (*Document, error) {
 		return nil, p.wrapErr(err)
 	}
 
-	doc := p.newDoc()
+	doc, err := p.newDoc()
+	if err != nil {
+		return nil, p.wrapErr(err)
+	}
+
 	doc.Nodes = Nodes{node}
 	if len(doc.Title) == 0 {
 		doc.Title = FindTitle(doc.Nodes)
@@ -259,7 +265,10 @@ func (p *Parser) ParseExecuteFragment(ctx context.Context, r io.Reader) (Nodes, 
 		return nil, p.wrapErr(err)
 	}
 
-	doc := p.newDoc()
+	doc, err := p.newDoc()
+	if err != nil {
+		return nil, p.wrapErr(err)
+	}
 	doc.Nodes = nodes
 
 	err = doc.Execute(ctx)
@@ -415,8 +424,30 @@ func NewParser(cab fs.FS) *Parser {
 	}
 }
 
-func (p *Parser) newDoc() *Document {
+func (p *Parser) newDoc() (*Document, error) {
+	if p == nil {
+		return nil, ErrIsNil("parser")
+	}
+
+	p.mu.Lock()
+	defer p.mu.Unlock()
+
+	if p.DocIDGen == nil {
+		p.DocIDGen = func() (string, error) {
+			id, err := uuid.NewV4()
+			if err != nil {
+				return "", err
+			}
+			return id.String(), nil
+		}
+	}
+
+	id, err := p.DocIDGen()
+	if err != nil {
+		return nil, p.wrapErr(err)
+	}
 	doc := &Document{
+		ID:        id,
 		FS:        p.FS,
 		Parser:    p,
 		Root:      p.Root,
@@ -424,7 +455,7 @@ func (p *Parser) newDoc() *Document {
 		Snippets:  p.Snippets,
 	}
 
-	return doc
+	return doc, nil
 }
 
 func (p *Parser) wrapErr(err error) error {
