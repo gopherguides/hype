@@ -17,6 +17,7 @@ type Document struct {
 	fs.FS        `json:"-"`
 	sync.RWMutex `json:"-"`
 
+	ID        string   `json:"id,omitempty"`
 	Nodes     Nodes    `json:"nodes,omitempty"`
 	Parser    *Parser  `json:"parser,omitempty"` // Parser used to create the document
 	Root      string   `json:"root,omitempty"`
@@ -31,6 +32,7 @@ func (doc *Document) MarshalJSON() ([]byte, error) {
 	}
 
 	x := struct {
+		ID        string   `json:"id,omitempty"`
 		Nodes     Nodes    `json:"nodes,omitempty"`
 		Parser    *Parser  `json:"parser,omitempty"` // Parser used to create the document
 		Root      string   `json:"root,omitempty"`
@@ -46,6 +48,7 @@ func (doc *Document) MarshalJSON() ([]byte, error) {
 		Snippets:  doc.Snippets,
 		Title:     doc.Title,
 		Nodes:     doc.Nodes,
+		ID:        doc.ID,
 	}
 
 	return json.Marshal(x)

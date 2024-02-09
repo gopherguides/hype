@@ -68,6 +68,10 @@ func Test_Encode_JSON(t *testing.T) {
 		t.Run(tc.name, func(t *testing.T) {
 			r := require.New(t)
 
+			p.DocIDGen = func() (string, error) {
+				return tc.name, nil
+			}
+
 			cmd := &Encode{
 				Parser: p,
 			}
