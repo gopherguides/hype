@@ -13,6 +13,9 @@ From the `.hype` directory, run:
 hype export -format=markdown -f module.md > ../README.md
 ```
 
+You can also use a [github action](#using-github-actions-to-update-your-readme) to automatically update your README as well.
+
+
 <include src="quickstart/module.md"></include>
 
 # README Source
@@ -22,6 +25,8 @@ You can view the source for this entire readme in the [.hype](https://github.com
 Here is the current structure that we are using to create this readme:
 
 <cmd exec="tree" src=".">
+
+<include src="actions/module.md"></include>
 
 
 # Issues
