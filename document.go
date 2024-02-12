@@ -17,13 +17,13 @@ type Document struct {
 	fs.FS        `json:"-"`
 	sync.RWMutex `json:"-"`
 
+	ID        string   `json:"id,omitempty"`
 	Nodes     Nodes    `json:"nodes,omitempty"`
 	Parser    *Parser  `json:"parser,omitempty"` // Parser used to create the document
 	Root      string   `json:"root,omitempty"`
 	SectionID int      `json:"section_id,omitempty"`
 	Snippets  Snippets `json:"snippets,omitempty"`
 	Title     string   `json:"title,omitempty"`
-	ID        string   `json:"id,omitempty"`
 	Filename  string   `json:"filename,omitempty"`
 }
 
@@ -33,6 +33,7 @@ func (doc *Document) MarshalJSON() ([]byte, error) {
 	}
 
 	x := struct {
+		ID        string   `json:"id,omitempty"`
 		Nodes     Nodes    `json:"nodes,omitempty"`
 		Parser    *Parser  `json:"parser,omitempty"` // Parser used to create the document
 		Root      string   `json:"root,omitempty"`
@@ -40,7 +41,6 @@ func (doc *Document) MarshalJSON() ([]byte, error) {
 		Snippets  Snippets `json:"snippets,omitempty"`
 		Title     string   `json:"title,omitempty"`
 		Type      string   `json:"type"`
-		ID        string   `json:"id,omitempty"`
 		Filename  string   `json:"filename,omitempty"`
 	}{
 		Type:      fmt.Sprintf("%T", doc),
