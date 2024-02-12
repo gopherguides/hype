@@ -11,6 +11,13 @@
 
 Hype is a content generation tool that use traditional Markdown syntax, and allows it to be extended for almost any use to create dynamic, rich, automated output that is easily maintainable and reusable.
 
+Hype follows the same principals that we use for coding;
+- packages (keep relevant content in small, reusable packages, with all links relative to the package)
+- reuse - write your documentation once (even in your code), and use everywhere (blog, book, github repo, etc)
+- partials/includes - support including documents into a larger document (just like code!)
+- validation - like tests, but validate all your code samples are valid (or not if that is what you expect).
+- asset validation - ensure local assets like images, etc actually exist
+
 ## Created with Hype
 
 This README was created with hype.  Here was the command we used to create it:
