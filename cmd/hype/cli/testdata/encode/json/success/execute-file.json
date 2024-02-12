@@ -92,5 +92,6 @@
   "section_id": 1,
   "snippets": {},
   "title": "JSON Encoding",
-  "type": "*hype.Document"
+  "type": "*hype.Document",
+  "filename": "module.md"
 }

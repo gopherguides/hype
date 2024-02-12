@@ -422,6 +422,7 @@ func (p *Parser) newDoc() *Document {
 		Root:      p.Root,
 		SectionID: p.Section,
 		Snippets:  p.Snippets,
+		Filename:  p.fileName,
 	}
 
 	return doc
