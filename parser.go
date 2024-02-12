@@ -453,6 +453,7 @@ func (p *Parser) newDoc() (*Document, error) {
 		Root:      p.Root,
 		SectionID: p.Section,
 		Snippets:  p.Snippets,
+		Filename:  p.fileName,
 	}
 
 	return doc, nil

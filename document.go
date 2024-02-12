@@ -24,6 +24,7 @@ type Document struct {
 	SectionID int      `json:"section_id,omitempty"`
 	Snippets  Snippets `json:"snippets,omitempty"`
 	Title     string   `json:"title,omitempty"`
+	Filename  string   `json:"filename,omitempty"`
 }
 
 func (doc *Document) MarshalJSON() ([]byte, error) {
@@ -40,6 +41,7 @@ func (doc *Document) MarshalJSON() ([]byte, error) {
 		Snippets  Snippets `json:"snippets,omitempty"`
 		Title     string   `json:"title,omitempty"`
 		Type      string   `json:"type"`
+		Filename  string   `json:"filename,omitempty"`
 	}{
 		Type:      fmt.Sprintf("%T", doc),
 		Parser:    doc.Parser,
@@ -49,6 +51,7 @@ func (doc *Document) MarshalJSON() ([]byte, error) {
 		Title:     doc.Title,
 		Nodes:     doc.Nodes,
 		ID:        doc.ID,
+		Filename:  doc.Filename,
 	}
 
 	return json.Marshal(x)
