@@ -34,7 +34,7 @@ type Parser struct {
 	DocIDGen     func() (string, error)  `json:"-"` // default: uuid.NewV4().String()
 	Vars         syncx.Map[string, any]  `json:"vars,omitempty"`
 
-	fileName string
+	Filename string // only set when Parser.ParseFile() is used
 	mu       sync.RWMutex
 }
 
@@ -85,7 +85,7 @@ func (p *Parser) ParseFile(name string) (*Document, error) {
 	}
 
 	p.mu.Lock()
-	p.fileName = name
+	p.Filename = name
 	p.mu.Unlock()
 
 	f, err := p.Open(name)
@@ -389,7 +389,7 @@ func (p *Parser) element(node *html.Node, parent Node) (Node, error) {
 		Attributes: ats,
 		HTMLNode:   node,
 		Parent:     parent,
-		Filename:   p.fileName,
+		Filename:   p.Filename,
 	}
 
 	var nodes Nodes
@@ -457,7 +457,7 @@ func (p *Parser) newDoc() (*Document, error) {
 		Root:      p.Root,
 		SectionID: p.Section,
 		Snippets:  p.Snippets,
-		Filename:  p.fileName,
+		Filename:  p.Filename,
 	}
 
 	return doc, nil
@@ -465,10 +465,8 @@ func (p *Parser) newDoc() (*Document, error) {
 
 func (p *Parser) newError(err error) ParseError {
 	return ParseError{
-		HypeError: HypeError{
-			Err:      err,
-			Root:     p.Root,
-			Filename: p.fileName,
-		},
+		Err:      err,
+		Filename: p.Filename,
+		Root:     p.Root,
 	}
 }

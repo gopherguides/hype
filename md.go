@@ -2,6 +2,7 @@ package hype
 
 import (
 	"bytes"
+	"fmt"
 	"io"
 
 	"github.com/gopherguides/hype/mdx"
@@ -22,13 +23,13 @@ func Markdown() PreParseFn {
 
 		b, err := io.ReadAll(r)
 		if err != nil {
-			return nil, err
+			return nil, fmt.Errorf("markdown: %w", err)
 		}
 		b = bytes.ReplaceAll(b, []byte("\\n"), []byte("  \n"))
 
 		b, err = md.Parse(b)
 		if err != nil {
-			return nil, err
+			return nil, fmt.Errorf("markdown: %w", err)
 		}
 
 		b = bytes.ReplaceAll(b, []byte("&rsquo;"), []byte("'"))

@@ -36,7 +36,7 @@ func Test_PreParsers_PreParse(t *testing.T) {
 		}),
 	}
 
-	in, err := pp.PreParse(nil, in)
+	in, err := pp.PreParse(testParser(t, ""), in)
 
 	r.NoError(err)
 
@@ -59,7 +59,9 @@ func Test_PreParsers_PreParse_Error(t *testing.T) {
 		}),
 	}
 
-	_, err := pp.PreParse(nil, strings.NewReader(""))
+	p := testParser(t, "")
+
+	_, err := pp.PreParse(p, strings.NewReader(""))
 	r.Error(err)
 
 	var e2 PreParseError

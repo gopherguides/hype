@@ -46,11 +46,9 @@ func (list Nodes) Execute(wg WaitGrouper, ctx context.Context, d *Document) erro
 				err := cn.Execute(ctx, d)
 				if err != nil {
 					return ExecuteError{
-						HypeError: HypeError{
-							Err:      err,
-							Root:     d.Root,
-							Filename: name,
-						},
+						Err:      err,
+						Filename: name,
+						Root:     d.Root,
 					}
 				}
 				return nil
@@ -60,11 +58,9 @@ func (list Nodes) Execute(wg WaitGrouper, ctx context.Context, d *Document) erro
 		err := n.Children().Execute(wg, ctx, d)
 		if err != nil {
 			return ExecuteError{
-				HypeError: HypeError{
-					Err:      err,
-					Root:     d.Root,
-					Filename: name,
-				},
+				Err:      err,
+				Root:     d.Root,
+				Filename: name,
 			}
 		}
 

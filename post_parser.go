@@ -1,10 +1,5 @@
 package hype
 
-import (
-	"fmt"
-	"strings"
-)
-
 type PostParser interface {
 	PostParse(p *Parser, d *Document, err error) error
 }
@@ -23,7 +18,15 @@ func (list Nodes) PostParse(p *Parser, d *Document, err error) error {
 		if nodes, ok := n.(Nodes); ok {
 			err2 = nodes.PostParse(p, d, err)
 			if err2 != nil {
-				return err2
+				if _, ok := err2.(PostParseError); ok {
+					return err2
+				}
+				return PostParseError{
+					Err:      err2,
+					Filename: p.Filename,
+					OrigErr:  err,
+					Root:     p.Root,
+				}
 			}
 			continue
 		}
@@ -34,39 +37,28 @@ func (list Nodes) PostParse(p *Parser, d *Document, err error) error {
 			err2 = pp.PostParse(p, d, err)
 			if err2 != nil {
 				return PostParseError{
-					OrigErr:    err,
 					Err:        err2,
+					Filename:   p.Filename,
+					OrigErr:    err,
 					PostParser: pp,
+					Root:       p.Root,
 				}
 			}
 		}
 
 		err2 = n.Children().PostParse(p, d, err)
 		if err2 != nil {
-			// the error should already be wrapped
-			return err2
+			if _, ok := err2.(PostParseError); ok {
+				return err2
+			}
+			return PostParseError{
+				Err:      err2,
+				Filename: p.Filename,
+				OrigErr:  err,
+				Root:     p.Root,
+			}
 		}
 	}
 
 	return err
-}
-
-type PostParseError struct {
-	Err        error
-	OrigErr    error
-	PostParser PostParser
-}
-
-func (e PostParseError) Error() string {
-	var errs []string
-
-	if e.Err != nil {
-		errs = append(errs, e.Err.Error())
-	}
-
-	if e.OrigErr != nil {
-		errs = append(errs, e.OrigErr.Error())
-	}
-
-	return fmt.Sprintf("post parse error: [%T]: %v", e.PostParser, strings.Join(errs, "; "))
 }

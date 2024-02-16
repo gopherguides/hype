@@ -19,7 +19,7 @@ func (ce CmdError) MarshalJSON() ([]byte, error) {
 	mm := map[string]any{
 		"args":     ce.Args,
 		"env":      ce.Env,
-		"err":      ce.Err,
+		"error":    ce.Err,
 		"exit":     ce.Exit,
 		"filename": ce.Filename,
 		"output":   string(ce.Output),

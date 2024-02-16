@@ -7,7 +7,9 @@ import (
 )
 
 type ParseError struct {
-	HypeError
+	Err      error  `json:"error,omitempty"`
+	Filename string `json:"filename,omitempty"`
+	Root     string `json:"root,omitempty"`
 }
 
 func (pe ParseError) MarshalJSON() ([]byte, error) {
