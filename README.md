@@ -246,8 +246,6 @@ type Context interface{ ... }
     func WithValue(parent Context, key, val any) Context
     func WithoutCancel(parent Context) Context
 
-go: github.com/markbates/clam@v0.0.0-20220808175708-ef60f46826fb (replaced by ../clam): reading ../../clam/go.mod: open /home/runner/work/hype/clam/go.mod: no such file or directory
-
 --------------------------------------------------------------------------------
 Go Version: go1.22.0
 
@@ -270,8 +268,6 @@ func WithCancel(parent Context) (ctx Context, cancel CancelFunc)
 
     Canceling this context releases resources associated with it, so code should
     call cancel as soon as the operations running in this Context complete.
-
-go: github.com/markbates/clam@v0.0.0-20220808175708-ef60f46826fb (replaced by ../clam): reading ../../clam/go.mod: open /home/runner/work/hype/clam/go.mod: no such file or directory
 
 --------------------------------------------------------------------------------
 Go Version: go1.22.0
