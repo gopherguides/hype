@@ -110,7 +110,7 @@ func helloCab(t testing.TB, names ...string) fstest.MapFS {
 
 const go_mod = `module %s
 
-go 1.18`
+go 1.22`
 
 const main_go = `package main
 

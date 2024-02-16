@@ -1,11 +1,90 @@
 package hype
 
 import (
+	"context"
+	"errors"
 	"testing"
 	"testing/fstest"
 
 	"github.com/stretchr/testify/require"
 )
+
+func Test_Include_Parse_Errors(t *testing.T) {
+	t.Parallel()
+
+	tcs := []struct {
+		root     string
+		filename string
+	}{
+		{
+			root:     "testdata/includes/broken",
+			filename: "module.md",
+		},
+	}
+
+	for _, tc := range tcs {
+		t.Run(tc.root, func(t *testing.T) {
+			r := require.New(t)
+			p := testParser(t, tc.root)
+
+			ctx := context.Background()
+
+			_, err := p.ParseExecuteFile(ctx, "module.md")
+			r.Error(err)
+
+			var ee ParseError
+			r.True(errors.As(err, &ee))
+
+			r.Equal(tc.filename, ee.Filename)
+			r.Equal(tc.root, ee.Root)
+
+		})
+	}
+
+}
+
+func Test_Include_Cmd_Errors(t *testing.T) {
+	t.Parallel()
+
+	tcs := []struct {
+		root     string
+		filename string
+	}{
+		{
+			root:     "testdata/includes/toplevel",
+			filename: "module.md",
+		},
+		{
+			root:     "testdata/includes/sublevel",
+			filename: "below/b.md",
+		},
+	}
+
+	for _, tc := range tcs {
+		t.Run(tc.root, func(t *testing.T) {
+			r := require.New(t)
+			p := testParser(t, tc.root)
+
+			ctx := context.Background()
+
+			_, err := p.ParseExecuteFile(ctx, "module.md")
+			r.Error(err)
+
+			var ee ExecuteError
+			r.True(errors.As(err, &ee))
+
+			r.Equal(tc.filename, ee.Filename)
+			r.Equal(tc.root, ee.Root)
+
+			var ce CmdError
+			r.True(errors.As(ee.Err, &ce))
+
+			r.Equal(tc.filename, ce.Filename)
+			r.Equal(-1, ce.Exit)
+		})
+	}
+
+}
 
 func Test_Include(t *testing.T) {
 	t.Parallel()

@@ -121,7 +121,7 @@ func NewInclude(p *Parser, el *Element) (*Include, error) {
 	}
 
 	if err := RestripeFigureIDs(inc.Nodes, fn); err != nil {
-		return nil, err
+		return nil, p2.newError(err)
 	}
 
 	return inc, nil

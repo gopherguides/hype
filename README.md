@@ -297,7 +297,7 @@ $ tree
     └── hello
         └── main.go
 
-3 directories, 4 files
+4 directories, 4 files
 ```
 
 # The Export Command
@@ -367,7 +367,7 @@ $ tree
         └── hello
             └── main.go
 
-5 directories, 9 files
+6 directories, 9 files
 ```
 ---
 

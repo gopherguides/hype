@@ -109,18 +109,18 @@ func (c *Cmd) Execute(ctx context.Context, doc *Document) error {
 		switch c.ExpectedExit {
 		case -1:
 			if res.Exit == 0 {
-				return fmt.Errorf("unexpected exit code: %d: %w", res.Exit, err)
+				return c.newError(err)
 			}
 		default:
 			if res.Exit != c.ExpectedExit {
-				return fmt.Errorf("unexpected exit code: %d: %w", res.Exit, err)
+				return c.newError(err)
 			}
 		}
 	}
 
 	cres, err := NewCmdResult(doc.Parser, c, res)
 	if err != nil {
-		return err
+		return c.newError(err)
 	}
 
 	c.Lock()
@@ -129,6 +129,27 @@ func (c *Cmd) Execute(ctx context.Context, doc *Document) error {
 	c.Unlock()
 
 	return nil
+}
+
+func (c *Cmd) newError(err error) error {
+	if c == nil {
+		return err
+	}
+
+	re, ok := err.(clam.RunError)
+	if !ok {
+		return CmdError{
+			RunError: clam.RunError{
+				Err: err,
+			},
+			Filename: c.Filename,
+		}
+	}
+
+	return CmdError{
+		RunError: re,
+		Filename: c.Filename,
+	}
 }
 
 func NewCmd(el *Element) (*Cmd, error) {

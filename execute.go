@@ -20,6 +20,9 @@ type WaitGrouper interface {
 }
 
 func (list Nodes) Execute(wg WaitGrouper, ctx context.Context, d *Document) error {
+	if d == nil {
+		return ErrIsNil("document")
+	}
 
 	for _, n := range list {
 
@@ -31,16 +34,38 @@ func (list Nodes) Execute(wg WaitGrouper, ctx context.Context, d *Document) erro
 			continue
 		}
 
+		name := d.Filename
+
+		if n, ok := n.(interface{ FileName() string }); ok {
+			name = n.FileName()
+		}
+
 		cn, ok := n.(ExecutableNode)
 		if ok {
 			wg.Go(func() error {
-				return cn.Execute(ctx, d)
+				err := cn.Execute(ctx, d)
+				if err != nil {
+					return ExecuteError{
+						HypeError: HypeError{
+							Err:      err,
+							Root:     d.Root,
+							Filename: name,
+						},
+					}
+				}
+				return nil
 			})
 		}
 
 		err := n.Children().Execute(wg, ctx, d)
 		if err != nil {
-			return err
+			return ExecuteError{
+				HypeError: HypeError{
+					Err:      err,
+					Root:     d.Root,
+					Filename: name,
+				},
+			}
 		}
 
 	}

@@ -23,7 +23,14 @@ type Element struct {
 	HTMLNode *html.Node
 	Nodes    Nodes
 	Parent   Node
-	FileName string // only set when Parser.ParseFile() is used
+	Filename string // only set when Parser.ParseFile() is used
+}
+
+// FileName returns the filename of the element.
+// This is only set when Parser.ParseFile() is used.
+func (el *Element) FileName() string {
+	// Note: this function was added to satisfy an interface.
+	return el.Filename
 }
 
 func (el *Element) JSONMap() (map[string]any, error) {
@@ -38,8 +45,8 @@ func (el *Element) JSONMap() (map[string]any, error) {
 		"type": fmt.Sprintf("%T", el),
 	}
 
-	if len(el.FileName) > 0 {
-		m["file"] = el.FileName
+	if len(el.Filename) > 0 {
+		m["file"] = el.Filename
 	}
 
 	if el.Attributes != nil && el.Attributes.Len() > 0 {
@@ -88,8 +95,8 @@ func (el *Element) Format(f fmt.State, verb rune) {
 			return
 		}
 
-		if len(el.FileName) > 0 {
-			fmt.Fprintf(f, "file://%s: ", el.FileName)
+		if len(el.Filename) > 0 {
+			fmt.Fprintf(f, "file://%s: ", el.Filename)
 		}
 
 		fmt.Fprintf(f, "%s", st)
@@ -120,7 +127,7 @@ func (el *Element) Clone() (*Element, error) {
 		},
 		Nodes:    el.Nodes,
 		Parent:   el.Parent,
-		FileName: el.FileName,
+		Filename: el.Filename,
 	}
 
 	return nel, nil
@@ -224,7 +231,7 @@ func NewEl[T ~string](at T, parent Node) *Element {
 	var fn string
 
 	if e, ok := parent.(*Element); ok {
-		fn = e.FileName
+		fn = e.Filename
 	}
 
 	return &Element{
@@ -235,7 +242,7 @@ func NewEl[T ~string](at T, parent Node) *Element {
 			DataAtom: atom.Lookup([]byte(string(at))),
 		},
 		Parent:   parent,
-		FileName: fn,
+		Filename: fn,
 	}
 }
 
@@ -244,13 +251,13 @@ func (el *Element) updateFileName(dir string) {
 		return
 	}
 
-	if strings.HasPrefix(el.FileName, dir) {
+	if strings.HasPrefix(el.Filename, dir) {
 		return
 	}
 
 	el.Lock()
 	defer el.Unlock()
-	el.FileName = filepath.Join(dir, el.FileName)
+	el.Filename = filepath.Join(dir, el.Filename)
 }
 
 func (el *Element) Set(k string, v string) error {

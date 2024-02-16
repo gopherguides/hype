@@ -83,7 +83,7 @@ func Test_Nodes_Execute_Errors(t *testing.T) {
 			nodes := Nodes{tc.node}
 
 			wg := &errgroup.Group{}
-			err := nodes.Execute(wg, nil, nil)
+			err := nodes.Execute(wg, nil, &Document{})
 			r.NoError(err)
 
 			err = wg.Wait()
