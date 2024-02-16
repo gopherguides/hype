@@ -7,7 +7,7 @@ toolchain go1.22.0
 require (
 	github.com/gobuffalo/flect v1.0.2
 	github.com/gofrs/uuid/v5 v5.0.0
-	github.com/markbates/clam v0.0.0-20220808175708-ef60f46826fb
+	github.com/markbates/clam v0.0.0-20240216202943-7a59eb77d084
 	github.com/markbates/cleo v0.0.0-20230821202903-72220ef5f7f0
 	github.com/markbates/fsx v1.3.0
 	github.com/markbates/garlic v1.0.0
@@ -30,5 +30,3 @@ require (
 	golang.org/x/exp v0.0.0-20240213143201-ec583247a57a // indirect
 	gopkg.in/yaml.v3 v3.0.1 // indirect
 )
-
-replace github.com/markbates/clam => ../clam
