@@ -21,7 +21,7 @@ func (p *Paragraph) MarshalJSON() ([]byte, error) {
 
 	m["type"] = fmt.Sprintf("%T", p)
 
-	return json.Marshal(m)
+	return json.MarshalIndent(m, "", "  ")
 }
 
 func (p *Paragraph) IsEmptyNode() bool {

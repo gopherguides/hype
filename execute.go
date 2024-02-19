@@ -57,6 +57,7 @@ func (list Nodes) Execute(wg WaitGrouper, ctx context.Context, d *Document) erro
 
 		err := n.Children().Execute(wg, ctx, d)
 		if err != nil {
+			panic(err)
 			return ExecuteError{
 				Err:      err,
 				Root:     d.Root,

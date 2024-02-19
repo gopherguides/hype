@@ -1,0 +1,18 @@
+{
+  "args": [
+    "echo",
+    "hello"
+  ],
+  "atom": "cmd",
+  "env": [
+    "FOO=bar",
+    "BAR=baz"
+  ],
+  "expected_exit": 1,
+  "result": {
+    "atom": "cmd",
+    "type": "*hype.CmdResult"
+  },
+  "timeout": "1s",
+  "type": "*hype.Cmd"
+}

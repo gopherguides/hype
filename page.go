@@ -26,7 +26,7 @@ func (page *Page) MarshalJSON() ([]byte, error) {
 		m["title"] = page.Title
 	}
 
-	return json.Marshal(m)
+	return json.MarshalIndent(m, "", "  ")
 }
 
 func (page *Page) Body() (*Body, error) {

@@ -2,6 +2,7 @@ package hype
 
 import (
 	"context"
+	"errors"
 	"fmt"
 	"testing"
 
@@ -89,7 +90,7 @@ func Test_Nodes_Execute_Errors(t *testing.T) {
 			err = wg.Wait()
 			r.Error(err)
 
-			r.Contains(err.Error(), "boom")
+			r.True(errors.Is(err, ExecuteError{}), err)
 		})
 	}
 }

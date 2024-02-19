@@ -45,7 +45,7 @@ func (snip Snippet) MarshalJSON() ([]byte, error) {
 		m.Type = fmt.Sprintf("%T", snip)
 	}
 
-	return json.Marshal(m)
+	return json.MarshalIndent(m, "", "  ")
 }
 
 func (snip Snippet) String() string {
@@ -90,7 +90,7 @@ func (sm *Snippets) MarshalJSON() ([]byte, error) {
 		m.Type = fmt.Sprintf("%T", sm)
 	}
 
-	return json.Marshal(m)
+	return json.MarshalIndent(m, "", "  ")
 }
 
 func (sm *Snippets) UnmarshalJSON(data []byte) error {

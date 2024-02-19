@@ -16,7 +16,9 @@ func Test_CmdError(t *testing.T) {
 
 	oce := CmdError{
 		RunError: clam.RunError{
-			Err: io.EOF,
+			Err: ExecuteError{
+				Err: io.EOF,
+			},
 		},
 	}
 
@@ -26,12 +28,31 @@ func Test_CmdError(t *testing.T) {
 	r.True(oce.Is(oce), oce)
 	r.True(oce.Unwrap() == io.EOF, oce)
 
-	var ce CmdError
-	r.True(errors.As(wrapped, &ce), wrapped)
+	r.True(errors.As(wrapped, &CmdError{}), wrapped)
+	r.True(errors.As(wrapped, &ExecuteError{}), wrapped)
 
-	ce = CmdError{}
-	r.True(errors.Is(wrapped, ce), wrapped)
+	r.True(errors.Is(wrapped, CmdError{}), wrapped)
+	r.True(errors.Is(wrapped, ExecuteError{}), wrapped)
+	r.True(errors.Is(wrapped, io.EOF), wrapped)
 
 	err := errors.Unwrap(oce)
 	r.Equal(io.EOF, err)
+}
+
+func Test_CmdError_MarshalJSON(t *testing.T) {
+	t.Parallel()
+
+	ce := CmdError{
+		RunError: clam.RunError{
+			Args:   []string{"echo", "hello"},
+			Env:    []string{"FOO=bar", "BAR=baz"},
+			Err:    io.EOF,
+			Exit:   1,
+			Output: []byte("foo\nbar\nbaz\n"),
+			Dir:    "/tmp",
+		},
+		Filename: "foo.go",
+	}
+
+	testJSON(t, "cmd_error", ce)
 }

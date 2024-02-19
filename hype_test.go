@@ -2,6 +2,7 @@ package hype
 
 import (
 	"context"
+	"encoding/json"
 	"fmt"
 	"io/fs"
 	"os"
@@ -78,6 +79,36 @@ func testModule(t testing.TB, root string) {
 
 		r.Equal(exp, act)
 	}
+}
+
+func testJSON(t testing.TB, gold string, val json.Marshaler) {
+	t.Helper()
+
+	r := require.New(t)
+
+	b, err := val.MarshalJSON()
+	r.NoError(err)
+
+	act := string(b)
+	act = strings.TrimSpace(act)
+
+	// fmt.Println(act)
+
+	fp := filepath.Join("json", gold+".json")
+
+	f, err := os.Create(filepath.Join("testdata", fp))
+	r.NoError(err)
+	f.Write(b)
+	f.Close()
+
+	b, err = fs.ReadFile(os.DirFS("testdata"), fp)
+	r.NoError(err)
+
+	exp := string(b)
+	exp = strings.TrimSpace(exp)
+
+	r.Equal(exp, act)
+
 }
 
 func Test_Testdata_Auto_Modules(t *testing.T) {

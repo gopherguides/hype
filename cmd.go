@@ -54,7 +54,7 @@ func (c *Cmd) MarshalJSON() ([]byte, error) {
 		m["result"] = c.res
 	}
 
-	return json.Marshal(m)
+	return json.MarshalIndent(m, "", "  ")
 }
 
 func (c *Cmd) MD() string {

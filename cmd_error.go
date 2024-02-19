@@ -2,7 +2,6 @@ package hype
 
 import (
 	"encoding/json"
-	"errors"
 	"fmt"
 	"strings"
 
@@ -46,7 +45,7 @@ func (ce CmdError) Error() string {
 func (ce CmdError) As(target any) bool {
 	ex, ok := target.(*CmdError)
 	if !ok {
-		return errors.As(ce.Err, target)
+		return ce.RunError.As(target)
 	}
 
 	(*ex) = ce
@@ -58,5 +57,5 @@ func (ce CmdError) Is(target error) bool {
 		return true
 	}
 
-	return errors.Is(ce.Err, target)
+	return ce.RunError.Is(target)
 }

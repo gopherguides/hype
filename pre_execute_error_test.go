@@ -1,9 +1,11 @@
 package hype
 
 import (
+	"context"
 	"errors"
 	"fmt"
 	"io"
+	"strings"
 	"testing"
 
 	"github.com/stretchr/testify/require"
@@ -31,4 +33,70 @@ func Test_PreExecuteError(t *testing.T) {
 
 	err := errors.Unwrap(pee)
 	r.Equal(io.EOF, err)
+}
+
+func Test_PreExecute_Errors(t *testing.T) {
+	t.Parallel()
+
+	tp := func() *Parser {
+		p := testParser(t, "testdata/parser/errors/pre_execute")
+
+		p.NodeParsers["foo"] = func(p *Parser, el *Element) (Nodes, error) {
+			n := newPreExecuteNode(t, func(ctx context.Context, d *Document) error {
+				return fmt.Errorf("boom")
+			})
+
+			return Nodes{n}, nil
+		}
+
+		return p
+	}
+
+	type inFn func() error
+
+	ctx := context.Background()
+
+	tcs := []struct {
+		name string
+		in   inFn
+	}{
+		{
+			name: "ParseExecuteFile",
+			in: func() error {
+				p := tp()
+				_, err := p.ParseExecuteFile(ctx, "module.md")
+				return err
+			},
+		},
+		{
+			name: "ParseExecute",
+			in: func() error {
+				p := tp()
+				_, err := p.ParseExecute(ctx, strings.NewReader("<foo></foo>"))
+				return err
+			},
+		},
+	}
+
+	for _, tc := range tcs {
+		t.Run(tc.name, func(t *testing.T) {
+			r := require.New(t)
+
+			err := tc.in()
+			r.Error(err)
+
+			var pee PreExecuteError
+			r.True(errors.As(err, &pee), err)
+
+			pee = PreExecuteError{}
+			r.True(errors.Is(err, pee), err)
+
+			var ee ExecuteError
+			r.True(errors.As(err, &ee), err)
+
+			ee = ExecuteError{}
+			r.True(errors.Is(err, ee), err)
+
+		})
+	}
 }

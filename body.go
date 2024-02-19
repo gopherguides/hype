@@ -25,7 +25,7 @@ func (b *Body) MarshalJSON() ([]byte, error) {
 
 	m["type"] = fmt.Sprintf("%T", b)
 
-	return json.Marshal(m)
+	return json.MarshalIndent(m, "", "  ")
 }
 
 // AsPage returns the body as a Page.

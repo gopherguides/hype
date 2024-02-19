@@ -32,7 +32,7 @@ func (l *Link) MarshalJSON() ([]byte, error) {
 
 	m["url"] = h
 
-	return json.Marshal(m)
+	return json.MarshalIndent(m, "", "  ")
 }
 
 func (l *Link) Href() (string, error) {

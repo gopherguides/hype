@@ -27,7 +27,7 @@ func (li *LI) MarshalJSON() ([]byte, error) {
 		m["list-type"] = li.Type
 	}
 
-	return json.Marshal(m)
+	return json.MarshalIndent(m, "", "  ")
 }
 
 func (li *LI) MD() string {

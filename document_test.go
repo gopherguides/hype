@@ -84,3 +84,50 @@ func Test_Document_MD(t *testing.T) {
 
 	r.Equal(exp, act)
 }
+
+func Test_Document_MarshalJSON(t *testing.T) {
+	t.Parallel()
+	r := require.New(t)
+
+	p := testParser(t, "testdata/doc/simple")
+	p.DocIDGen = func() (string, error) {
+		return "1", nil
+	}
+
+	ctx := context.Background()
+
+	doc, err := p.ParseExecuteFile(ctx, "module.md")
+	r.NoError(err)
+
+	testJSON(t, "document", doc)
+}
+
+func Test_Document_Pages(t *testing.T) {
+	t.Parallel()
+	r := require.New(t)
+
+	p := testParser(t, "testdata/doc/pages")
+
+	doc, err := p.ParseFile("module.md")
+	r.NoError(err)
+
+	pages, err := doc.Pages()
+	r.NoError(err)
+
+	r.Len(pages, 3)
+}
+
+func Test_Document_Pages_NoPages(t *testing.T) {
+	t.Parallel()
+	r := require.New(t)
+
+	p := testParser(t, "testdata/doc/simple")
+
+	doc, err := p.ParseFile("module.md")
+	r.NoError(err)
+
+	pages, err := doc.Pages()
+	r.NoError(err)
+
+	r.Len(pages, 1)
+}

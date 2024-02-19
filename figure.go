@@ -36,7 +36,7 @@ func (f *Figure) MarshalJSON() ([]byte, error) {
 	m["section_id"] = f.SectionID
 	m["style"] = f.Style()
 
-	return json.Marshal(m)
+	return json.MarshalIndent(m, "", "  ")
 }
 
 func (f *Figure) MD() string {

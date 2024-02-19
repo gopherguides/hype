@@ -29,7 +29,7 @@ func (r *Ref) MarshalJSON() ([]byte, error) {
 
 	m["type"] = fmt.Sprintf("%T", r)
 
-	return json.Marshal(m)
+	return json.MarshalIndent(m, "", "  ")
 }
 
 func (r *Ref) MD() string {

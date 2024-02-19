@@ -1,0 +1,7 @@
+{
+  "atom": "div",
+  "attributes": {
+    "class": "foo"
+  },
+  "type": "*hype.Element"
+}

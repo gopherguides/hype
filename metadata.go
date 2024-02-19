@@ -32,7 +32,7 @@ func (md *Metadata) MarshalJSON() ([]byte, error) {
 	m["type"] = fmt.Sprintf("%T", md)
 	m["data"] = md.Map.Map()
 
-	return json.Marshal(m)
+	return json.MarshalIndent(m, "", "  ")
 }
 
 func (md *Metadata) IsEmptyNode() bool {

@@ -61,10 +61,8 @@ func (el *Element) JSONMap() (map[string]any, error) {
 
 	hn := el.HTMLNode
 
-	if hn != nil {
-		if len(hn.Data) > 0 {
-			m["atom"] = hn.Data
-		}
+	if hn != nil && len(hn.Data) > 0 {
+		m["atom"] = hn.Data
 	}
 
 	return m, nil
@@ -80,7 +78,7 @@ func (el *Element) MarshalJSON() ([]byte, error) {
 		return nil, err
 	}
 
-	return json.Marshal(m)
+	return json.MarshalIndent(m, "", "  ")
 }
 
 func (el *Element) Format(f fmt.State, verb rune) {
@@ -104,33 +102,6 @@ func (el *Element) Format(f fmt.State, verb rune) {
 	default:
 		fmt.Fprintf(f, "%s", el.String())
 	}
-}
-
-func (el *Element) Clone() (*Element, error) {
-	if el == nil {
-		return nil, ErrIsNil("element")
-	}
-
-	ats, err := el.Attributes.Clone()
-	if err != nil {
-		return nil, err
-	}
-
-	nel := &Element{
-		Attributes: ats,
-		HTMLNode: &html.Node{
-			Attr:      el.HTMLNode.Attr,
-			Data:      el.HTMLNode.Data,
-			DataAtom:  el.HTMLNode.DataAtom,
-			Namespace: el.HTMLNode.Namespace,
-			Type:      el.HTMLNode.Type,
-		},
-		Nodes:    el.Nodes,
-		Parent:   el.Parent,
-		Filename: el.Filename,
-	}
-
-	return nel, nil
 }
 
 func (el *Element) Atom() Atom {

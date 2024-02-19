@@ -1,0 +1,10 @@
+{
+  "atom": "body",
+  "nodes": [
+    {
+      "text": "hello",
+      "type": "hype.Text"
+    }
+  ],
+  "type": "*hype.Body"
+}

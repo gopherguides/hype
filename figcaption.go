@@ -25,7 +25,7 @@ func (fc *Figcaption) MarshalJSON() ([]byte, error) {
 
 	m["type"] = fmt.Sprintf("%T", fc)
 
-	return json.Marshal(m)
+	return json.MarshalIndent(m, "", "  ")
 }
 
 func (fc *Figcaption) MD() string {

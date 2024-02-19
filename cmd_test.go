@@ -155,3 +155,19 @@ func Test_Cmd_Execute_Timeout(t *testing.T) {
 
 	r.True(errors.Is(err, CmdError{}))
 }
+
+func Test_Cmd_MarshalJSON(t *testing.T) {
+	t.Parallel()
+
+	c := &Cmd{
+		Element:      NewEl("cmd", nil),
+		Args:         []string{"echo", "hello"},
+		Env:          []string{"FOO=bar", "BAR=baz"},
+		ExpectedExit: 1,
+		Timeout:      time.Second,
+		res:          &CmdResult{Element: NewEl("cmd", nil)},
+	}
+
+	testJSON(t, "cmd", c)
+
+}

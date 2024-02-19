@@ -54,7 +54,7 @@ func (doc *Document) MarshalJSON() ([]byte, error) {
 		Filename:  doc.Filename,
 	}
 
-	return json.Marshal(x)
+	return json.MarshalIndent(x, "", "  ")
 }
 
 func (doc *Document) Pages() ([]*Page, error) {
@@ -63,15 +63,16 @@ func (doc *Document) Pages() ([]*Page, error) {
 	}
 
 	pages := ByType[*Page](doc.Nodes)
-
-	if len(pages) == 0 {
-		body, err := doc.Body()
-		if err != nil {
-			return nil, err
-		}
-
-		pages = append(pages, body.AsPage())
+	if len(pages) > 0 {
+		return pages, nil
 	}
+
+	body, err := doc.Body()
+	if err != nil {
+		return nil, err
+	}
+
+	pages = append(pages, body.AsPage())
 
 	return pages, nil
 }
@@ -120,12 +121,16 @@ func (doc *Document) String() string {
 // Execute the Document with the given context.
 // Any child nodes that implement the PreExecuter,
 // ExecutableNode, or PostExecuter interfaces will be executed.
-func (doc *Document) Execute(ctx context.Context) error {
+func (doc *Document) Execute(ctx context.Context) (err error) {
 	if doc == nil {
 		return ErrIsNil("document")
 	}
 
-	err := doc.Children().PreExecute(ctx, doc)
+	defer func() {
+		err = doc.ensureExecuteError(err)
+	}()
+
+	err = doc.Children().PreExecute(ctx, doc)
 	if err != nil {
 		return err
 	}
@@ -208,4 +213,20 @@ func (doc *Document) MD() string {
 	}
 
 	return strings.Join(bodies, "\n---\n")
+}
+
+func (doc *Document) ensureExecuteError(err error) error {
+	if err == nil {
+		return nil
+	}
+
+	if _, ok := err.(ExecuteError); ok {
+		return err
+	}
+
+	return ExecuteError{
+		Err:      err,
+		Filename: doc.Filename,
+		Root:     doc.Root,
+	}
 }

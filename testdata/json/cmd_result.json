@@ -1,0 +1,18 @@
+{
+  "args": [
+    "echo",
+    "hello"
+  ],
+  "atom": "cmd",
+  "dir": "/tmp",
+  "duration": "1s",
+  "env": [
+    "FOO=bar",
+    "BAR=baz"
+  ],
+  "err": "EOF",
+  "exit": 1,
+  "stderr": "nothing",
+  "stdout": "foo\nbar\nbaz\n",
+  "type": "*hype.CmdResult"
+}

@@ -25,7 +25,7 @@ func (now *Now) MarshalJSON() ([]byte, error) {
 
 	m["type"] = fmt.Sprintf("%T", now)
 
-	return json.Marshal(m)
+	return json.MarshalIndent(m, "", "  ")
 }
 
 func (now *Now) Execute(ctx context.Context, doc *Document) error {

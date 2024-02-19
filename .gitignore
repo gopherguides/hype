@@ -4,6 +4,7 @@ tmp
 *.pid
 coverage
 coverage.data
+coverage.out
 build/*
 *.pbxuser
 *.mode1v3

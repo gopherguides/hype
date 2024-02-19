@@ -3,6 +3,7 @@ package hype
 import (
 	"context"
 	"errors"
+	"fmt"
 	"os"
 	"strings"
 	"testing"
@@ -10,49 +11,6 @@ import (
 	"github.com/stretchr/testify/require"
 	"golang.org/x/net/html"
 )
-
-func Test_Parser(t *testing.T) {
-	t.Parallel()
-
-	r := require.New(t)
-	p := testParser(t, "testdata/parser/hello")
-
-	doc, err := p.ParseExecuteFile(context.Background(), "module.md")
-	r.NoError(err)
-	r.NotNil(doc)
-
-	exp := `<html><head></head><body><page>
-<h1>Page 1</h1>
-
-<p>This is <code>inline</code> code.</p>
-</page>
-<page>
-<h1>Second Page</h1>
-
-<pre><code class="language-go" language="go" src="second/src/main.go">package main
-
-import &#34;fmt&#34;
-
-func main() {
-	fmt.Println(&#34;Hello second!&#34;)
-}
-</code></pre>
-</page>
-
-<page>
-<cmd exec="echo hello"><pre><code class="language-shell" language="shell">$ echo hello
-
-hello</code></pre></cmd>
-
-<p>more words</p>
-</page>
-</body></html>`
-
-	act := doc.String()
-
-	// fmt.Println(act)
-	r.Equal(exp, act)
-}
 
 func Test_Parser_ParseFolder(t *testing.T) {
 	t.Parallel()
@@ -108,7 +66,7 @@ func Test_Parser_ParseHTMLNode_Error(t *testing.T) {
 		t.Run(tc.name, func(t *testing.T) {
 			r := require.New(t)
 
-			p := testParser(t, "testdata/parser/hello")
+			p := testParser(t, "testdata/auto/parser/hello")
 			_, err := p.ParseHTMLNode(tc.node, nil)
 			r.Error(err)
 
@@ -126,7 +84,7 @@ func Test_Parser_ParseFragment_Error(t *testing.T) {
 	t.Parallel()
 	r := require.New(t)
 
-	p := testParser(t, "testdata/parser/hello")
+	p := testParser(t, "testdata/auto/parser/hello")
 
 	_, err := p.ParseFragment(strings.NewReader(`<include`))
 	r.Error(err)
@@ -142,7 +100,13 @@ func Test_Parser_ParseExecuteFragment_Error(t *testing.T) {
 	t.Parallel()
 	r := require.New(t)
 
-	p := testParser(t, "testdata/parser/hello")
+	p := testParser(t, "testdata/auto/parser/hello")
+	p.NodeParsers["foo"] = func(p *Parser, el *Element) (Nodes, error) {
+		n := newExecuteNode(t, func(ctx context.Context, d *Document) error {
+			return fmt.Errorf("boom")
+		})
+		return Nodes{n}, nil
+	}
 
 	ctx := context.Background()
 	_, err := p.ParseExecuteFragment(ctx, strings.NewReader(`<include`))
@@ -154,7 +118,7 @@ func Test_Parser_ParseExecuteFragment_Error(t *testing.T) {
 	pe = ParseError{}
 	r.True(errors.Is(err, pe), err)
 
-	_, err = p.ParseExecuteFragment(ctx, strings.NewReader(`<cmd exec="boom"></cmd>`))
+	_, err = p.ParseExecuteFragment(ctx, strings.NewReader(`<foo></foo>`))
 	r.Error(err)
 
 	var ee ExecuteError

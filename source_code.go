@@ -38,7 +38,7 @@ func (code *SourceCode) MarshalJSON() ([]byte, error) {
 		m["lang"] = code.Lang
 	}
 
-	return json.Marshal(m)
+	return json.MarshalIndent(m, "", "  ")
 }
 
 func (code *SourceCode) StartTag() string {

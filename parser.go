@@ -64,7 +64,7 @@ func (p *Parser) MarshalJSON() ([]byte, error) {
 		Vars:         p.Vars.Map(),
 	}
 
-	return json.Marshal(x)
+	return json.MarshalIndent(x, "", "  ")
 
 }
 
@@ -79,10 +79,14 @@ func (p *Parser) Now() time.Time {
 // ParseFile parses the given file from Parser.FS.
 // If successful a *Document is returned. The returned
 // *Document is NOT yet executed.
-func (p *Parser) ParseFile(name string) (*Document, error) {
+func (p *Parser) ParseFile(name string) (doc *Document, err error) {
 	if p == nil {
 		return nil, ErrIsNil("parser")
 	}
+
+	defer func() {
+		err = p.ensureParseError(err)
+	}()
 
 	p.mu.Lock()
 	p.Filename = name
@@ -94,7 +98,7 @@ func (p *Parser) ParseFile(name string) (*Document, error) {
 	}
 	defer f.Close()
 
-	doc, err := p.Parse(f)
+	doc, err = p.Parse(f)
 	if err != nil {
 		return nil, err
 	}
@@ -102,31 +106,35 @@ func (p *Parser) ParseFile(name string) (*Document, error) {
 	return doc, nil
 }
 
-func (p *Parser) Parse(r io.Reader) (*Document, error) {
+func (p *Parser) Parse(r io.Reader) (doc *Document, err error) {
 	if p == nil {
 		return nil, ErrIsNil("parser")
 	}
 
+	defer func() {
+		err = p.ensureParseError(err)
+	}()
+
 	// pre parse
-	r, err := p.PreParsers.PreParse(p, r)
+	r, err = p.PreParsers.PreParse(p, r)
 	if err != nil {
-		return nil, p.newError(err)
+		return nil, err
 	}
 
 	// parse
 	hdoc, err := html.Parse(r)
 	if err != nil {
-		return nil, p.newError(err)
+		return nil, err
 	}
 
 	node, err := p.ParseHTMLNode(hdoc, nil)
 	if err != nil {
-		return nil, p.newError(err)
+		return nil, err
 	}
 
-	doc, err := p.newDoc()
+	doc, err = p.newDoc()
 	if err != nil {
-		return nil, p.newError(err)
+		return nil, err
 	}
 
 	doc.Nodes = Nodes{node}
@@ -137,7 +145,7 @@ func (p *Parser) Parse(r io.Reader) (*Document, error) {
 	// post parse
 	err = doc.Nodes.PostParse(p, doc, err)
 	if err != nil {
-		return nil, p.newError(err)
+		return nil, err
 	}
 
 	return doc, nil
@@ -161,10 +169,26 @@ func (p *Parser) ParseExecuteFile(ctx context.Context, name string) (*Document, 
 	return doc, nil
 }
 
-func (p *Parser) ParseFolder(name string) (Documents, error) {
+func (p *Parser) ParseFolder(name string) (doc Documents, err error) {
 	if p == nil {
 		return nil, ErrIsNil("parser")
 	}
+
+	defer func() {
+		if err == nil {
+			return
+		}
+
+		if _, ok := err.(ParseError); ok {
+			return
+		}
+
+		err = ParseError{
+			Err:      err,
+			Filename: name,
+			Root:     p.Root,
+		}
+	}()
 
 	var docs Documents
 	var wg errgroup.Group
@@ -172,9 +196,7 @@ func (p *Parser) ParseFolder(name string) (Documents, error) {
 
 	whole, err := binding.WholeFromPath(p.FS, name, "book", "chapter")
 	if err != nil && !errors.Is(err, binding.ErrPath("")) {
-		pe := p.newError(err)
-		pe.Filename = name
-		return nil, pe
+		return nil, err
 	}
 
 	err = fs.WalkDir(p.FS, ".", func(path string, d fs.DirEntry, err error) error {
@@ -377,7 +399,7 @@ func (p *Parser) Sub(dir string) (*Parser, error) {
 
 	cab, err := fs.Sub(p.FS, dir)
 	if err != nil {
-		return nil, p.newError(err)
+		return nil, err
 	}
 
 	p2.FS = cab
@@ -469,7 +491,19 @@ func (p *Parser) newDoc() (*Document, error) {
 	return doc, nil
 }
 
-func (p *Parser) newError(err error) ParseError {
+func (p *Parser) ensureParseError(err error) error {
+	if p == nil {
+		return ErrIsNil("parser")
+	}
+
+	if err == nil {
+		return nil
+	}
+
+	if _, ok := err.(ParseError); ok {
+		return err
+	}
+
 	return ParseError{
 		Err:      err,
 		Filename: p.Filename,

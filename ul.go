@@ -24,7 +24,7 @@ func (ul *UL) MarshalJSON() ([]byte, error) {
 
 	m["type"] = fmt.Sprintf("%T", ul)
 
-	return json.Marshal(m)
+	return json.MarshalIndent(m, "", "  ")
 }
 
 func (ol *UL) MD() string {

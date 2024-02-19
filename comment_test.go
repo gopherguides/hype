@@ -27,3 +27,12 @@ func Test_Comment(t *testing.T) {
 	r.True(ok)
 	r.Equal("<!-- hello -->", comment.String())
 }
+
+func Test_Comment_MarshalJSON(t *testing.T) {
+	t.Parallel()
+
+	comment := Comment("hello")
+
+	testJSON(t, "comment", comment)
+
+}
