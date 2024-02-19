@@ -7,37 +7,28 @@ import (
 )
 
 type ExecuteError struct {
-	Err      error  `json:"error,omitempty"`
-	Filename string `json:"filename,omitempty"`
-	Root     string `json:"root,omitempty"`
+	Err      error
+	Filename string
+	Root     string
 }
 
 func (pe ExecuteError) MarshalJSON() ([]byte, error) {
 	mm := map[string]any{
 		"type":     fmt.Sprintf("%T", pe),
-		"error":    pe.Err,
+		"error":    errForJSON(pe.Err),
 		"root":     pe.Root,
 		"filename": pe.Filename,
-	}
-
-	if _, ok := pe.Err.(json.Marshaler); !ok && pe.Err != nil {
-		mm["error"] = pe.Err.Error()
 	}
 
 	return json.MarshalIndent(mm, "", "  ")
 }
 
 func (pe ExecuteError) Error() string {
-	b, _ := json.MarshalIndent(pe, "", "  ")
-	return string(b)
+	return toError(pe)
 }
 
 func (pe ExecuteError) Unwrap() error {
-	type Unwrapper interface {
-		Unwrap() error
-	}
-
-	if _, ok := pe.Err.(Unwrapper); ok {
+	if _, ok := pe.Err.(unwrapper); ok {
 		return errors.Unwrap(pe.Err)
 	}
 

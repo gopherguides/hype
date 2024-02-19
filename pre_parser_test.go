@@ -2,16 +2,18 @@ package hype
 
 import (
 	"bytes"
+	"context"
 	"errors"
 	"fmt"
 	"io"
+	"path/filepath"
 	"strings"
 	"testing"
 
 	"github.com/stretchr/testify/require"
 )
 
-func Test_PreParsers_PreParse(t *testing.T) {
+func Test_PreParsers(t *testing.T) {
 	t.Parallel()
 	r := require.New(t)
 
@@ -49,25 +51,86 @@ func Test_PreParsers_PreParse(t *testing.T) {
 	r.Equal(exp, act)
 }
 
-func Test_PreParsers_PreParse_Error(t *testing.T) {
+func Test_PreParser_Errors(t *testing.T) {
 	t.Parallel()
-	r := require.New(t)
 
-	pp := PreParsers{
-		PreParseFn(func(p *Parser, r io.Reader) (io.Reader, error) {
+	const root = "testdata/parser/errors"
+
+	tp := func() *Parser {
+		p := testParser(t, filepath.Join(root, "pre_parse"))
+
+		fn := PreParseFn(func(p *Parser, r io.Reader) (io.Reader, error) {
 			return nil, fmt.Errorf("boom")
-		}),
+		})
+
+		p.PreParsers = append(p.PreParsers, fn)
+		return p
 	}
 
-	p := testParser(t, "")
+	type inFn func() error
 
-	_, err := pp.PreParse(p, strings.NewReader(""))
-	r.Error(err)
+	tcs := []struct {
+		name string
+		in   inFn
+	}{
+		{
+			name: "ParseFile",
+			in: func() error {
+				_, err := tp().ParseFile("module.md")
+				return err
+			},
+		},
+		{
+			name: "ParseExecuteFile",
+			in: func() error {
+				ctx := context.Background()
+				_, err := tp().ParseExecuteFile(ctx, "module.md")
+				return err
+			},
+		},
+		{
+			name: "Parse",
+			in: func() error {
+				_, err := tp().Parse(strings.NewReader("hello"))
+				return err
+			},
+		},
+		{
+			name: "ParseExecute",
+			in: func() error {
+				ctx := context.Background()
+				_, err := tp().ParseExecute(ctx, strings.NewReader("hello"))
+				return err
+			},
+		},
+		{
+			name: "ParseFragment",
+			in: func() error {
+				_, err := tp().ParseFragment(strings.NewReader("hello"))
+				return err
+			},
+		},
+	}
 
-	var e2 PreParseError
+	for _, tc := range tcs {
+		t.Run(tc.name, func(t *testing.T) {
+			r := require.New(t)
 
-	r.True(errors.As(err, &e2))
+			err := tc.in()
+			r.Error(err)
 
-	r.Contains(e2.Error(), "boom")
-	r.NotNil(e2.PreParser)
+			var pe ParseError
+			r.True(errors.As(err, &pe), err)
+
+			pe = ParseError{}
+			r.True(errors.Is(err, pe), err)
+
+			var ppe PreParseError
+			r.True(errors.As(err, &ppe), err)
+
+			ppe = PreParseError{}
+			r.True(errors.Is(err, ppe), err)
+		})
+	}
+
 }

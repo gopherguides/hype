@@ -336,21 +336,27 @@ func (p *Parser) ParseHTMLNode(node *html.Node, parent Node) (Node, error) {
 	switch node.Type {
 	case html.CommentNode:
 		return Comment(node.Data), nil
-	case html.DoctypeNode:
-		// return p.NewDocType(node)
 	case html.DocumentNode, html.ElementNode:
 		n, err := p.element(node, parent)
 		if err != nil {
 			return nil, err
 		}
 		return n, nil
-	case html.ErrorNode:
-		return nil, fmt.Errorf("error node: %v", node.Data)
 	case html.TextNode:
 		return Text(node.Data), nil
+	case html.ErrorNode:
+		return nil, ParseError{
+			Err:      fmt.Errorf("error node: %+v", node),
+			Filename: p.Filename,
+			Root:     p.Root,
+		}
 	}
 
-	return nil, fmt.Errorf("unknown node type %v", node.Data)
+	return nil, ParseError{
+		Err:      fmt.Errorf("unknown node: %+v", node),
+		Filename: p.Filename,
+		Root:     p.Root,
+	}
 }
 
 func (p *Parser) Sub(dir string) (*Parser, error) {

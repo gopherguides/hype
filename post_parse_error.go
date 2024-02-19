@@ -2,32 +2,26 @@ package hype
 
 import (
 	"encoding/json"
+	"errors"
 	"fmt"
 )
 
 type PostParseError struct {
-	Err        error      `json:"err,omitempty"`
-	Filename   string     `json:"filename,omitempty"`
-	OrigErr    error      `json:"orig_err,omitempty"`
-	Root       string     `json:"root,omitempty"`
-	PostParser PostParser `json:"-,omitempty"`
+	Err        error
+	Filename   string
+	OrigErr    error
+	Root       string
+	PostParser any
 }
 
 func (ppe PostParseError) MarshalJSON() ([]byte, error) {
 	mm := map[string]any{
-		"error":      ppe.Err,
-		"filename":   ppe.Filename,
-		"root":       ppe.Root,
-		"postparser": fmt.Sprintf("%T", ppe.PostParser),
-		"type":       fmt.Sprintf("%T", ppe),
-	}
-
-	if _, ok := ppe.Err.(json.Marshaler); !ok && ppe.Err != nil {
-		mm["error"] = ppe.Err.Error()
-	}
-
-	if ppe.OrigErr != nil {
-		mm["orig_error"] = ppe.OrigErr.Error()
+		"error":        toError(ppe.Err),
+		"origal_error": toError(ppe.OrigErr),
+		"filename":     ppe.Filename,
+		"root":         ppe.Root,
+		"post_parser":  fmt.Sprintf("%T", ppe.PostParser),
+		"type":         fmt.Sprintf("%T", ppe),
 	}
 
 	return json.MarshalIndent(mm, "", "  ")
@@ -39,15 +33,11 @@ func (ppe PostParseError) Error() string {
 }
 
 func (ppe PostParseError) Unwrap() error {
-	type Unwrapper interface {
-		Unwrap() error
+	if _, ok := ppe.Err.(unwrapper); ok {
+		return errors.Unwrap(ppe.Err)
 	}
 
-	if _, ok := ppe.Err.(Unwrapper); ok {
-		return ppe.Err
-	}
-
-	return nil
+	return ppe.Err
 }
 
 func (ppe PostParseError) As(target any) bool {

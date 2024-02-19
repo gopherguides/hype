@@ -93,6 +93,8 @@ func Test_Cmd_Execute_UnexpectedExit(t *testing.T) {
 	err := c.Execute(ctx, doc)
 	r.Error(err)
 
+	r.True(errors.Is(err, CmdError{}))
+
 	c.ExpectedExit = 1
 
 	err = c.Execute(ctx, doc)
@@ -151,4 +153,5 @@ func Test_Cmd_Execute_Timeout(t *testing.T) {
 	err := c.Execute(ctx, doc)
 	r.Error(err)
 
+	r.True(errors.Is(err, CmdError{}))
 }

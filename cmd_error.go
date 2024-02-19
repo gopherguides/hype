@@ -11,24 +11,20 @@ import (
 )
 
 type CmdError struct {
-	clam.RunError `json:"clam_error,omitempty"`
-	Filename      string `json:"filename,omitempty"`
+	clam.RunError
+	Filename string
 }
 
 func (ce CmdError) MarshalJSON() ([]byte, error) {
 	mm := map[string]any{
 		"args":     ce.Args,
 		"env":      ce.Env,
-		"error":    ce.Err,
+		"error":    errForJSON(ce.Err),
 		"exit":     ce.Exit,
 		"filename": ce.Filename,
 		"output":   string(ce.Output),
 		"root":     ce.Dir,
 		"type":     fmt.Sprintf("%T", ce),
-	}
-
-	if _, ok := ce.Err.(json.Marshaler); !ok && ce.Err != nil {
-		mm["err"] = ce.Err.Error()
 	}
 
 	p := hepa.Deep()
@@ -44,30 +40,23 @@ func (ce CmdError) MarshalJSON() ([]byte, error) {
 }
 
 func (ce CmdError) Error() string {
-	b, _ := json.MarshalIndent(ce, "", "  ")
-	return string(b)
-}
-
-func (ce CmdError) Unwrap() error {
-	type Unwrapper interface {
-		Unwrap() error
-	}
-
-	if _, ok := ce.Err.(Unwrapper); ok {
-		return errors.Unwrap(ce.Err)
-	}
-
-	return ce.Err
-}
-
-func (ce CmdError) Is(target error) bool {
-	if ce.Err == nil {
-		return false
-	}
-
-	return errors.Is(ce.Err, target)
+	return toError(ce)
 }
 
 func (ce CmdError) As(target any) bool {
-	return errors.As(ce.Err, target)
+	ex, ok := target.(*CmdError)
+	if !ok {
+		return errors.As(ce.Err, target)
+	}
+
+	(*ex) = ce
+	return true
+}
+
+func (ce CmdError) Is(target error) bool {
+	if _, ok := target.(CmdError); ok {
+		return true
+	}
+
+	return errors.Is(ce.Err, target)
 }

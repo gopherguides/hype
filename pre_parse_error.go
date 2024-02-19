@@ -2,6 +2,7 @@ package hype
 
 import (
 	"encoding/json"
+	"errors"
 	"fmt"
 )
 
@@ -9,43 +10,31 @@ type PreParseError struct {
 	Err       error  `json:"error,omitempty"`
 	Filename  string `json:"filename,omitempty"`
 	Root      string `json:"root,omitempty"`
-	PreParser PreParser
+	PreParser any
 }
 
 func (e PreParseError) MarshalJSON() ([]byte, error) {
 	mm := map[string]any{
-		"error":     e.Err,
-		"filename":  e.Filename,
-		"root":      e.Root,
-		"preparser": fmt.Sprintf("%T", e.PreParser),
-		"type":      fmt.Sprintf("%T", e),
-	}
-
-	if _, ok := e.Err.(json.Marshaler); !ok && e.Err != nil {
-		mm["error"] = e.Err.Error()
+		"error":      errForJSON(e.Err),
+		"filename":   e.Filename,
+		"root":       e.Root,
+		"pre_parser": fmt.Sprintf("%T", e.PreParser),
+		"type":       fmt.Sprintf("%T", e),
 	}
 
 	return json.MarshalIndent(mm, "", "  ")
 }
 
 func (e PreParseError) Error() string {
-	b, err := e.MarshalJSON()
-	if err != nil {
-		return fmt.Sprintf("error marshalling to json: %s", err)
-	}
-	return string(b)
+	return toError(e)
 }
 
 func (e PreParseError) Unwrap() error {
-	type Unwrapper interface {
-		Unwrap() error
+	if _, ok := e.Err.(unwrapper); ok {
+		return errors.Unwrap(e.Err)
 	}
 
-	if _, ok := e.Err.(Unwrapper); ok {
-		return e.Err
-	}
-
-	return nil
+	return e.Err
 }
 
 func (e PreParseError) As(target any) bool {

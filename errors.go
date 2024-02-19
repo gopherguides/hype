@@ -1,6 +1,7 @@
 package hype
 
 import (
+	"encoding/json"
 	"fmt"
 )
 
@@ -24,4 +25,32 @@ func WrapNodeErr(n Node, err error) error {
 	}
 
 	return fmt.Errorf("%T: %w", n, err)
+}
+
+func errForJSON(err error) any {
+	if err == nil {
+		return nil
+	}
+
+	if _, ok := err.(json.Marshaler); ok {
+		return err
+	}
+
+	return err.Error()
+}
+
+func toError(err error) string {
+	if err == nil {
+		return ""
+	}
+
+	if _, ok := err.(json.Marshaler); ok {
+		b, err := json.MarshalIndent(err, "", "  ")
+		if err != nil {
+			return "error marshalling to json: " + err.Error()
+		}
+		return string(b)
+	}
+
+	return err.Error()
 }

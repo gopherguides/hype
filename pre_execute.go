@@ -2,7 +2,6 @@ package hype
 
 import (
 	"context"
-	"fmt"
 )
 
 type PreExecuter interface {
@@ -10,6 +9,10 @@ type PreExecuter interface {
 }
 
 func (list Nodes) PreExecute(ctx context.Context, d *Document) error {
+	if d == nil {
+		return ErrIsNil("document")
+	}
+
 	var err error
 
 	for _, n := range list {
@@ -27,14 +30,21 @@ func (list Nodes) PreExecute(ctx context.Context, d *Document) error {
 			if err != nil {
 				return PreExecuteError{
 					Err:         err,
+					Filename:    d.Filename,
 					PreExecuter: pe,
+					Root:        d.Root,
 				}
 			}
 		}
 
 		err = n.Children().PreExecute(ctx, d)
 		if err != nil {
-			return err
+			return PreExecuteError{
+				Err:         err,
+				Filename:    d.Filename,
+				PreExecuter: pe,
+				Root:        d.Root,
+			}
 		}
 	}
 
@@ -45,13 +55,4 @@ type PreExecuteFn func(ctx context.Context, d *Document) error
 
 func (fn PreExecuteFn) PreExecute(ctx context.Context, d *Document) error {
 	return fn(ctx, d)
-}
-
-type PreExecuteError struct {
-	Err         error
-	PreExecuter PreExecuter
-}
-
-func (e PreExecuteError) Error() string {
-	return fmt.Sprintf("pre execute error: [%T]: %v", e.PreExecuter, e.Err)
 }

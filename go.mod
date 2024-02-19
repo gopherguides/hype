@@ -7,7 +7,7 @@ toolchain go1.22.0
 require (
 	github.com/gobuffalo/flect v1.0.2
 	github.com/gofrs/uuid/v5 v5.0.0
-	github.com/markbates/clam v0.0.0-20240216202943-7a59eb77d084
+	github.com/markbates/clam v0.0.0-20240219024730-b98cdab94ec3
 	github.com/markbates/cleo v0.0.0-20230821202903-72220ef5f7f0
 	github.com/markbates/fsx v1.3.0
 	github.com/markbates/garlic v1.0.0
