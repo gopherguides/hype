@@ -95,8 +95,6 @@ func Test_Encode_JSON(t *testing.T) {
 			act := bb.Out.String()
 			act = strings.TrimSpace(act)
 
-			// fmt.Println(act)
-
 			r.Equal(exp, act)
 
 		})

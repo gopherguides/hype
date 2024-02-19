@@ -1,27 +1,71 @@
 {
+  "filename": "module.md",
   "id": "parse file",
   "nodes": [
     {
-      "file": "module.md",
+      "atom": "",
+      "attributes": {},
+      "filename": "module.md",
+      "html_node": {
+        "data": "",
+        "data_atom": "",
+        "namespace": "",
+        "node_type": "html.DocumentNode",
+        "type": "*html.Node"
+      },
       "nodes": [
         {
           "atom": "html",
-          "file": "module.md",
+          "attributes": {},
+          "filename": "module.md",
+          "html_node": {
+            "data": "html",
+            "data_atom": "html",
+            "namespace": "",
+            "node_type": "html.ElementNode",
+            "type": "*html.Node"
+          },
           "nodes": [
             {
               "atom": "head",
-              "file": "module.md",
+              "attributes": {},
+              "filename": "module.md",
+              "html_node": {
+                "data": "head",
+                "data_atom": "head",
+                "namespace": "",
+                "node_type": "html.ElementNode",
+                "type": "*html.Node"
+              },
+              "nodes": [],
+              "tag": "\u003chead\u003e",
               "type": "*hype.Element"
             },
             [
               {
                 "atom": "body",
-                "file": "module.md",
+                "attributes": {},
+                "filename": "module.md",
+                "html_node": {
+                  "data": "body",
+                  "data_atom": "body",
+                  "namespace": "",
+                  "node_type": "html.ElementNode",
+                  "type": "*html.Node"
+                },
                 "nodes": [
                   [
                     {
                       "atom": "page",
-                      "file": "module.md",
+                      "attributes": {},
+                      "filename": "module.md",
+                      "html_node": {
+                        "data": "page",
+                        "data_atom": "",
+                        "namespace": "",
+                        "node_type": "html.ElementNode",
+                        "type": "*html.Node"
+                      },
                       "nodes": [
                         {
                           "text": "\n",
@@ -30,7 +74,15 @@
                         [
                           {
                             "atom": "h1",
-                            "file": "module.md",
+                            "attributes": {},
+                            "filename": "module.md",
+                            "html_node": {
+                              "data": "h1",
+                              "data_atom": "h1",
+                              "namespace": "",
+                              "node_type": "html.ElementNode",
+                              "type": "*html.Node"
+                            },
                             "level": 1,
                             "nodes": [
                               {
@@ -38,7 +90,8 @@
                                 "type": "hype.Text"
                               }
                             ],
-                            "type": "hype.Heading"
+                            "tag": "\u003ch1\u003e",
+                            "type": "*hype.Heading"
                           }
                         ],
                         {
@@ -51,13 +104,28 @@
                             "attributes": {
                               "id": "123"
                             },
-                            "file": "module.md",
+                            "filename": "module.md",
+                            "html_node": {
+                              "attributes": [
+                                {
+                                  "Namespace": "",
+                                  "Key": "id",
+                                  "Val": "123"
+                                }
+                              ],
+                              "data": "echo",
+                              "data_atom": "",
+                              "namespace": "",
+                              "node_type": "html.ElementNode",
+                              "type": "*html.Node"
+                            },
                             "nodes": [
                               {
                                 "text": "Hello!",
                                 "type": "hype.Text"
                               }
                             ],
+                            "tag": "\u003cecho id=\"123\"\u003e",
                             "type": "*hype.Element"
                           }
                         ],
@@ -66,6 +134,7 @@
                           "type": "hype.Text"
                         }
                       ],
+                      "tag": "\u003cpage\u003e",
                       "title": "JSON Encoding",
                       "type": "*hype.Page"
                     }
@@ -75,24 +144,25 @@
                     "type": "hype.Text"
                   }
                 ],
+                "tag": "\u003cbody\u003e",
                 "type": "*hype.Body"
               }
             ]
           ],
+          "tag": "\u003chtml\u003e",
           "type": "*hype.Element"
         }
       ],
+      "tag": "",
       "type": "*hype.Element"
     }
   ],
   "parser": {
     "type": "*hype.Parser",
-    "section": 1,
-    "snippets": {}
+    "section": 1
   },
   "section_id": 1,
   "snippets": {},
   "title": "JSON Encoding",
-  "type": "*hype.Document",
-  "filename": "module.md"
+  "type": "*hype.Document"
 }
