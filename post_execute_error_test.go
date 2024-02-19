@@ -115,3 +115,16 @@ func Test_PostExecute_Errors(t *testing.T) {
 		})
 	}
 }
+
+func Test_PostExecuteError_MarshalJSON(t *testing.T) {
+	t.Parallel()
+
+	pee := PostExecuteError{
+		Err:      io.EOF,
+		OrigErr:  io.ErrClosedPipe,
+		Filename: "filename",
+		Root:     "root",
+	}
+
+	testJSON(t, "post_execute_error", pee)
+}

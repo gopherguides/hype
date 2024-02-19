@@ -127,3 +127,21 @@ func Test_Parser_ParseExecuteFragment_Error(t *testing.T) {
 	ee = ExecuteError{}
 	r.True(errors.Is(err, ee), err)
 }
+
+func Test_Parser_MarshalJSON(t *testing.T) {
+	t.Parallel()
+
+	r := require.New(t)
+
+	p := testParser(t, "testdata/auto/snippets/simple")
+	p.DisablePages = true
+	p.Section = 42
+
+	err := p.Vars.Set("foo", "bar")
+	r.NoError(err)
+
+	_, err = p.ParseFile("module.md")
+	r.NoError(err)
+
+	testJSON(t, "parser", p)
+}

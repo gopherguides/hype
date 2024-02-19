@@ -34,26 +34,6 @@ func (code *FencedCode) MarshalJSON() ([]byte, error) {
 	return json.MarshalIndent(m, "", "  ")
 }
 
-func (code *FencedCode) StartTag() string {
-	if code == nil || code.Element == nil {
-		return ""
-	}
-
-	return code.Element.StartTag()
-}
-
-func (code *FencedCode) EndTag() string {
-	if code == nil || code.Element == nil {
-		return ""
-	}
-
-	return "</code>"
-}
-
-func (code *FencedCode) String() string {
-	return code.StartTag() + code.Children().String() + code.EndTag()
-}
-
 func (code *FencedCode) MD() string {
 	if code == nil {
 		return ""

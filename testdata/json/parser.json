@@ -1,0 +1,9 @@
+{
+  "type": "*hype.Parser",
+  "root": "testdata/auto/snippets/simple",
+  "disable_pages": true,
+  "section": 42,
+  "vars": {
+    "foo": "bar"
+  }
+}

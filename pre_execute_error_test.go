@@ -100,3 +100,15 @@ func Test_PreExecute_Errors(t *testing.T) {
 		})
 	}
 }
+
+func Test_PreExecuteError_MarshalJSON(t *testing.T) {
+	t.Parallel()
+
+	pee := PreExecuteError{
+		Err:      io.EOF,
+		Filename: "module.md",
+		Root:     "root",
+	}
+
+	testJSON(t, "pre_execute_error", pee)
+}

@@ -191,3 +191,19 @@ func Test_Include_Nested(t *testing.T) {
 	r.Equal(exp, act)
 
 }
+
+func Test_Include_MarshalJSON(t *testing.T) {
+	t.Parallel()
+
+	r := require.New(t)
+
+	inc := &Include{
+		Element: NewEl("include", nil),
+		dir:     "testdata/includes",
+	}
+
+	err := inc.Set("src", "sub.md")
+	r.NoError(err)
+
+	testJSON(t, "include", inc)
+}

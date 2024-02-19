@@ -1,0 +1,6 @@
+{
+  "error": "EOF",
+  "filename": "test.md",
+  "root": "root",
+  "type": "hype.ParseError"
+}

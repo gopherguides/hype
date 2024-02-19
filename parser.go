@@ -22,20 +22,19 @@ import (
 type ParseElementFn func(p *Parser, el *Element) (Nodes, error)
 
 type Parser struct {
-	fs.FS `json:"-"`
+	fs.FS
 
-	Root         string                  `json:"root,omitempty"`
-	DisablePages bool                    `json:"disable_pages,omitempty"`
-	NodeParsers  map[Atom]ParseElementFn `json:"-"`
-	PreParsers   PreParsers              `json:"-"`
-	Snippets     Snippets                `json:"snippets,omitempty"`
-	Section      int                     `json:"section,omitempty"`
-	NowFn        func() time.Time        `json:"-"` // default: time.Now()
-	DocIDGen     func() (string, error)  `json:"-"` // default: uuid.NewV4().String()
-	Vars         syncx.Map[string, any]  `json:"vars,omitempty"`
+	DisablePages bool
+	DocIDGen     func() (string, error) // default: uuid.NewV4().String()
+	Filename     string                 // only set when Parser.ParseFile() is used
+	NodeParsers  map[Atom]ParseElementFn
+	NowFn        func() time.Time // default: time.Now()
+	PreParsers   PreParsers
+	Root         string
+	Section      int
+	Vars         syncx.Map[string, any]
 
-	Filename string // only set when Parser.ParseFile() is used
-	mu       sync.RWMutex
+	mu sync.RWMutex
 }
 
 func (p *Parser) MarshalJSON() ([]byte, error) {
@@ -46,21 +45,17 @@ func (p *Parser) MarshalJSON() ([]byte, error) {
 	p.mu.RLock()
 	defer p.mu.RUnlock()
 
-	// p.Vars.Map()
-
 	x := struct {
 		Type         string         `json:"type,omitempty"`
 		Root         string         `json:"root,omitempty"`
 		DisablePages bool           `json:"disable_pages,omitempty"`
 		Section      int            `json:"section,omitempty"`
-		Snippets     Snippets       `json:"snippets,omitempty"`
 		Vars         map[string]any `json:"vars,omitempty"`
 	}{
 		Type:         fmt.Sprintf("%T", p),
 		Root:         p.Root,
 		DisablePages: p.DisablePages,
 		Section:      p.Section,
-		Snippets:     p.Snippets,
 		Vars:         p.Vars.Map(),
 	}
 
@@ -479,13 +474,13 @@ func (p *Parser) newDoc() (*Document, error) {
 		return nil, err
 	}
 	doc := &Document{
-		ID:        id,
 		FS:        p.FS,
+		Filename:  p.Filename,
+		ID:        id,
 		Parser:    p,
 		Root:      p.Root,
 		SectionID: p.Section,
-		Snippets:  p.Snippets,
-		Filename:  p.Filename,
+		Snippets:  Snippets{},
 	}
 
 	return doc, nil

@@ -7,8 +7,9 @@ import (
 )
 
 type LI struct {
-	Type string
 	*Element
+
+	Type string
 }
 
 func (li *LI) MarshalJSON() ([]byte, error) {

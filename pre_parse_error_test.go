@@ -117,3 +117,15 @@ func Test_PreParser_Errors(t *testing.T) {
 	}
 
 }
+
+func Test_PreParseError_MarshalJSON(t *testing.T) {
+	t.Parallel()
+
+	ppe := PreParseError{
+		Err:      io.EOF,
+		Filename: "module.md",
+		Root:     "root",
+	}
+
+	testJSON(t, "pre_parse_error", ppe)
+}

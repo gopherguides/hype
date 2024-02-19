@@ -32,3 +32,15 @@ func Test_ParseError(t *testing.T) {
 	err := errors.Unwrap(oce)
 	r.Equal(io.EOF, err)
 }
+
+func Test_ParseError_MarshalJSON(t *testing.T) {
+	t.Parallel()
+
+	pe := ParseError{
+		Err:      io.EOF,
+		Filename: "test.md",
+		Root:     "root",
+	}
+
+	testJSON(t, "parse_error", pe)
+}

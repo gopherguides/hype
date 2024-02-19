@@ -107,3 +107,15 @@ func Test_Execute_Errors(t *testing.T) {
 		})
 	}
 }
+
+func Test_ExecuteError_MarshalJSON(t *testing.T) {
+	t.Parallel()
+
+	ee := ExecuteError{
+		Err:      io.EOF,
+		Filename: "module.md",
+		Root:     "testdata/parser/errors/execute",
+	}
+
+	testJSON(t, "execute_error", ee)
+}

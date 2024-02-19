@@ -12,7 +12,11 @@ type Heading struct {
 	level int
 }
 
-func (h Heading) MarshalJSON() ([]byte, error) {
+func (h *Heading) MarshalJSON() ([]byte, error) {
+	if h == nil {
+		return nil, ErrIsNil("heading")
+	}
+
 	h.RLock()
 	defer h.RUnlock()
 
@@ -27,17 +31,17 @@ func (h Heading) MarshalJSON() ([]byte, error) {
 	return json.MarshalIndent(m, "", "  ")
 }
 
-func (h Heading) MD() string {
+func (h *Heading) MD() string {
 	x := strings.Repeat("#", h.level)
 
 	return fmt.Sprintf("%s %s", x, h.Children().MD())
 }
 
-func (h Heading) Level() int {
+func (h *Heading) Level() int {
 	return h.level
 }
 
-func (h Heading) Format(f fmt.State, verb rune) {
+func (h *Heading) Format(f fmt.State, verb rune) {
 	switch verb {
 	case 'v':
 		if len(h.Filename) > 0 {

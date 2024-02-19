@@ -29,22 +29,6 @@ func (code *InlineCode) MarshalJSON() ([]byte, error) {
 	return json.MarshalIndent(m, "", "  ")
 }
 
-func (code *InlineCode) StartTag() string {
-	if code == nil || code.Element == nil {
-		return "<code>"
-	}
-
-	return code.Element.StartTag()
-}
-
-func (code *InlineCode) EndTag() string {
-	if code == nil || code.Element == nil {
-		return "</code>"
-	}
-
-	return code.Element.EndTag()
-}
-
 func (code *InlineCode) String() string {
 	if code == nil || code.Element == nil {
 		return "<code></code>"

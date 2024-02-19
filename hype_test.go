@@ -96,10 +96,10 @@ func testJSON(t testing.TB, gold string, val json.Marshaler) {
 
 	fp := filepath.Join("json", gold+".json")
 
-	f, err := os.Create(filepath.Join("testdata", fp))
-	r.NoError(err)
-	f.Write(b)
-	f.Close()
+	// f, err := os.Create(filepath.Join("testdata", fp))
+	// r.NoError(err)
+	// f.Write(b)
+	// f.Close()
 
 	b, err = fs.ReadFile(os.DirFS("testdata"), fp)
 	r.NoError(err)

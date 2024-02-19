@@ -14,17 +14,17 @@ import (
 var _ Node = &Document{}
 
 type Document struct {
-	fs.FS        `json:"-"`
-	sync.RWMutex `json:"-"`
+	fs.FS
+	sync.RWMutex
 
-	ID        string   `json:"id,omitempty"`
-	Nodes     Nodes    `json:"nodes,omitempty"`
-	Parser    *Parser  `json:"parser,omitempty"` // Parser used to create the document
-	Root      string   `json:"root,omitempty"`
-	SectionID int      `json:"section_id,omitempty"`
-	Snippets  Snippets `json:"snippets,omitempty"`
-	Title     string   `json:"title,omitempty"`
-	Filename  string   `json:"filename,omitempty"`
+	ID        string
+	Nodes     Nodes
+	Parser    *Parser // Parser used to create the document
+	Root      string
+	SectionID int
+	Snippets  Snippets
+	Title     string
+	Filename  string
 }
 
 func (doc *Document) MarshalJSON() ([]byte, error) {
@@ -32,26 +32,34 @@ func (doc *Document) MarshalJSON() ([]byte, error) {
 		return nil, ErrIsNil("document")
 	}
 
-	x := struct {
-		ID        string   `json:"id,omitempty"`
-		Nodes     Nodes    `json:"nodes,omitempty"`
-		Parser    *Parser  `json:"parser,omitempty"` // Parser used to create the document
-		Root      string   `json:"root,omitempty"`
-		SectionID int      `json:"section_id,omitempty"`
-		Snippets  Snippets `json:"snippets,omitempty"`
-		Title     string   `json:"title,omitempty"`
-		Type      string   `json:"type"`
-		Filename  string   `json:"filename,omitempty"`
+	snips := struct {
+		Rules    map[string]string             `json:"rules,omitempty"`
+		Snippets map[string]map[string]Snippet `json:"snippets,omitempty"`
 	}{
-		Type:      fmt.Sprintf("%T", doc),
+		Rules:    doc.Snippets.rules,
+		Snippets: doc.Snippets.snippets,
+	}
+
+	x := struct {
+		Filename  string  `json:"filename,omitempty"`
+		ID        string  `json:"id,omitempty"`
+		Nodes     Nodes   `json:"nodes,omitempty"`
+		Parser    *Parser `json:"parser,omitempty"`
+		Root      string  `json:"root,omitempty"`
+		SectionID int     `json:"section_id,omitempty"`
+		Snippets  any     `json:"snippets,omitempty"`
+		Title     string  `json:"title,omitempty"`
+		Type      string  `json:"type"`
+	}{
+		Filename:  doc.Filename,
+		ID:        doc.ID,
+		Nodes:     doc.Nodes,
 		Parser:    doc.Parser,
 		Root:      doc.Root,
 		SectionID: doc.SectionID,
-		Snippets:  doc.Snippets,
+		Snippets:  snips,
 		Title:     doc.Title,
-		Nodes:     doc.Nodes,
-		ID:        doc.ID,
-		Filename:  doc.Filename,
+		Type:      fmt.Sprintf("%T", doc),
 	}
 
 	return json.MarshalIndent(x, "", "  ")

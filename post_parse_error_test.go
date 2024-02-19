@@ -124,3 +124,16 @@ func Test_PostParser_Errors(t *testing.T) {
 		})
 	}
 }
+
+func Test_PostParseError_MarshalJSON(t *testing.T) {
+	t.Parallel()
+
+	ppe := PostParseError{
+		Err:      io.EOF,
+		Filename: "foo.md",
+		OrigErr:  io.ErrClosedPipe,
+		Root:     "root",
+	}
+
+	testJSON(t, "post_parse_error", ppe)
+}

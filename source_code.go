@@ -41,22 +41,6 @@ func (code *SourceCode) MarshalJSON() ([]byte, error) {
 	return json.MarshalIndent(m, "", "  ")
 }
 
-func (code *SourceCode) StartTag() string {
-	if code == nil || code.Element == nil {
-		return ""
-	}
-
-	return code.Element.StartTag()
-}
-
-func (code *SourceCode) EndTag() string {
-	if code == nil || code.Element == nil {
-		return ""
-	}
-
-	return "</code>"
-}
-
 func (code *SourceCode) String() string {
 	if code == nil {
 		return ""

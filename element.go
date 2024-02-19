@@ -42,28 +42,56 @@ func (el *Element) JSONMap() (map[string]any, error) {
 	defer el.RUnlock()
 
 	m := map[string]any{
-		"type": fmt.Sprintf("%T", el),
+		"atom":       el.Atom(),
+		"attributes": map[string]string{},
+		"filename":   el.Filename,
+		"nodes":      Nodes{},
+		"tag":        el.StartTag(),
+		"type":       fmt.Sprintf("%T", el),
 	}
 
-	if len(el.Filename) > 0 {
-		m["file"] = el.Filename
+	if len(el.Nodes) > 0 {
+		m["nodes"] = el.Nodes
 	}
 
-	if el.Attributes != nil && el.Attributes.Len() > 0 {
+	if el.Attributes.Len() > 0 {
 		m["attributes"] = el.Attributes
 	}
 
-	nodes := el.Nodes
-
-	if len(nodes) > 0 {
-		m["nodes"] = nodes
-	}
-
 	hn := el.HTMLNode
-
-	if hn != nil && len(hn.Data) > 0 {
-		m["atom"] = hn.Data
+	if hn == nil {
+		return m, nil
 	}
+
+	hnm := map[string]any{
+		"data":      hn.Data,
+		"data_atom": hn.DataAtom.String(),
+		"namespace": hn.Namespace,
+		"type":      fmt.Sprintf("%T", hn),
+	}
+
+	switch hn.Type {
+	case html.ErrorNode:
+		hnm["node_type"] = "html.ErrorNode"
+	case html.TextNode:
+		hnm["node_type"] = "html.TextNode"
+	case html.DocumentNode:
+		hnm["node_type"] = "html.DocumentNode"
+	case html.ElementNode:
+		hnm["node_type"] = "html.ElementNode"
+	case html.CommentNode:
+		hnm["node_type"] = "html.CommentNode"
+	case html.DoctypeNode:
+		hnm["node_type"] = "html.DoctypeNode"
+	case html.RawNode:
+		hnm["node_type"] = "html.RawNode"
+	}
+
+	if len(hn.Attr) > 0 {
+		hnm["attributes"] = hn.Attr
+	}
+
+	m["html_node"] = hnm
 
 	return m, nil
 }

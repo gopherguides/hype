@@ -68,3 +68,15 @@ adfadf`
 	r.Len(pages, 5)
 
 }
+
+func Test_Pages_MarshalJSON(t *testing.T) {
+	t.Parallel()
+
+	p := &Page{
+		Title:   "Page 1",
+		Element: NewEl("page", nil),
+	}
+	p.Nodes = append(p.Nodes, Text("more text"))
+
+	testJSON(t, "page", p)
+}

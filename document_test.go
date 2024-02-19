@@ -89,7 +89,7 @@ func Test_Document_MarshalJSON(t *testing.T) {
 	t.Parallel()
 	r := require.New(t)
 
-	p := testParser(t, "testdata/doc/simple")
+	p := testParser(t, "testdata/doc/snippets")
 	p.DocIDGen = func() (string, error) {
 		return "1", nil
 	}
