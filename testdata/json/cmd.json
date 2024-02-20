@@ -28,10 +28,6 @@
     "attributes": {},
     "dir": "testdata/commands",
     "duration": "1s",
-    "env": [
-      "FOO=bar",
-      "BAR=baz"
-    ],
     "err": "this is an error",
     "exit": 1,
     "filename": "",

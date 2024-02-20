@@ -3,10 +3,8 @@ package hype
 import (
 	"encoding/json"
 	"fmt"
-	"strings"
 
 	"github.com/markbates/clam"
-	"github.com/markbates/hepa"
 )
 
 type CmdError struct {
@@ -17,7 +15,6 @@ type CmdError struct {
 func (ce CmdError) MarshalJSON() ([]byte, error) {
 	mm := map[string]any{
 		"args":     ce.Args,
-		"env":      ce.Env,
 		"error":    errForJSON(ce.Err),
 		"exit":     ce.Exit,
 		"filename": ce.Filename,
@@ -25,15 +22,6 @@ func (ce CmdError) MarshalJSON() ([]byte, error) {
 		"root":     ce.Dir,
 		"type":     fmt.Sprintf("%T", ce),
 	}
-
-	p := hepa.Deep()
-
-	env := make([]string, 0, len(ce.Env))
-	for _, e := range ce.Env {
-		b, _ := p.Clean(strings.NewReader(e))
-		env = append(env, string(b))
-	}
-	mm["env"] = env
 
 	return json.MarshalIndent(mm, "", "  ")
 }

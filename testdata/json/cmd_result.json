@@ -7,10 +7,6 @@
   "attributes": {},
   "dir": "/tmp",
   "duration": "1s",
-  "env": [
-    "FOO=bar",
-    "BAR=baz"
-  ],
   "err": "EOF",
   "exit": 1,
   "filename": "",

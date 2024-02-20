@@ -45,7 +45,6 @@ func (c *CmdResult) MarshalJSON() ([]byte, error) {
 	m["args"] = c.Args
 	m["dir"] = c.Dir
 	m["duration"] = c.Duration.String()
-	m["env"] = c.Env
 	m["err"] = errForJSON(c.Err)
 	m["exit"] = c.Exit
 	m["stderr"] = string(c.Stderr)
