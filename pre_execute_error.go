@@ -8,6 +8,7 @@ import (
 
 type PreExecuteError struct {
 	Err         error
+	Document    *Document
 	Filename    string
 	Root        string
 	PreExecuter any
@@ -15,10 +16,11 @@ type PreExecuteError struct {
 
 func (pee PreExecuteError) MarshalJSON() ([]byte, error) {
 	mm := map[string]any{
+		"document":     pee.Document,
 		"error":        errForJSON(pee.Err),
 		"filename":     pee.Filename,
-		"root":         pee.Root,
 		"pre_executer": fmt.Sprintf("%T", pee.PreExecuter),
+		"root":         pee.Root,
 		"type":         fmt.Sprintf("%T", pee),
 	}
 

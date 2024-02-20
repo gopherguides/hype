@@ -124,6 +124,9 @@ func Test_PostExecuteError_MarshalJSON(t *testing.T) {
 		OrigErr:  io.ErrClosedPipe,
 		Filename: "filename",
 		Root:     "root",
+		Document: &Document{
+			Title: "My Title",
+		},
 	}
 
 	testJSON(t, "post_execute_error", pee)

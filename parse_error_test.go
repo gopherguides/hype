@@ -37,6 +37,7 @@ func Test_ParseError_MarshalJSON(t *testing.T) {
 	t.Parallel()
 
 	pe := ParseError{
+		Contents: []byte("contents"),
 		Err:      io.EOF,
 		Filename: "test.md",
 		Root:     "root",

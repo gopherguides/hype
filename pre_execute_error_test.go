@@ -108,6 +108,9 @@ func Test_PreExecuteError_MarshalJSON(t *testing.T) {
 		Err:      io.EOF,
 		Filename: "module.md",
 		Root:     "root",
+		Document: &Document{
+			Title: "My Title",
+		},
 	}
 
 	testJSON(t, "pre_execute_error", pee)

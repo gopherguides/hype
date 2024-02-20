@@ -22,6 +22,7 @@ func (list Nodes) PostParse(p *Parser, d *Document, err error) error {
 					return err2
 				}
 				return PostParseError{
+					Document: d,
 					Err:      err2,
 					Filename: p.Filename,
 					OrigErr:  err,
@@ -37,6 +38,7 @@ func (list Nodes) PostParse(p *Parser, d *Document, err error) error {
 			err2 = pp.PostParse(p, d, err)
 			if err2 != nil {
 				return PostParseError{
+					Document:   d,
 					Err:        err2,
 					Filename:   p.Filename,
 					OrigErr:    err,
@@ -52,6 +54,7 @@ func (list Nodes) PostParse(p *Parser, d *Document, err error) error {
 				return err2
 			}
 			return PostParseError{
+				Document: d,
 				Err:      err2,
 				Filename: p.Filename,
 				OrigErr:  err,

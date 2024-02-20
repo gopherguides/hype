@@ -15,11 +15,11 @@ type ParseError struct {
 
 func (pe ParseError) MarshalJSON() ([]byte, error) {
 	mm := map[string]any{
-		"type":     fmt.Sprintf("%T", pe),
-		"error":    errForJSON(pe.Err),
-		"root":     pe.Root,
-		"filename": pe.Filename,
 		"contents": string(pe.Contents),
+		"error":    errForJSON(pe.Err),
+		"filename": pe.Filename,
+		"root":     pe.Root,
+		"type":     fmt.Sprintf("%T", pe),
 	}
 
 	return json.MarshalIndent(mm, "", "  ")

@@ -1,4 +1,9 @@
 {
+  "document": {
+    "snippets": {},
+    "title": "My Title",
+    "type": "*hype.Document"
+  },
   "error": "EOF",
   "filename": "module.md",
   "pre_executer": "\u003cnil\u003e",

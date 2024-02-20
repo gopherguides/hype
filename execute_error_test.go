@@ -101,6 +101,7 @@ func Test_Execute_Errors(t *testing.T) {
 
 			var ce ExecuteError
 			r.True(errors.As(err, &ce), err)
+			r.NotNil(ce.Document, err)
 
 			ce = ExecuteError{}
 			r.True(errors.Is(err, ce), err)
@@ -115,6 +116,10 @@ func Test_ExecuteError_MarshalJSON(t *testing.T) {
 		Err:      io.EOF,
 		Filename: "module.md",
 		Root:     "testdata/parser/errors/execute",
+		Document: &Document{
+			Title: "My Title",
+		},
+		Contents: []byte("foo"),
 	}
 
 	testJSON(t, "execute_error", ee)

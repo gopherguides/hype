@@ -8,18 +8,20 @@ import (
 
 type ExecuteError struct {
 	Err      error
+	Contents []byte
+	Document *Document
 	Filename string
 	Root     string
-	Contents []byte
 }
 
 func (pe ExecuteError) MarshalJSON() ([]byte, error) {
 	mm := map[string]any{
-		"type":     fmt.Sprintf("%T", pe),
-		"error":    errForJSON(pe.Err),
-		"root":     pe.Root,
-		"filename": pe.Filename,
 		"contents": string(pe.Contents),
+		"document": pe.Document,
+		"error":    errForJSON(pe.Err),
+		"filename": pe.Filename,
+		"root":     pe.Root,
+		"type":     fmt.Sprintf("%T", pe),
 	}
 
 	return json.MarshalIndent(mm, "", "  ")

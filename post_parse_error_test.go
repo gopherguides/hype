@@ -111,6 +111,7 @@ func Test_PostParser_Errors(t *testing.T) {
 
 			var ppe PostParseError
 			r.True(errors.As(err, &ppe), err)
+			r.NotNil(ppe.Document, err)
 
 			ppe = PostParseError{}
 			r.True(errors.Is(err, ppe), err)
@@ -133,6 +134,9 @@ func Test_PostParseError_MarshalJSON(t *testing.T) {
 		Filename: "foo.md",
 		OrigErr:  io.ErrClosedPipe,
 		Root:     "root",
+		Document: &Document{
+			Title: "My Title",
+		},
 	}
 
 	testJSON(t, "post_parse_error", ppe)

@@ -1,4 +1,9 @@
 {
+  "document": {
+    "snippets": {},
+    "title": "My Title",
+    "type": "*hype.Document"
+  },
   "error": "EOF",
   "filename": "foo.md",
   "origal_error": "io: read/write on closed pipe",

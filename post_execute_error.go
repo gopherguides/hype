@@ -8,6 +8,7 @@ import (
 
 type PostExecuteError struct {
 	Err          error
+	Document     *Document
 	Filename     string
 	OrigErr      error
 	Root         string
@@ -16,11 +17,12 @@ type PostExecuteError struct {
 
 func (pee PostExecuteError) MarshalJSON() ([]byte, error) {
 	mm := map[string]any{
+		"document":      pee.Document,
 		"error":         errForJSON(pee.Err),
-		"origal_error":  errForJSON(pee.OrigErr),
 		"filename":      pee.Filename,
-		"root":          pee.Root,
+		"origal_error":  errForJSON(pee.OrigErr),
 		"post_executer": fmt.Sprintf("%T", pee.PostExecuter),
+		"root":          pee.Root,
 		"type":          fmt.Sprintf("%T", pee),
 	}
 

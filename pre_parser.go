@@ -1,6 +1,7 @@
 package hype
 
 import (
+	"bytes"
 	"io"
 )
 
@@ -15,12 +16,18 @@ func (list PreParsers) PreParse(p *Parser, r io.Reader) (io.Reader, error) {
 		return nil, ErrIsNil("parser")
 	}
 
-	var err error
+	contents, err := io.ReadAll(r)
+	if err != nil {
+		return nil, err
+	}
+
+	r = bytes.NewReader(contents)
 
 	for _, pp := range list {
 		r, err = pp.PreParse(p, r)
 		if err != nil {
 			return nil, PreParseError{
+				Contents:  contents,
 				Err:       err,
 				Filename:  p.Filename,
 				PreParser: pp,

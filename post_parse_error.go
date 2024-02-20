@@ -8,6 +8,7 @@ import (
 
 type PostParseError struct {
 	Err        error
+	Document   *Document
 	Filename   string
 	OrigErr    error
 	Root       string
@@ -16,11 +17,12 @@ type PostParseError struct {
 
 func (ppe PostParseError) MarshalJSON() ([]byte, error) {
 	mm := map[string]any{
+		"document":     ppe.Document,
 		"error":        toError(ppe.Err),
-		"origal_error": toError(ppe.OrigErr),
 		"filename":     ppe.Filename,
-		"root":         ppe.Root,
+		"origal_error": toError(ppe.OrigErr),
 		"post_parser":  fmt.Sprintf("%T", ppe.PostParser),
+		"root":         ppe.Root,
 		"type":         fmt.Sprintf("%T", ppe),
 	}
 

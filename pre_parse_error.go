@@ -7,18 +7,20 @@ import (
 )
 
 type PreParseError struct {
-	Err       error  `json:"error,omitempty"`
-	Filename  string `json:"filename,omitempty"`
-	Root      string `json:"root,omitempty"`
+	Err       error
+	Contents  []byte
+	Filename  string
+	Root      string
 	PreParser any
 }
 
 func (e PreParseError) MarshalJSON() ([]byte, error) {
 	mm := map[string]any{
+		"contents":   string(e.Contents),
 		"error":      errForJSON(e.Err),
 		"filename":   e.Filename,
-		"root":       e.Root,
 		"pre_parser": fmt.Sprintf("%T", e.PreParser),
+		"root":       e.Root,
 		"type":       fmt.Sprintf("%T", e),
 	}
 

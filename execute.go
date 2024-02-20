@@ -50,10 +50,11 @@ func (list Nodes) Execute(wg WaitGrouper, ctx context.Context, d *Document) (err
 						contents = d.Parser.Contents
 					}
 					return ExecuteError{
+						Contents: contents,
+						Document: d,
 						Err:      err,
 						Filename: name,
 						Root:     d.Root,
-						Contents: contents,
 					}
 				}
 				return nil
@@ -63,10 +64,11 @@ func (list Nodes) Execute(wg WaitGrouper, ctx context.Context, d *Document) (err
 		err := n.Children().Execute(wg, ctx, d)
 		if err != nil {
 			return ExecuteError{
-				Err:      err,
-				Root:     d.Root,
-				Filename: name,
 				Contents: d.Parser.Contents,
+				Document: d,
+				Err:      err,
+				Filename: name,
+				Root:     d.Root,
 			}
 		}
 
