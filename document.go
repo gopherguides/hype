@@ -232,7 +232,18 @@ func (doc *Document) ensureExecuteError(err error) error {
 		return err
 	}
 
+	if doc == nil {
+		return err
+	}
+
+	var contents []byte
+	if doc.Parser != nil {
+		contents = doc.Parser.Contents
+	}
+
 	return ExecuteError{
+		Contents: contents,
+		Document: doc,
 		Err:      err,
 		Filename: doc.Filename,
 		Root:     doc.Root,
