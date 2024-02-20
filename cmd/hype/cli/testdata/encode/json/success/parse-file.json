@@ -159,7 +159,8 @@
   ],
   "parser": {
     "type": "*hype.Parser",
-    "section": 1
+    "section": 1,
+    "contents": "# JSON Encoding\n\n\u003cecho id=\"123\"\u003eHello!\u003c/echo\u003e\n"
   },
   "section_id": 1,
   "snippets": {},
