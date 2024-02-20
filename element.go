@@ -153,6 +153,10 @@ func (el *Element) HTML() *html.Node {
 // StartTag returns the start tag for the element.
 // For example, for an element with an Atom of "div", the start tag would be "<div>".
 func (el *Element) StartTag() string {
+	if el == nil {
+		return ""
+	}
+
 	a := el.Atom()
 	if len(a) == 0 {
 		return ""
@@ -191,6 +195,10 @@ func (el *Element) EndTag() string {
 
 // String returns StartTag() + Children().String() + EndTag()
 func (el *Element) String() string {
+	if el == nil {
+		return ""
+	}
+
 	s := el.StartTag()
 	s += el.Children().String()
 	s += el.EndTag()
