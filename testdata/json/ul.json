@@ -7,9 +7,9 @@
     "data_atom": "ul",
     "namespace": "",
     "node_type": "html.ElementNode",
-    "type": "*html.Node"
+    "type": "html.Node"
   },
   "nodes": [],
   "tag": "\u003cul\u003e",
-  "type": "*hype.UL"
+  "type": "hype.UL"
 }

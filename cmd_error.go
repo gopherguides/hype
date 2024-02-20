@@ -2,7 +2,6 @@ package hype
 
 import (
 	"encoding/json"
-	"fmt"
 
 	"github.com/markbates/clam"
 )
@@ -20,7 +19,7 @@ func (ce CmdError) MarshalJSON() ([]byte, error) {
 		"filename": ce.Filename,
 		"output":   string(ce.Output),
 		"root":     ce.Dir,
-		"type":     fmt.Sprintf("%T", ce),
+		"type":     toType(ce),
 	}
 
 	return json.MarshalIndent(mm, "", "  ")

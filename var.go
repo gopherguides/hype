@@ -87,7 +87,7 @@ func (v *Var) MarshalJSON() ([]byte, error) {
 		return nil, err
 	}
 
-	m["type"] = fmt.Sprintf("%T", v)
+	m["type"] = toType(v)
 	m["key"] = v.Key
 	m["value"] = v.Value
 

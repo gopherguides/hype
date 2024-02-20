@@ -7,7 +7,7 @@
     "data_atom": "ol",
     "namespace": "",
     "node_type": "html.ElementNode",
-    "type": "*html.Node"
+    "type": "html.Node"
   },
   "nodes": [
     {
@@ -16,5 +16,5 @@
     }
   ],
   "tag": "\u003col\u003e",
-  "type": "*hype.OL"
+  "type": "hype.OL"
 }

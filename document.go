@@ -59,7 +59,7 @@ func (doc *Document) MarshalJSON() ([]byte, error) {
 		SectionID: doc.SectionID,
 		Snippets:  snips,
 		Title:     doc.Title,
-		Type:      fmt.Sprintf("%T", doc),
+		Type:      toType(doc),
 	}
 
 	return json.MarshalIndent(x, "", "  ")

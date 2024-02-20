@@ -47,7 +47,7 @@ func (el *Element) JSONMap() (map[string]any, error) {
 		"filename":   el.Filename,
 		"nodes":      Nodes{},
 		"tag":        el.StartTag(),
-		"type":       fmt.Sprintf("%T", el),
+		"type":       toType(el),
 	}
 
 	if len(el.Nodes) > 0 {
@@ -67,7 +67,7 @@ func (el *Element) JSONMap() (map[string]any, error) {
 		"data":      hn.Data,
 		"data_atom": hn.DataAtom.String(),
 		"namespace": hn.Namespace,
-		"type":      fmt.Sprintf("%T", hn),
+		"type":      toType(hn),
 	}
 
 	switch hn.Type {

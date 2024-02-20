@@ -38,7 +38,7 @@ func (c *Cmd) MarshalJSON() ([]byte, error) {
 		return nil, err
 	}
 
-	m["type"] = fmt.Sprintf("%T", c)
+	m["type"] = toType(c)
 	m["expected_exit"] = c.ExpectedExit
 	m["timeout"] = c.Timeout.String()
 

@@ -25,7 +25,7 @@ func (h *Heading) MarshalJSON() ([]byte, error) {
 		return nil, err
 	}
 
-	m["type"] = fmt.Sprintf("%T", h)
+	m["type"] = toType(h)
 	m["level"] = h.level
 
 	return json.MarshalIndent(m, "", "  ")

@@ -2,7 +2,6 @@ package hype
 
 import (
 	"encoding/json"
-	"fmt"
 	"strings"
 )
 
@@ -23,7 +22,7 @@ func (fc *Figcaption) MarshalJSON() ([]byte, error) {
 		return nil, err
 	}
 
-	m["type"] = fmt.Sprintf("%T", fc)
+	m["type"] = toType(fc)
 
 	return json.MarshalIndent(m, "", "  ")
 }

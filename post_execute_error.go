@@ -3,7 +3,6 @@ package hype
 import (
 	"encoding/json"
 	"errors"
-	"fmt"
 )
 
 type PostExecuteError struct {
@@ -21,9 +20,9 @@ func (pee PostExecuteError) MarshalJSON() ([]byte, error) {
 		"error":         errForJSON(pee.Err),
 		"filename":      pee.Filename,
 		"origal_error":  errForJSON(pee.OrigErr),
-		"post_executer": fmt.Sprintf("%T", pee.PostExecuter),
+		"post_executer": toType(pee.PostExecuter),
 		"root":          pee.Root,
-		"type":          fmt.Sprintf("%T", pee),
+		"type":          toType(pee),
 	}
 
 	return json.MarshalIndent(mm, "", "  ")

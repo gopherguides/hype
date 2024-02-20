@@ -22,7 +22,7 @@ func (toc *ToC) MarshalJSON() ([]byte, error) {
 		return nil, err
 	}
 
-	m["type"] = fmt.Sprintf("%T", toc)
+	m["type"] = toType(toc)
 
 	return json.MarshalIndent(m, "", "  ")
 }

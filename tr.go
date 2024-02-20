@@ -2,7 +2,6 @@ package hype
 
 import (
 	"encoding/json"
-	"fmt"
 )
 
 type TR struct {
@@ -19,7 +18,7 @@ func (tr *TR) MarshalJSON() ([]byte, error) {
 		return nil, err
 	}
 
-	m["type"] = fmt.Sprintf("%T", tr)
+	m["type"] = toType(tr)
 
 	return json.MarshalIndent(m, "", "  ")
 }

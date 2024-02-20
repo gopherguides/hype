@@ -36,7 +36,7 @@ func (c *CmdResult) MarshalJSON() ([]byte, error) {
 		return nil, err
 	}
 
-	m["type"] = fmt.Sprintf("%T", c)
+	m["type"] = toType(c)
 
 	if c.Result == nil {
 		return json.MarshalIndent(m, "", "  ")

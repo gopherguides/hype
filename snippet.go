@@ -42,7 +42,7 @@ func (snip *Snippet) MarshalJSON() ([]byte, error) {
 	}
 
 	if snip.Content != "" {
-		m.Type = fmt.Sprintf("%T", snip)
+		m.Type = toType(snip)
 	}
 
 	return json.MarshalIndent(m, "", "  ")
@@ -73,7 +73,6 @@ type Snippets struct {
 }
 
 func (sm *Snippets) MarshalJSON() ([]byte, error) {
-	fmt.Printf("TODO >> snippet.go:76 sm %[1]T %+[1]v\n", sm)
 	if sm == nil {
 		return nil, ErrIsNil("snippets")
 	}
@@ -85,7 +84,7 @@ func (sm *Snippets) MarshalJSON() ([]byte, error) {
 	}{
 		Rules:    sm.rules,
 		Snippets: sm.snippets,
-		Type:     fmt.Sprintf("%T", sm),
+		Type:     toType(sm),
 	}
 
 	return json.MarshalIndent(m, "", "  ")

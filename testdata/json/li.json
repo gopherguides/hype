@@ -7,7 +7,7 @@
     "data_atom": "li",
     "namespace": "",
     "node_type": "html.ElementNode",
-    "type": "*html.Node"
+    "type": "html.Node"
   },
   "list-type": "ul",
   "nodes": [
@@ -17,5 +17,5 @@
     }
   ],
   "tag": "\u003cli\u003e",
-  "type": "*hype.LI"
+  "type": "hype.LI"
 }

@@ -10,9 +10,9 @@
     "data_atom": "",
     "namespace": "",
     "node_type": "html.ElementNode",
-    "type": "*html.Node"
+    "type": "html.Node"
   },
   "nodes": [],
   "tag": "\u003cinclude src=\"sub.md\"\u003e",
-  "type": "*hype.Include"
+  "type": "hype.Include"
 }

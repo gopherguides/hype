@@ -55,7 +55,7 @@ func (p *Parser) MarshalJSON() ([]byte, error) {
 		Vars         map[string]any `json:"vars,omitempty"`
 		Contents     string         `json:"contents,omitempty"`
 	}{
-		Type:         fmt.Sprintf("%T", p),
+		Type:         toType(p),
 		Root:         p.Root,
 		DisablePages: p.DisablePages,
 		Section:      p.Section,

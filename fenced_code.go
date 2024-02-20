@@ -29,7 +29,7 @@ func (code *FencedCode) MarshalJSON() ([]byte, error) {
 		m["lang"] = lang
 	}
 
-	m["type"] = fmt.Sprintf("%T", code)
+	m["type"] = toType(code)
 
 	return json.MarshalIndent(m, "", "  ")
 }

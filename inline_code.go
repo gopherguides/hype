@@ -24,7 +24,7 @@ func (code *InlineCode) MarshalJSON() ([]byte, error) {
 		return nil, err
 	}
 
-	m["type"] = fmt.Sprintf("%T", code)
+	m["type"] = toType(code)
 
 	return json.MarshalIndent(m, "", "  ")
 }

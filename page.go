@@ -20,7 +20,7 @@ func (page *Page) MarshalJSON() ([]byte, error) {
 		return nil, err
 	}
 
-	m["type"] = fmt.Sprintf("%T", page)
+	m["type"] = toType(page)
 
 	if len(page.Title) > 0 {
 		m["title"] = page.Title

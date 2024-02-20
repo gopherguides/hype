@@ -7,7 +7,7 @@
     "data_atom": "p",
     "namespace": "",
     "node_type": "html.ElementNode",
-    "type": "*html.Node"
+    "type": "html.Node"
   },
   "nodes": [
     {
@@ -16,5 +16,5 @@
     }
   ],
   "tag": "\u003cp\u003e",
-  "type": "*hype.Paragraph"
+  "type": "hype.Paragraph"
 }

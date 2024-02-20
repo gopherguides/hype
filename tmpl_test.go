@@ -2,7 +2,6 @@ package hype
 
 import (
 	"context"
-	"fmt"
 	"testing"
 	"time"
 
@@ -26,7 +25,7 @@ func Test_GoTemplates(t *testing.T) {
 
 	act := doc.String()
 
-	fmt.Println(act)
+	// fmt.Println(act)
 
 	exp := ``
 

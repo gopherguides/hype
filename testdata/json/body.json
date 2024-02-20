@@ -7,7 +7,7 @@
     "data_atom": "body",
     "namespace": "",
     "node_type": "html.ElementNode",
-    "type": "*html.Node"
+    "type": "html.Node"
   },
   "nodes": [
     {
@@ -16,5 +16,5 @@
     }
   ],
   "tag": "\u003cbody\u003e",
-  "type": "*hype.Body"
+  "type": "hype.Body"
 }

@@ -3,7 +3,6 @@ package hype
 import (
 	"encoding/json"
 	"errors"
-	"fmt"
 )
 
 type PreParseError struct {
@@ -19,9 +18,9 @@ func (e PreParseError) MarshalJSON() ([]byte, error) {
 		"contents":   string(e.Contents),
 		"error":      errForJSON(e.Err),
 		"filename":   e.Filename,
-		"pre_parser": fmt.Sprintf("%T", e.PreParser),
+		"pre_parser": toType(e.PreParser),
 		"root":       e.Root,
-		"type":       fmt.Sprintf("%T", e),
+		"type":       toType(e),
 	}
 
 	return json.MarshalIndent(mm, "", "  ")

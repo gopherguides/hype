@@ -11,7 +11,7 @@
         "data_atom": "",
         "namespace": "",
         "node_type": "html.DocumentNode",
-        "type": "*html.Node"
+        "type": "html.Node"
       },
       "nodes": [
         {
@@ -23,7 +23,7 @@
             "data_atom": "html",
             "namespace": "",
             "node_type": "html.ElementNode",
-            "type": "*html.Node"
+            "type": "html.Node"
           },
           "nodes": [
             {
@@ -35,11 +35,11 @@
                 "data_atom": "head",
                 "namespace": "",
                 "node_type": "html.ElementNode",
-                "type": "*html.Node"
+                "type": "html.Node"
               },
               "nodes": [],
               "tag": "\u003chead\u003e",
-              "type": "*hype.Element"
+              "type": "hype.Element"
             },
             [
               {
@@ -51,7 +51,7 @@
                   "data_atom": "body",
                   "namespace": "",
                   "node_type": "html.ElementNode",
-                  "type": "*html.Node"
+                  "type": "html.Node"
                 },
                 "nodes": [
                   [
@@ -64,7 +64,7 @@
                         "data_atom": "",
                         "namespace": "",
                         "node_type": "html.ElementNode",
-                        "type": "*html.Node"
+                        "type": "html.Node"
                       },
                       "nodes": [
                         {
@@ -81,7 +81,7 @@
                               "data_atom": "h1",
                               "namespace": "",
                               "node_type": "html.ElementNode",
-                              "type": "*html.Node"
+                              "type": "html.Node"
                             },
                             "level": 1,
                             "nodes": [
@@ -91,7 +91,7 @@
                               }
                             ],
                             "tag": "\u003ch1\u003e",
-                            "type": "*hype.Heading"
+                            "type": "hype.Heading"
                           }
                         ],
                         {
@@ -108,7 +108,7 @@
                               "data_atom": "pre",
                               "namespace": "",
                               "node_type": "html.ElementNode",
-                              "type": "*html.Node"
+                              "type": "html.Node"
                             },
                             "nodes": [
                               {
@@ -137,7 +137,7 @@
                                   "data_atom": "code",
                                   "namespace": "",
                                   "node_type": "html.ElementNode",
-                                  "type": "*html.Node"
+                                  "type": "html.Node"
                                 },
                                 "lang": "ts",
                                 "nodes": [
@@ -151,11 +151,11 @@
                                   }
                                 ],
                                 "tag": "\u003ccode class=\"language-ts\" language=\"ts\" snippet=\"class\" src=\"src/main.ts\"\u003e",
-                                "type": "*hype.SourceCode"
+                                "type": "hype.SourceCode"
                               }
                             ],
                             "tag": "\u003cpre\u003e",
-                            "type": "*hype.Element"
+                            "type": "hype.Element"
                           }
                         ],
                         {
@@ -172,7 +172,7 @@
                               "data_atom": "pre",
                               "namespace": "",
                               "node_type": "html.ElementNode",
-                              "type": "*html.Node"
+                              "type": "html.Node"
                             },
                             "nodes": [
                               {
@@ -201,7 +201,7 @@
                                   "data_atom": "code",
                                   "namespace": "",
                                   "node_type": "html.ElementNode",
-                                  "type": "*html.Node"
+                                  "type": "html.Node"
                                 },
                                 "lang": "ts",
                                 "nodes": [
@@ -215,11 +215,11 @@
                                   }
                                 ],
                                 "tag": "\u003ccode class=\"language-ts\" language=\"ts\" snippet=\"constructor\" src=\"src/main.ts\"\u003e",
-                                "type": "*hype.SourceCode"
+                                "type": "hype.SourceCode"
                               }
                             ],
                             "tag": "\u003cpre\u003e",
-                            "type": "*hype.Element"
+                            "type": "hype.Element"
                           }
                         ],
                         {
@@ -229,7 +229,7 @@
                       ],
                       "tag": "\u003cpage\u003e",
                       "title": "Hello",
-                      "type": "*hype.Page"
+                      "type": "hype.Page"
                     }
                   ],
                   {
@@ -238,20 +238,20 @@
                   }
                 ],
                 "tag": "\u003cbody\u003e",
-                "type": "*hype.Body"
+                "type": "hype.Body"
               }
             ]
           ],
           "tag": "\u003chtml\u003e",
-          "type": "*hype.Element"
+          "type": "hype.Element"
         }
       ],
       "tag": "",
-      "type": "*hype.Element"
+      "type": "hype.Element"
     }
   ],
   "parser": {
-    "type": "*hype.Parser",
+    "type": "hype.Parser",
     "root": "testdata/doc/snippets",
     "section": 1,
     "contents": "# Hello\n\n\u003ccode src=\"src/main.ts\" snippet=\"class\"\u003e\u003c/code\u003e\n\n\u003ccode src=\"src/main.ts\" snippet=\"constructor\"\u003e\u003c/code\u003e\n"
@@ -289,5 +289,5 @@
     }
   },
   "title": "Hello",
-  "type": "*hype.Document"
+  "type": "hype.Document"
 }

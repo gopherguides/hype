@@ -15,11 +15,11 @@
     "data_atom": "",
     "namespace": "",
     "node_type": "html.ElementNode",
-    "type": "*html.Node"
+    "type": "html.Node"
   },
   "nodes": [],
   "stderr": "nothing",
   "stdout": "foo\nbar\nbaz\n",
   "tag": "\u003ccmd\u003e",
-  "type": "*hype.CmdResult"
+  "type": "hype.CmdResult"
 }

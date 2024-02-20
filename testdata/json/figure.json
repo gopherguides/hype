@@ -7,7 +7,7 @@
     "data_atom": "figure",
     "namespace": "",
     "node_type": "html.ElementNode",
-    "type": "*html.Node"
+    "type": "html.Node"
   },
   "nodes": [
     {
@@ -19,5 +19,5 @@
   "section_id": 2,
   "style": "figure",
   "tag": "\u003cfigure\u003e",
-  "type": "*hype.Figure"
+  "type": "hype.Figure"
 }

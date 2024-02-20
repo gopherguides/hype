@@ -3,7 +3,6 @@ package hype
 import (
 	"bytes"
 	"encoding/json"
-	"fmt"
 )
 
 type LI struct {
@@ -22,7 +21,7 @@ func (li *LI) MarshalJSON() ([]byte, error) {
 		return nil, err
 	}
 
-	m["type"] = fmt.Sprintf("%T", li)
+	m["type"] = toType(li)
 
 	if li.Type != "" {
 		m["list-type"] = li.Type

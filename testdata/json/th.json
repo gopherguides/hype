@@ -7,9 +7,9 @@
     "data_atom": "th",
     "namespace": "",
     "node_type": "html.ElementNode",
-    "type": "*html.Node"
+    "type": "html.Node"
   },
   "nodes": [],
   "tag": "\u003cth\u003e",
-  "type": "*hype.TH"
+  "type": "hype.TH"
 }

@@ -9,7 +9,7 @@
     "data_atom": "a",
     "namespace": "",
     "node_type": "html.ElementNode",
-    "type": "*html.Node"
+    "type": "html.Node"
   },
   "nodes": [
     {
@@ -18,6 +18,6 @@
     }
   ],
   "tag": "\u003ca href=\"https://example.com\"\u003e",
-  "type": "*hype.Link",
+  "type": "hype.Link",
   "url": "https://example.com"
 }

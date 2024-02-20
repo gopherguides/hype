@@ -2,7 +2,6 @@ package hype
 
 import (
 	"encoding/json"
-	"fmt"
 )
 
 type Paragraph struct {
@@ -19,7 +18,7 @@ func (p *Paragraph) MarshalJSON() ([]byte, error) {
 		return nil, err
 	}
 
-	m["type"] = fmt.Sprintf("%T", p)
+	m["type"] = toType(p)
 
 	return json.MarshalIndent(m, "", "  ")
 }

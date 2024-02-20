@@ -9,7 +9,7 @@
     "data_atom": "",
     "namespace": "",
     "node_type": "html.ElementNode",
-    "type": "*html.Node"
+    "type": "html.Node"
   },
   "nodes": [
     {
@@ -18,5 +18,5 @@
     }
   ],
   "tag": "\u003cref id=\"foo\"\u003e",
-  "type": "*hype.Ref"
+  "type": "hype.Ref"
 }

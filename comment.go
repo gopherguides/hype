@@ -10,7 +10,7 @@ type Comment string
 func (c Comment) MarshalJSON() ([]byte, error) {
 	m := map[string]any{
 		"text": string(c),
-		"type": fmt.Sprintf("%T", c),
+		"type": toType(c),
 	}
 	return json.MarshalIndent(m, "", "  ")
 }

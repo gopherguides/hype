@@ -16,7 +16,7 @@
     "data_atom": "",
     "namespace": "",
     "node_type": "html.ElementNode",
-    "type": "*html.Node"
+    "type": "html.Node"
   },
   "nodes": [],
   "result": {
@@ -36,15 +36,15 @@
       "data_atom": "",
       "namespace": "",
       "node_type": "html.ElementNode",
-      "type": "*html.Node"
+      "type": "html.Node"
     },
     "nodes": [],
     "stderr": "this is stderr",
     "stdout": "this is stdout",
     "tag": "\u003cresult\u003e",
-    "type": "*hype.CmdResult"
+    "type": "hype.CmdResult"
   },
   "tag": "\u003ccmd\u003e",
   "timeout": "1s",
-  "type": "*hype.Cmd"
+  "type": "hype.Cmd"
 }

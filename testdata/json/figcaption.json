@@ -7,7 +7,7 @@
     "data_atom": "figcaption",
     "namespace": "",
     "node_type": "html.ElementNode",
-    "type": "*html.Node"
+    "type": "html.Node"
   },
   "nodes": [
     {
@@ -16,5 +16,5 @@
     }
   ],
   "tag": "\u003cfigcaption\u003e",
-  "type": "*hype.Figcaption"
+  "type": "hype.Figcaption"
 }

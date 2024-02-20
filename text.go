@@ -10,7 +10,7 @@ type Text string
 
 func (tn Text) MarshalJSON() ([]byte, error) {
 	return json.MarshalIndent(map[string]any{
-		"type": fmt.Sprintf("%T", tn),
+		"type": toType(tn),
 		"text": string(tn),
 	}, "", "  ")
 }

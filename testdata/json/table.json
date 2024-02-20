@@ -7,7 +7,7 @@
     "data_atom": "table",
     "namespace": "",
     "node_type": "html.ElementNode",
-    "type": "*html.Node"
+    "type": "html.Node"
   },
   "nodes": [
     {
@@ -24,7 +24,7 @@
           "data_atom": "thead",
           "namespace": "",
           "node_type": "html.ElementNode",
-          "type": "*html.Node"
+          "type": "html.Node"
         },
         "nodes": [
           {
@@ -41,7 +41,7 @@
                 "data_atom": "tr",
                 "namespace": "",
                 "node_type": "html.ElementNode",
-                "type": "*html.Node"
+                "type": "html.Node"
               },
               "nodes": [
                 {
@@ -58,7 +58,7 @@
                       "data_atom": "th",
                       "namespace": "",
                       "node_type": "html.ElementNode",
-                      "type": "*html.Node"
+                      "type": "html.Node"
                     },
                     "nodes": [
                       {
@@ -67,7 +67,7 @@
                       }
                     ],
                     "tag": "\u003cth\u003e",
-                    "type": "*hype.TH"
+                    "type": "hype.TH"
                   }
                 ],
                 {
@@ -84,7 +84,7 @@
                       "data_atom": "th",
                       "namespace": "",
                       "node_type": "html.ElementNode",
-                      "type": "*html.Node"
+                      "type": "html.Node"
                     },
                     "nodes": [
                       {
@@ -93,7 +93,7 @@
                       }
                     ],
                     "tag": "\u003cth\u003e",
-                    "type": "*hype.TH"
+                    "type": "hype.TH"
                   }
                 ],
                 {
@@ -102,7 +102,7 @@
                 }
               ],
               "tag": "\u003ctr\u003e",
-              "type": "*hype.TR"
+              "type": "hype.TR"
             }
           ],
           {
@@ -111,7 +111,7 @@
           }
         ],
         "tag": "\u003cthead\u003e",
-        "type": "*hype.THead"
+        "type": "hype.THead"
       }
     ],
     {
@@ -127,7 +127,7 @@
         "data_atom": "tbody",
         "namespace": "",
         "node_type": "html.ElementNode",
-        "type": "*html.Node"
+        "type": "html.Node"
       },
       "nodes": [
         {
@@ -144,7 +144,7 @@
               "data_atom": "tr",
               "namespace": "",
               "node_type": "html.ElementNode",
-              "type": "*html.Node"
+              "type": "html.Node"
             },
             "nodes": [
               {
@@ -161,7 +161,7 @@
                     "data_atom": "td",
                     "namespace": "",
                     "node_type": "html.ElementNode",
-                    "type": "*html.Node"
+                    "type": "html.Node"
                   },
                   "nodes": [
                     {
@@ -170,7 +170,7 @@
                     }
                   ],
                   "tag": "\u003ctd\u003e",
-                  "type": "*hype.TD"
+                  "type": "hype.TD"
                 }
               ],
               {
@@ -187,7 +187,7 @@
                     "data_atom": "td",
                     "namespace": "",
                     "node_type": "html.ElementNode",
-                    "type": "*html.Node"
+                    "type": "html.Node"
                   },
                   "nodes": [
                     {
@@ -196,7 +196,7 @@
                     }
                   ],
                   "tag": "\u003ctd\u003e",
-                  "type": "*hype.TD"
+                  "type": "hype.TD"
                 }
               ],
               {
@@ -205,7 +205,7 @@
               }
             ],
             "tag": "\u003ctr\u003e",
-            "type": "*hype.TR"
+            "type": "hype.TR"
           }
         ],
         {
@@ -222,7 +222,7 @@
               "data_atom": "tr",
               "namespace": "",
               "node_type": "html.ElementNode",
-              "type": "*html.Node"
+              "type": "html.Node"
             },
             "nodes": [
               {
@@ -239,7 +239,7 @@
                     "data_atom": "td",
                     "namespace": "",
                     "node_type": "html.ElementNode",
-                    "type": "*html.Node"
+                    "type": "html.Node"
                   },
                   "nodes": [
                     {
@@ -248,7 +248,7 @@
                     }
                   ],
                   "tag": "\u003ctd\u003e",
-                  "type": "*hype.TD"
+                  "type": "hype.TD"
                 }
               ],
               {
@@ -265,7 +265,7 @@
                     "data_atom": "td",
                     "namespace": "",
                     "node_type": "html.ElementNode",
-                    "type": "*html.Node"
+                    "type": "html.Node"
                   },
                   "nodes": [
                     {
@@ -274,7 +274,7 @@
                     }
                   ],
                   "tag": "\u003ctd\u003e",
-                  "type": "*hype.TD"
+                  "type": "hype.TD"
                 }
               ],
               {
@@ -283,7 +283,7 @@
               }
             ],
             "tag": "\u003ctr\u003e",
-            "type": "*hype.TR"
+            "type": "hype.TR"
           }
         ],
         {
@@ -300,7 +300,7 @@
               "data_atom": "tr",
               "namespace": "",
               "node_type": "html.ElementNode",
-              "type": "*html.Node"
+              "type": "html.Node"
             },
             "nodes": [
               {
@@ -317,7 +317,7 @@
                     "data_atom": "td",
                     "namespace": "",
                     "node_type": "html.ElementNode",
-                    "type": "*html.Node"
+                    "type": "html.Node"
                   },
                   "nodes": [
                     {
@@ -326,7 +326,7 @@
                     }
                   ],
                   "tag": "\u003ctd\u003e",
-                  "type": "*hype.TD"
+                  "type": "hype.TD"
                 }
               ],
               {
@@ -343,7 +343,7 @@
                     "data_atom": "td",
                     "namespace": "",
                     "node_type": "html.ElementNode",
-                    "type": "*html.Node"
+                    "type": "html.Node"
                   },
                   "nodes": [
                     {
@@ -352,7 +352,7 @@
                     }
                   ],
                   "tag": "\u003ctd\u003e",
-                  "type": "*hype.TD"
+                  "type": "hype.TD"
                 }
               ],
               {
@@ -361,7 +361,7 @@
               }
             ],
             "tag": "\u003ctr\u003e",
-            "type": "*hype.TR"
+            "type": "hype.TR"
           }
         ],
         {
@@ -370,7 +370,7 @@
         }
       ],
       "tag": "\u003ctbody\u003e",
-      "type": "*hype.Element"
+      "type": "hype.Element"
     },
     {
       "text": "\n",
@@ -378,5 +378,5 @@
     }
   ],
   "tag": "\u003ctable\u003e",
-  "type": "*hype.Table"
+  "type": "hype.Table"
 }

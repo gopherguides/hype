@@ -28,7 +28,7 @@ func (inc *Include) MarshalJSON() ([]byte, error) {
 		return nil, err
 	}
 
-	m["type"] = fmt.Sprintf("%T", inc)
+	m["type"] = toType(inc)
 
 	if inc.dir != "" {
 		m["dir"] = inc.dir
