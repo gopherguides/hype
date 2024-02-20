@@ -10,6 +10,7 @@ type ParseError struct {
 	Err      error
 	Filename string
 	Root     string
+	Contents []byte
 }
 
 func (pe ParseError) MarshalJSON() ([]byte, error) {
@@ -18,6 +19,7 @@ func (pe ParseError) MarshalJSON() ([]byte, error) {
 		"error":    errForJSON(pe.Err),
 		"root":     pe.Root,
 		"filename": pe.Filename,
+		"contents": string(pe.Contents),
 	}
 
 	return json.MarshalIndent(mm, "", "  ")

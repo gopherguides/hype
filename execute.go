@@ -45,10 +45,15 @@ func (list Nodes) Execute(wg WaitGrouper, ctx context.Context, d *Document) (err
 			wg.Go(func() error {
 				err := cn.Execute(ctx, d)
 				if err != nil {
+					var contents []byte
+					if d.Parser != nil {
+						contents = d.Parser.Contents
+					}
 					return ExecuteError{
 						Err:      err,
 						Filename: name,
 						Root:     d.Root,
+						Contents: contents,
 					}
 				}
 				return nil
@@ -61,6 +66,7 @@ func (list Nodes) Execute(wg WaitGrouper, ctx context.Context, d *Document) (err
 				Err:      err,
 				Root:     d.Root,
 				Filename: name,
+				Contents: d.Parser.Contents,
 			}
 		}
 

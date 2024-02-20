@@ -1,4 +1,5 @@
 {
+  "contents": "",
   "error": "EOF",
   "filename": "module.md",
   "root": "testdata/parser/errors/execute",

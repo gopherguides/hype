@@ -253,7 +253,8 @@
   "parser": {
     "type": "*hype.Parser",
     "root": "testdata/doc/snippets",
-    "section": 1
+    "section": 1,
+    "contents": "# Hello\n\n\u003ccode src=\"src/main.ts\" snippet=\"class\"\u003e\u003c/code\u003e\n\n\u003ccode src=\"src/main.ts\" snippet=\"constructor\"\u003e\u003c/code\u003e\n"
   },
   "root": "testdata/doc/snippets",
   "section_id": 1,

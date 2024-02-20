@@ -1,6 +1,7 @@
 package hype
 
 import (
+	"bytes"
 	"context"
 	"encoding/json"
 	"errors"
@@ -33,6 +34,7 @@ type Parser struct {
 	Root         string
 	Section      int
 	Vars         syncx.Map[string, any]
+	Contents     []byte // a copy of the contents being parsed - set just before parsing
 
 	mu sync.RWMutex
 }
@@ -51,12 +53,14 @@ func (p *Parser) MarshalJSON() ([]byte, error) {
 		DisablePages bool           `json:"disable_pages,omitempty"`
 		Section      int            `json:"section,omitempty"`
 		Vars         map[string]any `json:"vars,omitempty"`
+		Contents     string         `json:"contents,omitempty"`
 	}{
 		Type:         fmt.Sprintf("%T", p),
 		Root:         p.Root,
 		DisablePages: p.DisablePages,
 		Section:      p.Section,
 		Vars:         p.Vars.Map(),
+		Contents:     string(p.Contents),
 	}
 
 	return json.MarshalIndent(x, "", "  ")
@@ -109,6 +113,14 @@ func (p *Parser) Parse(r io.Reader) (doc *Document, err error) {
 	defer func() {
 		err = p.ensureParseError(err)
 	}()
+
+	b, err := io.ReadAll(r)
+	if err != nil {
+		return nil, err
+	}
+	p.Contents = b
+
+	r = bytes.NewReader(b)
 
 	// pre parse
 	r, err = p.PreParsers.PreParse(p, r)
@@ -503,5 +515,6 @@ func (p *Parser) ensureParseError(err error) error {
 		Err:      err,
 		Filename: p.Filename,
 		Root:     p.Root,
+		Contents: p.Contents,
 	}
 }
