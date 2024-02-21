@@ -1,0 +1,22 @@
+{
+  "atom": "ref",
+  "attributes": {
+    "id": "foo"
+  },
+  "filename": "",
+  "html_node": {
+    "data": "ref",
+    "data_atom": "",
+    "namespace": "",
+    "node_type": "html.ElementNode",
+    "type": "html.Node"
+  },
+  "nodes": [
+    {
+      "text": "foo",
+      "type": "hype.Text"
+    }
+  ],
+  "tag": "\u003cref id=\"foo\"\u003e",
+  "type": "hype.Ref"
+}

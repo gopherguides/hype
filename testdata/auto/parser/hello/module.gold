@@ -1,0 +1,26 @@
+<html><head></head><body><page>
+<h1>Page 1</h1>
+
+<p>This is <code>inline</code> code.</p>
+</page>
+<page>
+<h1>Second Page</h1>
+
+<pre><code class="language-go" language="go" src="second/src/main.go">package main
+
+import &#34;fmt&#34;
+
+func main() {
+	fmt.Println(&#34;Hello second!&#34;)
+}
+</code></pre>
+</page>
+
+<page>
+<cmd exec="echo hello"><pre><code class="language-shell" language="shell">$ echo hello
+
+hello</code></pre></cmd>
+
+<p>more words</p>
+</page>
+</body></html>

@@ -1,0 +1,25 @@
+{
+  "args": [
+    "echo",
+    "hello"
+  ],
+  "atom": "cmd",
+  "attributes": {},
+  "dir": "/tmp",
+  "duration": "1s",
+  "err": "EOF",
+  "exit": 1,
+  "filename": "",
+  "html_node": {
+    "data": "cmd",
+    "data_atom": "",
+    "namespace": "",
+    "node_type": "html.ElementNode",
+    "type": "html.Node"
+  },
+  "nodes": [],
+  "stderr": "nothing",
+  "stdout": "foo\nbar\nbaz\n",
+  "tag": "\u003ccmd\u003e",
+  "type": "hype.CmdResult"
+}

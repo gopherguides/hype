@@ -1,0 +1,13 @@
+{
+  "document": {
+    "snippets": {},
+    "title": "My Title",
+    "type": "hype.Document"
+  },
+  "error": "EOF",
+  "filename": "foo.md",
+  "origal_error": "io: read/write on closed pipe",
+  "post_parser": "\u003cnil\u003e",
+  "root": "root",
+  "type": "hype.PostParseError"
+}

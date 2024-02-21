@@ -1,7 +1,7 @@
 package hype
 
 import (
-	"fmt"
+	"bytes"
 	"io"
 )
 
@@ -12,14 +12,26 @@ type PreParser interface {
 type PreParsers []PreParser
 
 func (list PreParsers) PreParse(p *Parser, r io.Reader) (io.Reader, error) {
-	var err error
+	if p == nil {
+		return nil, ErrIsNil("parser")
+	}
+
+	contents, err := io.ReadAll(r)
+	if err != nil {
+		return nil, err
+	}
+
+	r = bytes.NewReader(contents)
 
 	for _, pp := range list {
 		r, err = pp.PreParse(p, r)
 		if err != nil {
 			return nil, PreParseError{
+				Contents:  contents,
 				Err:       err,
+				Filename:  p.Filename,
 				PreParser: pp,
+				Root:      p.Root,
 			}
 		}
 	}
@@ -31,13 +43,4 @@ type PreParseFn func(p *Parser, r io.Reader) (io.Reader, error)
 
 func (fn PreParseFn) PreParse(p *Parser, r io.Reader) (io.Reader, error) {
 	return fn(p, r)
-}
-
-type PreParseError struct {
-	Err       error
-	PreParser PreParser
-}
-
-func (e PreParseError) Error() string {
-	return fmt.Sprintf("pre parse error: [%T]: %v", e.PreParser, e.Err)
 }

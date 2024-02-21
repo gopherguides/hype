@@ -17,10 +17,10 @@ import (
 type Cmd struct {
 	*Element
 
-	Args         []string      `json:"args,omitempty"`
-	Env          []string      `json:"env,omitempty"`
-	ExpectedExit int           `json:"expected_exit,omitempty"`
-	Timeout      time.Duration `json:"timeout,omitempty"`
+	Args         []string
+	Env          []string
+	ExpectedExit int
+	Timeout      time.Duration
 
 	res *CmdResult
 }
@@ -38,7 +38,7 @@ func (c *Cmd) MarshalJSON() ([]byte, error) {
 		return nil, err
 	}
 
-	m["type"] = fmt.Sprintf("%T", c)
+	m["type"] = toType(c)
 	m["expected_exit"] = c.ExpectedExit
 	m["timeout"] = c.Timeout.String()
 
@@ -54,7 +54,7 @@ func (c *Cmd) MarshalJSON() ([]byte, error) {
 		m["result"] = c.res
 	}
 
-	return json.Marshal(m)
+	return json.MarshalIndent(m, "", "  ")
 }
 
 func (c *Cmd) MD() string {
@@ -109,18 +109,18 @@ func (c *Cmd) Execute(ctx context.Context, doc *Document) error {
 		switch c.ExpectedExit {
 		case -1:
 			if res.Exit == 0 {
-				return fmt.Errorf("unexpected exit code: %d: %w", res.Exit, err)
+				return c.newError(err)
 			}
 		default:
 			if res.Exit != c.ExpectedExit {
-				return fmt.Errorf("unexpected exit code: %d: %w", res.Exit, err)
+				return c.newError(err)
 			}
 		}
 	}
 
 	cres, err := NewCmdResult(doc.Parser, c, res)
 	if err != nil {
-		return err
+		return c.newError(err)
 	}
 
 	c.Lock()
@@ -129,6 +129,27 @@ func (c *Cmd) Execute(ctx context.Context, doc *Document) error {
 	c.Unlock()
 
 	return nil
+}
+
+func (c *Cmd) newError(err error) error {
+	if c == nil {
+		return err
+	}
+
+	re, ok := err.(clam.RunError)
+	if !ok {
+		return CmdError{
+			RunError: clam.RunError{
+				Err: err,
+			},
+			Filename: c.Filename,
+		}
+	}
+
+	return CmdError{
+		RunError: re,
+		Filename: c.Filename,
+	}
 }
 
 func NewCmd(el *Element) (*Cmd, error) {

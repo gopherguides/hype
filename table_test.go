@@ -1,7 +1,6 @@
 package hype
 
 import (
-	"os"
 	"testing"
 
 	"github.com/markbates/table"
@@ -13,10 +12,7 @@ func Test_Table_Data(t *testing.T) {
 	r := require.New(t)
 
 	root := "testdata/table/data"
-	cab := os.DirFS(root)
-
-	p := NewParser(cab)
-	p.Root = root
+	p := testParser(t, root)
 
 	doc, err := p.ParseFile("module.md")
 	r.NoError(err)
@@ -73,4 +69,22 @@ func Test_Table_No_THEAD(t *testing.T) {
 	root := "testdata/table/headless"
 
 	testModule(t, root)
+}
+
+func Test_Table_MarshalJSON(t *testing.T) {
+	t.Parallel()
+	r := require.New(t)
+
+	p := testParser(t, "testdata/table/data")
+
+	doc, err := p.ParseFile("module.md")
+	r.NoError(err)
+
+	tables := ByType[*Table](doc.Children())
+	r.Len(tables, 1)
+
+	tab := tables[0]
+	r.NotNil(tab)
+
+	testJSON(t, "table", tab)
 }

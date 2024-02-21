@@ -1,0 +1,293 @@
+{
+  "filename": "module.md",
+  "id": "1",
+  "nodes": [
+    {
+      "atom": "",
+      "attributes": {},
+      "filename": "module.md",
+      "html_node": {
+        "data": "",
+        "data_atom": "",
+        "namespace": "",
+        "node_type": "html.DocumentNode",
+        "type": "html.Node"
+      },
+      "nodes": [
+        {
+          "atom": "html",
+          "attributes": {},
+          "filename": "module.md",
+          "html_node": {
+            "data": "html",
+            "data_atom": "html",
+            "namespace": "",
+            "node_type": "html.ElementNode",
+            "type": "html.Node"
+          },
+          "nodes": [
+            {
+              "atom": "head",
+              "attributes": {},
+              "filename": "module.md",
+              "html_node": {
+                "data": "head",
+                "data_atom": "head",
+                "namespace": "",
+                "node_type": "html.ElementNode",
+                "type": "html.Node"
+              },
+              "nodes": [],
+              "tag": "\u003chead\u003e",
+              "type": "hype.Element"
+            },
+            [
+              {
+                "atom": "body",
+                "attributes": {},
+                "filename": "module.md",
+                "html_node": {
+                  "data": "body",
+                  "data_atom": "body",
+                  "namespace": "",
+                  "node_type": "html.ElementNode",
+                  "type": "html.Node"
+                },
+                "nodes": [
+                  [
+                    {
+                      "atom": "page",
+                      "attributes": {},
+                      "filename": "module.md",
+                      "html_node": {
+                        "data": "page",
+                        "data_atom": "",
+                        "namespace": "",
+                        "node_type": "html.ElementNode",
+                        "type": "html.Node"
+                      },
+                      "nodes": [
+                        {
+                          "text": "\n",
+                          "type": "hype.Text"
+                        },
+                        [
+                          {
+                            "atom": "h1",
+                            "attributes": {},
+                            "filename": "module.md",
+                            "html_node": {
+                              "data": "h1",
+                              "data_atom": "h1",
+                              "namespace": "",
+                              "node_type": "html.ElementNode",
+                              "type": "html.Node"
+                            },
+                            "level": 1,
+                            "nodes": [
+                              {
+                                "text": "Hello",
+                                "type": "hype.Text"
+                              }
+                            ],
+                            "tag": "\u003ch1\u003e",
+                            "type": "hype.Heading"
+                          }
+                        ],
+                        {
+                          "text": "\n\n",
+                          "type": "hype.Text"
+                        },
+                        [
+                          {
+                            "atom": "pre",
+                            "attributes": {},
+                            "filename": "module.md",
+                            "html_node": {
+                              "data": "pre",
+                              "data_atom": "pre",
+                              "namespace": "",
+                              "node_type": "html.ElementNode",
+                              "type": "html.Node"
+                            },
+                            "nodes": [
+                              {
+                                "atom": "code",
+                                "attributes": {
+                                  "class": "language-ts",
+                                  "language": "ts",
+                                  "snippet": "class",
+                                  "src": "src/main.ts"
+                                },
+                                "filename": "module.md",
+                                "html_node": {
+                                  "attributes": [
+                                    {
+                                      "Namespace": "",
+                                      "Key": "src",
+                                      "Val": "src/main.ts"
+                                    },
+                                    {
+                                      "Namespace": "",
+                                      "Key": "snippet",
+                                      "Val": "class"
+                                    }
+                                  ],
+                                  "data": "code",
+                                  "data_atom": "code",
+                                  "namespace": "",
+                                  "node_type": "html.ElementNode",
+                                  "type": "html.Node"
+                                },
+                                "lang": "ts",
+                                "nodes": [
+                                  {
+                                    "content": "export class Hype {\n    constructor(parameters) {\n    }\n}",
+                                    "file": "src/main.ts",
+                                    "lang": "ts",
+                                    "name": "class",
+                                    "start": 1,
+                                    "end": 8
+                                  }
+                                ],
+                                "tag": "\u003ccode class=\"language-ts\" language=\"ts\" snippet=\"class\" src=\"src/main.ts\"\u003e",
+                                "type": "hype.SourceCode"
+                              }
+                            ],
+                            "tag": "\u003cpre\u003e",
+                            "type": "hype.Element"
+                          }
+                        ],
+                        {
+                          "text": "\n\n",
+                          "type": "hype.Text"
+                        },
+                        [
+                          {
+                            "atom": "pre",
+                            "attributes": {},
+                            "filename": "module.md",
+                            "html_node": {
+                              "data": "pre",
+                              "data_atom": "pre",
+                              "namespace": "",
+                              "node_type": "html.ElementNode",
+                              "type": "html.Node"
+                            },
+                            "nodes": [
+                              {
+                                "atom": "code",
+                                "attributes": {
+                                  "class": "language-ts",
+                                  "language": "ts",
+                                  "snippet": "constructor",
+                                  "src": "src/main.ts"
+                                },
+                                "filename": "module.md",
+                                "html_node": {
+                                  "attributes": [
+                                    {
+                                      "Namespace": "",
+                                      "Key": "src",
+                                      "Val": "src/main.ts"
+                                    },
+                                    {
+                                      "Namespace": "",
+                                      "Key": "snippet",
+                                      "Val": "constructor"
+                                    }
+                                  ],
+                                  "data": "code",
+                                  "data_atom": "code",
+                                  "namespace": "",
+                                  "node_type": "html.ElementNode",
+                                  "type": "html.Node"
+                                },
+                                "lang": "ts",
+                                "nodes": [
+                                  {
+                                    "content": "constructor(parameters) {\n}",
+                                    "file": "src/main.ts",
+                                    "lang": "ts",
+                                    "name": "constructor",
+                                    "start": 3,
+                                    "end": 6
+                                  }
+                                ],
+                                "tag": "\u003ccode class=\"language-ts\" language=\"ts\" snippet=\"constructor\" src=\"src/main.ts\"\u003e",
+                                "type": "hype.SourceCode"
+                              }
+                            ],
+                            "tag": "\u003cpre\u003e",
+                            "type": "hype.Element"
+                          }
+                        ],
+                        {
+                          "text": "\n",
+                          "type": "hype.Text"
+                        }
+                      ],
+                      "tag": "\u003cpage\u003e",
+                      "title": "Hello",
+                      "type": "hype.Page"
+                    }
+                  ],
+                  {
+                    "text": "\n",
+                    "type": "hype.Text"
+                  }
+                ],
+                "tag": "\u003cbody\u003e",
+                "type": "hype.Body"
+              }
+            ]
+          ],
+          "tag": "\u003chtml\u003e",
+          "type": "hype.Element"
+        }
+      ],
+      "tag": "",
+      "type": "hype.Element"
+    }
+  ],
+  "parser": {
+    "type": "hype.Parser",
+    "root": "testdata/doc/snippets",
+    "section": 1,
+    "contents": "# Hello\n\n\u003ccode src=\"src/main.ts\" snippet=\"class\"\u003e\u003c/code\u003e\n\n\u003ccode src=\"src/main.ts\" snippet=\"constructor\"\u003e\u003c/code\u003e\n"
+  },
+  "root": "testdata/doc/snippets",
+  "section_id": 1,
+  "snippets": {
+    "rules": {
+      ".go": "// %s",
+      ".html": "\u003c!-- %s --\u003e",
+      ".js": "// %s",
+      ".md": "\u003c!-- %s --\u003e",
+      ".rb": "# %s",
+      ".ts": "// %s"
+    },
+    "snippets": {
+      "src/main.ts": {
+        "class": {
+          "content": "export class Hype {\n    constructor(parameters) {\n    }\n}",
+          "file": "src/main.ts",
+          "lang": "ts",
+          "name": "class",
+          "start": 1,
+          "end": 8
+        },
+        "constructor": {
+          "content": "constructor(parameters) {\n}",
+          "file": "src/main.ts",
+          "lang": "ts",
+          "name": "constructor",
+          "start": 3,
+          "end": 6
+        }
+      }
+    }
+  },
+  "title": "Hello",
+  "type": "hype.Document"
+}

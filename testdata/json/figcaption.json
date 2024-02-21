@@ -1,0 +1,20 @@
+{
+  "atom": "figcaption",
+  "attributes": {},
+  "filename": "",
+  "html_node": {
+    "data": "figcaption",
+    "data_atom": "figcaption",
+    "namespace": "",
+    "node_type": "html.ElementNode",
+    "type": "html.Node"
+  },
+  "nodes": [
+    {
+      "text": "This is a caption",
+      "type": "hype.Text"
+    }
+  ],
+  "tag": "\u003cfigcaption\u003e",
+  "type": "hype.Figcaption"
+}

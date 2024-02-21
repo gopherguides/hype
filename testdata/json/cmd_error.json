@@ -1,0 +1,12 @@
+{
+  "args": [
+    "echo",
+    "hello"
+  ],
+  "error": "EOF",
+  "exit": 1,
+  "filename": "foo.go",
+  "output": "foo\nbar\nbaz\n",
+  "root": "/tmp",
+  "type": "hype.CmdError"
+}

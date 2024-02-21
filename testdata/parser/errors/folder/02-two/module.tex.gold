@@ -1,0 +1,47 @@
+\hypertarget{simple-references}{%
+\section{Simple References}\label{simple-references}}
+
+In \protect\hyperlink{figure-1-1}{Figure 1.1} we see the reference.
+
+\begin{figure}
+\centering
+\includegraphics{assets/foo.png}
+\caption{\emph{Figure 1.1:} Optional caption}
+\end{figure}
+
+\hypertarget{include-references}{%
+\section{Include References}\label{include-references}}
+
+This \protect\hyperlink{figure-1-1}{Figure 1.1} is in an included file.
+
+\begin{Shaded}
+\begin{Highlighting}[]
+\NormalTok{$ go doc {-}short context.Canceled}
+
+\NormalTok{var Canceled = errors.New("context canceled")}
+\NormalTok{    Canceled is the error returned by Context.Err when the context is canceled.}
+
+\NormalTok{{-}{-}{-}{-}{-}{-}{-}{-}{-}{-}{-}{-}{-}{-}{-}{-}{-}{-}{-}{-}{-}{-}{-}{-}{-}{-}{-}{-}{-}{-}{-}{-}{-}{-}{-}{-}{-}{-}{-}{-}{-}{-}{-}{-}{-}{-}{-}{-}{-}{-}{-}{-}{-}{-}{-}{-}{-}{-}{-}{-}{-}{-}{-}{-}{-}{-}{-}{-}{-}{-}{-}{-}{-}{-}{-}{-}{-}{-}{-}{-}}
+\NormalTok{Go Version: go1.19beta1}
+\end{Highlighting}
+\end{Shaded}
+
+More included text that references \protect\hyperlink{figure-1-1}{Figure
+1.1}.
+
+\begin{Shaded}
+\begin{Highlighting}[]
+\KeywordTok{package}\NormalTok{ main}
+
+\KeywordTok{import} \StringTok{"fmt"}
+
+\KeywordTok{func}\NormalTok{ main}\OperatorTok{()} \OperatorTok{\{}
+\NormalTok{    fmt}\OperatorTok{.}\NormalTok{Println}\OperatorTok{(}\StringTok{"Howdy!"}\OperatorTok{)}
+\OperatorTok{\}}
+\end{Highlighting}
+\end{Shaded}
+
+end note
+
+Some more text that references \protect\hyperlink{figure-1-1}{Figure
+1.1}.

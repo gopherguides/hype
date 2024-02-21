@@ -1,0 +1,20 @@
+{
+  "atom": "now",
+  "attributes": {},
+  "filename": "",
+  "html_node": {
+    "data": "now",
+    "data_atom": "",
+    "namespace": "",
+    "node_type": "html.ElementNode",
+    "type": "html.Node"
+  },
+  "nodes": [
+    {
+      "text": "1/2/2006",
+      "type": "hype.Text"
+    }
+  ],
+  "tag": "\u003cnow\u003e",
+  "type": "hype.Now"
+}

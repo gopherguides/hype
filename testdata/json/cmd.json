@@ -1,0 +1,50 @@
+{
+  "args": [
+    "echo",
+    "hello"
+  ],
+  "atom": "cmd",
+  "attributes": {},
+  "env": [
+    "FOO=bar",
+    "BAR=baz"
+  ],
+  "expected_exit": 1,
+  "filename": "",
+  "html_node": {
+    "data": "cmd",
+    "data_atom": "",
+    "namespace": "",
+    "node_type": "html.ElementNode",
+    "type": "html.Node"
+  },
+  "nodes": [],
+  "result": {
+    "args": [
+      "echo",
+      "hello"
+    ],
+    "atom": "result",
+    "attributes": {},
+    "dir": "testdata/commands",
+    "duration": "1s",
+    "err": "this is an error",
+    "exit": 1,
+    "filename": "",
+    "html_node": {
+      "data": "result",
+      "data_atom": "",
+      "namespace": "",
+      "node_type": "html.ElementNode",
+      "type": "html.Node"
+    },
+    "nodes": [],
+    "stderr": "this is stderr",
+    "stdout": "this is stdout",
+    "tag": "\u003cresult\u003e",
+    "type": "hype.CmdResult"
+  },
+  "tag": "\u003ccmd\u003e",
+  "timeout": "1s",
+  "type": "hype.Cmd"
+}

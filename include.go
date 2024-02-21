@@ -28,13 +28,13 @@ func (inc *Include) MarshalJSON() ([]byte, error) {
 		return nil, err
 	}
 
-	m["type"] = fmt.Sprintf("%T", inc)
+	m["type"] = toType(inc)
 
 	if inc.dir != "" {
 		m["dir"] = inc.dir
 	}
 
-	return json.Marshal(m)
+	return json.MarshalIndent(m, "", "  ")
 }
 
 func (inc *Include) PostParse(p *Parser, d *Document, err error) error {
@@ -121,7 +121,11 @@ func NewInclude(p *Parser, el *Element) (*Include, error) {
 	}
 
 	if err := RestripeFigureIDs(inc.Nodes, fn); err != nil {
-		return nil, err
+		return nil, ParseError{
+			Err:      err,
+			Filename: p.Filename,
+			Root:     p.Root,
+		}
 	}
 
 	return inc, nil

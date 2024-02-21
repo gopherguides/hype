@@ -3,12 +3,12 @@ package hype
 import (
 	"bytes"
 	"encoding/json"
-	"fmt"
 )
 
 type LI struct {
-	Type string
 	*Element
+
+	Type string
 }
 
 func (li *LI) MarshalJSON() ([]byte, error) {
@@ -21,13 +21,13 @@ func (li *LI) MarshalJSON() ([]byte, error) {
 		return nil, err
 	}
 
-	m["type"] = fmt.Sprintf("%T", li)
+	m["type"] = toType(li)
 
 	if li.Type != "" {
 		m["list-type"] = li.Type
 	}
 
-	return json.Marshal(m)
+	return json.MarshalIndent(m, "", "  ")
 }
 
 func (li *LI) MD() string {

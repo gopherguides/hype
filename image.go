@@ -3,7 +3,6 @@ package hype
 import (
 	"context"
 	"encoding/json"
-	"fmt"
 	"io/fs"
 	"strings"
 )
@@ -22,9 +21,9 @@ func (i *Image) MarshalJSON() ([]byte, error) {
 		return nil, err
 	}
 
-	m["type"] = fmt.Sprintf("%T", i)
+	m["type"] = toType(i)
 
-	return json.Marshal(m)
+	return json.MarshalIndent(m, "", "  ")
 }
 
 func (i *Image) MD() string {

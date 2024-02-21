@@ -76,7 +76,7 @@ func Test_Nodes_PreExecute_Errors(t *testing.T) {
 
 			nodes := Nodes{tc.node}
 
-			err := nodes.PreExecute(context.Background(), nil)
+			err := nodes.PreExecute(context.Background(), &Document{})
 			r.Error(err)
 
 			r.Contains(err.Error(), "boom")

@@ -1,0 +1,21 @@
+{
+  "atom": "li",
+  "attributes": {},
+  "filename": "",
+  "html_node": {
+    "data": "li",
+    "data_atom": "li",
+    "namespace": "",
+    "node_type": "html.ElementNode",
+    "type": "html.Node"
+  },
+  "list-type": "ul",
+  "nodes": [
+    {
+      "text": "This is a list item",
+      "type": "hype.Text"
+    }
+  ],
+  "tag": "\u003cli\u003e",
+  "type": "hype.LI"
+}

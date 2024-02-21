@@ -26,9 +26,9 @@ func (tab *Table) MarshalJSON() ([]byte, error) {
 		return nil, err
 	}
 
-	m["type"] = fmt.Sprintf("%T", tab)
+	m["type"] = toType(tab)
 
-	return json.Marshal(m)
+	return json.MarshalIndent(m, "", "  ")
 }
 
 func (tab *Table) IsEmptyNode() bool {

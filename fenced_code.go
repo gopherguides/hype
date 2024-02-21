@@ -29,29 +29,9 @@ func (code *FencedCode) MarshalJSON() ([]byte, error) {
 		m["lang"] = lang
 	}
 
-	m["type"] = fmt.Sprintf("%T", code)
+	m["type"] = toType(code)
 
-	return json.Marshal(m)
-}
-
-func (code *FencedCode) StartTag() string {
-	if code == nil || code.Element == nil {
-		return ""
-	}
-
-	return code.Element.StartTag()
-}
-
-func (code *FencedCode) EndTag() string {
-	if code == nil || code.Element == nil {
-		return ""
-	}
-
-	return "</code>"
-}
-
-func (code *FencedCode) String() string {
-	return code.StartTag() + code.Children().String() + code.EndTag()
+	return json.MarshalIndent(m, "", "  ")
 }
 
 func (code *FencedCode) MD() string {

@@ -3,7 +3,7 @@
 
 <pre><code class="language-go" language="go" src="src/go.mod">module demo
 
-go 1.18
+go 1.22
 </code></pre><hr></hr><cmd exec="go doc -cmd -u -src -short main" hide-cmd="" language="go" run="main.go" src="src" sym="main"><pre><code class="language-go" language="go">func main() {
 	// snippet: example
 	fmt.Println(&#34;Hello, World!&#34;)

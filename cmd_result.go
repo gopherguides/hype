@@ -36,20 +36,21 @@ func (c *CmdResult) MarshalJSON() ([]byte, error) {
 		return nil, err
 	}
 
-	m["type"] = fmt.Sprintf("%T", c)
+	m["type"] = toType(c)
 
-	if c.Result != nil {
-		y := struct {
-			*clam.Result
-			Type string `json:"type,omitempty"`
-		}{
-			Result: c.Result,
-			Type:   fmt.Sprintf("%T", c.Result),
-		}
-		m["result"] = y
+	if c.Result == nil {
+		return json.MarshalIndent(m, "", "  ")
 	}
 
-	return json.Marshal(m)
+	m["args"] = c.Args
+	m["dir"] = c.Dir
+	m["duration"] = c.Duration.String()
+	m["err"] = errForJSON(c.Err)
+	m["exit"] = c.Exit
+	m["stderr"] = string(c.Stderr)
+	m["stdout"] = string(c.Stdout)
+
+	return json.MarshalIndent(m, "", "  ")
 }
 
 func (c *CmdResult) MD() string {

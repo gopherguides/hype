@@ -14,17 +14,17 @@ import (
 var _ Node = &Document{}
 
 type Document struct {
-	fs.FS        `json:"-"`
-	sync.RWMutex `json:"-"`
+	fs.FS
+	sync.RWMutex
 
-	ID        string   `json:"id,omitempty"`
-	Nodes     Nodes    `json:"nodes,omitempty"`
-	Parser    *Parser  `json:"parser,omitempty"` // Parser used to create the document
-	Root      string   `json:"root,omitempty"`
-	SectionID int      `json:"section_id,omitempty"`
-	Snippets  Snippets `json:"snippets,omitempty"`
-	Title     string   `json:"title,omitempty"`
-	Filename  string   `json:"filename,omitempty"`
+	ID        string
+	Nodes     Nodes
+	Parser    *Parser // Parser used to create the document
+	Root      string
+	SectionID int
+	Snippets  Snippets
+	Title     string
+	Filename  string
 }
 
 func (doc *Document) MarshalJSON() ([]byte, error) {
@@ -32,29 +32,37 @@ func (doc *Document) MarshalJSON() ([]byte, error) {
 		return nil, ErrIsNil("document")
 	}
 
-	x := struct {
-		ID        string   `json:"id,omitempty"`
-		Nodes     Nodes    `json:"nodes,omitempty"`
-		Parser    *Parser  `json:"parser,omitempty"` // Parser used to create the document
-		Root      string   `json:"root,omitempty"`
-		SectionID int      `json:"section_id,omitempty"`
-		Snippets  Snippets `json:"snippets,omitempty"`
-		Title     string   `json:"title,omitempty"`
-		Type      string   `json:"type"`
-		Filename  string   `json:"filename,omitempty"`
+	snips := struct {
+		Rules    map[string]string             `json:"rules,omitempty"`
+		Snippets map[string]map[string]Snippet `json:"snippets,omitempty"`
 	}{
-		Type:      fmt.Sprintf("%T", doc),
+		Rules:    doc.Snippets.rules,
+		Snippets: doc.Snippets.snippets,
+	}
+
+	x := struct {
+		Filename  string  `json:"filename,omitempty"`
+		ID        string  `json:"id,omitempty"`
+		Nodes     Nodes   `json:"nodes,omitempty"`
+		Parser    *Parser `json:"parser,omitempty"`
+		Root      string  `json:"root,omitempty"`
+		SectionID int     `json:"section_id,omitempty"`
+		Snippets  any     `json:"snippets,omitempty"`
+		Title     string  `json:"title,omitempty"`
+		Type      string  `json:"type"`
+	}{
+		Filename:  doc.Filename,
+		ID:        doc.ID,
+		Nodes:     doc.Nodes,
 		Parser:    doc.Parser,
 		Root:      doc.Root,
 		SectionID: doc.SectionID,
-		Snippets:  doc.Snippets,
+		Snippets:  snips,
 		Title:     doc.Title,
-		Nodes:     doc.Nodes,
-		ID:        doc.ID,
-		Filename:  doc.Filename,
+		Type:      toType(doc),
 	}
 
-	return json.Marshal(x)
+	return json.MarshalIndent(x, "", "  ")
 }
 
 func (doc *Document) Pages() ([]*Page, error) {
@@ -63,15 +71,16 @@ func (doc *Document) Pages() ([]*Page, error) {
 	}
 
 	pages := ByType[*Page](doc.Nodes)
-
-	if len(pages) == 0 {
-		body, err := doc.Body()
-		if err != nil {
-			return nil, err
-		}
-
-		pages = append(pages, body.AsPage())
+	if len(pages) > 0 {
+		return pages, nil
 	}
+
+	body, err := doc.Body()
+	if err != nil {
+		return nil, err
+	}
+
+	pages = append(pages, body.AsPage())
 
 	return pages, nil
 }
@@ -120,12 +129,16 @@ func (doc *Document) String() string {
 // Execute the Document with the given context.
 // Any child nodes that implement the PreExecuter,
 // ExecutableNode, or PostExecuter interfaces will be executed.
-func (doc *Document) Execute(ctx context.Context) error {
+func (doc *Document) Execute(ctx context.Context) (err error) {
 	if doc == nil {
 		return ErrIsNil("document")
 	}
 
-	err := doc.Children().PreExecute(ctx, doc)
+	defer func() {
+		err = doc.ensureExecuteError(err)
+	}()
+
+	err = doc.Children().PreExecute(ctx, doc)
 	if err != nil {
 		return err
 	}
@@ -208,4 +221,31 @@ func (doc *Document) MD() string {
 	}
 
 	return strings.Join(bodies, "\n---\n")
+}
+
+func (doc *Document) ensureExecuteError(err error) error {
+	if err == nil {
+		return nil
+	}
+
+	if _, ok := err.(ExecuteError); ok {
+		return err
+	}
+
+	if doc == nil {
+		return err
+	}
+
+	var contents []byte
+	if doc.Parser != nil {
+		contents = doc.Parser.Contents
+	}
+
+	return ExecuteError{
+		Contents: contents,
+		Document: doc,
+		Err:      err,
+		Filename: doc.Filename,
+		Root:     doc.Root,
+	}
 }

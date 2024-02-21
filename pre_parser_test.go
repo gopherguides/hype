@@ -2,8 +2,6 @@ package hype
 
 import (
 	"bytes"
-	"errors"
-	"fmt"
 	"io"
 	"strings"
 	"testing"
@@ -11,7 +9,7 @@ import (
 	"github.com/stretchr/testify/require"
 )
 
-func Test_PreParsers_PreParse(t *testing.T) {
+func Test_PreParsers(t *testing.T) {
 	t.Parallel()
 	r := require.New(t)
 
@@ -36,7 +34,7 @@ func Test_PreParsers_PreParse(t *testing.T) {
 		}),
 	}
 
-	in, err := pp.PreParse(nil, in)
+	in, err := pp.PreParse(testParser(t, ""), in)
 
 	r.NoError(err)
 
@@ -47,25 +45,4 @@ func Test_PreParsers_PreParse(t *testing.T) {
 	exp := `<HTML><BODY><h2>HELLO</h2></BODY></HTML>`
 
 	r.Equal(exp, act)
-}
-
-func Test_PreParsers_PreParse_Error(t *testing.T) {
-	t.Parallel()
-	r := require.New(t)
-
-	pp := PreParsers{
-		PreParseFn(func(p *Parser, r io.Reader) (io.Reader, error) {
-			return nil, fmt.Errorf("boom")
-		}),
-	}
-
-	_, err := pp.PreParse(nil, strings.NewReader(""))
-	r.Error(err)
-
-	var e2 PreParseError
-
-	r.True(errors.As(err, &e2))
-
-	r.Contains(e2.Error(), "boom")
-	r.NotNil(e2.PreParser)
 }

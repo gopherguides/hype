@@ -43,3 +43,14 @@ func Test_NowNodes(t *testing.T) {
 
 	r.Equal(exp, act)
 }
+
+func Test_Now_MarshalJSON(t *testing.T) {
+	t.Parallel()
+
+	n := &Now{
+		Element: NewEl("now", nil),
+	}
+	n.Nodes = append(n.Nodes, Text("1/2/2006"))
+
+	testJSON(t, "now", n)
+}

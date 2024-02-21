@@ -1,6 +1,7 @@
 package hype
 
 import (
+	"bytes"
 	"context"
 	"encoding/json"
 	"errors"
@@ -22,20 +23,20 @@ import (
 type ParseElementFn func(p *Parser, el *Element) (Nodes, error)
 
 type Parser struct {
-	fs.FS `json:"-"`
+	fs.FS
 
-	Root         string                  `json:"root,omitempty"`
-	DisablePages bool                    `json:"disable_pages,omitempty"`
-	NodeParsers  map[Atom]ParseElementFn `json:"-"`
-	PreParsers   PreParsers              `json:"-"`
-	Snippets     Snippets                `json:"snippets,omitempty"`
-	Section      int                     `json:"section,omitempty"`
-	NowFn        func() time.Time        `json:"-"` // default: time.Now()
-	DocIDGen     func() (string, error)  `json:"-"` // default: uuid.NewV4().String()
-	Vars         syncx.Map[string, any]  `json:"vars,omitempty"`
+	DisablePages bool
+	DocIDGen     func() (string, error) // default: uuid.NewV4().String()
+	Filename     string                 // only set when Parser.ParseFile() is used
+	NodeParsers  map[Atom]ParseElementFn
+	NowFn        func() time.Time // default: time.Now()
+	PreParsers   PreParsers
+	Root         string
+	Section      int
+	Vars         syncx.Map[string, any]
+	Contents     []byte // a copy of the contents being parsed - set just before parsing
 
-	fileName string
-	mu       sync.RWMutex
+	mu sync.RWMutex
 }
 
 func (p *Parser) MarshalJSON() ([]byte, error) {
@@ -46,25 +47,23 @@ func (p *Parser) MarshalJSON() ([]byte, error) {
 	p.mu.RLock()
 	defer p.mu.RUnlock()
 
-	// p.Vars.Map()
-
 	x := struct {
 		Type         string         `json:"type,omitempty"`
 		Root         string         `json:"root,omitempty"`
 		DisablePages bool           `json:"disable_pages,omitempty"`
 		Section      int            `json:"section,omitempty"`
-		Snippets     Snippets       `json:"snippets,omitempty"`
 		Vars         map[string]any `json:"vars,omitempty"`
+		Contents     string         `json:"contents,omitempty"`
 	}{
-		Type:         fmt.Sprintf("%T", p),
+		Type:         toType(p),
 		Root:         p.Root,
 		DisablePages: p.DisablePages,
 		Section:      p.Section,
-		Snippets:     p.Snippets,
 		Vars:         p.Vars.Map(),
+		Contents:     string(p.Contents),
 	}
 
-	return json.Marshal(x)
+	return json.MarshalIndent(x, "", "  ")
 
 }
 
@@ -79,54 +78,70 @@ func (p *Parser) Now() time.Time {
 // ParseFile parses the given file from Parser.FS.
 // If successful a *Document is returned. The returned
 // *Document is NOT yet executed.
-func (p *Parser) ParseFile(name string) (*Document, error) {
+func (p *Parser) ParseFile(name string) (doc *Document, err error) {
 	if p == nil {
 		return nil, ErrIsNil("parser")
 	}
 
+	defer func() {
+		err = p.ensureParseError(err)
+	}()
+
 	p.mu.Lock()
-	p.fileName = name
+	p.Filename = name
 	p.mu.Unlock()
 
 	f, err := p.Open(name)
 	if err != nil {
-		return nil, p.wrapErr(err)
+		return nil, err
 	}
 	defer f.Close()
 
-	doc, err := p.Parse(f)
+	doc, err = p.Parse(f)
 	if err != nil {
-		return nil, p.wrapErr(err)
+		return nil, err
 	}
 
 	return doc, nil
 }
 
-func (p *Parser) Parse(r io.Reader) (*Document, error) {
+func (p *Parser) Parse(r io.Reader) (doc *Document, err error) {
 	if p == nil {
 		return nil, ErrIsNil("parser")
 	}
 
-	// pre parse
-	r, err := p.PreParsers.PreParse(p, r)
+	defer func() {
+		err = p.ensureParseError(err)
+	}()
+
+	b, err := io.ReadAll(r)
 	if err != nil {
-		return nil, p.wrapErr(err)
+		return nil, err
+	}
+	p.Contents = b
+
+	r = bytes.NewReader(b)
+
+	// pre parse
+	r, err = p.PreParsers.PreParse(p, r)
+	if err != nil {
+		return nil, err
 	}
 
 	// parse
 	hdoc, err := html.Parse(r)
 	if err != nil {
-		return nil, p.wrapErr(err)
+		return nil, err
 	}
 
 	node, err := p.ParseHTMLNode(hdoc, nil)
 	if err != nil {
-		return nil, p.wrapErr(err)
+		return nil, err
 	}
 
-	doc, err := p.newDoc()
+	doc, err = p.newDoc()
 	if err != nil {
-		return nil, p.wrapErr(err)
+		return nil, err
 	}
 
 	doc.Nodes = Nodes{node}
@@ -137,7 +152,7 @@ func (p *Parser) Parse(r io.Reader) (*Document, error) {
 	// post parse
 	err = doc.Nodes.PostParse(p, doc, err)
 	if err != nil {
-		return nil, p.wrapErr(err)
+		return nil, err
 	}
 
 	return doc, nil
@@ -150,21 +165,37 @@ func (p *Parser) ParseExecuteFile(ctx context.Context, name string) (*Document, 
 
 	doc, err := p.ParseFile(name)
 	if err != nil {
-		return nil, p.wrapErr(err)
+		return nil, err
 	}
 
 	err = doc.Execute(ctx)
 	if err != nil {
-		return nil, p.wrapErr(err)
+		return nil, err
 	}
 
 	return doc, nil
 }
 
-func (p *Parser) ParseFolder(name string) (Documents, error) {
+func (p *Parser) ParseFolder(name string) (doc Documents, err error) {
 	if p == nil {
 		return nil, ErrIsNil("parser")
 	}
+
+	defer func() {
+		if err == nil {
+			return
+		}
+
+		if _, ok := err.(ParseError); ok {
+			return
+		}
+
+		err = ParseError{
+			Err:      err,
+			Filename: name,
+			Root:     p.Root,
+		}
+	}()
 
 	var docs Documents
 	var wg errgroup.Group
@@ -172,7 +203,7 @@ func (p *Parser) ParseFolder(name string) (Documents, error) {
 
 	whole, err := binding.WholeFromPath(p.FS, name, "book", "chapter")
 	if err != nil && !errors.Is(err, binding.ErrPath("")) {
-		return nil, p.wrapErr(err)
+		return nil, err
 	}
 
 	err = fs.WalkDir(p.FS, ".", func(path string, d fs.DirEntry, err error) error {
@@ -208,7 +239,7 @@ func (p *Parser) ParseFolder(name string) (Documents, error) {
 
 			doc, err := p.ParseFile(base)
 			if err != nil {
-				return fmt.Errorf("error parsing: %q: %w", path, err)
+				return err
 			}
 
 			mu.Lock()
@@ -223,11 +254,13 @@ func (p *Parser) ParseFolder(name string) (Documents, error) {
 
 	if err != nil {
 		err = fmt.Errorf("error walking: %q: %w", name, err)
-		return nil, p.wrapErr(err)
+		if err != nil && !errors.Is(err, binding.ErrPath("")) {
+			return nil, err
+		}
 	}
 
 	if err := wg.Wait(); err != nil {
-		return nil, p.wrapErr(err)
+		return nil, err
 	}
 
 	sort.Slice(docs, func(i, j int) bool {
@@ -244,12 +277,12 @@ func (p *Parser) ParseExecuteFolder(ctx context.Context, name string) (Documents
 
 	docs, err := p.ParseFolder(name)
 	if err != nil {
-		return nil, p.wrapErr(err)
+		return nil, err
 	}
 
 	err = docs.Execute(ctx)
 	if err != nil {
-		return nil, p.wrapErr(err)
+		return nil, err
 	}
 
 	return docs, nil
@@ -262,19 +295,19 @@ func (p *Parser) ParseExecuteFragment(ctx context.Context, r io.Reader) (Nodes, 
 
 	nodes, err := p.ParseFragment(r)
 	if err != nil {
-		return nil, p.wrapErr(err)
+		return nil, err
 	}
 
 	doc, err := p.newDoc()
 	if err != nil {
-		return nil, p.wrapErr(err)
+		return nil, err
 	}
 	doc.Nodes = nodes
 
 	err = doc.Execute(ctx)
 
 	if err != nil {
-		return nil, p.wrapErr(err)
+		return nil, err
 	}
 
 	return nodes, nil
@@ -283,12 +316,12 @@ func (p *Parser) ParseExecuteFragment(ctx context.Context, r io.Reader) (Nodes, 
 func (p *Parser) ParseExecute(ctx context.Context, r io.Reader) (*Document, error) {
 	doc, err := p.Parse(r)
 	if err != nil {
-		return nil, p.wrapErr(err)
+		return nil, err
 	}
 
 	err = doc.Execute(ctx)
 	if err != nil {
-		return nil, p.wrapErr(err)
+		return nil, err
 	}
 
 	return doc, nil
@@ -301,7 +334,7 @@ func (p *Parser) ParseFragment(r io.Reader) (Nodes, error) {
 
 	doc, err := p.Parse(r)
 	if err != nil {
-		return nil, p.wrapErr(err)
+		return nil, err
 	}
 
 	nodes := doc.Nodes
@@ -332,21 +365,27 @@ func (p *Parser) ParseHTMLNode(node *html.Node, parent Node) (Node, error) {
 	switch node.Type {
 	case html.CommentNode:
 		return Comment(node.Data), nil
-	case html.DoctypeNode:
-		// return p.NewDocType(node)
 	case html.DocumentNode, html.ElementNode:
 		n, err := p.element(node, parent)
 		if err != nil {
-			return nil, p.wrapErr(err)
+			return nil, err
 		}
 		return n, nil
-	case html.ErrorNode:
-		return nil, p.wrapErr(fmt.Errorf(node.Data))
 	case html.TextNode:
 		return Text(node.Data), nil
+	case html.ErrorNode:
+		return nil, ParseError{
+			Err:      fmt.Errorf("error node: %+v", node),
+			Filename: p.Filename,
+			Root:     p.Root,
+		}
 	}
 
-	return nil, p.wrapErr(fmt.Errorf("unknown node type %v", node.Data))
+	return nil, ParseError{
+		Err:      fmt.Errorf("unknown node: %+v", node),
+		Filename: p.Filename,
+		Root:     p.Root,
+	}
 }
 
 func (p *Parser) Sub(dir string) (*Parser, error) {
@@ -367,7 +406,7 @@ func (p *Parser) Sub(dir string) (*Parser, error) {
 
 	cab, err := fs.Sub(p.FS, dir)
 	if err != nil {
-		return nil, p.wrapErr(err)
+		return nil, err
 	}
 
 	p2.FS = cab
@@ -385,7 +424,7 @@ func (p *Parser) element(node *html.Node, parent Node) (Node, error) {
 		Attributes: ats,
 		HTMLNode:   node,
 		Parent:     parent,
-		FileName:   p.fileName,
+		Filename:   p.Filename,
 	}
 
 	var nodes Nodes
@@ -444,94 +483,38 @@ func (p *Parser) newDoc() (*Document, error) {
 
 	id, err := p.DocIDGen()
 	if err != nil {
-		return nil, p.wrapErr(err)
+		return nil, err
 	}
 	doc := &Document{
-		ID:        id,
 		FS:        p.FS,
+		Filename:  p.Filename,
+		ID:        id,
 		Parser:    p,
 		Root:      p.Root,
 		SectionID: p.Section,
-		Snippets:  p.Snippets,
-		Filename:  p.fileName,
+		Snippets:  Snippets{},
 	}
 
 	return doc, nil
 }
 
-func (p *Parser) wrapErr(err error) error {
+func (p *Parser) ensureParseError(err error) error {
+	if p == nil {
+		return ErrIsNil("parser")
+	}
+
 	if err == nil {
 		return nil
 	}
 
-	if _, ok := err.(parserErr); ok {
+	if _, ok := err.(ParseError); ok {
 		return err
 	}
 
-	if p == nil {
-		return err
+	return ParseError{
+		Err:      err,
+		Filename: p.Filename,
+		Root:     p.Root,
+		Contents: p.Contents,
 	}
-
-	p.mu.RLock()
-	defer p.mu.RUnlock()
-
-	return parserErr{
-		fileName: p.fileName,
-		root:     p.Root,
-		err:      err,
-	}
-}
-
-type parserErr struct {
-	err      error
-	fileName string
-	root     string
-}
-
-func (pe parserErr) Error() string {
-	if pe.err == nil {
-		return ""
-	}
-
-	err := pe.err
-
-	if len(pe.fileName) > 0 {
-		err = fmt.Errorf("file: %q: %s", pe.fileName, err)
-	}
-
-	if len(pe.root) > 0 {
-		err = fmt.Errorf("root: %q: %s", pe.root, err)
-	}
-
-	return err.Error()
-}
-
-func (pe parserErr) Unwrap() error {
-	type Unwrapper interface {
-		Unwrap() error
-	}
-
-	if _, ok := pe.err.(Unwrapper); ok {
-		return errors.Unwrap(pe.err)
-	}
-
-	return pe.err
-}
-
-func (pe parserErr) As(target any) bool {
-	ex, ok := target.(*parserErr)
-	if !ok {
-		return errors.As(pe.err, target)
-	}
-
-	(*ex) = pe
-	return true
-}
-
-func (pe parserErr) Is(target error) bool {
-	if _, ok := target.(parserErr); ok {
-		return true
-	}
-
-	return errors.Is(pe.err, target)
 }

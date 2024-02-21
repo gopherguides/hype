@@ -9,10 +9,10 @@ import (
 type Text string
 
 func (tn Text) MarshalJSON() ([]byte, error) {
-	return json.Marshal(map[string]any{
-		"type": fmt.Sprintf("%T", tn),
+	return json.MarshalIndent(map[string]any{
+		"type": toType(tn),
 		"text": string(tn),
-	})
+	}, "", "  ")
 }
 
 func (tn Text) Children() Nodes {

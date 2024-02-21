@@ -28,8 +28,6 @@ func (cmd *TOC) Main(ctx context.Context, pwd string, args []string) error {
 		cmd.FS = os.DirFS(path)
 	}
 
-	fmt.Printf("TODO >> toc.go:32 path %[1]T %[1]v\n", path)
-
 	p := hype.NewParser(cmd.FS)
 
 	docs, err := p.ParseFolder(path)

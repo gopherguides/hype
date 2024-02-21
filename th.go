@@ -3,7 +3,6 @@ package hype
 import (
 	"encoding/json"
 	"errors"
-	"fmt"
 	"strings"
 )
 
@@ -24,9 +23,9 @@ func (th *TH) MarshalJSON() ([]byte, error) {
 		return nil, err
 	}
 
-	m["type"] = fmt.Sprintf("%T", th)
+	m["type"] = toType(th)
 
-	return json.Marshal(m)
+	return json.MarshalIndent(m, "", "  ")
 }
 
 func (th *TH) IsEmptyNode() bool {

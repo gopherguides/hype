@@ -3,7 +3,6 @@ package hype
 import (
 	"context"
 	"encoding/json"
-	"fmt"
 	"time"
 )
 
@@ -23,9 +22,9 @@ func (now *Now) MarshalJSON() ([]byte, error) {
 		return nil, err
 	}
 
-	m["type"] = fmt.Sprintf("%T", now)
+	m["type"] = toType(now)
 
-	return json.Marshal(m)
+	return json.MarshalIndent(m, "", "  ")
 }
 
 func (now *Now) Execute(ctx context.Context, doc *Document) error {

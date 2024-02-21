@@ -2,10 +2,10 @@ package hype
 
 import (
 	"context"
+	"errors"
 	"io/fs"
 	"strings"
 	"testing"
-	"testing/fstest"
 	"time"
 
 	"github.com/stretchr/testify/require"
@@ -13,80 +13,45 @@ import (
 
 func Test_Document_Execute(t *testing.T) {
 	t.Parallel()
-	r := require.New(t)
 
-	mod := `# Page 1
+	t.Run("success", func(t *testing.T) {
+		r := require.New(t)
+		p := testParser(t, "testdata/doc/execution/success")
 
-<foo></foo>
+		doc, err := p.ParseFile("module.md")
+		r.NoError(err)
 
-<include src="second/second.md"></include>`
-
-	second := `# Second Page
-
-<foo></foo>`
-
-	cab := fstest.MapFS{
-		"module.md": &fstest.MapFile{
-			Data: []byte(mod),
-		},
-		"second/second.md": &fstest.MapFile{
-			Data: []byte(second),
-		},
-	}
-
-	p := NewParser(cab)
-	p.NodeParsers["foo"] = func(p *Parser, el *Element) (Nodes, error) {
-		x := executeNode{
-			Element: el,
-		}
-		x.ExecuteFn = func(ctx context.Context, d *Document) error {
-			time.Sleep(time.Millisecond * 10)
-
-			x.Lock()
-			x.Nodes = append(x.Nodes, Text("baz"))
-			x.Unlock()
-			return nil
-		}
-
-		x.Nodes = append(x.Nodes, Text("bar"))
-
-		return Nodes{x}, nil
-	}
-
-	doc, err := p.ParseFile("module.md")
-	r.NoError(err)
-
-	ctx, cancel := context.WithTimeout(context.Background(), time.Millisecond*100)
-	defer cancel()
-
-	go func() {
+		ctx, cancel := context.WithTimeout(context.Background(), time.Second*3)
 		defer cancel()
 
 		err = doc.Execute(ctx)
 		r.NoError(err)
-	}()
 
-	<-ctx.Done()
+		act := doc.String()
+		act = strings.TrimSpace(act)
 
-	r.NotEqual(context.DeadlineExceeded, ctx.Err())
+		exp := "<html><head></head><body><page>\n<h1>Command</h1>\n\n<cmd exec=\"echo 'Hello World'\"><pre><code class=\"language-shell\" language=\"shell\">$ echo Hello World\n\nHello World</code></pre></cmd>\n</page>\n</body></html>"
 
-	act := doc.String()
-	// fmt.Println(act)
+		r.Equal(exp, act)
+	})
 
-	exp := `<html><head></head><body><page>
-<h1>Page 1</h1>
+	t.Run("failure", func(t *testing.T) {
+		r := require.New(t)
+		p := testParser(t, "testdata/doc/execution/failure")
 
-<foo>barbaz</foo>
-</page>
-<page>
-<h1>Second Page</h1>
+		doc, err := p.ParseFile("module.md")
+		r.NoError(err)
 
-<foo>barbaz</foo>
-</page>
+		ctx, cancel := context.WithTimeout(context.Background(), time.Second*3)
+		defer cancel()
 
-</body></html>`
+		err = doc.Execute(ctx)
+		r.Error(err)
 
-	r.Equal(exp, act)
+		_, ok := err.(ExecuteError)
+		r.True(ok, err)
+		r.True(errors.Is(err, ExecuteError{}), err)
+	})
 
 }
 
@@ -118,4 +83,51 @@ func Test_Document_MD(t *testing.T) {
 	exp = strings.TrimSpace(exp)
 
 	r.Equal(exp, act)
+}
+
+func Test_Document_MarshalJSON(t *testing.T) {
+	t.Parallel()
+	r := require.New(t)
+
+	p := testParser(t, "testdata/doc/snippets")
+	p.DocIDGen = func() (string, error) {
+		return "1", nil
+	}
+
+	ctx := context.Background()
+
+	doc, err := p.ParseExecuteFile(ctx, "module.md")
+	r.NoError(err)
+
+	testJSON(t, "document", doc)
+}
+
+func Test_Document_Pages(t *testing.T) {
+	t.Parallel()
+	r := require.New(t)
+
+	p := testParser(t, "testdata/doc/pages")
+
+	doc, err := p.ParseFile("module.md")
+	r.NoError(err)
+
+	pages, err := doc.Pages()
+	r.NoError(err)
+
+	r.Len(pages, 3)
+}
+
+func Test_Document_Pages_NoPages(t *testing.T) {
+	t.Parallel()
+	r := require.New(t)
+
+	p := testParser(t, "testdata/doc/simple")
+
+	doc, err := p.ParseFile("module.md")
+	r.NoError(err)
+
+	pages, err := doc.Pages()
+	r.NoError(err)
+
+	r.Len(pages, 1)
 }

@@ -8,10 +8,11 @@ import (
 type Comment string
 
 func (c Comment) MarshalJSON() ([]byte, error) {
-	return json.Marshal(map[string]any{
-		"type": fmt.Sprintf("%T", c),
+	m := map[string]any{
 		"text": string(c),
-	})
+		"type": toType(c),
+	}
+	return json.MarshalIndent(m, "", "  ")
 }
 
 func (tn Comment) Children() Nodes {

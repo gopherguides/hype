@@ -32,29 +32,13 @@ func (code *SourceCode) MarshalJSON() ([]byte, error) {
 		return nil, err
 	}
 
-	m["type"] = fmt.Sprintf("%T", code)
+	m["type"] = toType(code)
 
 	if len(code.Lang) > 0 {
 		m["lang"] = code.Lang
 	}
 
-	return json.Marshal(m)
-}
-
-func (code *SourceCode) StartTag() string {
-	if code == nil || code.Element == nil {
-		return ""
-	}
-
-	return code.Element.StartTag()
-}
-
-func (code *SourceCode) EndTag() string {
-	if code == nil || code.Element == nil {
-		return ""
-	}
-
-	return "</code>"
+	return json.MarshalIndent(m, "", "  ")
 }
 
 func (code *SourceCode) String() string {

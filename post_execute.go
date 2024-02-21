@@ -2,8 +2,6 @@ package hype
 
 import (
 	"context"
-	"fmt"
-	"strings"
 )
 
 type PostExecuter interface {
@@ -48,24 +46,4 @@ type PostExecuteFn func(ctx context.Context, d *Document, err error) error
 
 func (fn PostExecuteFn) PostExecute(ctx context.Context, d *Document, err error) error {
 	return fn(ctx, d, err)
-}
-
-type PostExecuteError struct {
-	Err          error
-	OrigErr      error
-	PostExecuter PostExecuter
-}
-
-func (e PostExecuteError) Error() string {
-	var errs []string
-
-	if e.Err != nil {
-		errs = append(errs, e.Err.Error())
-	}
-
-	if e.OrigErr != nil {
-		errs = append(errs, e.OrigErr.Error())
-	}
-
-	return fmt.Sprintf("post execute error: [%T]: %v", e.PostExecuter, strings.Join(errs, "; "))
 }

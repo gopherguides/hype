@@ -23,7 +23,7 @@ type Snippet struct {
 	End     int    `json:"end,omitempty"`     // the end line of the snippet
 }
 
-func (snip Snippet) MarshalJSON() ([]byte, error) {
+func (snip *Snippet) MarshalJSON() ([]byte, error) {
 	m := struct {
 		Content string `json:"content,omitempty"`
 		File    string `json:"file,omitempty"`
@@ -42,10 +42,10 @@ func (snip Snippet) MarshalJSON() ([]byte, error) {
 	}
 
 	if snip.Content != "" {
-		m.Type = fmt.Sprintf("%T", snip)
+		m.Type = toType(snip)
 	}
 
-	return json.Marshal(m)
+	return json.MarshalIndent(m, "", "  ")
 }
 
 func (snip Snippet) String() string {
@@ -84,13 +84,10 @@ func (sm *Snippets) MarshalJSON() ([]byte, error) {
 	}{
 		Rules:    sm.rules,
 		Snippets: sm.snippets,
+		Type:     toType(sm),
 	}
 
-	if len(sm.rules) > 0 || len(sm.snippets) > 0 {
-		m.Type = fmt.Sprintf("%T", sm)
-	}
-
-	return json.Marshal(m)
+	return json.MarshalIndent(m, "", "  ")
 }
 
 func (sm *Snippets) UnmarshalJSON(data []byte) error {
@@ -130,8 +127,10 @@ func (sm *Snippets) init() {
 			sm.rules = map[string]string{
 				".go":   "// %s",
 				".html": "<!-- %s -->",
+				".js":   "// %s",
 				".md":   "<!-- %s -->",
 				".rb":   "# %s",
+				".ts":   "// %s",
 			}
 		}
 	})

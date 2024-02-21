@@ -1,0 +1,17 @@
+{
+  "atom": "div",
+  "attributes": {
+    "class": "foo"
+  },
+  "filename": "",
+  "html_node": {
+    "data": "div",
+    "data_atom": "div",
+    "namespace": "",
+    "node_type": "html.ElementNode",
+    "type": "html.Node"
+  },
+  "nodes": [],
+  "tag": "\u003cdiv class=\"foo\"\u003e",
+  "type": "hype.Element"
+}

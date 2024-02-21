@@ -7,6 +7,7 @@ import (
 	"testing"
 	"time"
 
+	"github.com/markbates/clam"
 	"github.com/stretchr/testify/require"
 )
 
@@ -93,6 +94,8 @@ func Test_Cmd_Execute_UnexpectedExit(t *testing.T) {
 	err := c.Execute(ctx, doc)
 	r.Error(err)
 
+	r.True(errors.Is(err, CmdError{}))
+
 	c.ExpectedExit = 1
 
 	err = c.Execute(ctx, doc)
@@ -150,5 +153,36 @@ func Test_Cmd_Execute_Timeout(t *testing.T) {
 
 	err := c.Execute(ctx, doc)
 	r.Error(err)
+
+	r.True(errors.Is(err, CmdError{}))
+}
+
+func Test_Cmd_MarshalJSON(t *testing.T) {
+	t.Parallel()
+
+	res := &CmdResult{
+		Element: NewEl("result", nil),
+		Result: &clam.Result{
+			Args:     []string{"echo", "hello"},
+			Dir:      "testdata/commands",
+			Env:      []string{"FOO=bar", "BAR=baz"},
+			Err:      errors.New("this is an error"),
+			Exit:     1,
+			Stderr:   []byte("this is stderr"),
+			Stdout:   []byte("this is stdout"),
+			Duration: time.Second,
+		},
+	}
+
+	c := &Cmd{
+		Element:      NewEl("cmd", nil),
+		Args:         []string{"echo", "hello"},
+		Env:          []string{"FOO=bar", "BAR=baz"},
+		ExpectedExit: 1,
+		Timeout:      time.Second,
+		res:          res,
+	}
+
+	testJSON(t, "cmd", c)
 
 }

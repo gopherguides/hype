@@ -1,0 +1,15 @@
+{
+  "atom": "toc",
+  "attributes": {},
+  "filename": "",
+  "html_node": {
+    "data": "toc",
+    "data_atom": "",
+    "namespace": "",
+    "node_type": "html.ElementNode",
+    "type": "html.Node"
+  },
+  "nodes": [],
+  "tag": "\u003ctoc\u003e",
+  "type": "hype.ToC"
+}

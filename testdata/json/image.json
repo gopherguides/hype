@@ -1,0 +1,17 @@
+{
+  "atom": "img",
+  "attributes": {
+    "src": "https://example.com/image.jpg"
+  },
+  "filename": "",
+  "html_node": {
+    "data": "img",
+    "data_atom": "img",
+    "namespace": "",
+    "node_type": "html.ElementNode",
+    "type": "html.Node"
+  },
+  "nodes": [],
+  "tag": "\u003cimg src=\"https://example.com/image.jpg\"\u003e",
+  "type": "hype.Image"
+}

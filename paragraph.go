@@ -2,7 +2,6 @@ package hype
 
 import (
 	"encoding/json"
-	"fmt"
 )
 
 type Paragraph struct {
@@ -19,9 +18,9 @@ func (p *Paragraph) MarshalJSON() ([]byte, error) {
 		return nil, err
 	}
 
-	m["type"] = fmt.Sprintf("%T", p)
+	m["type"] = toType(p)
 
-	return json.Marshal(m)
+	return json.MarshalIndent(m, "", "  ")
 }
 
 func (p *Paragraph) IsEmptyNode() bool {

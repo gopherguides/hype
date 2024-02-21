@@ -2,7 +2,6 @@ package hype
 
 import (
 	"encoding/json"
-	"fmt"
 )
 
 // Body is a container for all the elements in a document.
@@ -23,9 +22,9 @@ func (b *Body) MarshalJSON() ([]byte, error) {
 		return nil, err
 	}
 
-	m["type"] = fmt.Sprintf("%T", b)
+	m["type"] = toType(b)
 
-	return json.Marshal(m)
+	return json.MarshalIndent(m, "", "  ")
 }
 
 // AsPage returns the body as a Page.

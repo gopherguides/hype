@@ -76,11 +76,18 @@ func Test_PostParsers_PostParse_Errors(t *testing.T) {
 			}
 
 			d := &Document{}
-			err := nodes.PostParse(nil, d, fmt.Errorf("original"))
 
+			p := testParser(t, "testdata/whole/simple")
+			p.Filename = "module.md"
+
+			err := nodes.PostParse(p, d, fmt.Errorf("original"))
 			r.Error(err)
+
+			var pperr PostParseError
+
+			r.ErrorAs(err, &pperr)
+
 			r.Equal("Hello", d.Title)
-			r.Contains(err.Error(), tc.exp)
 		})
 	}
 }

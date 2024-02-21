@@ -1,0 +1,23 @@
+{
+  "atom": "code",
+  "attributes": {
+    "language": "go"
+  },
+  "filename": "",
+  "html_node": {
+    "data": "code",
+    "data_atom": "code",
+    "namespace": "",
+    "node_type": "html.ElementNode",
+    "type": "html.Node"
+  },
+  "lang": "go",
+  "nodes": [
+    {
+      "text": "var x = 1",
+      "type": "hype.Text"
+    }
+  ],
+  "tag": "\u003ccode language=\"go\"\u003e",
+  "type": "hype.FencedCode"
+}

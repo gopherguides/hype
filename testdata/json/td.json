@@ -1,0 +1,20 @@
+{
+  "atom": "td",
+  "attributes": {},
+  "filename": "",
+  "html_node": {
+    "data": "td",
+    "data_atom": "td",
+    "namespace": "",
+    "node_type": "html.ElementNode",
+    "type": "html.Node"
+  },
+  "nodes": [
+    {
+      "text": "foo",
+      "type": "hype.Text"
+    }
+  ],
+  "tag": "\u003ctd\u003e",
+  "type": "hype.TD"
+}

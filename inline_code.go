@@ -24,25 +24,9 @@ func (code *InlineCode) MarshalJSON() ([]byte, error) {
 		return nil, err
 	}
 
-	m["type"] = fmt.Sprintf("%T", code)
+	m["type"] = toType(code)
 
-	return json.Marshal(m)
-}
-
-func (code *InlineCode) StartTag() string {
-	if code == nil || code.Element == nil {
-		return "<code>"
-	}
-
-	return code.Element.StartTag()
-}
-
-func (code *InlineCode) EndTag() string {
-	if code == nil || code.Element == nil {
-		return "</code>"
-	}
-
-	return code.Element.EndTag()
+	return json.MarshalIndent(m, "", "  ")
 }
 
 func (code *InlineCode) String() string {

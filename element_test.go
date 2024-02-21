@@ -110,3 +110,16 @@ func Test_Element_String(t *testing.T) {
 	}
 
 }
+
+func Test_Element_MarshalJSON(t *testing.T) {
+	t.Parallel()
+	r := require.New(t)
+
+	parent := NewEl("body", nil)
+	el := NewEl("div", parent)
+	err := el.Set("class", "foo")
+	r.NoError(err)
+
+	testJSON(t, "element", el)
+
+}

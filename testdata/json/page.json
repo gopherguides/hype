@@ -1,0 +1,21 @@
+{
+  "atom": "page",
+  "attributes": {},
+  "filename": "",
+  "html_node": {
+    "data": "page",
+    "data_atom": "",
+    "namespace": "",
+    "node_type": "html.ElementNode",
+    "type": "html.Node"
+  },
+  "nodes": [
+    {
+      "text": "more text",
+      "type": "hype.Text"
+    }
+  ],
+  "tag": "\u003cpage\u003e",
+  "title": "Page 1",
+  "type": "hype.Page"
+}

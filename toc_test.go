@@ -41,3 +41,13 @@ func Test_GenerateToC(t *testing.T) {
 
 	r.Equal(exp, act)
 }
+
+func Test_ToC_MarshalJSON(t *testing.T) {
+	t.Parallel()
+
+	toc := &ToC{
+		Element: NewEl("toc", nil),
+	}
+
+	testJSON(t, "toc", toc)
+}

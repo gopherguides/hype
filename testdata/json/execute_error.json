@@ -1,0 +1,12 @@
+{
+  "contents": "foo",
+  "document": {
+    "snippets": {},
+    "title": "My Title",
+    "type": "hype.Document"
+  },
+  "error": "EOF",
+  "filename": "module.md",
+  "root": "testdata/parser/errors/execute",
+  "type": "hype.ExecuteError"
+}

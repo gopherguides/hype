@@ -23,7 +23,7 @@ func (l *Link) MarshalJSON() ([]byte, error) {
 		return nil, err
 	}
 
-	m["type"] = fmt.Sprintf("%T", l)
+	m["type"] = toType(l)
 
 	h, err := l.Href()
 	if err != nil {
@@ -32,7 +32,7 @@ func (l *Link) MarshalJSON() ([]byte, error) {
 
 	m["url"] = h
 
-	return json.Marshal(m)
+	return json.MarshalIndent(m, "", "  ")
 }
 
 func (l *Link) Href() (string, error) {

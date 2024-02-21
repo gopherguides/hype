@@ -1,0 +1,23 @@
+{
+  "atom": "figure",
+  "attributes": {},
+  "filename": "",
+  "html_node": {
+    "data": "figure",
+    "data_atom": "figure",
+    "namespace": "",
+    "node_type": "html.ElementNode",
+    "type": "html.Node"
+  },
+  "nodes": [
+    {
+      "text": "This is a figure",
+      "type": "hype.Text"
+    }
+  ],
+  "pos": 1,
+  "section_id": 2,
+  "style": "figure",
+  "tag": "\u003cfigure\u003e",
+  "type": "hype.Figure"
+}

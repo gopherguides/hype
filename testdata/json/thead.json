@@ -1,0 +1,15 @@
+{
+  "atom": "th",
+  "attributes": {},
+  "filename": "",
+  "html_node": {
+    "data": "th",
+    "data_atom": "th",
+    "namespace": "",
+    "node_type": "html.ElementNode",
+    "type": "html.Node"
+  },
+  "nodes": [],
+  "tag": "\u003cth\u003e",
+  "type": "hype.THead"
+}

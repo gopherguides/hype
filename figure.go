@@ -31,12 +31,12 @@ func (f *Figure) MarshalJSON() ([]byte, error) {
 		return nil, err
 	}
 
-	m["type"] = fmt.Sprintf("%T", f)
+	m["type"] = toType(f)
 	m["pos"] = f.Pos
 	m["section_id"] = f.SectionID
 	m["style"] = f.Style()
 
-	return json.Marshal(m)
+	return json.MarshalIndent(m, "", "  ")
 }
 
 func (f *Figure) MD() string {

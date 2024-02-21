@@ -20,13 +20,13 @@ func (page *Page) MarshalJSON() ([]byte, error) {
 		return nil, err
 	}
 
-	m["type"] = fmt.Sprintf("%T", page)
+	m["type"] = toType(page)
 
 	if len(page.Title) > 0 {
 		m["title"] = page.Title
 	}
 
-	return json.Marshal(m)
+	return json.MarshalIndent(m, "", "  ")
 }
 
 func (page *Page) Body() (*Body, error) {

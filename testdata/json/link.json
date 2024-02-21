@@ -1,0 +1,23 @@
+{
+  "atom": "a",
+  "attributes": {
+    "href": "https://example.com"
+  },
+  "filename": "",
+  "html_node": {
+    "data": "a",
+    "data_atom": "a",
+    "namespace": "",
+    "node_type": "html.ElementNode",
+    "type": "html.Node"
+  },
+  "nodes": [
+    {
+      "text": "This is a link",
+      "type": "hype.Text"
+    }
+  ],
+  "tag": "\u003ca href=\"https://example.com\"\u003e",
+  "type": "hype.Link",
+  "url": "https://example.com"
+}

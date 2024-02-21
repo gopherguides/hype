@@ -23,7 +23,14 @@ type Element struct {
 	HTMLNode *html.Node
 	Nodes    Nodes
 	Parent   Node
-	FileName string // only set when Parser.ParseFile() is used
+	Filename string // only set when Parser.ParseFile() is used
+}
+
+// FileName returns the filename of the element.
+// This is only set when Parser.ParseFile() is used.
+func (el *Element) FileName() string {
+	// Note: this function was added to satisfy an interface.
+	return el.Filename
 }
 
 func (el *Element) JSONMap() (map[string]any, error) {
@@ -35,30 +42,56 @@ func (el *Element) JSONMap() (map[string]any, error) {
 	defer el.RUnlock()
 
 	m := map[string]any{
-		"type": fmt.Sprintf("%T", el),
+		"atom":       el.Atom(),
+		"attributes": map[string]string{},
+		"filename":   el.Filename,
+		"nodes":      Nodes{},
+		"tag":        el.StartTag(),
+		"type":       toType(el),
 	}
 
-	if len(el.FileName) > 0 {
-		m["file"] = el.FileName
+	if len(el.Nodes) > 0 {
+		m["nodes"] = el.Nodes
 	}
 
-	if el.Attributes != nil && el.Attributes.Len() > 0 {
+	if el.Attributes.Len() > 0 {
 		m["attributes"] = el.Attributes
 	}
 
-	nodes := el.Nodes
-
-	if len(nodes) > 0 {
-		m["nodes"] = nodes
-	}
-
 	hn := el.HTMLNode
-
-	if hn != nil {
-		if len(hn.Data) > 0 {
-			m["atom"] = hn.Data
-		}
+	if hn == nil {
+		return m, nil
 	}
+
+	hnm := map[string]any{
+		"data":      hn.Data,
+		"data_atom": hn.DataAtom.String(),
+		"namespace": hn.Namespace,
+		"type":      toType(hn),
+	}
+
+	switch hn.Type {
+	case html.ErrorNode:
+		hnm["node_type"] = "html.ErrorNode"
+	case html.TextNode:
+		hnm["node_type"] = "html.TextNode"
+	case html.DocumentNode:
+		hnm["node_type"] = "html.DocumentNode"
+	case html.ElementNode:
+		hnm["node_type"] = "html.ElementNode"
+	case html.CommentNode:
+		hnm["node_type"] = "html.CommentNode"
+	case html.DoctypeNode:
+		hnm["node_type"] = "html.DoctypeNode"
+	case html.RawNode:
+		hnm["node_type"] = "html.RawNode"
+	}
+
+	if len(hn.Attr) > 0 {
+		hnm["attributes"] = hn.Attr
+	}
+
+	m["html_node"] = hnm
 
 	return m, nil
 }
@@ -73,7 +106,7 @@ func (el *Element) MarshalJSON() ([]byte, error) {
 		return nil, err
 	}
 
-	return json.Marshal(m)
+	return json.MarshalIndent(m, "", "  ")
 }
 
 func (el *Element) Format(f fmt.State, verb rune) {
@@ -88,8 +121,8 @@ func (el *Element) Format(f fmt.State, verb rune) {
 			return
 		}
 
-		if len(el.FileName) > 0 {
-			fmt.Fprintf(f, "file://%s: ", el.FileName)
+		if len(el.Filename) > 0 {
+			fmt.Fprintf(f, "file://%s: ", el.Filename)
 		}
 
 		fmt.Fprintf(f, "%s", st)
@@ -97,33 +130,6 @@ func (el *Element) Format(f fmt.State, verb rune) {
 	default:
 		fmt.Fprintf(f, "%s", el.String())
 	}
-}
-
-func (el *Element) Clone() (*Element, error) {
-	if el == nil {
-		return nil, ErrIsNil("element")
-	}
-
-	ats, err := el.Attributes.Clone()
-	if err != nil {
-		return nil, err
-	}
-
-	nel := &Element{
-		Attributes: ats,
-		HTMLNode: &html.Node{
-			Attr:      el.HTMLNode.Attr,
-			Data:      el.HTMLNode.Data,
-			DataAtom:  el.HTMLNode.DataAtom,
-			Namespace: el.HTMLNode.Namespace,
-			Type:      el.HTMLNode.Type,
-		},
-		Nodes:    el.Nodes,
-		Parent:   el.Parent,
-		FileName: el.FileName,
-	}
-
-	return nel, nil
 }
 
 func (el *Element) Atom() Atom {
@@ -147,6 +153,10 @@ func (el *Element) HTML() *html.Node {
 // StartTag returns the start tag for the element.
 // For example, for an element with an Atom of "div", the start tag would be "<div>".
 func (el *Element) StartTag() string {
+	if el == nil {
+		return ""
+	}
+
 	a := el.Atom()
 	if len(a) == 0 {
 		return ""
@@ -185,6 +195,10 @@ func (el *Element) EndTag() string {
 
 // String returns StartTag() + Children().String() + EndTag()
 func (el *Element) String() string {
+	if el == nil {
+		return ""
+	}
+
 	s := el.StartTag()
 	s += el.Children().String()
 	s += el.EndTag()
@@ -224,7 +238,7 @@ func NewEl[T ~string](at T, parent Node) *Element {
 	var fn string
 
 	if e, ok := parent.(*Element); ok {
-		fn = e.FileName
+		fn = e.Filename
 	}
 
 	return &Element{
@@ -235,7 +249,7 @@ func NewEl[T ~string](at T, parent Node) *Element {
 			DataAtom: atom.Lookup([]byte(string(at))),
 		},
 		Parent:   parent,
-		FileName: fn,
+		Filename: fn,
 	}
 }
 
@@ -244,13 +258,13 @@ func (el *Element) updateFileName(dir string) {
 		return
 	}
 
-	if strings.HasPrefix(el.FileName, dir) {
+	if strings.HasPrefix(el.Filename, dir) {
 		return
 	}
 
 	el.Lock()
 	defer el.Unlock()
-	el.FileName = filepath.Join(dir, el.FileName)
+	el.Filename = filepath.Join(dir, el.Filename)
 }
 
 func (el *Element) Set(k string, v string) error {

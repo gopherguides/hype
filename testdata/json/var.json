@@ -1,0 +1,22 @@
+{
+  "atom": "var",
+  "attributes": {},
+  "filename": "",
+  "html_node": {
+    "data": "var",
+    "data_atom": "var",
+    "namespace": "",
+    "node_type": "html.ElementNode",
+    "type": "html.Node"
+  },
+  "key": "id",
+  "nodes": [
+    {
+      "text": "id",
+      "type": "hype.Text"
+    }
+  ],
+  "tag": "\u003cvar\u003e",
+  "type": "hype.Var",
+  "value": 1
+}
