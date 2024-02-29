@@ -1,3 +1,4 @@
+
 [<img alt="Release" src="https://img.shields.io/github/release/goreleaser/goreleaser.svg"></img>](https://github.com/gopherguides/hype/releases/latest)
 [<img alt="Go Build Status" src="https://github.com/gopherguides/hype/actions/workflows/tests.yml/badge.svg"></img>](https://github.com/gopherguides/hype/actions)
 [<img alt="Go Reference" src="https://pkg.go.dev/badge/github.com/goherguides/hype.svg"></img>](https://pkg.go.dev/github.com/gopherguides/hype)
@@ -12,11 +13,13 @@ Hype is a content generation tool that use traditional Markdown syntax, and allo
 
 Hype follows the same principals that we use for coding;
 
-- packages (keep relevant content in small, reusable packages, with all links relative to the package)
-- reuse - write your documentation once (even in your code), and use everywhere (blog, book, github repo, etc)
-- partials/includes - support including documents into a larger document (just like code!)
-- validation - like tests, but validate all your code samples are valid (or not if that is what you expect).
-- asset validation - ensure local assets like images, etc actually exist
+
+* packages (keep relevant content in small, reusable packages, with all links relative to the package)
+* reuse - write your documentation once (even in your code), and use everywhere (blog, book, github repo, etc)
+* partials/includes - support including documents into a larger document (just like code!)
+* validation - like tests, but validate all your code samples are valid (or not if that is what you expect).
+* asset validation - ensure local assets like images, etc actually exist
+
 
 ## Created with Hype
 
@@ -45,8 +48,10 @@ This is the syntax to include a code sample in your document:
 
 The above code snippet does the following:
 
-- Includes the code snippet specified in the source code
-- Validates that the code compiles
+
+* Includes the code snippet specified in the source code
+* Validates that the code compiles
+
 
 Here is the source file:
 
@@ -255,7 +260,6 @@ You can also be more specific.
 `
 
 Here is the output for the above command:
-
 ```shell
 $ go doc -short context.WithCancel
 
@@ -288,8 +292,8 @@ Here is the output:
 $ tree
 
 .
-├── includes.md
 ├── hype.md
+├── includes.md
 └── src
     ├── broken
     │   └── main.go
@@ -306,20 +310,20 @@ There are several options for running the `hype` command. Most notable is the `e
 `$ hype export -h
 
 Usage of hype:
--f string
-optional file name to preview, if not provided, defaults to hype.md (default "hype.md")
--format string
-content type to export to: markdown, html (default "markdown")
--timeout duration
-timeout for execution, defaults to 30 seconds (30s) (default 5s)
--v enable verbose output for debugging
+  -f string
+    	optional file name to preview, if not provided, defaults to hype.md (default "hype.md")
+  -format string
+    	content type to export to: markdown, html (default "markdown")
+  -timeout duration
+    	timeout for execution, defaults to 30 seconds (30s) (default 5s)
+  -v	enable verbose output for debugging
 
 Usage: hype export [options]
 
 Examples:
-hype export -format html
-hype export -f README.md -format html
-hype export -f README.md -format markdown -timeout=10s
+	hype export -format html
+	hype export -f README.md -format html
+	hype export -f README.md -format markdown -timeout=10s
 `
 
 This allows you to see your compiled document either as a single markdown, or as an html document that you can preview in the browser.
@@ -336,6 +340,7 @@ The following code will parse the code/code.md and sourceable/sourceable.md docu
 <include src="code/code.md"></include>
 
 <include src="sourceable/sourceable.md"></include>
+
 ```
 
 ---
@@ -351,14 +356,14 @@ $ tree
 
 .
 ├── actions
-│   ├── hype.yml
-│   └── hype.md
+│   ├── hype.md
+│   └── hype.yml
 ├── badges.md
-├── license.md
 ├── hype.md
+├── license.md
 └── quickstart
-    ├── includes.md
     ├── hype.md
+    ├── includes.md
     └── src
         ├── broken
         │   └── main.go
@@ -367,7 +372,6 @@ $ tree
 
 5 directories, 9 files
 ```
-
 ---
 
 # Using Github Actions to update your README
@@ -384,8 +388,10 @@ You need to give permission to your GitHub Actions to create a pull request in y
 
 Under `Workflow Permissions`
 
-- Check `Allow GitHub Actions to create and approve pull requests`.
-- Check `Read and write permissions`
+
+* Check `Allow GitHub Actions to create and approve pull requests`.
+* Check `Read and write permissions`
+
 
 ### Personal Access Token
 
@@ -395,7 +401,7 @@ It is recommend to use a GitHub [Personnal Acces Token](https://docs.github.com/
 
 ## The Action
 
-The current action is set to only generate the readme on a pull request and commit it back to that same pull request. You can modify this to your own needs.
+The current action is set to only generate the readme on a pull request and commit it back to that same pull request.  You can modify this to your own needs.
 
 ```yml
 name: Generate README with Hype
@@ -428,6 +434,7 @@ jobs:
           git config user.email 'actions@github.com'
           git diff --quiet || (git add README.md && git commit -am "Updated README")
           git push origin ${{github.event.pull_request.head.ref}}
+
 ```
 
 ---
@@ -441,3 +448,4 @@ There are several issues that still need to be worked on. Please see the issues 
 # License
 
 [Hype](https://github.com/gopherguides/hype) by [Gopher Guides LLC](https://github.com/gopherguides) is licensed under [Attribution-NonCommercial-ShareAlike 4.0 International<img src="https://mirrors.creativecommons.org/presskit/icons/cc.svg?ref=chooser-v1" style="height:22px!important;margin-left:3px;vertical-align:text-bottom;"></img><img src="https://mirrors.creativecommons.org/presskit/icons/by.svg?ref=chooser-v1" style="height:22px!important;margin-left:3px;vertical-align:text-bottom;"></img><img src="https://mirrors.creativecommons.org/presskit/icons/nc.svg?ref=chooser-v1" style="height:22px!important;margin-left:3px;vertical-align:text-bottom;"></img><img src="https://mirrors.creativecommons.org/presskit/icons/sa.svg?ref=chooser-v1" style="height:22px!important;margin-left:3px;vertical-align:text-bottom;"></img>](http://creativecommons.org/licenses/by-nc-sa/4.0/?ref=chooser-v1)
+
