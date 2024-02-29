@@ -1,11 +1,11 @@
 {
-  "filename": "module.md",
+  "filename": "hype.md",
   "id": "1",
   "nodes": [
     {
       "atom": "",
       "attributes": {},
-      "filename": "module.md",
+      "filename": "hype.md",
       "html_node": {
         "data": "",
         "data_atom": "",
@@ -17,7 +17,7 @@
         {
           "atom": "html",
           "attributes": {},
-          "filename": "module.md",
+          "filename": "hype.md",
           "html_node": {
             "data": "html",
             "data_atom": "html",
@@ -29,7 +29,7 @@
             {
               "atom": "head",
               "attributes": {},
-              "filename": "module.md",
+              "filename": "hype.md",
               "html_node": {
                 "data": "head",
                 "data_atom": "head",
@@ -45,7 +45,7 @@
               {
                 "atom": "body",
                 "attributes": {},
-                "filename": "module.md",
+                "filename": "hype.md",
                 "html_node": {
                   "data": "body",
                   "data_atom": "body",
@@ -58,7 +58,7 @@
                     {
                       "atom": "page",
                       "attributes": {},
-                      "filename": "module.md",
+                      "filename": "hype.md",
                       "html_node": {
                         "data": "page",
                         "data_atom": "",
@@ -75,7 +75,7 @@
                           {
                             "atom": "h1",
                             "attributes": {},
-                            "filename": "module.md",
+                            "filename": "hype.md",
                             "html_node": {
                               "data": "h1",
                               "data_atom": "h1",
@@ -102,7 +102,7 @@
                           {
                             "atom": "pre",
                             "attributes": {},
-                            "filename": "module.md",
+                            "filename": "hype.md",
                             "html_node": {
                               "data": "pre",
                               "data_atom": "pre",
@@ -119,7 +119,7 @@
                                   "snippet": "class",
                                   "src": "src/main.ts"
                                 },
-                                "filename": "module.md",
+                                "filename": "hype.md",
                                 "html_node": {
                                   "attributes": [
                                     {
@@ -166,7 +166,7 @@
                           {
                             "atom": "pre",
                             "attributes": {},
-                            "filename": "module.md",
+                            "filename": "hype.md",
                             "html_node": {
                               "data": "pre",
                               "data_atom": "pre",
@@ -183,7 +183,7 @@
                                   "snippet": "constructor",
                                   "src": "src/main.ts"
                                 },
-                                "filename": "module.md",
+                                "filename": "hype.md",
                                 "html_node": {
                                   "attributes": [
                                     {

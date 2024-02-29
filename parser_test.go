@@ -140,7 +140,7 @@ func Test_Parser_MarshalJSON(t *testing.T) {
 	err := p.Vars.Set("foo", "bar")
 	r.NoError(err)
 
-	_, err = p.ParseFile("module.md")
+	_, err = p.ParseFile("hype.md")
 	r.NoError(err)
 
 	testJSON(t, "parser", p)

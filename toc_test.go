@@ -21,7 +21,7 @@ func Test_GenerateToC(t *testing.T) {
 	ctx, cancel := context.WithTimeout(ctx, time.Second)
 	defer cancel()
 
-	doc, err := p.ParseExecuteFile(ctx, "module.md")
+	doc, err := p.ParseExecuteFile(ctx, "hype.md")
 	r.NoError(err)
 
 	toc, err := GenerateToC(p, doc.Children())
@@ -29,7 +29,7 @@ func Test_GenerateToC(t *testing.T) {
 
 	r.Len(toc, 1)
 
-	b, err := fs.ReadFile(p.FS, "module.gold")
+	b, err := fs.ReadFile(p.FS, "hype.gold")
 	r.NoError(err)
 
 	exp := string(b)

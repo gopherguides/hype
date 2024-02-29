@@ -61,14 +61,14 @@ func Test_PreParser_Errors(t *testing.T) {
 		{
 			name: "ParseFile",
 			in: func() error {
-				_, err := tp().ParseFile("module.md")
+				_, err := tp().ParseFile("hype.md")
 				return err
 			},
 		},
 		{
 			name: "ParseExecuteFile",
 			in: func() error {
-				_, err := tp().ParseExecuteFile(ctx, "module.md")
+				_, err := tp().ParseExecuteFile(ctx, "hype.md")
 				return err
 			},
 		},
@@ -123,7 +123,7 @@ func Test_PreParseError_MarshalJSON(t *testing.T) {
 
 	ppe := PreParseError{
 		Err:      io.EOF,
-		Filename: "module.md",
+		Filename: "hype.md",
 		Root:     "root",
 	}
 

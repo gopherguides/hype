@@ -23,7 +23,7 @@ more text
 adfadf`
 
 	cab := fstest.MapFS{
-		"module.md": &fstest.MapFile{
+		"hype.md": &fstest.MapFile{
 			Data: []byte(mod),
 		},
 		"second/second.md": &fstest.MapFile{

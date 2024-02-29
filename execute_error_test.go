@@ -72,7 +72,7 @@ func Test_Execute_Errors(t *testing.T) {
 			name: "ParseExecuteFile",
 			in: func() error {
 				p := tp()
-				_, err := p.ParseExecuteFile(ctx, "module.md")
+				_, err := p.ParseExecuteFile(ctx, "hype.md")
 				return err
 			},
 		},
@@ -80,7 +80,7 @@ func Test_Execute_Errors(t *testing.T) {
 			name: "Document.Execute",
 			in: func() error {
 				p := tp()
-				d, err := p.ParseFile("module.md")
+				d, err := p.ParseFile("hype.md")
 				if err != nil {
 					return err
 				}
@@ -114,7 +114,7 @@ func Test_ExecuteError_MarshalJSON(t *testing.T) {
 
 	ee := ExecuteError{
 		Err:      io.EOF,
-		Filename: "module.md",
+		Filename: "hype.md",
 		Root:     "testdata/parser/errors/execute",
 		Document: &Document{
 			Title: "My Title",

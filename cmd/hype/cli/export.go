@@ -96,7 +96,7 @@ Examples:
 	cmd.flags = flag.NewFlagSet("export", flag.ContinueOnError)
 	cmd.flags.SetOutput(stderr)
 	cmd.flags.DurationVar(&cmd.Timeout, "timeout", DefaultTimeout(), "timeout for execution, defaults to 30 seconds (30s)")
-	cmd.flags.StringVar(&cmd.File, "f", "module.md", "optional file name to preview, if not provided, defaults to module.md")
+	cmd.flags.StringVar(&cmd.File, "f", "hype.md", "optional file name to preview, if not provided, defaults to hype.md")
 	cmd.flags.BoolVar(&cmd.Verbose, "v", false, "enable verbose output for debugging")
 	cmd.flags.StringVar(&cmd.Format, "format", "markdown", "content type to export to: markdown, html")
 

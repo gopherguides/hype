@@ -91,7 +91,7 @@ func (cmd *Marked) Flags() (*flag.FlagSet, error) {
 	cmd.flags.BoolVar(&cmd.ParseOnly, "p", cmd.ParseOnly, "if true, only parse the file and exit")
 	cmd.flags.DurationVar(&cmd.Timeout, "timeout", DefaultTimeout(), "timeout for execution")
 	cmd.flags.StringVar(&cmd.ContextPath, "context", cmd.ContextPath, "a folder containing all chapters of a book, for example")
-	cmd.flags.StringVar(&cmd.File, "f", cmd.File, "optional file name to preview, if not provided, defaults to module.md")
+	cmd.flags.StringVar(&cmd.File, "f", cmd.File, "optional file name to preview, if not provided, defaults to hype.md")
 	cmd.flags.IntVar(&cmd.Section, "section", 0, "")
 	cmd.flags.BoolVar(&cmd.Verbose, "v", false, "enable verbose output for debugging")
 

@@ -20,7 +20,7 @@ func Test_GoTemplates(t *testing.T) {
 	ctx, cancel := context.WithTimeout(context.Background(), time.Second)
 	defer cancel()
 
-	doc, err := p.ParseExecuteFile(ctx, "module.md")
+	doc, err := p.ParseExecuteFile(ctx, "hype.md")
 	r.NoError(err)
 
 	act := doc.String()

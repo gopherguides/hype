@@ -48,14 +48,14 @@ func testModule(t testing.TB, root string) {
 	ctx, cancel := context.WithTimeout(context.Background(), 5*time.Second)
 	defer cancel()
 
-	doc, err := p.ParseExecuteFile(ctx, "module.md")
+	doc, err := p.ParseExecuteFile(ctx, "hype.md")
 	r.NoError(err)
 
 	act := doc.String()
 
 	// fmt.Println(act)
 
-	b, err := fs.ReadFile(p.FS, "module.gold")
+	b, err := fs.ReadFile(p.FS, "hype.gold")
 	r.NoError(err)
 
 	exp := string(b)
@@ -124,7 +124,7 @@ func Test_Testdata_Auto_Modules(t *testing.T) {
 		}
 
 		base := filepath.Base(path)
-		if base != "module.md" {
+		if base != "hype.md" {
 			return nil
 		}
 

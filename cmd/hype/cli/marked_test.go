@@ -79,7 +79,7 @@ func Test_Marked_Path_Env(t *testing.T) {
 
 	r := require.New(t)
 
-	t.Setenv("MARKED_PATH", "testdata/whole/simple/01-one/module.md")
+	t.Setenv("MARKED_PATH", "testdata/whole/simple/01-one/hype.md")
 
 	cmd := &Marked{}
 
