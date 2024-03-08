@@ -38,7 +38,7 @@ func (pe ParseError) Error() string {
 	}
 
 	if pe.Err != nil {
-		lines = append(lines, fmt.Sprintf("error: %s", pe.Err))
+		lines = append(lines, fmt.Sprintf("parse error: %s", pe.Err))
 	}
 
 	sb.WriteString(strings.Join(lines, "\n"))

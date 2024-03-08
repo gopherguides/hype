@@ -78,7 +78,7 @@ func Test_CmdError_Error(t *testing.T) {
 	act := ce.Error()
 	act = strings.TrimSpace(act)
 
-	exp := "filepath: /tmp/hype.md\ncmd: $ echo hello\nexit: 1\nerror: EOF"
+	exp := "filepath: /tmp/hype.md\ncmd: $ echo hello\nexit: 1\ncmd error: EOF"
 	exp = strings.TrimSpace(exp)
 
 	r.Equal(exp, act)

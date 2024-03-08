@@ -145,7 +145,7 @@ func Test_PreParseError_Error(t *testing.T) {
 	act = strings.TrimSpace(act)
 
 	// fmt.Println(act)
-	exp := "filepath: root/hype.md\nerror: EOF"
+	exp := "filepath: root/hype.md\npre-parse error: EOF"
 
 	r.Equal(exp, act)
 }

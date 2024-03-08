@@ -146,12 +146,12 @@ func Test_ExecuteError_String(t *testing.T) {
 		{
 			name: "detailed",
 			in:   detailed,
-			exp:  "filepath: testdata/parser/errors/execute/hype.md\ndocument: My Title\nerror: EOF",
+			exp:  "filepath: testdata/parser/errors/execute/hype.md\ndocument: My Title\nexecute error: EOF",
 		},
 		{
 			name: "basic",
 			in:   ExecuteError{Err: io.EOF},
-			exp:  "error: EOF",
+			exp:  "execute error: EOF",
 		},
 	}
 

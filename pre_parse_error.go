@@ -40,11 +40,11 @@ func (e PreParseError) Error() string {
 	}
 
 	if e.PreParser != nil {
-		lines = append(lines, fmt.Sprintf("pre_parser: %s", toType(e.PreParser)))
+		lines = append(lines, fmt.Sprintf("pre parser: %s", toType(e.PreParser)))
 	}
 
 	if e.Err != nil {
-		lines = append(lines, fmt.Sprintf("error: %s", e.Err))
+		lines = append(lines, fmt.Sprintf("pre-parse error: %s", e.Err))
 	}
 
 	sb.WriteString(strings.Join(lines, "\n"))

@@ -47,7 +47,7 @@ func (ce CmdError) Error() string {
 	}
 
 	if ce.Err != nil {
-		lines = append(lines, fmt.Sprintf("error: %s", ce.Err))
+		lines = append(lines, fmt.Sprintf("cmd error: %s", ce.Err))
 	}
 
 	sb.WriteString(strings.Join(lines, "\n"))

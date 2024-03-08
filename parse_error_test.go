@@ -64,7 +64,7 @@ func Test_ParseError_Error(t *testing.T) {
 
 	fmt.Println(act)
 
-	exp := "filepath: root/test.md\ncontents: contents\nerror: EOF"
+	exp := "filepath: root/test.md\nparse error: EOF"
 
 	r.Equal(exp, act)
 }
