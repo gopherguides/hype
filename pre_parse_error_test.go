@@ -129,3 +129,23 @@ func Test_PreParseError_MarshalJSON(t *testing.T) {
 
 	testJSON(t, "pre_parse_error", ppe)
 }
+
+func Test_PreParseError_Error(t *testing.T) {
+	t.Parallel()
+
+	r := require.New(t)
+
+	ppe := PreParseError{
+		Err:      io.EOF,
+		Filename: "hype.md",
+		Root:     "root",
+	}
+
+	act := ppe.Error()
+	act = strings.TrimSpace(act)
+
+	// fmt.Println(act)
+	exp := "filepath: root/hype.md\nerror: EOF"
+
+	r.Equal(exp, act)
+}

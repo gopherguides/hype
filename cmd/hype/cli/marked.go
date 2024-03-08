@@ -204,6 +204,7 @@ func (cmd *Marked) execute(ctx context.Context, pwd string) error {
 	}
 
 	p.Root = filepath.Dir(mp)
+	p.Filename = filepath.Base(mp)
 
 	if len(cmd.File) > 0 {
 		f, err := cmd.FS.Open(cmd.File)

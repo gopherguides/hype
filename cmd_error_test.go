@@ -4,6 +4,7 @@ import (
 	"errors"
 	"fmt"
 	"io"
+	"strings"
 	"testing"
 
 	"github.com/markbates/clam"
@@ -55,4 +56,30 @@ func Test_CmdError_MarshalJSON(t *testing.T) {
 	}
 
 	testJSON(t, "cmd_error", ce)
+}
+
+func Test_CmdError_Error(t *testing.T) {
+	t.Parallel()
+
+	ce := CmdError{
+		RunError: clam.RunError{
+			Args:   []string{"echo", "hello"},
+			Env:    []string{"FOO=bar", "BAR=baz"},
+			Err:    io.EOF,
+			Exit:   1,
+			Output: []byte("foo\nbar\nbaz\n"),
+			Dir:    "/tmp",
+		},
+		Filename: "hype.md",
+	}
+
+	r := require.New(t)
+
+	act := ce.Error()
+	act = strings.TrimSpace(act)
+
+	exp := "filepath: /tmp/hype.md\ncmd: $ echo hello\nexit: 1\nerror: EOF"
+	exp = strings.TrimSpace(exp)
+
+	r.Equal(exp, act)
 }
