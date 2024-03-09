@@ -45,10 +45,11 @@ func (f *Figure) MD() string {
 	}
 
 	bb := &strings.Builder{}
-	bb.WriteString(f.StartTag())
+	// bb.WriteString(f.StartTag())
+	fmt.Fprintf(bb, "<a id=%q></a>\n", strings.TrimPrefix(f.Link(), "#"))
 	fmt.Fprintln(bb)
 	bb.WriteString(f.Nodes.MD())
-	bb.WriteString(f.EndTag())
+	// bb.WriteString(f.EndTag())
 
 	return bb.String()
 }
