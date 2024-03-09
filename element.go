@@ -300,7 +300,7 @@ func (el *Element) MD() string {
 	case atomx.Details:
 		return el.String()
 	default:
-		fmt.Printf("TODO: Element.MD(): %q\n", el.Atom())
+		// fmt.Printf("TODO: Element.MD(): %q\n", el.Atom())
 	}
 
 	bb := &bytes.Buffer{}

@@ -47,7 +47,7 @@ func (f *Figure) MD() string {
 	bb := &strings.Builder{}
 	bb.WriteString(f.StartTag())
 	fmt.Fprintln(bb)
-	bb.WriteString(f.Nodes.String())
+	bb.WriteString(f.Nodes.MD())
 	bb.WriteString(f.EndTag())
 
 	return bb.String()

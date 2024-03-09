@@ -2,7 +2,6 @@ package hype
 
 import (
 	"context"
-	"fmt"
 	"os"
 	"path/filepath"
 	"strings"
@@ -44,7 +43,7 @@ func Test_SourceCode_MD(t *testing.T) {
 			act := doc.MD()
 			act = strings.TrimSpace(act)
 
-			fmt.Println(act)
+			// fmt.Println(act)
 
 			b, err := os.ReadFile(filepath.Join(root, tc.name, "hype.gold"))
 			r.NoError(err)

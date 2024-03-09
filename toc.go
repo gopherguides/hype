@@ -27,6 +27,20 @@ func (toc *ToC) MarshalJSON() ([]byte, error) {
 	return json.MarshalIndent(m, "", "  ")
 }
 
+func (toc *ToC) MD() string {
+	if toc == nil {
+		return ""
+	}
+
+	bb := &bytes.Buffer{}
+	bb.WriteString(toc.StartTag())
+	bb.WriteString("\n")
+	bb.WriteString(toc.Nodes.MD())
+	bb.WriteString(toc.EndTag())
+
+	return bb.String()
+}
+
 func (toc *ToC) PostExecute(ctx context.Context, doc *Document, err error) error {
 	if err != nil {
 		return nil

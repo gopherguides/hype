@@ -16,8 +16,9 @@ import (
 
 type SourceCode struct {
 	*Element
-	Lang string
-	Src  string
+	Lang    string
+	Src     string
+	Snippet Snippet
 }
 
 func (code *SourceCode) MarshalJSON() ([]byte, error) {
@@ -83,7 +84,11 @@ func (code *SourceCode) MD() string {
 
 	fmt.Fprintln(bb, "```")
 
-	fmt.Fprintf(bb, "<em>%s</em>\n", code.Src)
+	if len(code.Snippet.Name) > 0 {
+		fmt.Fprintf(bb, "> *source: %s:%s*\n", code.Src, code.Snippet.Name)
+	} else {
+		fmt.Fprintf(bb, "> *source: %s*\n", code.Src)
+	}
 
 	return bb.String()
 }
@@ -276,6 +281,7 @@ func (code *SourceCode) setSnippet(snippet Snippet) error {
 
 	code.Lang = snippet.Lang
 	code.Nodes = Nodes{snippet}
+	code.Snippet = snippet
 
 	if err := code.Set("language", code.Lang); err != nil {
 		return err

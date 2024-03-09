@@ -120,6 +120,7 @@
                                   "src": "src/main.ts"
                                 },
                                 "filename": "hype.md",
+                                "filepath": "src/main.ts",
                                 "html_node": {
                                   "attributes": [
                                     {
@@ -184,6 +185,7 @@
                                   "src": "src/main.ts"
                                 },
                                 "filename": "hype.md",
+                                "filepath": "src/main.ts",
                                 "html_node": {
                                   "attributes": [
                                     {
