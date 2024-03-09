@@ -62,8 +62,6 @@ func Test_ParseError_Error(t *testing.T) {
 	act := pe.Error()
 	act = strings.TrimSpace(act)
 
-	fmt.Println(act)
-
 	exp := "filepath: root/test.md\nparse error: EOF"
 
 	r.Equal(exp, act)

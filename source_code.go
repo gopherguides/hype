@@ -17,6 +17,7 @@ import (
 type SourceCode struct {
 	*Element
 	Lang string
+	Src  string
 }
 
 func (code *SourceCode) MarshalJSON() ([]byte, error) {
@@ -36,6 +37,10 @@ func (code *SourceCode) MarshalJSON() ([]byte, error) {
 
 	if len(code.Lang) > 0 {
 		m["lang"] = code.Lang
+	}
+
+	if len(code.Src) > 0 {
+		m["filepath"] = code.Src
 	}
 
 	return json.MarshalIndent(m, "", "  ")
@@ -72,9 +77,13 @@ func (code *SourceCode) MD() string {
 	body := code.Children().MD()
 	body = html.UnescapeString(body)
 
+	body = strings.TrimSpace(body)
+
 	fmt.Fprintln(bb, body)
 
-	fmt.Fprint(bb, "```")
+	fmt.Fprintln(bb, "```")
+
+	fmt.Fprintf(bb, "<em>%s</em>\n", code.Src)
 
 	return bb.String()
 }
@@ -99,6 +108,8 @@ func (code *SourceCode) Execute(ctx context.Context, d *Document) error {
 		code.Unlock()
 		return nil
 	}
+
+	code.Src = src
 
 	if len(code.Lang) == 0 {
 		ext := filepath.Ext(src)
