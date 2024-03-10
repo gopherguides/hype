@@ -114,9 +114,11 @@ func GenerateToC(p *Parser, nodes Nodes) (Nodes, error) {
 		}
 
 		lvl := strings.Join(dots, ".")
-		lvl = fmt.Sprintf("<level>%s</level>", lvl)
+		lvl = fmt.Sprintf("<toc-level>%s</toc-level>", lvl)
 
-		fmt.Fprintf(bb, "- <a href=\"#heading-%d\">%s %s</a>\n", i, lvl, t)
+		h.Nodes = append(Nodes{Text(fmt.Sprintf("%s - ", lvl))}, h.Nodes...)
+
+		fmt.Fprintf(bb, "- <a href=\"#heading-%d\">%s - %s</a>\n", i, lvl, t)
 	}
 
 	frag, err := p.ParseFragment(bb)

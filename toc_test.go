@@ -36,7 +36,6 @@ func Test_GenerateToC(t *testing.T) {
 	exp = strings.TrimSpace(exp)
 
 	act := toc.String()
-	// fmt.Println(act)
 	act = strings.TrimSpace(act)
 
 	r.Equal(exp, act)
