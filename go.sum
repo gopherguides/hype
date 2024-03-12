@@ -17,8 +17,8 @@ github.com/markbates/garlic v1.0.0 h1:IOsPWAMbH2p/jnh2OYXTous891NSAkXQdosToJvlg+
 github.com/markbates/garlic v1.0.0/go.mod h1:k4nxVa4o0HPTVgFiL6IZV8JAfJP9xXqxOkbzEZWO+oQ=
 github.com/markbates/hepa v0.0.0-20211129002629-856d16f89b9d h1:+2OKR5x2iAJTQ2/u8Uyk1hOnJ8pneNV298dhJ0DO0nU=
 github.com/markbates/hepa v0.0.0-20211129002629-856d16f89b9d/go.mod h1:YCs1lt0wCv6j/HTzT2V/bUWKgdXlOXwTz0118HvMGAo=
-github.com/markbates/iox v0.0.0-20230829013604-e0813da73cc6 h1:z/d6wuXj40wjOVq9dnpYJVNlO7PFuBK0vz0eyzJ70lk=
-github.com/markbates/iox v0.0.0-20230829013604-e0813da73cc6/go.mod h1:q+P6BLqC21cbcmL82OdIO3A9VFCjq9fRQ+ije7T85ow=
+github.com/markbates/iox v1.0.0 h1:jbg1H1DH1U9yPJ5WxdRw9zl8B4hHg9/xwe4+yLXgLY0=
+github.com/markbates/iox v1.0.0/go.mod h1:q+P6BLqC21cbcmL82OdIO3A9VFCjq9fRQ+ije7T85ow=
 github.com/markbates/plugins v0.0.0-20240228174810-34b6b949cf9e h1:PXixirD5fy4dEyPw1P97LWBwxueR+OTDM1BtcrFgOIU=
 github.com/markbates/plugins v0.0.0-20240228174810-34b6b949cf9e/go.mod h1:iBZ9agLtjGRUflFuIntKen8W0EUuU9sDG9j05uX3GuU=
 github.com/markbates/sweets v0.0.0-20210926032915-062eb9bcc0e5 h1:od8GvggTptD2HUz8nGaQQe6n1zAHDbsG+82hfHPNExY=
@@ -43,8 +43,8 @@ github.com/stretchr/testify v1.8.0/go.mod h1:yNjHg4UonilssWZ8iaSj1OCr/vHnekPRkoO
 github.com/stretchr/testify v1.8.1/go.mod h1:w2LPCIKwWwSfY2zedu0+kehJoqGctiVI29o6fzry7u4=
 github.com/stretchr/testify v1.9.0 h1:HtqpIVDClZ4nwg75+f6Lvsy/wHu+3BoSGCbBAcpTsTg=
 github.com/stretchr/testify v1.9.0/go.mod h1:r2ic/lqez/lEtzL7wO/rwa5dbSLXVDPFyf8C91i36aY=
-golang.org/x/exp v0.0.0-20230321023759-10a507213a29 h1:ooxPy7fPvB4kwsA2h+iBNHkAbp/4JxTSwCmvdjEYmug=
-golang.org/x/exp v0.0.0-20230321023759-10a507213a29/go.mod h1:CxIveKay+FTh1D0yPZemJVgC/95VzuuOLq5Qi4xnoYc=
+golang.org/x/exp v0.0.0-20240222234643-814bf88cf225 h1:LfspQV/FYTatPTr/3HzIcmiUFH7PGP+OQ6mgDYo3yuQ=
+golang.org/x/exp v0.0.0-20240222234643-814bf88cf225/go.mod h1:CxmFvTBINI24O/j8iY7H1xHzx2i4OsyguNBmN/uPtqc=
 golang.org/x/net v0.22.0 h1:9sGLhx7iRIHEiX0oAJ3MRZMUCElJgy7Br1nO+AMN3Tc=
 golang.org/x/net v0.22.0/go.mod h1:JKghWKKOSdJwpW2GEx0Ja7fmaKnMsbu+MWVZTokSYmg=
 golang.org/x/sync v0.6.0 h1:5BMeUDZ7vkXGfEr1x9B4bRcTH4lpkTkpdh0T/J+qjbQ=
