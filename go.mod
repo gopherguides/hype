@@ -8,11 +8,11 @@ require (
 	github.com/gobuffalo/flect v1.0.2
 	github.com/gofrs/uuid/v5 v5.0.0
 	github.com/markbates/clam v0.0.0-20240219024730-b98cdab94ec3
-	github.com/markbates/cleo v0.0.0-20230821202903-72220ef5f7f0
+	github.com/markbates/cleo v0.0.0-20240313030849-949830e20db3
 	github.com/markbates/fsx v1.3.0
-	github.com/markbates/garlic v1.0.0
+	github.com/markbates/garlic v1.1.0
 	github.com/markbates/iox v1.0.0
-	github.com/markbates/plugins v0.0.0-20240228174810-34b6b949cf9e
+	github.com/markbates/plugins v1.1.0
 	github.com/markbates/sweets v0.0.0-20210926032915-062eb9bcc0e5
 	github.com/markbates/syncx v1.5.1
 	github.com/markbates/table v0.0.0-20230314205021-441ed58296d1

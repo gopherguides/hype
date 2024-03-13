@@ -9,12 +9,12 @@ import (
 	"os"
 	"path/filepath"
 	"strings"
+	"sync"
 	"time"
 
 	"github.com/gopherguides/hype"
 	"github.com/gopherguides/hype/atomx"
 	"github.com/markbates/cleo"
-	"github.com/markbates/plugins"
 )
 
 type VSCode struct {
@@ -25,6 +25,8 @@ type VSCode struct {
 	Parser  *hype.Parser // If nil, a default parser is used.
 
 	flags *flag.FlagSet
+
+	mu sync.RWMutex
 }
 
 func (cmd *VSCode) Flags() (*flag.FlagSet, error) {
@@ -32,8 +34,8 @@ func (cmd *VSCode) Flags() (*flag.FlagSet, error) {
 		return nil, err
 	}
 
-	cmd.Lock()
-	defer cmd.Unlock()
+	cmd.mu.Lock()
+	defer cmd.mu.Unlock()
 
 	if cmd.flags != nil {
 		return cmd.flags, nil
@@ -49,28 +51,28 @@ func (cmd *VSCode) Flags() (*flag.FlagSet, error) {
 
 func (cmd *VSCode) Main(ctx context.Context, pwd string, args []string) error {
 	if err := cmd.validate(); err != nil {
-		return plugins.Wrap(cmd, err)
+		return err
 	}
 
 	flags, err := cmd.Flags()
 	if err != nil {
-		return plugins.Wrap(cmd, err)
+		return err
 	}
 
 	if err := flags.Parse(args); err != nil {
-		return plugins.Wrap(cmd, err)
+		return err
 	}
 
 	args = flags.Args()
 
 	if len(args) < 1 {
 		err = fmt.Errorf("no filename specified")
-		return plugins.Wrap(cmd, err)
+		return err
 	}
 
 	if len(cmd.Host) == 0 {
 		err = fmt.Errorf("no host specified")
-		return plugins.Wrap(cmd, err)
+		return err
 	}
 
 	path := args[0]
@@ -87,7 +89,7 @@ func (cmd *VSCode) Main(ctx context.Context, pwd string, args []string) error {
 	})
 
 	if err != nil {
-		return plugins.Wrap(cmd, err)
+		return err
 	}
 	return nil
 }
@@ -194,8 +196,8 @@ func (cmd *VSCode) validate() error {
 		return fmt.Errorf("cmd is nil")
 	}
 
-	cmd.Lock()
-	defer cmd.Unlock()
+	cmd.mu.Lock()
+	defer cmd.mu.Unlock()
 
 	if cmd.FS == nil {
 		cmd.FS = os.DirFS(".")
