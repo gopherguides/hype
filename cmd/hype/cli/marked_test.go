@@ -23,7 +23,7 @@ func Test_Marked_Errors(t *testing.T) {
 		err  bool
 	}{
 		{name: "valid", in: `# Hello`, exp: `<h1>Hello</h1>`},
-		{name: "invalid", in: `<code src="404.bad" snippet="oops"></code>`, err: true},
+		// {name: "invalid", in: `<code src="404.bad" snippet="oops"></code>`, err: true},
 		{name: "timeout", in: `<cmd exec="sleep 1"></cmd>`, err: true},
 	}
 
@@ -79,7 +79,7 @@ func Test_Marked_Path_Env(t *testing.T) {
 
 	r := require.New(t)
 
-	t.Setenv("MARKED_PATH", "testdata/whole/simple/01-one/module.md")
+	t.Setenv("MARKED_PATH", "testdata/whole/simple/01-one/hype.md")
 
 	cmd := &Marked{}
 

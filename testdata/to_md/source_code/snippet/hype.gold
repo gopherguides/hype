@@ -1,0 +1,8 @@
+# Hello
+
+```go
+func main() {
+	fmt.Println("Hello, World!")
+}
+```
+> *source: src/main.go:main*

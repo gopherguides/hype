@@ -26,7 +26,7 @@ and finally:
 `
 
 	cab := &fstest.MapFS{
-		"module.md": &fstest.MapFile{
+		"hype.md": &fstest.MapFile{
 			Data: []byte(mod),
 		},
 	}
@@ -39,7 +39,7 @@ func byXYZDoc(t testing.TB) *Document {
 
 	p := NewParser(byXYZCab(t))
 
-	doc, err := p.ParseFile("module.md")
+	doc, err := p.ParseFile("hype.md")
 	if err != nil {
 		t.Fatal(err)
 	}

@@ -23,7 +23,7 @@ func Test_Markdown_UnknownAtom(t *testing.T) {
 	ctx, cancel := context.WithTimeout(ctx, time.Second)
 	defer cancel()
 
-	doc, err := p.ParseExecuteFile(ctx, "module.md")
+	doc, err := p.ParseExecuteFile(ctx, "hype.md")
 	r.NoError(err)
 
 	exp := `<a for="io#EOF" href="https://pkg.go.dev/io#EOF" target="_blank"><code>io.EOF</code></a>`

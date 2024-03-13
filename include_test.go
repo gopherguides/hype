@@ -18,7 +18,7 @@ func Test_Include_Parse_Errors(t *testing.T) {
 	}{
 		{
 			root:     "testdata/includes/broken",
-			filename: "module.md",
+			filename: "hype.md",
 		},
 	}
 
@@ -29,7 +29,7 @@ func Test_Include_Parse_Errors(t *testing.T) {
 
 			ctx := context.Background()
 
-			_, err := p.ParseExecuteFile(ctx, "module.md")
+			_, err := p.ParseExecuteFile(ctx, "hype.md")
 			r.Error(err)
 
 			var ee ParseError
@@ -52,7 +52,7 @@ func Test_Include_Cmd_Errors(t *testing.T) {
 	}{
 		{
 			root:     "testdata/includes/toplevel",
-			filename: "module.md",
+			filename: "hype.md",
 		},
 		{
 			root:     "testdata/includes/sublevel",
@@ -67,7 +67,7 @@ func Test_Include_Cmd_Errors(t *testing.T) {
 
 			ctx := context.Background()
 
-			_, err := p.ParseExecuteFile(ctx, "module.md")
+			_, err := p.ParseExecuteFile(ctx, "hype.md")
 			r.Error(err)
 
 			var ee ExecuteError
@@ -99,7 +99,7 @@ func Test_Include(t *testing.T) {
 <img src="assets/second.png"></img>`
 
 	cab := fstest.MapFS{
-		"module.md": &fstest.MapFile{
+		"hype.md": &fstest.MapFile{
 			Data: []byte(mod),
 		},
 		"second/second.md": &fstest.MapFile{
@@ -110,7 +110,7 @@ func Test_Include(t *testing.T) {
 
 	p := NewParser(cab)
 
-	doc, err := p.ParseFile("module.md")
+	doc, err := p.ParseFile("hype.md")
 	r.NoError(err)
 	r.NotNil(doc)
 
@@ -150,7 +150,7 @@ func Test_Include_Nested(t *testing.T) {
 <img src="assets/third.png"></img>`
 
 	cab := fstest.MapFS{
-		"module.md": &fstest.MapFile{
+		"hype.md": &fstest.MapFile{
 			Data: []byte(mod),
 		},
 		"second/second.md": &fstest.MapFile{
@@ -165,7 +165,7 @@ func Test_Include_Nested(t *testing.T) {
 
 	p := NewParser(cab)
 
-	doc, err := p.ParseFile("module.md")
+	doc, err := p.ParseFile("hype.md")
 	r.NoError(err)
 	r.NotNil(doc)
 

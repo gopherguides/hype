@@ -27,7 +27,7 @@ func Test_NowNodes(t *testing.T) {
 
 	defer cancel()
 
-	doc, err := p.ParseExecuteFile(ctx, "module.md")
+	doc, err := p.ParseExecuteFile(ctx, "hype.md")
 	r.NoError(err)
 
 	act := doc.String()
@@ -35,7 +35,7 @@ func Test_NowNodes(t *testing.T) {
 
 	// fmt.Println(act)
 
-	b, err := fs.ReadFile(p.FS, "module.gold")
+	b, err := fs.ReadFile(p.FS, "hype.gold")
 	r.NoError(err)
 
 	exp := string(b)

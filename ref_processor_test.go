@@ -20,7 +20,7 @@ func Test_RefProcessor_Process(t *testing.T) {
 
 	ctx := context.Background()
 
-	doc, err := p.ParseExecuteFile(ctx, "module.md")
+	doc, err := p.ParseExecuteFile(ctx, "hype.md")
 	r.NoError(err)
 
 	rp := &RefProcessor{}
@@ -28,7 +28,7 @@ func Test_RefProcessor_Process(t *testing.T) {
 	err = rp.Process(doc)
 	r.NoError(err)
 
-	b, err := fs.ReadFile(cab, "module.gold")
+	b, err := fs.ReadFile(cab, "hype.gold")
 	r.NoError(err)
 
 	exp := string(b)

@@ -18,7 +18,7 @@ func Test_Document_Execute(t *testing.T) {
 		r := require.New(t)
 		p := testParser(t, "testdata/doc/execution/success")
 
-		doc, err := p.ParseFile("module.md")
+		doc, err := p.ParseFile("hype.md")
 		r.NoError(err)
 
 		ctx, cancel := context.WithTimeout(context.Background(), time.Second*3)
@@ -39,7 +39,7 @@ func Test_Document_Execute(t *testing.T) {
 		r := require.New(t)
 		p := testParser(t, "testdata/doc/execution/failure")
 
-		doc, err := p.ParseFile("module.md")
+		doc, err := p.ParseFile("hype.md")
 		r.NoError(err)
 
 		ctx, cancel := context.WithTimeout(context.Background(), time.Second*3)
@@ -67,7 +67,7 @@ func Test_Document_MD(t *testing.T) {
 	ctx, cancel := context.WithTimeout(context.Background(), time.Second*30)
 	defer cancel()
 
-	doc, err := p.ParseExecuteFile(ctx, "module.md")
+	doc, err := p.ParseExecuteFile(ctx, "hype.md")
 	r.NoError(err)
 
 	s := doc.MD()
@@ -76,7 +76,7 @@ func Test_Document_MD(t *testing.T) {
 
 	// fmt.Println(act)
 
-	b, err := fs.ReadFile(p.FS, "module.gold")
+	b, err := fs.ReadFile(p.FS, "hype.gold")
 	r.NoError(err)
 
 	exp := string(b)
@@ -96,7 +96,7 @@ func Test_Document_MarshalJSON(t *testing.T) {
 
 	ctx := context.Background()
 
-	doc, err := p.ParseExecuteFile(ctx, "module.md")
+	doc, err := p.ParseExecuteFile(ctx, "hype.md")
 	r.NoError(err)
 
 	testJSON(t, "document", doc)
@@ -108,7 +108,7 @@ func Test_Document_Pages(t *testing.T) {
 
 	p := testParser(t, "testdata/doc/pages")
 
-	doc, err := p.ParseFile("module.md")
+	doc, err := p.ParseFile("hype.md")
 	r.NoError(err)
 
 	pages, err := doc.Pages()
@@ -123,7 +123,7 @@ func Test_Document_Pages_NoPages(t *testing.T) {
 
 	p := testParser(t, "testdata/doc/simple")
 
-	doc, err := p.ParseFile("module.md")
+	doc, err := p.ParseFile("hype.md")
 	r.NoError(err)
 
 	pages, err := doc.Pages()

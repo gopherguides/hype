@@ -34,7 +34,7 @@ func Test_Parser_Parse(t *testing.T) {
 	t.Parallel()
 	r := require.New(t)
 
-	src, err := fs.ReadFile(testdata, "module.md")
+	src, err := fs.ReadFile(testdata, "hype.md")
 	r.NoError(err)
 
 	p := New()

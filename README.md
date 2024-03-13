@@ -12,19 +12,22 @@
 Hype is a content generation tool that use traditional Markdown syntax, and allows it to be extended for almost any use to create dynamic, rich, automated output that is easily maintainable and reusable.
 
 Hype follows the same principals that we use for coding;
-- packages (keep relevant content in small, reusable packages, with all links relative to the package)
-- reuse - write your documentation once (even in your code), and use everywhere (blog, book, github repo, etc)
-- partials/includes - support including documents into a larger document (just like code!)
-- validation - like tests, but validate all your code samples are valid (or not if that is what you expect).
-- asset validation - ensure local assets like images, etc actually exist
+
+
+* packages (keep relevant content in small, reusable packages, with all links relative to the package)
+* reuse - write your documentation once (even in your code), and use everywhere (blog, book, github repo, etc)
+* partials/includes - support including documents into a larger document (just like code!)
+* validation - like tests, but validate all your code samples are valid (or not if that is what you expect).
+* asset validation - ensure local assets like images, etc actually exist
+
 
 ## Created with Hype
 
-This README was created with hype.  Here was the command we used to create it:
+This README was created with hype. Here was the command we used to create it:
 
 From the `.hype` directory, run:
 
-`hype export -format=markdown -f module.md > ../README.md
+`hype export -format=markdown -f hype.md > ../README.md
 `
 
 You can also use a [github action](#using-github-actions-to-update-your-readme) to automatically update your README as well.
@@ -66,7 +69,7 @@ func main() {
 
 ```
 
-Notice the use of the `snippet` comment.  The format for the comment is:
+Notice the use of the `snippet` comment. The format for the comment is:
 
 `// snippet: <snippet_name_here>
 `
@@ -81,7 +84,7 @@ func main() {
 }
 ```
 
-A `snippet` is not required in your `code` tag.  They default behavior of a `code` tag is to include the entire source file.
+A `snippet` is not required in your `code` tag. They default behavior of a `code` tag is to include the entire source file.
 
 If we leave the tag out, it will result in the following code being included:
 
@@ -97,7 +100,7 @@ func main() {
 
 ```
 
-Notice that none of the `snippet` comments were in the output?  This is because hype recognizes them as directives for the document, and will not show them in the actual output.
+Notice that none of the `snippet` comments were in the output? This is because hype recognizes them as directives for the document, and will not show them in the actual output.
 
 # Go Specific Commands
 
@@ -105,7 +108,7 @@ There are a number of [Go](https://go.dev/) specific commands you can run as wel
 
 Let's look at how we use the `go` tag.
 
-Here is the source code of the Go file we are going to include.  Notice the use of the `snippet` comments to identify the area of code we want included.  We'll see how to specify that in the next section when we include it in our markdown.
+Here is the source code of the Go file we are going to include. Notice the use of the `snippet` comments to identify the area of code we want included. We'll see how to specify that in the next section when we include it in our markdown.
 
 # Running Go Code
 
@@ -161,7 +164,7 @@ Go Version: go1.22.0
 
 ## Snippets with Go
 
-You can also specify the snippet in a `go` tag as well.  The result is that it will only include the code snippet in the included source:
+You can also specify the snippet in a `go` tag as well. The result is that it will only include the code snippet in the included source:
 
 `<go src="src/hello" run="." code="main.go#example"></go>
 `
@@ -188,7 +191,7 @@ Go Version: go1.22.0
 
 ## Invalid Code
 
-What if you want to include an example of code that does not compile?  We still want the code to be parsed and included, even though the code doesn't compile.  For this, we can state the expected output of the program.
+What if you want to include an example of code that does not compile? We still want the code to be parsed and included, even though the code doesn't compile. For this, we can state the expected output of the program.
 
 `<go src="src/broken" run="." code="main.go#example" exit="1"></go>
 `
@@ -216,7 +219,7 @@ Go Version: go1.22.0
 
 ### GoDoc
 
-While there are a number of `godoc` commands that will allow you to put your documentation from your code directly into your articles as well.  Here are some of the commands.
+While there are a number of `godoc` commands that will allow you to put your documentation from your code directly into your articles as well. Here are some of the commands.
 
 Here is the basic usage first:
 
@@ -278,7 +281,7 @@ For more examples, see the [hype repo](https://www.github.com/gopherguides/hype)
 
 # Arbitrary Commands
 
-You can also use the `cmd` tag and the `exec` attribute to run arbitrary commands and include them in your documentation.  Here is the command to run the `tree` command and include it in our documentation:
+You can also use the `cmd` tag and the `exec` attribute to run arbitrary commands and include them in your documentation. Here is the command to run the `tree` command and include it in our documentation:
 
 `<cmd exec="tree" src="."></cmd>
 `
@@ -289,8 +292,8 @@ Here is the output:
 $ tree
 
 .
+├── hype.md
 ├── includes.md
-├── module.md
 └── src
     ├── broken
     │   └── main.go
@@ -302,13 +305,13 @@ $ tree
 
 # The Export Command
 
-There are several options for running the `hype` command.  Most notable is the `export` option:
+There are several options for running the `hype` command. Most notable is the `export` option:
 
 `$ hype export -h
 
 Usage of hype:
   -f string
-    	optional file name to preview, if not provided, defaults to module.md (default "module.md")
+    	optional file name to preview, if not provided, defaults to hype.md (default "hype.md")
   -format string
     	content type to export to: markdown, html (default "markdown")
   -timeout duration
@@ -353,14 +356,14 @@ $ tree
 
 .
 ├── actions
-│   ├── hype.yml
-│   └── module.md
+│   ├── hype.md
+│   └── hype.yml
 ├── badges.md
+├── hype.md
 ├── license.md
-├── module.md
 └── quickstart
+    ├── hype.md
     ├── includes.md
-    ├── module.md
     └── src
         ├── broken
         │   └── main.go
@@ -405,33 +408,32 @@ name: Generate README with Hype
 on: [pull_request]
 
 jobs:
-
   build:
     runs-on: ubuntu-latest
     steps:
-    - uses: actions/checkout@v4
-      with:
-        repository: ${{ github.event.pull_request.head.repo.full_name }}
-        ref: ${{ github.event.pull_request.head.ref }}
-    - name: Set up Go
-      uses: actions/setup-go@v4
-      with:
-        go-version: "1.22.x"
-        cache-dependency-path: subdir/go.sum
+      - uses: actions/checkout@v4
+        with:
+          repository: ${{ github.event.pull_request.head.repo.full_name }}
+          ref: ${{ github.event.pull_request.head.ref }}
+      - name: Set up Go
+        uses: actions/setup-go@v4
+        with:
+          go-version: "1.22.x"
+          cache-dependency-path: subdir/go.sum
 
-    - name: Install hype
-      run: go install github.com/gopherguides/hype/cmd/hype@latest
+      - name: Install hype
+        run: go install github.com/gopherguides/hype/cmd/hype@latest
 
-    - name: Run hype
-      run: pushd .hype;hype export -format=markdown -f module.md > ../README.md;popd
+      - name: Run hype
+        run: pushd .hype;hype export -format=markdown -f hype.md > ../README.md;popd
 
-    - name: Commit README back to the repo
-      run: |-
-        git rev-parse --abbrev-ref HEAD
-        git config user.name 'GitHub Actions'
-        git config user.email 'actions@github.com'
-        git diff --quiet || (git add README.md && git commit -am "Updated README")
-        git push origin ${{github.event.pull_request.head.ref}}
+      - name: Commit README back to the repo
+        run: |-
+          git rev-parse --abbrev-ref HEAD
+          git config user.name 'GitHub Actions'
+          git config user.email 'actions@github.com'
+          git diff --quiet || (git add README.md && git commit -am "Updated README")
+          git push origin ${{github.event.pull_request.head.ref}}
 
 ```
 

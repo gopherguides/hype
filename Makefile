@@ -15,4 +15,4 @@ install:
 	go install -v ./cmd/hype
 
 hype:
-	pushd .hype;hype export -format=markdown -f module.md > ../README.md;popd
+	pushd .hype;hype export -format=markdown -f hype.md > ../README.md;popd

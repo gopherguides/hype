@@ -62,7 +62,7 @@ func (cmd *App) ScopedPlugins() plugins.Plugins {
 
 func (cmd *App) execute(ctx context.Context, pwd string, args []string) error {
 	if cmd == nil {
-		return plugins.Wrap(cmd, fmt.Errorf("app is nil"))
+		return fmt.Errorf("app is nil")
 	}
 
 	plugs := plugins.Plugins{}
@@ -73,7 +73,7 @@ func (cmd *App) execute(ctx context.Context, pwd string, args []string) error {
 	c := plugcmd.FindFromArgs(args, plugs)
 
 	if c == nil {
-		return plugins.Wrap(cmd, cleo.ErrNoCommands)
+		return cleo.ErrNoCommands
 	}
 
 	err := c.Main(ctx, pwd, args[1:])
@@ -86,18 +86,18 @@ func (cmd *App) execute(ctx context.Context, pwd string, args []string) error {
 
 func (cmd *App) init(pwd string, args []string) error {
 	if cmd == nil {
-		return plugins.Wrap(cmd, fmt.Errorf("app is nil"))
+		return fmt.Errorf("app is nil")
 	}
 
 	cmd.once.Do(func() {
-		if err := cleo.Init(&cmd.Cmd, pwd); err != nil {
-			cmd.initErr = plugins.Wrap(cmd, err)
+		if err := (&cmd.Cmd).Init(); err != nil {
+			cmd.initErr = err
 		}
 
 		for _, c := range cmd.SubCommands() {
 			if pc, ok := c.(ParserCommander); ok {
 				if err := pc.SetParser(cmd.Parser); err != nil {
-					cmd.initErr = plugins.Wrap(cmd, err)
+					cmd.initErr = err
 					break
 				}
 			}
@@ -196,14 +196,16 @@ func WithTimeout(ctx context.Context, timeout time.Duration, f func(context.Cont
 		timeout = DefaultTimeout()
 	}
 
-	cltx, cancel := cleo.ContextWithTimeout(ctx, timeout)
+	cltx, cancel := context.WithTimeout(ctx, timeout)
 	defer cancel()
+
+	cltx, cause := context.WithCancelCause(cltx)
 
 	go func() {
 		defer cancel()
 		err := f(cltx)
 		if err != nil {
-			cltx.SetErr(err)
+			cause(err)
 		}
 	}()
 

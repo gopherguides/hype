@@ -16,7 +16,9 @@ import (
 
 type SourceCode struct {
 	*Element
-	Lang string
+	Lang    string
+	Src     string
+	Snippet Snippet
 }
 
 func (code *SourceCode) MarshalJSON() ([]byte, error) {
@@ -36,6 +38,10 @@ func (code *SourceCode) MarshalJSON() ([]byte, error) {
 
 	if len(code.Lang) > 0 {
 		m["lang"] = code.Lang
+	}
+
+	if len(code.Src) > 0 {
+		m["filepath"] = code.Src
 	}
 
 	return json.MarshalIndent(m, "", "  ")
@@ -72,9 +78,17 @@ func (code *SourceCode) MD() string {
 	body := code.Children().MD()
 	body = html.UnescapeString(body)
 
+	body = strings.TrimSpace(body)
+
 	fmt.Fprintln(bb, body)
 
-	fmt.Fprint(bb, "```")
+	fmt.Fprintln(bb, "```")
+
+	if len(code.Snippet.Name) > 0 {
+		fmt.Fprintf(bb, "> *source: %s:%s*\n", code.Src, code.Snippet.Name)
+	} else {
+		fmt.Fprintf(bb, "> *source: %s*\n", code.Src)
+	}
 
 	return bb.String()
 }
@@ -99,6 +113,8 @@ func (code *SourceCode) Execute(ctx context.Context, d *Document) error {
 		code.Unlock()
 		return nil
 	}
+
+	code.Src = src
 
 	if len(code.Lang) == 0 {
 		ext := filepath.Ext(src)
@@ -265,6 +281,7 @@ func (code *SourceCode) setSnippet(snippet Snippet) error {
 
 	code.Lang = snippet.Lang
 	code.Nodes = Nodes{snippet}
+	code.Snippet = snippet
 
 	if err := code.Set("language", code.Lang); err != nil {
 		return err

@@ -4,6 +4,7 @@ import (
 	"errors"
 	"fmt"
 	"io"
+	"strings"
 	"testing"
 
 	"github.com/stretchr/testify/require"
@@ -44,4 +45,24 @@ func Test_ParseError_MarshalJSON(t *testing.T) {
 	}
 
 	testJSON(t, "parse_error", pe)
+}
+
+func Test_ParseError_Error(t *testing.T) {
+	t.Parallel()
+
+	r := require.New(t)
+
+	pe := ParseError{
+		Contents: []byte("contents"),
+		Err:      io.EOF,
+		Filename: "test.md",
+		Root:     "root",
+	}
+
+	act := pe.Error()
+	act = strings.TrimSpace(act)
+
+	exp := "filepath: root/test.md\nparse error: EOF"
+
+	r.Equal(exp, act)
 }

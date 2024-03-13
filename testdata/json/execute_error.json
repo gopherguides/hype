@@ -6,7 +6,7 @@
     "type": "hype.Document"
   },
   "error": "EOF",
-  "filename": "module.md",
+  "filename": "hype.md",
   "root": "testdata/parser/errors/execute",
   "type": "hype.ExecuteError"
 }

@@ -3,6 +3,9 @@ package hype
 import (
 	"encoding/json"
 	"errors"
+	"fmt"
+	"path/filepath"
+	"strings"
 )
 
 type PreExecuteError struct {
@@ -27,7 +30,28 @@ func (pee PreExecuteError) MarshalJSON() ([]byte, error) {
 }
 
 func (pee PreExecuteError) Error() string {
-	return toError(pee)
+	sb := &strings.Builder{}
+
+	var lines []string
+
+	fp := filepath.Join(pee.Root, pee.Filename)
+	if len(fp) > 0 {
+		lines = append(lines, fmt.Sprintf("filepath: %s", fp))
+	}
+
+	if pee.Document != nil && len(pee.Document.Title) > 0 {
+		lines = append(lines, fmt.Sprintf("document: %s", pee.Document.Title))
+	}
+
+	if pee.Err != nil {
+		lines = append(lines, fmt.Sprintf("pre execute error: %s", pee.Err))
+	}
+
+	sb.WriteString(strings.Join(lines, "\n"))
+
+	s := sb.String()
+
+	return strings.TrimSpace(s)
 }
 
 func (pee PreExecuteError) Unwrap() error {

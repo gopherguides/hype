@@ -16,7 +16,7 @@ func Test_NewMetadata_Pages(t *testing.T) {
 	cab := os.DirFS("testdata/metadata/pages")
 
 	p := NewParser(cab)
-	doc, err := p.ParseFile("module.md")
+	doc, err := p.ParseFile("hype.md")
 	r.NoError(err)
 
 	mds := ByType[*Metadata](doc.Children())
@@ -49,7 +49,7 @@ func Test_NewMetadata_Multiple_Erro0r(t *testing.T) {
 	cab := os.DirFS("testdata/metadata/multi")
 
 	p := NewParser(cab)
-	_, err := p.ParseFile("module.md")
+	_, err := p.ParseFile("hype.md")
 	r.Error(err)
 
 	r.True(errors.Is(err, ParseError{}))

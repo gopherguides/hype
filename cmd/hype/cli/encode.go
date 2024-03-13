@@ -7,11 +7,11 @@ import (
 	"fmt"
 	"io"
 	"os"
+	"sync"
 	"time"
 
 	"github.com/gopherguides/hype"
 	"github.com/markbates/cleo"
-	"github.com/markbates/plugins"
 )
 
 type Encode struct {
@@ -23,6 +23,8 @@ type Encode struct {
 	ParseOnly bool          // if true, only parse the file and exit
 
 	flags *flag.FlagSet
+
+	mu sync.RWMutex
 }
 
 func (cmd *Encode) SetParser(p *hype.Parser) error {
@@ -30,8 +32,8 @@ func (cmd *Encode) SetParser(p *hype.Parser) error {
 		return fmt.Errorf("encode is nil")
 	}
 
-	cmd.Lock()
-	defer cmd.Unlock()
+	cmd.mu.Lock()
+	defer cmd.mu.Unlock()
 
 	cmd.Parser = p
 	return nil
@@ -42,8 +44,8 @@ func (cmd *Encode) Flags() (*flag.FlagSet, error) {
 		return nil, fmt.Errorf("marked is nil")
 	}
 
-	cmd.Lock()
-	defer cmd.Unlock()
+	cmd.mu.Lock()
+	defer cmd.mu.Unlock()
 
 	if cmd.flags != nil {
 		return cmd.flags, nil
@@ -60,10 +62,10 @@ func (cmd *Encode) Flags() (*flag.FlagSet, error) {
 
 func (cmd *Encode) Main(ctx context.Context, pwd string, args []string) error {
 	if cmd == nil {
-		return plugins.Wrap(cmd, fmt.Errorf("cmd is nil"))
+		return fmt.Errorf("cmd is nil")
 	}
 
-	cmd.Lock()
+	cmd.mu.Lock()
 	if cmd.FS == nil {
 		cmd.FS = os.DirFS(pwd)
 	}
@@ -74,16 +76,16 @@ func (cmd *Encode) Main(ctx context.Context, pwd string, args []string) error {
 
 	p := cmd.Parser
 
-	cmd.Unlock()
+	cmd.mu.Unlock()
 
 	flags, err := cmd.Flags()
 	if err != nil {
-		return plugins.Wrap(cmd, err)
+		return err
 	}
 
 	err = flags.Parse(args)
 	if err != nil {
-		return plugins.Wrap(cmd, err)
+		return err
 	}
 
 	args = flags.Args()

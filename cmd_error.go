@@ -2,6 +2,9 @@ package hype
 
 import (
 	"encoding/json"
+	"fmt"
+	"path/filepath"
+	"strings"
 
 	"github.com/markbates/clam"
 )
@@ -26,7 +29,32 @@ func (ce CmdError) MarshalJSON() ([]byte, error) {
 }
 
 func (ce CmdError) Error() string {
-	return toError(ce)
+	sb := &strings.Builder{}
+
+	var lines []string
+
+	fp := filepath.Join(ce.Dir, ce.Filename)
+	if len(fp) > 0 {
+		lines = append(lines, fmt.Sprintf("filepath: %s", fp))
+	}
+
+	if len(ce.Args) > 0 {
+		lines = append(lines, fmt.Sprintf("cmd: $ %s", strings.Join(ce.Args, " ")))
+	}
+
+	if ce.Exit != 0 {
+		lines = append(lines, fmt.Sprintf("exit: %d", ce.Exit))
+	}
+
+	if ce.Err != nil {
+		lines = append(lines, fmt.Sprintf("cmd error: %s", ce.Err))
+	}
+
+	sb.WriteString(strings.Join(lines, "\n"))
+
+	s := sb.String()
+
+	return strings.TrimSpace(s)
 }
 
 func (ce CmdError) As(target any) bool {

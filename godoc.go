@@ -22,6 +22,7 @@ func NewGoDocLinkNodes(p *Parser, el *Element) (Nodes, error) {
 	af.Attributes = ats
 
 	href := el.Nodes.String()
+
 	if err := af.Set("href", fmt.Sprintf("https://pkg.go.dev/%s", href)); err != nil {
 		return nil, err
 	}

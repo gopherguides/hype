@@ -117,6 +117,7 @@ func NewCmdResult(p *Parser, c *Cmd, res *clam.Result) (*CmdResult, error) {
 		return nil, err
 	}
 
+	body = strings.TrimSpace(body)
 	cel.Nodes = append(cel.Nodes, Text(body))
 
 	if _, ok := c.Get("hide-data"); ok {

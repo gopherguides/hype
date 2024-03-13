@@ -27,6 +27,20 @@ func (toc *ToC) MarshalJSON() ([]byte, error) {
 	return json.MarshalIndent(m, "", "  ")
 }
 
+func (toc *ToC) MD() string {
+	if toc == nil {
+		return ""
+	}
+
+	bb := &bytes.Buffer{}
+	bb.WriteString(toc.StartTag())
+	bb.WriteString("\n")
+	bb.WriteString(toc.Nodes.MD())
+	bb.WriteString(toc.EndTag())
+
+	return bb.String()
+}
+
 func (toc *ToC) PostExecute(ctx context.Context, doc *Document, err error) error {
 	if err != nil {
 		return nil
@@ -100,9 +114,11 @@ func GenerateToC(p *Parser, nodes Nodes) (Nodes, error) {
 		}
 
 		lvl := strings.Join(dots, ".")
-		lvl = fmt.Sprintf("<level>%s</level>", lvl)
+		lvl = fmt.Sprintf("<toc-level>%s</toc-level>", lvl)
 
-		fmt.Fprintf(bb, "- <a href=\"#heading-%d\">%s %s</a>\n", i, lvl, t)
+		h.Nodes = append(Nodes{Text(fmt.Sprintf("%s - ", lvl))}, h.Nodes...)
+
+		fmt.Fprintf(bb, "- <a href=\"#heading-%d\">%s - %s</a>\n", i, lvl, t)
 	}
 
 	frag, err := p.ParseFragment(bb)

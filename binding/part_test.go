@@ -17,22 +17,22 @@ func Test_PartFromPath(t *testing.T) {
 		err  bool
 	}{
 		{in: `.`, err: true},
-		{in: `01-foo/module.md`, num: 1, name: "foo"},
+		{in: `01-foo/hype.md`, num: 1, name: "foo"},
 		{in: `01-foo`, num: 1, name: "foo"},
 		{in: `01-pkgs-mods-deps`, num: 1, name: "pkgs-mods-deps"},
-		{in: `012-foo/module.md`, num: 12, name: "foo"},
+		{in: `012-foo/hype.md`, num: 12, name: "foo"},
 		{in: `012-foo`, num: 12, name: "foo"},
-		{in: `01234-foo/module.md`, num: 1234, name: "foo"},
+		{in: `01234-foo/hype.md`, num: 1234, name: "foo"},
 		{in: `01234-foo`, num: 1234, name: "foo"},
-		{in: `1-foo/module.md`, num: 1, name: "foo"},
+		{in: `1-foo/hype.md`, num: 1, name: "foo"},
 		{in: `1-foo`, num: 1, name: "foo"},
-		{in: `12-foo/module.md`, num: 12, name: "foo"},
+		{in: `12-foo/hype.md`, num: 12, name: "foo"},
 		{in: `12-foo`, num: 12, name: "foo"},
-		{in: `1234-foo/module.md`, num: 1234, name: "foo"},
+		{in: `1234-foo/hype.md`, num: 1234, name: "foo"},
 		{in: `1234-foo`, num: 1234, name: "foo"},
 		{in: ``, err: true},
 		{in: `foo.md`, err: true},
-		{in: `src/simple/1-foo/module.md`, num: 1, name: "foo"},
+		{in: `src/simple/1-foo/hype.md`, num: 1, name: "foo"},
 	}
 
 	for _, tc := range tcs {
