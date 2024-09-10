@@ -136,13 +136,13 @@ For more examples, see the [hype repo](https://www.github.com/gopherguides/hype)
 
 You can also use the `cmd` tag and the `exec` attribute to run arbitrary commands and include them in your documentation. Here is the command to run the `tree` command and include it in our documentation:
 
-```
-<cmd exec="tree" src="."></cmd>
+```html
+<cmd exec="tree | head -n 30" src="."></cmd>
 ```
 
 Here is the output:
 
-<cmd exec="tree" src="."></cmd>
+<cmd exec="tree | head -n 30" src="."></cmd>
 
 # The Export Command
 
