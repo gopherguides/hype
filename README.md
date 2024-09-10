@@ -83,8 +83,6 @@ func main() {
 	fmt.Println("Hello World")
 }
 ```
-> *source: docs/quickstart/src/hello/main.go:example*
-
 
 A `snippet` is not required in your `code` tag. The default behavior of a `code` tag is to include the entire source file.
 
@@ -98,9 +96,9 @@ import "fmt"
 func main() {
 	fmt.Println("Hello World")
 }
-```
-> *source: docs/quickstart/src/hello/main.go*
 
+
+```
 
 Notice that none of the `snippet` comments were in the output? This is because hype recognizes them as directives for the document, and will not show them in the actual output.
 
@@ -127,7 +125,7 @@ $ go run .
 Hello World
 
 --------------------------------------------------------------------------------
-Go Version: go1.23.0
+Go Version: go1.22.6
 
 ```
 
@@ -148,9 +146,9 @@ import "fmt"
 func main() {
 	fmt.Println("Hello World")
 }
-```
-> *source: docs/quickstart/src/hello/main.go*
 
+
+```
 
 ---
 
@@ -160,7 +158,7 @@ $ go run .
 Hello World
 
 --------------------------------------------------------------------------------
-Go Version: go1.23.0
+Go Version: go1.22.6
 
 ```
 
@@ -178,8 +176,6 @@ func main() {
 	fmt.Println("Hello World")
 }
 ```
-> *source: docs/quickstart/src/hello/main.go#example:example*
-
 
 ---
 
@@ -189,7 +185,7 @@ $ go run .
 Hello World
 
 --------------------------------------------------------------------------------
-Go Version: go1.23.0
+Go Version: go1.22.6
 
 ```
 
@@ -207,8 +203,6 @@ func main() {
 	fmt.Prin("Hello World")
 }
 ```
-> *source: docs/quickstart/src/broken/main.go#example:example*
-
 
 ---
 
@@ -219,7 +213,7 @@ $ go run .
 ./main.go:7:6: undefined: fmt.Prin
 
 --------------------------------------------------------------------------------
-Go Version: go1.23.0
+Go Version: go1.22.6
 
 ```
 
@@ -256,7 +250,7 @@ type Context interface{ ... }
     func WithoutCancel(parent Context) Context
 
 --------------------------------------------------------------------------------
-Go Version: go1.23.0
+Go Version: go1.22.6
 
 ```
 
@@ -279,7 +273,7 @@ func WithCancel(parent Context) (ctx Context, cancel CancelFunc)
     call cancel as soon as the operations running in this Context complete.
 
 --------------------------------------------------------------------------------
-Go Version: go1.23.0
+Go Version: go1.22.6
 
 ```
 
@@ -346,9 +340,8 @@ The following code will parse the code/code.md and sourceable/sourceable.md docu
 <include src="code/code.md"></include>
 
 <include src="sourceable/sourceable.md"></include>
-```
-> *source: docs/quickstart/includes.md*
 
+```
 
 ---
 
@@ -576,36 +569,6 @@ $ tree
 ├── code_test.go
 ├── comment.go
 ├── comment_test.go
-├── dist
-│   ├── CHANGELOG.md
-│   ├── artifacts.json
-│   ├── config.yaml
-│   ├── hype_0.1.0_checksums.txt
-│   ├── hype_Darwin_arm64.tar.gz
-│   ├── hype_Darwin_x86_64.tar.gz
-│   ├── hype_Linux_arm64.tar.gz
-│   ├── hype_Linux_i386.tar.gz
-│   ├── hype_Linux_x86_64.tar.gz
-│   ├── hype_Windows_arm64.zip
-│   ├── hype_Windows_i386.zip
-│   ├── hype_Windows_x86_64.zip
-│   ├── hype_darwin_amd64_v1
-│   │   └── hype
-│   ├── hype_darwin_arm64
-│   │   └── hype
-│   ├── hype_linux_386
-│   │   └── hype
-│   ├── hype_linux_amd64_v1
-│   │   └── hype
-│   ├── hype_linux_arm64
-│   │   └── hype
-│   ├── hype_windows_386
-│   │   └── hype.exe
-│   ├── hype_windows_amd64_v1
-│   │   └── hype.exe
-│   ├── hype_windows_arm64
-│   │   └── hype.exe
-│   └── metadata.json
 ├── docs
 │   ├── badges.md
 │   ├── license.md
@@ -1266,7 +1229,7 @@ $ tree
 ├── var.go
 └── var_test.go
 
-322 directories, 581 files
+313 directories, 560 files
 ```
 ---
 
@@ -1326,9 +1289,8 @@ jobs:
           git config user.email 'actions@github.com'
           git diff --quiet || (git add README.md && git commit -am "Updated README")
           git push origin ${{github.event.pull_request.head.ref}}
-```
-> *source: .github/workflows/hype.yml*
 
+```
 
 ---
 
