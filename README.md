@@ -289,8 +289,10 @@ For more examples, see the [hype repo](https://www.github.com/gopherguides/hype)
 
 You can also use the `cmd` tag and the `exec` attribute to run arbitrary commands and include them in your documentation. Here is the command to run the `tree` command and include it in our documentation:
 
-`<cmd exec="tree" src="."></cmd>
-`
+```html
+<cmd exec="tree | head -n 30" src="."></cmd>
+
+```
 
 Here is the output:
 
@@ -1268,8 +1270,6 @@ It is recommend to use a GitHub [Personnal Acces Token](https://docs.github.com/
 ## The Action
 
 The current action is set to only generate the readme on a pull request and commit it back to that same pull request.  You can modify this to your own needs.
-
-It should be noted that we are ignoring the `docs` directory in our workflow because we purposefully have broken code examples.  You should not do this.  Your can simply run `go test ./...` and `staticcheck ./...` respectively in your actions.
 
 ```yml
 name: Generate README with Hype
