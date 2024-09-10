@@ -1269,6 +1269,8 @@ It is recommend to use a GitHub [Personnal Acces Token](https://docs.github.com/
 
 The current action is set to only generate the readme on a pull request and commit it back to that same pull request.  You can modify this to your own needs.
 
+It should be noted that we are ignoring the `docs` directory in our workflow because we purposefully have broken code examples.  You should not do this.  Your can simply run `go test ./...` and `staticcheck ./...` respectively in your actions.
+
 ```yml
 name: Generate README with Hype
 on: [pull_request]
