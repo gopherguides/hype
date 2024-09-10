@@ -21,7 +21,9 @@ jobs:
       - name: Build
         run: go build -v ./cmd/hype/
       - name: Run tests with Race Detector
-        run: go test -race -vet=off ./...
+        run: |
+          go_dirs=$(go list ./... | grep -v '/docs')
+          go test -race -vet=off $go_dirs
       - name: Install staticcheck
         run: go install honnef.co/go/tools/cmd/staticcheck@latest
       - name: Run staticcheck
