@@ -25,7 +25,7 @@ import "fmt"
 
 // snippet: example
 func main() {
-	fmt.Println("Hello World")
+ fmt.Println("Hello World")
 }
 
 // snippet: example
@@ -43,7 +43,7 @@ The output of including that tag will be as follows:
 
 <code src="src/hello/main.go" snippet="example"></code>
 
-A `snippet` is not required in your `code` tag. They default behavior of a `code` tag is to include the entire source file.
+A `snippet` is not required in your `code` tag. The default behavior of a `code` tag is to include the entire source file.
 
 If we leave the tag out, it will result in the following code being included:
 
@@ -153,19 +153,19 @@ $ hype export -h
 
 Usage of hype:
   -f string
-    	optional file name to preview, if not provided, defaults to hype.md (default "hype.md")
+     optional file name to preview, if not provided, defaults to hype.md (default "hype.md")
   -format string
-    	content type to export to: markdown, html (default "markdown")
+     content type to export to: markdown, html (default "markdown")
   -timeout duration
-    	timeout for execution, defaults to 30 seconds (30s) (default 5s)
-  -v	enable verbose output for debugging
+     timeout for execution, defaults to 30 seconds (30s) (default 5s)
+  -v enable verbose output for debugging
 
 Usage: hype export [options]
 
 Examples:
-	hype export -format html
-	hype export -f README.md -format html
-	hype export -f README.md -format markdown -timeout=10s
+ hype export -format html
+ hype export -f README.md -format html
+ hype export -f README.md -format markdown -timeout=10s
 ```
 
 This allows you to see your compiled document either as a single markdown, or as an html document that you can preview in the browser.

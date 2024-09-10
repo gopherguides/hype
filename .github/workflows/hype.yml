@@ -1,6 +1,5 @@
 name: Generate README with Hype
 on: [pull_request]
-
 jobs:
   build:
     runs-on: ubuntu-latest
@@ -14,13 +13,10 @@ jobs:
         with:
           go-version: "1.22.x"
           cache-dependency-path: subdir/go.sum
-
       - name: Install hype
         run: go install github.com/gopherguides/hype/cmd/hype@latest
-
       - name: Run hype
-        run: pushd .hype;hype export -format=markdown -f hype.md > ../README.md;popd
-
+        run: hype export -format=markdown -f hype.md > README.md
       - name: Commit README back to the repo
         run: |-
           git rev-parse --abbrev-ref HEAD
