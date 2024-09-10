@@ -32,7 +32,7 @@ You can view the source for this entire readme in the [.hype](https://github.com
 
 Here is the current structure that we are using to create this readme:
 
-<cmd exec="tree" src=".">
+<cmd exec="tree ./docs" src=".">
 
 <include src=".github/workflows/hype.md"></include>
 
