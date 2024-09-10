@@ -78,7 +78,7 @@ func Test_PostParsers_PostParse_Errors(t *testing.T) {
 			d := &Document{}
 
 			p := testParser(t, "testdata/whole/simple")
-			p.Filename = "module.md"
+			p.Filename = "hype.md"
 
 			err := nodes.PostParse(p, d, fmt.Errorf("original"))
 			r.Error(err)

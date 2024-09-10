@@ -33,9 +33,9 @@ func (fc *Figcaption) MD() string {
 	}
 
 	bb := &strings.Builder{}
-	bb.WriteString(fc.StartTag())
+	bb.WriteString("> *")
 	bb.WriteString(fc.Nodes.MD())
-	bb.WriteString(fc.EndTag())
+	bb.WriteString("*")
 
 	return bb.String()
 }

@@ -64,7 +64,7 @@ func Test_PreExecute_Errors(t *testing.T) {
 			name: "ParseExecuteFile",
 			in: func() error {
 				p := tp()
-				_, err := p.ParseExecuteFile(ctx, "module.md")
+				_, err := p.ParseExecuteFile(ctx, "hype.md")
 				return err
 			},
 		},
@@ -106,7 +106,7 @@ func Test_PreExecuteError_MarshalJSON(t *testing.T) {
 
 	pee := PreExecuteError{
 		Err:      io.EOF,
-		Filename: "module.md",
+		Filename: "hype.md",
 		Root:     "root",
 		Document: &Document{
 			Title: "My Title",

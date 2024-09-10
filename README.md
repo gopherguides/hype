@@ -11,20 +11,23 @@
 
 Hype is a content generation tool that use traditional Markdown syntax, and allows it to be extended for almost any use to create dynamic, rich, automated output that is easily maintainable and reusable.
 
-Hype follows the same principals that we use for coding;
-- packages (keep relevant content in small, reusable packages, with all links relative to the package)
-- reuse - write your documentation once (even in your code), and use everywhere (blog, book, github repo, etc)
-- partials/includes - support including documents into a larger document (just like code!)
-- validation - like tests, but validate all your code samples are valid (or not if that is what you expect).
-- asset validation - ensure local assets like images, etc actually exist
+Hype follows the same principals that we use for coding:
+
+
+* packages (keep relevant content in small, reusable packages, with all links relative to the package)
+* reuse - write your documentation once (even in your code), and use everywhere (blog, book, github repo, etc)
+* partials/includes - support including documents into a larger document (just like code!)
+* validation - like tests, but validate all your code samples are valid (or not if that is what you expect).
+* asset validation - ensure local assets like images, etc actually exist
+
 
 ## Created with Hype
 
-This README was created with hype.  Here was the command we used to create it:
+This README was created with hype. Here was the command we used to create it:
 
 From the `.hype` directory, run:
 
-`hype export -format=markdown -f module.md > ../README.md
+`hype export -format=markdown -f hype.md > ../README.md
 `
 
 You can also use a [github action](#using-github-actions-to-update-your-readme) to automatically update your README as well.
@@ -59,14 +62,14 @@ import "fmt"
 
 // snippet: example
 func main() {
-	fmt.Println("Hello World")
+ fmt.Println("Hello World")
 }
 
 // snippet: example
 
 ```
 
-Notice the use of the `snippet` comment.  The format for the comment is:
+Notice the use of the `snippet` comment. The format for the comment is:
 
 `// snippet: <snippet_name_here>
 `
@@ -81,7 +84,7 @@ func main() {
 }
 ```
 
-A `snippet` is not required in your `code` tag.  They default behavior of a `code` tag is to include the entire source file.
+A `snippet` is not required in your `code` tag. The default behavior of a `code` tag is to include the entire source file.
 
 If we leave the tag out, it will result in the following code being included:
 
@@ -97,7 +100,7 @@ func main() {
 
 ```
 
-Notice that none of the `snippet` comments were in the output?  This is because hype recognizes them as directives for the document, and will not show them in the actual output.
+Notice that none of the `snippet` comments were in the output? This is because hype recognizes them as directives for the document, and will not show them in the actual output.
 
 # Go Specific Commands
 
@@ -105,7 +108,7 @@ There are a number of [Go](https://go.dev/) specific commands you can run as wel
 
 Let's look at how we use the `go` tag.
 
-Here is the source code of the Go file we are going to include.  Notice the use of the `snippet` comments to identify the area of code we want included.  We'll see how to specify that in the next section when we include it in our markdown.
+Here is the source code of the Go file we are going to include. Notice the use of the `snippet` comments to identify the area of code we want included. We'll see how to specify that in the next section when we include it in our markdown.
 
 # Running Go Code
 
@@ -122,7 +125,7 @@ $ go run .
 Hello World
 
 --------------------------------------------------------------------------------
-Go Version: go1.22.0
+Go Version: go1.22.6
 
 ```
 
@@ -155,13 +158,13 @@ $ go run .
 Hello World
 
 --------------------------------------------------------------------------------
-Go Version: go1.22.0
+Go Version: go1.22.6
 
 ```
 
 ## Snippets with Go
 
-You can also specify the snippet in a `go` tag as well.  The result is that it will only include the code snippet in the included source:
+You can also specify the snippet in a `go` tag as well. The result is that it will only include the code snippet in the included source:
 
 `<go src="src/hello" run="." code="main.go#example"></go>
 `
@@ -182,13 +185,13 @@ $ go run .
 Hello World
 
 --------------------------------------------------------------------------------
-Go Version: go1.22.0
+Go Version: go1.22.6
 
 ```
 
 ## Invalid Code
 
-What if you want to include an example of code that does not compile?  We still want the code to be parsed and included, even though the code doesn't compile.  For this, we can state the expected output of the program.
+What if you want to include an example of code that does not compile? We still want the code to be parsed and included, even though the code doesn't compile. For this, we can state the expected output of the program.
 
 `<go src="src/broken" run="." code="main.go#example" exit="1"></go>
 `
@@ -206,17 +209,17 @@ func main() {
 ```shell
 $ go run .
 
-# github.com/gopherguides/hype/.hype/.
+# github.com/gopherguides/hype/.
 ./main.go:7:6: undefined: fmt.Prin
 
 --------------------------------------------------------------------------------
-Go Version: go1.22.0
+Go Version: go1.22.6
 
 ```
 
 ### GoDoc
 
-While there are a number of `godoc` commands that will allow you to put your documentation from your code directly into your articles as well.  Here are some of the commands.
+While there are a number of `godoc` commands that will allow you to put your documentation from your code directly into your articles as well. Here are some of the commands.
 
 Here is the basic usage first:
 
@@ -247,7 +250,7 @@ type Context interface{ ... }
     func WithoutCancel(parent Context) Context
 
 --------------------------------------------------------------------------------
-Go Version: go1.22.0
+Go Version: go1.22.6
 
 ```
 
@@ -270,7 +273,7 @@ func WithCancel(parent Context) (ctx Context, cancel CancelFunc)
     call cancel as soon as the operations running in this Context complete.
 
 --------------------------------------------------------------------------------
-Go Version: go1.22.0
+Go Version: go1.22.6
 
 ```
 
@@ -278,7 +281,7 @@ For more examples, see the [hype repo](https://www.github.com/gopherguides/hype)
 
 # Arbitrary Commands
 
-You can also use the `cmd` tag and the `exec` attribute to run arbitrary commands and include them in your documentation.  Here is the command to run the `tree` command and include it in our documentation:
+You can also use the `cmd` tag and the `exec` attribute to run arbitrary commands and include them in your documentation. Here is the command to run the `tree` command and include it in our documentation:
 
 `<cmd exec="tree" src="."></cmd>
 `
@@ -289,8 +292,8 @@ Here is the output:
 $ tree
 
 .
+├── hype.md
 ├── includes.md
-├── module.md
 └── src
     ├── broken
     │   └── main.go
@@ -302,25 +305,25 @@ $ tree
 
 # The Export Command
 
-There are several options for running the `hype` command.  Most notable is the `export` option:
+There are several options for running the `hype` command. Most notable is the `export` option:
 
 `$ hype export -h
 
 Usage of hype:
   -f string
-    	optional file name to preview, if not provided, defaults to module.md (default "module.md")
+     optional file name to preview, if not provided, defaults to hype.md (default "hype.md")
   -format string
-    	content type to export to: markdown, html (default "markdown")
+     content type to export to: markdown, html (default "markdown")
   -timeout duration
-    	timeout for execution, defaults to 30 seconds (30s) (default 5s)
-  -v	enable verbose output for debugging
+     timeout for execution, defaults to 30 seconds (30s) (default 5s)
+  -v enable verbose output for debugging
 
 Usage: hype export [options]
 
 Examples:
-	hype export -format html
-	hype export -f README.md -format html
-	hype export -f README.md -format markdown -timeout=10s
+ hype export -format html
+ hype export -f README.md -format html
+ hype export -f README.md -format markdown -timeout=10s
 `
 
 This allows you to see your compiled document either as a single markdown, or as an html document that you can preview in the browser.
@@ -352,22 +355,881 @@ Here is the current structure that we are using to create this readme:
 $ tree
 
 .
-├── actions
-│   ├── hype.yml
-│   └── module.md
-├── badges.md
+├── Makefile
+├── README.md
+├── atom.go
+├── atomx
+│   ├── atoms.go
+│   ├── atoms.ts
+│   ├── atomx.go
+│   ├── atomx_test.go
+│   └── gen.go
+├── attributes.go
+├── attributes_test.go
+├── binding
+│   ├── errors.go
+│   ├── part.go
+│   ├── part_test.go
+│   ├── testdata
+│   │   ├── toc
+│   │   │   ├── 01-one
+│   │   │   │   ├── assets
+│   │   │   │   │   └── foo.png
+│   │   │   │   ├── hype.md
+│   │   │   │   ├── hype.tex.gold
+│   │   │   │   ├── simple
+│   │   │   │   │   ├── assets
+│   │   │   │   │   │   └── foo.png
+│   │   │   │   │   ├── simple.md
+│   │   │   │   │   └── src
+│   │   │   │   │       └── greet
+│   │   │   │   │           ├── go.mod
+│   │   │   │   │           └── main.go
+│   │   │   │   └── src
+│   │   │   │       └── greet
+│   │   │   │           ├── go.mod
+│   │   │   │           └── main.go
+│   │   │   ├── 02-two
+│   │   │   │   ├── assets
+│   │   │   │   │   └── foo.png
+│   │   │   │   ├── hype.md
+│   │   │   │   ├── hype.tex.gold
+│   │   │   │   ├── simple
+│   │   │   │   │   ├── assets
+│   │   │   │   │   │   └── foo.png
+│   │   │   │   │   ├── simple.md
+│   │   │   │   │   └── src
+│   │   │   │   │       └── greet
+│   │   │   │   │           ├── go.mod
+│   │   │   │   │           └── main.go
+│   │   │   │   └── src
+│   │   │   │       └── greet
+│   │   │   │           ├── go.mod
+│   │   │   │           └── main.go
+│   │   │   └── 03-three
+│   │   │       ├── assets
+│   │   │       │   └── foo.png
+│   │   │       ├── hype.md
+│   │   │       ├── hype.tex.gold
+│   │   │       ├── simple
+│   │   │       │   ├── assets
+│   │   │       │   │   └── foo.png
+│   │   │       │   ├── simple.md
+│   │   │       │   └── src
+│   │   │       │       └── greet
+│   │   │       │           ├── go.mod
+│   │   │       │           └── main.go
+│   │   │       └── src
+│   │   │           └── greet
+│   │   │               ├── go.mod
+│   │   │               └── main.go
+│   │   └── whole
+│   │       └── simple
+│   │           ├── 01-one
+│   │           │   └── hype.md
+│   │           ├── 02-two
+│   │           │   └── hype.md
+│   │           └── 03-three
+│   │               └── hype.md
+│   ├── whole.go
+│   └── whole_test.go
+├── body.go
+├── body_test.go
+├── cmd
+│   └── hype
+│       ├── cli
+│       │   ├── binding.go
+│       │   ├── binding_test.go
+│       │   ├── cli.go
+│       │   ├── cli_darwin.go
+│       │   ├── commander.go
+│       │   ├── encode.go
+│       │   ├── encode_test.go
+│       │   ├── env.go
+│       │   ├── env_test.go
+│       │   ├── export.go
+│       │   ├── marked.go
+│       │   ├── marked_test.go
+│       │   ├── parser.go
+│       │   ├── pwd.go
+│       │   ├── slides.go
+│       │   ├── testdata
+│       │   │   ├── encode
+│       │   │   │   └── json
+│       │   │   │       ├── hype.md
+│       │   │   │       └── success
+│       │   │   │           ├── execute-file.json
+│       │   │   │           └── parse-file.json
+│       │   │   ├── latex
+│       │   │   │   ├── file
+│       │   │   │   │   ├── assets
+│       │   │   │   │   │   └── foo.png
+│       │   │   │   │   ├── hype.tex.gold
+│       │   │   │   │   ├── index.md
+│       │   │   │   │   ├── simple
+│       │   │   │   │   │   ├── assets
+│       │   │   │   │   │   │   └── foo.png
+│       │   │   │   │   │   ├── simple.md
+│       │   │   │   │   │   └── src
+│       │   │   │   │   │       └── greet
+│       │   │   │   │   │           ├── go.mod
+│       │   │   │   │   │           └── main.go
+│       │   │   │   │   └── src
+│       │   │   │   │       └── greet
+│       │   │   │   │           ├── go.mod
+│       │   │   │   │           └── main.go
+│       │   │   │   ├── multi
+│       │   │   │   │   ├── one
+│       │   │   │   │   │   ├── assets
+│       │   │   │   │   │   │   └── foo.png
+│       │   │   │   │   │   ├── hype.md
+│       │   │   │   │   │   ├── hype.tex.gold
+│       │   │   │   │   │   ├── simple
+│       │   │   │   │   │   │   ├── assets
+│       │   │   │   │   │   │   │   └── foo.png
+│       │   │   │   │   │   │   ├── simple.md
+│       │   │   │   │   │   │   └── src
+│       │   │   │   │   │   │       └── greet
+│       │   │   │   │   │   │           ├── go.mod
+│       │   │   │   │   │   │           └── main.go
+│       │   │   │   │   │   └── src
+│       │   │   │   │   │       └── greet
+│       │   │   │   │   │           ├── go.mod
+│       │   │   │   │   │           └── main.go
+│       │   │   │   │   ├── three
+│       │   │   │   │   │   ├── assets
+│       │   │   │   │   │   │   └── foo.png
+│       │   │   │   │   │   ├── hype.md
+│       │   │   │   │   │   ├── hype.tex.gold
+│       │   │   │   │   │   ├── simple
+│       │   │   │   │   │   │   ├── assets
+│       │   │   │   │   │   │   │   └── foo.png
+│       │   │   │   │   │   │   ├── simple.md
+│       │   │   │   │   │   │   └── src
+│       │   │   │   │   │   │       └── greet
+│       │   │   │   │   │   │           ├── go.mod
+│       │   │   │   │   │   │           └── main.go
+│       │   │   │   │   │   └── src
+│       │   │   │   │   │       └── greet
+│       │   │   │   │   │           ├── go.mod
+│       │   │   │   │   │           └── main.go
+│       │   │   │   │   └── two
+│       │   │   │   │       ├── assets
+│       │   │   │   │       │   └── foo.png
+│       │   │   │   │       ├── hype.md
+│       │   │   │   │       ├── hype.tex.gold
+│       │   │   │   │       ├── simple
+│       │   │   │   │       │   ├── assets
+│       │   │   │   │       │   │   └── foo.png
+│       │   │   │   │       │   ├── simple.md
+│       │   │   │   │       │   └── src
+│       │   │   │   │       │       └── greet
+│       │   │   │   │       │           ├── go.mod
+│       │   │   │   │       │           └── main.go
+│       │   │   │   │       └── src
+│       │   │   │   │           └── greet
+│       │   │   │   │               ├── go.mod
+│       │   │   │   │               └── main.go
+│       │   │   │   └── simple
+│       │   │   │       ├── assets
+│       │   │   │       │   └── foo.png
+│       │   │   │       ├── hype.md
+│       │   │   │       ├── hype.tex.gold
+│       │   │   │       ├── simple
+│       │   │   │       │   ├── assets
+│       │   │   │       │   │   └── foo.png
+│       │   │   │       │   ├── simple.md
+│       │   │   │       │   └── src
+│       │   │   │       │       └── greet
+│       │   │   │       │           ├── go.mod
+│       │   │   │       │           └── main.go
+│       │   │   │       └── src
+│       │   │   │           └── greet
+│       │   │   │               ├── go.mod
+│       │   │   │               └── main.go
+│       │   │   └── whole
+│       │   │       └── simple
+│       │   │           ├── 01-one
+│       │   │           │   └── hype.md
+│       │   │           ├── 02-two
+│       │   │           │   └── hype.md
+│       │   │           └── 03-three
+│       │   │               └── hype.md
+│       │   ├── toc.go
+│       │   ├── toc_test.go
+│       │   └── vscode.go
+│       └── main.go
+├── cmd.go
+├── cmd_error.go
+├── cmd_error_test.go
+├── cmd_result.go
+├── cmd_result_test.go
+├── cmd_test.go
+├── code.go
+├── code_test.go
+├── comment.go
+├── comment_test.go
+├── docs
+│   ├── badges.md
+│   ├── license.md
+│   └── quickstart
+│       ├── hype.md
+│       ├── includes.md
+│       └── src
+│           ├── broken
+│           │   └── main.go
+│           └── hello
+│               └── main.go
+├── document.go
+├── document_test.go
+├── element.go
+├── element_test.go
+├── empty.go
+├── empty_test.go
+├── errors.go
+├── execute.go
+├── execute_error.go
+├── execute_error_test.go
+├── execute_test.go
+├── fenced_code.go
+├── fenced_code_test.go
+├── figcaption.go
+├── figcaption_test.go
+├── figure.go
+├── figure_test.go
+├── finders.go
+├── finders_test.go
+├── go.mod
+├── go.sum
+├── godoc.go
+├── golang.go
+├── golang_test.go
+├── heading.go
+├── heading_test.go
+├── hype.go
+├── hype.md
+├── hype_test.go
+├── image.go
+├── image_test.go
+├── include.go
+├── include_test.go
+├── inline_code.go
+├── inline_code_test.go
+├── internal
+│   └── lone
+│       ├── ranger.go
+│       └── ranger_test.go
+├── li.go
+├── li_test.go
 ├── license.md
-├── module.md
-└── quickstart
-    ├── includes.md
-    ├── module.md
-    └── src
-        ├── broken
-        │   └── main.go
-        └── hello
-            └── main.go
+├── link.go
+├── link_test.go
+├── md.go
+├── md_test.go
+├── mdx
+│   ├── parser.go
+│   ├── parser_test.go
+│   └── testdata
+│       ├── assignment.md
+│       ├── basics.md
+│       ├── booleans.md
+│       ├── constants.md
+│       ├── hype.md
+│       ├── numbers.md
+│       ├── src
+│       │   ├── constants
+│       │   │   ├── const
+│       │   │   │   └── main.go
+│       │   │   ├── const-err
+│       │   │   │   └── main.go
+│       │   │   ├── const-infer
+│       │   │   │   └── main.go
+│       │   │   └── const_type
+│       │   │       └── main.go
+│       │   ├── go.mod
+│       │   ├── numbers
+│       │   │   ├── maxuint8
+│       │   │   │   └── main.go
+│       │   │   ├── maxuint8-overflow
+│       │   │   │   └── main.go
+│       │   │   └── maxuint8-saturation
+│       │   │       └── main.go
+│       │   ├── utf8
+│       │   │   ├── utf8
+│       │   │   │   └── main.go
+│       │   │   ├── utf8-loop
+│       │   │   │   └── main.go
+│       │   │   ├── utf8-range
+│       │   │   │   └── main.go
+│       │   │   └── utf8-rune
+│       │   │       └── main.go
+│       │   └── variables
+│       │       ├── multiple
+│       │       │   └── main.go
+│       │       └── zero
+│       │           └── main.go
+│       ├── strings.md
+│       ├── utf8.md
+│       └── variables.md
+├── metadata.go
+├── metadata_test.go
+├── node.go
+├── node_test.go
+├── now.go
+├── now_test.go
+├── ol.go
+├── ol_test.go
+├── page.go
+├── page_test.go
+├── paragraph.go
+├── paragraph_test.go
+├── parse_error.go
+├── parse_error_test.go
+├── parser.go
+├── parser_test.go
+├── post_execute.go
+├── post_execute_error.go
+├── post_execute_error_test.go
+├── post_execute_test.go
+├── post_parse_error.go
+├── post_parse_error_test.go
+├── post_parser.go
+├── post_parser_test.go
+├── pre_execute.go
+├── pre_execute_error.go
+├── pre_execute_error_test.go
+├── pre_execute_test.go
+├── pre_parse_error.go
+├── pre_parse_error_test.go
+├── pre_parser.go
+├── pre_parser_test.go
+├── ref.go
+├── ref_processor.go
+├── ref_processor_test.go
+├── ref_test.go
+├── references_test.go
+├── restripe_figures.go
+├── revive.toml
+├── slides
+│   ├── app.go
+│   └── templates
+│       ├── assets
+│       │   ├── app.css
+│       │   └── app.js
+│       └── slides.html
+├── snippet.go
+├── snippet_test.go
+├── source_code.go
+├── source_code_test.go
+├── table.go
+├── table_test.go
+├── tag.go
+├── td.go
+├── td_test.go
+├── testdata
+│   ├── auto
+│   │   ├── blockquote
+│   │   │   ├── html
+│   │   │   │   ├── hype.gold
+│   │   │   │   ├── hype.md
+│   │   │   │   └── shine.txt
+│   │   │   └── md
+│   │   │       ├── hype.gold
+│   │   │       ├── hype.md
+│   │   │       └── shine.txt
+│   │   ├── commands
+│   │   │   ├── greet
+│   │   │   │   ├── hype.gold
+│   │   │   │   ├── hype.md
+│   │   │   │   └── src
+│   │   │   │       ├── go.mod
+│   │   │   │       └── main.go
+│   │   │   ├── results
+│   │   │   │   ├── data
+│   │   │   │   │   ├── hype.gold
+│   │   │   │   │   └── hype.md
+│   │   │   │   └── truncate
+│   │   │   │       ├── hype.gold
+│   │   │   │       ├── hype.md
+│   │   │   │       └── src
+│   │   │   │           ├── go.mod
+│   │   │   │           └── main.go
+│   │   │   ├── side-by-side
+│   │   │   │   ├── hype.gold
+│   │   │   │   ├── hype.md
+│   │   │   │   └── values
+│   │   │   │       ├── _string.md
+│   │   │   │       ├── assets
+│   │   │   │       │   └── string-keys.svg
+│   │   │   │       ├── src
+│   │   │   │       │   └── string-keys
+│   │   │   │       │       ├── go.mod
+│   │   │   │       │       └── main.go
+│   │   │   │       └── values.md
+│   │   │   └── timeout
+│   │   │       ├── go.mod
+│   │   │       └── main.go
+│   │   ├── metadata
+│   │   │   └── simple
+│   │   │       ├── hype.gold
+│   │   │       └── hype.md
+│   │   ├── parser
+│   │   │   └── hello
+│   │   │       ├── hype.gold
+│   │   │       ├── hype.md
+│   │   │       └── second
+│   │   │           ├── second.md
+│   │   │           └── src
+│   │   │               ├── go.mod
+│   │   │               └── main.go
+│   │   ├── refs
+│   │   │   ├── fenced
+│   │   │   │   ├── hype.gold
+│   │   │   │   └── hype.md
+│   │   │   ├── figure-styles
+│   │   │   │   ├── hype.gold
+│   │   │   │   └── hype.md
+│   │   │   ├── images
+│   │   │   │   ├── assets
+│   │   │   │   │   └── nodes.svg
+│   │   │   │   ├── hype.gold
+│   │   │   │   └── hype.md
+│   │   │   ├── includes
+│   │   │   │   ├── assets
+│   │   │   │   │   └── foo.png
+│   │   │   │   ├── hype.gold
+│   │   │   │   ├── hype.md
+│   │   │   │   ├── simple
+│   │   │   │   │   ├── assets
+│   │   │   │   │   │   └── foo.png
+│   │   │   │   │   ├── simple.md
+│   │   │   │   │   └── src
+│   │   │   │   │       └── greet
+│   │   │   │   │           ├── go.mod
+│   │   │   │   │           └── main.go
+│   │   │   │   └── src
+│   │   │   │       └── greet
+│   │   │   │           ├── go.mod
+│   │   │   │           └── main.go
+│   │   │   └── simple
+│   │   │       ├── assets
+│   │   │       │   └── foo.png
+│   │   │       ├── hype.gold
+│   │   │       ├── hype.md
+│   │   │       └── src
+│   │   │           └── greet
+│   │   │               ├── go.mod
+│   │   │               └── main.go
+│   │   ├── snippets
+│   │   │   ├── range
+│   │   │   │   ├── hype.gold
+│   │   │   │   ├── hype.md
+│   │   │   │   └── src
+│   │   │   │       ├── go.mod
+│   │   │   │       └── main.go
+│   │   │   └── simple
+│   │   │       ├── hype.gold
+│   │   │       ├── hype.md
+│   │   │       └── src
+│   │   │           ├── go.mod
+│   │   │           └── main.go
+│   │   ├── toc
+│   │   │   ├── hype.gold
+│   │   │   └── hype.md
+│   │   └── vars
+│   │       ├── details
+│   │       │   ├── hype.gold
+│   │       │   └── hype.md
+│   │       ├── metadata
+│   │       │   ├── hype.gold
+│   │       │   └── hype.md
+│   │       └── var_tag
+│   │           ├── hype.gold
+│   │           └── hype.md
+│   ├── commands
+│   │   └── bad-exit
+│   │       ├── go.mod
+│   │       └── main.go
+│   ├── doc
+│   │   ├── execution
+│   │   │   ├── failure
+│   │   │   │   └── hype.md
+│   │   │   ├── nested_failure
+│   │   │   │   ├── hype.md
+│   │   │   │   └── second
+│   │   │   │       ├── second.md
+│   │   │   │       └── src
+│   │   │   │           ├── go.mod
+│   │   │   │           └── main.go
+│   │   │   └── success
+│   │   │       └── hype.md
+│   │   ├── pages
+│   │   │   ├── hype.md
+│   │   │   └── second
+│   │   │       ├── second.md
+│   │   │       └── src
+│   │   │           ├── go.mod
+│   │   │           └── main.go
+│   │   ├── simple
+│   │   │   └── hype.md
+│   │   ├── snippets
+│   │   │   ├── hype.md
+│   │   │   └── src
+│   │   │       └── main.ts
+│   │   └── to_md
+│   │       ├── basics
+│   │       │   ├── basics.md
+│   │       │   └── src
+│   │       │       └── background
+│   │       │           ├── empty
+│   │       │           │   ├── go.mod
+│   │       │           │   └── main.go
+│   │       │           └── implementation
+│   │       │               ├── go.mod
+│   │       │               └── main.go
+│   │       ├── cancellation
+│   │       │   ├── assets
+│   │       │   │   ├── cancellation.svg
+│   │       │   │   └── nodes.svg
+│   │       │   ├── cancellation.md
+│   │       │   └── src
+│   │       │       ├── basic
+│   │       │       │   ├── go.mod
+│   │       │       │   └── main.go
+│   │       │       └── cancelling
+│   │       │           ├── go.mod
+│   │       │           └── main.go
+│   │       ├── errors
+│   │       │   ├── errors.md
+│   │       │   └── src
+│   │       │       ├── canceled
+│   │       │       │   ├── go.mod
+│   │       │       │   └── main.go
+│   │       │       └── deadline
+│   │       │           ├── go.mod
+│   │       │           └── main.go
+│   │       ├── graffles
+│   │       │   └── context.graffle
+│   │       ├── hype.gold
+│   │       ├── hype.md
+│   │       ├── nodes
+│   │       │   ├── assets
+│   │       │   │   └── nodes.svg
+│   │       │   ├── nodes.md
+│   │       │   └── src
+│   │       │       └── node-tree
+│   │       │           ├── go.mod
+│   │       │           ├── go.sum
+│   │       │           ├── main.go
+│   │       │           └── stdout.txt
+│   │       ├── rules
+│   │       │   └── rules.md
+│   │       ├── signals
+│   │       │   ├── signals.md
+│   │       │   └── src
+│   │       │       ├── signals
+│   │       │       │   ├── go.mod
+│   │       │       │   └── main.go
+│   │       │       └── testing
+│   │       │           ├── go.mod
+│   │       │           ├── go.sum
+│   │       │           ├── signals.go
+│   │       │           ├── signals_test.go
+│   │       │           └── stdout.txt
+│   │       ├── timeouts
+│   │       │   ├── src
+│   │       │   │   ├── timeout
+│   │       │   │   │   ├── go.mod
+│   │       │   │   │   └── main.go
+│   │       │   │   ├── with-deadline
+│   │       │   │   │   ├── go.mod
+│   │       │   │   │   ├── go.sum
+│   │       │   │   │   └── main.go
+│   │       │   │   └── with-timeout
+│   │       │   │       ├── go.mod
+│   │       │   │       ├── go.sum
+│   │       │   │       └── main.go
+│   │       │   └── timeouts.md
+│   │       └── values
+│   │           ├── _securing.md
+│   │           ├── _strings.md
+│   │           ├── assets
+│   │           │   └── string-keys.svg
+│   │           ├── src
+│   │           │   ├── basic
+│   │           │   │   ├── go.mod
+│   │           │   │   ├── go.sum
+│   │           │   │   └── main.go
+│   │           │   ├── custom-const
+│   │           │   │   ├── go.mod
+│   │           │   │   └── main.go
+│   │           │   ├── custom-keys
+│   │           │   │   ├── go.mod
+│   │           │   │   └── main.go
+│   │           │   ├── keys
+│   │           │   │   ├── go.mod
+│   │           │   │   ├── main.go
+│   │           │   │   └── stdout.txt
+│   │           │   ├── malicious
+│   │           │   │   ├── bar
+│   │           │   │   │   └── bar.go
+│   │           │   │   ├── foo
+│   │           │   │   │   └── foo.go
+│   │           │   │   ├── go.mod
+│   │           │   │   └── main.go
+│   │           │   ├── resolution
+│   │           │   │   ├── go.mod
+│   │           │   │   ├── go.sum
+│   │           │   │   ├── main.go
+│   │           │   │   └── stdout.txt
+│   │           │   ├── secured
+│   │           │   │   ├── bar
+│   │           │   │   │   └── bar.go
+│   │           │   │   ├── foo
+│   │           │   │   │   └── foo.go
+│   │           │   │   ├── go.mod
+│   │           │   │   └── main.go
+│   │           │   └── string-keys
+│   │           │       ├── go.mod
+│   │           │       └── main.go
+│   │           └── values.md
+│   ├── golang
+│   │   └── sym
+│   │       ├── cmd
+│   │       │   ├── go.mod
+│   │       │   └── main.go
+│   │       ├── go.mod
+│   │       └── sym.go
+│   ├── includes
+│   │   ├── broken
+│   │   │   └── hype.md
+│   │   ├── sublevel
+│   │   │   ├── below
+│   │   │   │   └── b.md
+│   │   │   └── hype.md
+│   │   └── toplevel
+│   │       └── hype.md
+│   ├── json
+│   │   ├── body.json
+│   │   ├── cmd.json
+│   │   ├── cmd_error.json
+│   │   ├── cmd_result.json
+│   │   ├── comment.json
+│   │   ├── document.json
+│   │   ├── element.json
+│   │   ├── execute_error.json
+│   │   ├── fenced_code.json
+│   │   ├── figcaption.json
+│   │   ├── figure.json
+│   │   ├── heading.json
+│   │   ├── image.json
+│   │   ├── include.json
+│   │   ├── inline_code.json
+│   │   ├── li.json
+│   │   ├── link.json
+│   │   ├── metadata.json
+│   │   ├── now.json
+│   │   ├── ol.json
+│   │   ├── p.json
+│   │   ├── page.json
+│   │   ├── parse_error.json
+│   │   ├── parser.json
+│   │   ├── post_execute_error.json
+│   │   ├── post_parse_error.json
+│   │   ├── pre_execute_error.json
+│   │   ├── pre_parse_error.json
+│   │   ├── ref.json
+│   │   ├── table.json
+│   │   ├── td.json
+│   │   ├── th.json
+│   │   ├── thead.json
+│   │   ├── toc.json
+│   │   ├── tr.json
+│   │   ├── ul.json
+│   │   └── var.json
+│   ├── markdown
+│   │   └── unknown-atom
+│   │       ├── _included.md
+│   │       └── hype.md
+│   ├── metadata
+│   │   ├── multi
+│   │   │   └── hype.md
+│   │   └── pages
+│   │       └── hype.md
+│   ├── now
+│   │   ├── hype.gold
+│   │   └── hype.md
+│   ├── parser
+│   │   ├── errors
+│   │   │   ├── execute
+│   │   │   │   └── hype.md
+│   │   │   ├── folder
+│   │   │   │   ├── 01-one
+│   │   │   │   │   ├── assets
+│   │   │   │   │   │   └── foo.png
+│   │   │   │   │   ├── hype.md
+│   │   │   │   │   ├── hype.tex.gold
+│   │   │   │   │   ├── simple
+│   │   │   │   │   │   ├── assets
+│   │   │   │   │   │   │   └── foo.png
+│   │   │   │   │   │   ├── simple.md
+│   │   │   │   │   │   └── src
+│   │   │   │   │   │       └── greet
+│   │   │   │   │   │           ├── go.mod
+│   │   │   │   │   │           └── main.go
+│   │   │   │   │   └── src
+│   │   │   │   │       └── greet
+│   │   │   │   │           ├── go.mod
+│   │   │   │   │           └── main.go
+│   │   │   │   ├── 02-two
+│   │   │   │   │   ├── assets
+│   │   │   │   │   │   └── foo.png
+│   │   │   │   │   ├── hype.md
+│   │   │   │   │   ├── hype.tex.gold
+│   │   │   │   │   ├── simple
+│   │   │   │   │   │   ├── assets
+│   │   │   │   │   │   │   └── foo.png
+│   │   │   │   │   │   ├── simple.md
+│   │   │   │   │   │   └── src
+│   │   │   │   │   │       └── greet
+│   │   │   │   │   │           ├── go.mod
+│   │   │   │   │   │           └── main.go
+│   │   │   │   │   └── src
+│   │   │   │   │       └── greet
+│   │   │   │   │           ├── go.mod
+│   │   │   │   │           └── main.go
+│   │   │   │   └── 03-three
+│   │   │   │       ├── assets
+│   │   │   │       │   └── foo.png
+│   │   │   │       ├── hype.md
+│   │   │   │       ├── hype.tex.gold
+│   │   │   │       ├── simple
+│   │   │   │       │   ├── assets
+│   │   │   │       │   │   └── foo.png
+│   │   │   │       │   ├── simple.md
+│   │   │   │       │   └── src
+│   │   │   │       │       └── greet
+│   │   │   │       │           ├── go.mod
+│   │   │   │       │           └── main.go
+│   │   │   │       └── src
+│   │   │   │           └── greet
+│   │   │   │               ├── go.mod
+│   │   │   │               └── main.go
+│   │   │   ├── post_execute
+│   │   │   │   └── hype.md
+│   │   │   ├── post_parse
+│   │   │   │   └── hype.md
+│   │   │   ├── pre_execute
+│   │   │   │   └── hype.md
+│   │   │   └── pre_parse
+│   │   │       └── hype.md
+│   │   └── folder
+│   │       ├── 01-one
+│   │       │   ├── assets
+│   │       │   │   └── foo.png
+│   │       │   ├── hype.md
+│   │       │   ├── hype.tex.gold
+│   │       │   ├── simple
+│   │       │   │   ├── assets
+│   │       │   │   │   └── foo.png
+│   │       │   │   ├── simple.md
+│   │       │   │   └── src
+│   │       │   │       └── greet
+│   │       │   │           ├── go.mod
+│   │       │   │           └── main.go
+│   │       │   └── src
+│   │       │       └── greet
+│   │       │           ├── go.mod
+│   │       │           └── main.go
+│   │       ├── 02-two
+│   │       │   ├── assets
+│   │       │   │   └── foo.png
+│   │       │   ├── hype.md
+│   │       │   ├── hype.tex.gold
+│   │       │   ├── simple
+│   │       │   │   ├── assets
+│   │       │   │   │   └── foo.png
+│   │       │   │   ├── simple.md
+│   │       │   │   └── src
+│   │       │   │       └── greet
+│   │       │   │           ├── go.mod
+│   │       │   │           └── main.go
+│   │       │   └── src
+│   │       │       └── greet
+│   │       │           ├── go.mod
+│   │       │           └── main.go
+│   │       └── 03-three
+│   │           ├── assets
+│   │           │   └── foo.png
+│   │           ├── hype.md
+│   │           ├── hype.tex.gold
+│   │           ├── simple
+│   │           │   ├── assets
+│   │           │   │   └── foo.png
+│   │           │   ├── simple.md
+│   │           │   └── src
+│   │           │       └── greet
+│   │           │           ├── go.mod
+│   │           │           └── main.go
+│   │           └── src
+│   │               └── greet
+│   │                   ├── go.mod
+│   │                   └── main.go
+│   ├── snippets
+│   │   ├── snip.txt
+│   │   ├── snippets.go
+│   │   ├── snippets.html
+│   │   ├── snippets.js
+│   │   └── snippets.rb
+│   ├── table
+│   │   ├── data
+│   │   │   └── hype.md
+│   │   ├── headless
+│   │   │   ├── hype.gold
+│   │   │   └── hype.md
+│   │   ├── md_in_html
+│   │   │   ├── hype.gold
+│   │   │   └── hype.md
+│   │   └── md_in_md
+│   │       ├── hype.gold
+│   │       └── hype.md
+│   ├── to_md
+│   │   └── source_code
+│   │       ├── full
+│   │       │   ├── hype.gold
+│   │       │   ├── hype.md
+│   │       │   └── src
+│   │       │       └── main.go
+│   │       └── snippet
+│   │           ├── hype.gold
+│   │           ├── hype.md
+│   │           └── src
+│   │               └── main.go
+│   └── toc
+│       ├── hype.gold
+│       └── hype.md
+├── text.go
+├── th.go
+├── th_test.go
+├── thead.go
+├── thead_test.go
+├── time.go
+├── title.go
+├── title_test.go
+├── tmpl.go
+├── tmpl_test.go
+├── toc.go
+├── toc_test.go
+├── tr.go
+├── tr_test.go
+├── type.go
+├── ul.go
+├── ul_test.go
+├── unwrap.go
+├── var.go
+└── var_test.go
 
-5 directories, 9 files
+313 directories, 560 files
 ```
 ---
 
@@ -403,35 +1265,30 @@ The current action is set to only generate the readme on a pull request and comm
 ```yml
 name: Generate README with Hype
 on: [pull_request]
-
 jobs:
-
   build:
     runs-on: ubuntu-latest
     steps:
-    - uses: actions/checkout@v4
-      with:
-        repository: ${{ github.event.pull_request.head.repo.full_name }}
-        ref: ${{ github.event.pull_request.head.ref }}
-    - name: Set up Go
-      uses: actions/setup-go@v4
-      with:
-        go-version: "1.22.x"
-        cache-dependency-path: subdir/go.sum
-
-    - name: Install hype
-      run: go install github.com/gopherguides/hype/cmd/hype@latest
-
-    - name: Run hype
-      run: pushd .hype;hype export -format=markdown -f module.md > ../README.md;popd
-
-    - name: Commit README back to the repo
-      run: |-
-        git rev-parse --abbrev-ref HEAD
-        git config user.name 'GitHub Actions'
-        git config user.email 'actions@github.com'
-        git diff --quiet || (git add README.md && git commit -am "Updated README")
-        git push origin ${{github.event.pull_request.head.ref}}
+      - uses: actions/checkout@v4
+        with:
+          repository: ${{ github.event.pull_request.head.repo.full_name }}
+          ref: ${{ github.event.pull_request.head.ref }}
+      - name: Set up Go
+        uses: actions/setup-go@v4
+        with:
+          go-version: "1.22.x"
+          cache-dependency-path: subdir/go.sum
+      - name: Install hype
+        run: go install github.com/gopherguides/hype/cmd/hype@latest
+      - name: Run hype
+        run: hype export -format=markdown -f hype.md > README.md
+      - name: Commit README back to the repo
+        run: |-
+          git rev-parse --abbrev-ref HEAD
+          git config user.name 'GitHub Actions'
+          git config user.email 'actions@github.com'
+          git diff --quiet || (git add README.md && git commit -am "Updated README")
+          git push origin ${{github.event.pull_request.head.ref}}
 
 ```
 

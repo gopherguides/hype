@@ -67,7 +67,7 @@ func WholeFromPath(cab fs.FS, root string, wholeName string, partName string) (*
 		}
 
 		base := filepath.Base(path)
-		if base != "module.md" {
+		if base != "hype.md" {
 			return nil
 		}
 

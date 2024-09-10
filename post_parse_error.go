@@ -3,6 +3,9 @@ package hype
 import (
 	"encoding/json"
 	"errors"
+	"fmt"
+	"path/filepath"
+	"strings"
 )
 
 type PostParseError struct {
@@ -29,8 +32,32 @@ func (ppe PostParseError) MarshalJSON() ([]byte, error) {
 }
 
 func (ppe PostParseError) Error() string {
-	b, _ := ppe.MarshalJSON()
-	return string(b)
+	sb := &strings.Builder{}
+
+	var lines []string
+
+	fp := filepath.Join(ppe.Root, ppe.Filename)
+	if len(fp) > 0 {
+		lines = append(lines, fmt.Sprintf("filepath: %s", fp))
+	}
+
+	if ppe.Document != nil && len(ppe.Document.Title) > 0 {
+		lines = append(lines, fmt.Sprintf("document: %s", ppe.Document.Title))
+	}
+
+	if ppe.Err != nil {
+		lines = append(lines, fmt.Sprintf("post parse error: %s", ppe.Err))
+	}
+
+	if ppe.OrigErr != nil {
+		lines = append(lines, fmt.Sprintf("original error: %s", ppe.OrigErr))
+	}
+
+	sb.WriteString(strings.Join(lines, "\n"))
+
+	s := sb.String()
+
+	return strings.TrimSpace(s)
 }
 
 func (ppe PostParseError) Unwrap() error {

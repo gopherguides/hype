@@ -57,7 +57,7 @@ func (a *Slides) Main(ctx context.Context, pwd string, args []string) error {
 		a.App.Parser = a.Parser
 	}
 	a.App.PWD = pwd
-	a.App.FileName = "module.md"
+	a.App.FileName = "hype.md"
 
 	if p := flags.Arg(0); len(p) > 0 {
 		a.App.PWD = filepath.Dir(p)

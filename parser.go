@@ -213,7 +213,7 @@ func (p *Parser) ParseFolder(name string) (doc Documents, err error) {
 
 		base := filepath.Base(path)
 
-		if base != "module.md" {
+		if base != "hype.md" {
 			return nil
 		}
 

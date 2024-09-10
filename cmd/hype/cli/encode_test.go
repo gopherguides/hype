@@ -60,8 +60,8 @@ func Test_Encode_JSON(t *testing.T) {
 		args []string
 		exp  string
 	}{
-		{name: "execute file", exp: "success/execute-file.json", args: []string{"module.md"}},
-		{name: "parse file", exp: "success/parse-file.json", args: []string{"-p", "module.md"}},
+		{name: "execute file", exp: "success/execute-file.json", args: []string{"hype.md"}},
+		{name: "parse file", exp: "success/parse-file.json", args: []string{"-p", "hype.md"}},
 	}
 
 	for _, tc := range tcs {

@@ -105,7 +105,7 @@ func (b *Binding) parseParts(p *hype.Parser, key string) error {
 		return b.WrapErr(err)
 	}
 
-	doc, err := p.ParseFile("module.md")
+	doc, err := p.ParseFile("hype.md")
 	if err != nil {
 		return b.WrapErr(err)
 	}

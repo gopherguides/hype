@@ -16,6 +16,8 @@ import (
 	"github.com/markbates/plugins"
 )
 
+var _ plugins.Needer = &Marked{}
+
 type Marked struct {
 	cleo.Cmd
 
@@ -29,16 +31,25 @@ type Marked struct {
 	Verbose     bool          // default: false
 
 	flags *flag.FlagSet
+
+	mu sync.RWMutex
 }
 
-func (cmd *Marked) WithPlugins(fn plugins.Feeder) {
+func (cmd *Marked) WithPlugins(fn plugins.FeederFn) error {
 	if cmd == nil {
-		return
+		return fmt.Errorf("marked is nil")
 	}
 
-	cmd.Lock()
-	defer cmd.Unlock()
+	if fn == nil {
+		return fmt.Errorf("fn is nil")
+	}
+
+	cmd.mu.Lock()
+	defer cmd.mu.Unlock()
+
 	cmd.Feeder = fn
+
+	return nil
 }
 
 func (cmd *Marked) ScopedPlugins() plugins.Plugins {
@@ -67,8 +78,8 @@ func (cmd *Marked) SetParser(p *hype.Parser) error {
 		return fmt.Errorf("marked is nil")
 	}
 
-	cmd.Lock()
-	defer cmd.Unlock()
+	cmd.mu.Lock()
+	defer cmd.mu.Unlock()
 
 	cmd.Parser = p
 	return nil
@@ -79,8 +90,8 @@ func (cmd *Marked) Flags() (*flag.FlagSet, error) {
 		return nil, err
 	}
 
-	cmd.Lock()
-	defer cmd.Unlock()
+	cmd.mu.Lock()
+	defer cmd.mu.Unlock()
 
 	if cmd.flags != nil {
 		return cmd.flags, nil
@@ -91,7 +102,7 @@ func (cmd *Marked) Flags() (*flag.FlagSet, error) {
 	cmd.flags.BoolVar(&cmd.ParseOnly, "p", cmd.ParseOnly, "if true, only parse the file and exit")
 	cmd.flags.DurationVar(&cmd.Timeout, "timeout", DefaultTimeout(), "timeout for execution")
 	cmd.flags.StringVar(&cmd.ContextPath, "context", cmd.ContextPath, "a folder containing all chapters of a book, for example")
-	cmd.flags.StringVar(&cmd.File, "f", cmd.File, "optional file name to preview, if not provided, defaults to module.md")
+	cmd.flags.StringVar(&cmd.File, "f", cmd.File, "optional file name to preview, if not provided, defaults to hype.md")
 	cmd.flags.IntVar(&cmd.Section, "section", 0, "")
 	cmd.flags.BoolVar(&cmd.Verbose, "v", false, "enable verbose output for debugging")
 
@@ -104,23 +115,23 @@ func (cmd *Marked) Main(ctx context.Context, pwd string, args []string) error {
 		return nil
 	}
 
-	cmd.Lock()
+	cmd.mu.Lock()
 	to := cmd.Timeout
 	if to == 0 {
 		to = DefaultTimeout()
 		cmd.Timeout = to
 	}
-	cmd.Unlock()
+	cmd.mu.Unlock()
 
-	ctx, cancel := cleo.ContextWithTimeout(ctx, to)
+	ctx, cancel := context.WithTimeout(ctx, to)
 	defer cancel()
 
 	var mu sync.Mutex
 
 	go func() {
-		mu.Lock()
-		err = plugins.Wrap(cmd, err)
-		mu.Unlock()
+		// mu.Lock()
+		// // err = err
+		// mu.Unlock()
 		cancel()
 	}()
 
@@ -140,7 +151,7 @@ func (cmd *Marked) main(ctx context.Context, pwd string, args []string) error {
 
 	pwd = filepath.Dir(mp)
 
-	if err := cleo.Init(&cmd.Cmd, pwd); err != nil {
+	if err := (&cmd.Cmd).Init(); err != nil {
 		return err
 	}
 
@@ -204,6 +215,7 @@ func (cmd *Marked) execute(ctx context.Context, pwd string) error {
 	}
 
 	p.Root = filepath.Dir(mp)
+	p.Filename = filepath.Base(mp)
 
 	if len(cmd.File) > 0 {
 		f, err := cmd.FS.Open(cmd.File)
@@ -250,8 +262,8 @@ func (cmd *Marked) validate() error {
 		return fmt.Errorf("cmd is nil")
 	}
 
-	cmd.Lock()
-	defer cmd.Unlock()
+	cmd.mu.Lock()
+	defer cmd.mu.Unlock()
 
 	if cmd.Timeout == 0 {
 		cmd.Timeout = DefaultTimeout()

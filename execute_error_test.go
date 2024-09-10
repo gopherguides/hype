@@ -72,7 +72,7 @@ func Test_Execute_Errors(t *testing.T) {
 			name: "ParseExecuteFile",
 			in: func() error {
 				p := tp()
-				_, err := p.ParseExecuteFile(ctx, "module.md")
+				_, err := p.ParseExecuteFile(ctx, "hype.md")
 				return err
 			},
 		},
@@ -80,7 +80,7 @@ func Test_Execute_Errors(t *testing.T) {
 			name: "Document.Execute",
 			in: func() error {
 				p := tp()
-				d, err := p.ParseFile("module.md")
+				d, err := p.ParseFile("hype.md")
 				if err != nil {
 					return err
 				}
@@ -114,7 +114,7 @@ func Test_ExecuteError_MarshalJSON(t *testing.T) {
 
 	ee := ExecuteError{
 		Err:      io.EOF,
-		Filename: "module.md",
+		Filename: "hype.md",
 		Root:     "testdata/parser/errors/execute",
 		Document: &Document{
 			Title: "My Title",
@@ -123,4 +123,47 @@ func Test_ExecuteError_MarshalJSON(t *testing.T) {
 	}
 
 	testJSON(t, "execute_error", ee)
+}
+
+func Test_ExecuteError_String(t *testing.T) {
+	t.Parallel()
+
+	detailed := ExecuteError{
+		Err:      io.EOF,
+		Filename: "hype.md",
+		Root:     "testdata/parser/errors/execute",
+		Document: &Document{
+			Title: "My Title",
+		},
+		Contents: []byte("foo"),
+	}
+
+	tcs := []struct {
+		name string
+		in   ExecuteError
+		exp  string
+	}{
+		{
+			name: "detailed",
+			in:   detailed,
+			exp:  "filepath: testdata/parser/errors/execute/hype.md\ndocument: My Title\nexecute error: EOF",
+		},
+		{
+			name: "basic",
+			in:   ExecuteError{Err: io.EOF},
+			exp:  "execute error: EOF",
+		},
+	}
+
+	for _, tc := range tcs {
+		tc := tc
+		t.Run(tc.name, func(t *testing.T) {
+			t.Parallel()
+			r := require.New(t)
+
+			act := tc.in.Error()
+
+			r.Equal(tc.exp, act)
+		})
+	}
 }

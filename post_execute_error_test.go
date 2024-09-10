@@ -63,7 +63,7 @@ func Test_PostExecute_Errors(t *testing.T) {
 			name: "ParseExecuteFile",
 			in: func() error {
 				p := tp()
-				_, err := p.ParseExecuteFile(ctx, "module.md")
+				_, err := p.ParseExecuteFile(ctx, "hype.md")
 				return err
 			},
 		},

@@ -94,7 +94,7 @@ func PartFromPath(cab fs.FS, mp string) (Part, error) {
 
 	part.Name = flect.New(name)
 
-	fp := filepath.Join(mp, "module.md")
+	fp := filepath.Join(mp, "hype.md")
 
 	if _, err := fs.Stat(cab, fp); err != nil {
 		return part, nil

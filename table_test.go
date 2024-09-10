@@ -14,7 +14,7 @@ func Test_Table_Data(t *testing.T) {
 	root := "testdata/table/data"
 	p := testParser(t, root)
 
-	doc, err := p.ParseFile("module.md")
+	doc, err := p.ParseFile("hype.md")
 	r.NoError(err)
 
 	// fmt.Println(doc.String())
@@ -77,7 +77,7 @@ func Test_Table_MarshalJSON(t *testing.T) {
 
 	p := testParser(t, "testdata/table/data")
 
-	doc, err := p.ParseFile("module.md")
+	doc, err := p.ParseFile("hype.md")
 	r.NoError(err)
 
 	tables := ByType[*Table](doc.Children())
