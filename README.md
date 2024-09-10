@@ -83,6 +83,8 @@ func main() {
 	fmt.Println("Hello World")
 }
 ```
+> *source: docs/quickstart/src/hello/main.go:example*
+
 
 A `snippet` is not required in your `code` tag. The default behavior of a `code` tag is to include the entire source file.
 
@@ -96,9 +98,9 @@ import "fmt"
 func main() {
 	fmt.Println("Hello World")
 }
-
-
 ```
+> *source: docs/quickstart/src/hello/main.go*
+
 
 Notice that none of the `snippet` comments were in the output? This is because hype recognizes them as directives for the document, and will not show them in the actual output.
 
@@ -146,9 +148,9 @@ import "fmt"
 func main() {
 	fmt.Println("Hello World")
 }
-
-
 ```
+> *source: docs/quickstart/src/hello/main.go*
+
 
 ---
 
@@ -176,6 +178,8 @@ func main() {
 	fmt.Println("Hello World")
 }
 ```
+> *source: docs/quickstart/src/hello/main.go#example:example*
+
 
 ---
 
@@ -203,6 +207,8 @@ func main() {
 	fmt.Prin("Hello World")
 }
 ```
+> *source: docs/quickstart/src/broken/main.go#example:example*
+
 
 ---
 
@@ -340,8 +346,9 @@ The following code will parse the code/code.md and sourceable/sourceable.md docu
 <include src="code/code.md"></include>
 
 <include src="sourceable/sourceable.md"></include>
-
 ```
+> *source: docs/quickstart/includes.md*
+
 
 ---
 
@@ -1289,8 +1296,9 @@ jobs:
           git config user.email 'actions@github.com'
           git diff --quiet || (git add README.md && git commit -am "Updated README")
           git push origin ${{github.event.pull_request.head.ref}}
-
 ```
+> *source: .github/workflows/hype.yml*
+
 
 ---
 
