@@ -104,7 +104,17 @@ func (c *Cmd) Execute(ctx context.Context, doc *Document) error {
 		cmd.Dir = dir
 	}
 
-	res, err := cmd.Run(ctx, c.Args...)
+	// Check the args for the ~ character and replace it with the home directory
+	// Make a copy of those args as we only want to change them when we pass it to the clam.Cmd
+	args := make([]string, len(c.Args))
+	copy(args, c.Args)
+	for i, arg := range args {
+		if strings.HasPrefix(arg, "~") {
+			args[i] = filepath.Join(homeDirectory(), arg[1:])
+		}
+	}
+
+	res, err := cmd.Run(ctx, args...)
 	if err != nil {
 		switch c.ExpectedExit {
 		case -1:

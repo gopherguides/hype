@@ -3,6 +3,8 @@ package hype
 import (
 	"context"
 	"errors"
+	"os"
+	"path/filepath"
 	"strings"
 	"testing"
 	"time"
@@ -185,4 +187,55 @@ func Test_Cmd_MarshalJSON(t *testing.T) {
 
 	testJSON(t, "cmd", c)
 
+}
+func Test_Cmd_HomeDirectory(t *testing.T) {
+	t.Parallel()
+	r := require.New(t)
+
+	homeDir, err := os.UserHomeDir()
+	r.NoError(err)
+
+	// Create a directory in the user's home directory with a random temporary name
+	dir := filepath.Join(homeDir, "tmp_test_dir")
+	t.Log("created dir:", dir)
+	err = os.MkdirAll(dir, 0755)
+	r.NoError(err)
+	t.Cleanup(func() {
+		os.RemoveAll(dir)
+	})
+
+	// Add three files to the directory: a.txt, b.txt, and c.txt
+	files := []string{"a.txt", "b.txt", "c.txt"}
+	for _, file := range files {
+		filePath := filepath.Join(dir, file)
+		_, err := os.Create(filePath)
+		r.NoError(err)
+	}
+
+	c := &Cmd{
+		Element: NewEl("cmd", nil),
+		Args:    []string{"ls", "~/tmp_test_dir"},
+	}
+	r.NoError(c.Set("exec", "ls ~/tmp_test_dir"))
+	r.NoError(c.Set("hide-cmd", ""))
+
+	ctx := context.Background()
+	doc := &Document{
+		Parser: NewParser(nil),
+	}
+
+	doc.Nodes = append(doc.Nodes, c)
+	err = doc.Execute(ctx)
+	r.NoError(err)
+
+	r.NotNil(c.Result())
+
+	act := c.String()
+	act = strings.TrimSpace(act)
+
+	exp := `<cmd exec="ls ~/tmp_test_dir" hide-cmd=""><pre><code class="language-shell" language="shell">a.txt
+b.txt
+c.txt</code></pre></cmd>`
+
+	r.Equal(exp, act)
 }
