@@ -110,7 +110,11 @@ func (c *Cmd) Execute(ctx context.Context, doc *Document) error {
 	copy(args, c.Args)
 	for i, arg := range args {
 		if strings.HasPrefix(arg, "~") {
-			args[i] = filepath.Join(homeDirectory(), arg[1:])
+			hd, err := homeDirectory()
+			if err != nil {
+				return c.newError(err)
+			}
+			args[i] = filepath.Join(hd, arg[1:])
 		}
 	}
 
