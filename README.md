@@ -127,7 +127,7 @@ $ go run .
 Hello World
 
 --------------------------------------------------------------------------------
-Go Version: go1.23.1
+Go Version: go1.23.8
 
 ```
 
@@ -160,7 +160,7 @@ $ go run .
 Hello World
 
 --------------------------------------------------------------------------------
-Go Version: go1.23.1
+Go Version: go1.23.8
 
 ```
 
@@ -189,7 +189,7 @@ $ go run .
 Hello World
 
 --------------------------------------------------------------------------------
-Go Version: go1.23.1
+Go Version: go1.23.8
 
 ```
 
@@ -219,7 +219,7 @@ $ go run .
 ./main.go:7:6: undefined: fmt.Prin
 
 --------------------------------------------------------------------------------
-Go Version: go1.23.1
+Go Version: go1.23.8
 
 ```
 
@@ -256,7 +256,7 @@ type Context interface{ ... }
     func WithoutCancel(parent Context) Context
 
 --------------------------------------------------------------------------------
-Go Version: go1.23.1
+Go Version: go1.23.8
 
 ```
 
@@ -279,7 +279,7 @@ func WithCancel(parent Context) (ctx Context, cancel CancelFunc)
     call cancel as soon as the operations running in this Context complete.
 
 --------------------------------------------------------------------------------
-Go Version: go1.23.1
+Go Version: go1.23.8
 
 ```
 
@@ -308,7 +308,7 @@ $ tree
     └── hello
         └── main.go
 
-3 directories, 4 files
+4 directories, 4 files
 ```
 
 # The Export Command
@@ -375,7 +375,7 @@ $ tree ./docs
         └── hello
             └── main.go
 
-4 directories, 6 files
+5 directories, 6 files
 ```
 ---
 
