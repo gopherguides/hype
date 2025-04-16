@@ -1,7 +1,6 @@
 package hype
 
 import (
-	"log"
 	"os"
 )
 
@@ -9,15 +8,15 @@ import (
 // it only runs once
 var homeDir string
 
-func homeDirectory() string {
+func homeDirectory() (string, error) {
 	if homeDir != "" {
-		return homeDir
+		return homeDir, nil
 	}
 
 	hd, err := os.UserHomeDir()
 	if err != nil {
-		log.Fatal(err)
+		return "", err
 	}
 	homeDir = hd
-	return homeDir
+	return homeDir, nil
 }
