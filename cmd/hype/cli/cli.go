@@ -202,7 +202,6 @@ func WithTimeout(ctx context.Context, timeout time.Duration, f func(context.Cont
 	defer cancel()
 
 	go func() {
-		// TODO: check for context cancellation in f() to prevent leaking the goroutine
 		errCh <- f(cltx)
 	}()
 
