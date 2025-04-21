@@ -197,24 +197,22 @@ func WithTimeout(ctx context.Context, timeout time.Duration, f func(context.Cont
 	}
 
 	cltx, cancel := context.WithTimeout(ctx, timeout)
+	errCh := make(chan error, 1)
+
 	defer cancel()
 
-	cltx, cause := context.WithCancelCause(cltx)
-
 	go func() {
-		defer cancel()
-		err := f(cltx)
-		if err != nil {
-			cause(err)
-		}
+		errCh <- f(cltx)
 	}()
 
-	<-cltx.Done()
-
-	err := cltx.Err()
-	if !errors.Is(err, context.Canceled) {
+	select {
+	case <-cltx.Done():
+		err := cltx.Err()
+		if errors.Is(err, context.DeadlineExceeded) {
+			return fmt.Errorf("Context exceeded set deadline after %v", timeout)
+		}
+		return err
+	case err := <-errCh:
 		return err
 	}
-
-	return nil
 }
