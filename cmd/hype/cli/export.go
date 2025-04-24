@@ -121,11 +121,6 @@ Examples:
 }
 
 func (cmd *Export) Main(ctx context.Context, pwd string, args []string) error {
-	err := cmd.main(ctx, pwd, args)
-	if err == nil {
-		return nil
-	}
-
 	cmd.mu.Lock()
 	to := cmd.Timeout
 	if to == 0 {
@@ -134,20 +129,7 @@ func (cmd *Export) Main(ctx context.Context, pwd string, args []string) error {
 	}
 	cmd.mu.Unlock()
 
-	ctx, cancel := context.WithTimeout(ctx, to)
-	defer cancel()
-
-	var mu sync.Mutex
-
-	go func() {
-		cancel()
-	}()
-
-	<-ctx.Done()
-
-	mu.Lock()
-	defer mu.Unlock()
-	return err
+	return cmd.main(ctx, pwd, args)
 }
 
 func (cmd *Export) main(ctx context.Context, pwd string, args []string) error {
