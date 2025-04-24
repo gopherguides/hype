@@ -119,11 +119,6 @@ func Test_Output_Flag_Error(t *testing.T) {
 	err = hypeCmd.Run()
 	r.Error(err)
 
-	tmpFile := filepath.Join(root, outputFile+".tmp")
-	_, err = os.Stat(tmpFile)
-	r.Error(err)
-	r.True(os.IsNotExist(err))
-
 	info, err := os.Stat(filepath.Join(root, inputFile))
 	r.NoError(err)
 
@@ -149,18 +144,13 @@ func Test_Output_Flag_Success(t *testing.T) {
 	err = hypeCmd.Run()
 	r.NoError(err)
 
-	tmpFile := outputFile + ".tmp"
-	_, err = os.Stat(tmpFile)
-	r.Error(err)
-	r.True(os.IsNotExist(err))
-
 	info, err := os.Stat(outputFile)
 	r.NoError(err)
 	r.True(info.Size() > 0)
 
-	bExp, err := os.ReadFile(outputFile)
+	bExp, err := os.ReadFile(filepath.Join(root, "hype.gold"))
 	r.NoError(err)
-	bAct, err := os.ReadFile(filepath.Join(root, "hype.gold"))
+	bAct, err := os.ReadFile(outputFile)
 	r.NoError(err)
 
 	exp := strings.TrimSpace(string(bExp))

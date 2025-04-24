@@ -1,6 +1,7 @@
 package cli
 
 import (
+	"bytes"
 	"context"
 	"flag"
 	"fmt"
@@ -159,19 +160,8 @@ func (cmd *Export) main(ctx context.Context, pwd string, args []string) error {
 		return err
 	}
 
-	if cmd.OutPath.Exists() {
-		tmpPath := cmd.OutPath.Value() + ".tmp"
-		tmpFile, err := os.OpenFile(tmpPath, os.O_WRONLY|os.O_CREATE, 0644)
-		if err != nil {
-			return err
-		}
-
-		defer func() {
-			_ = tmpFile.Close()
-			_ = os.Remove(tmpPath)
-		}()
-		cmd.setOut(tmpFile)
-	}
+	var stdoutBuffer bytes.Buffer
+	cmd.setOut(&stdoutBuffer)
 
 	if cmd.Verbose {
 		// enable debugging
@@ -193,12 +183,16 @@ func (cmd *Export) main(ctx context.Context, pwd string, args []string) error {
 		return err
 	}
 
-	if cmd.OutPath.Exists() {
-		tmpPath := cmd.OutPath.Value() + ".tmp"
-		err := os.Rename(tmpPath, cmd.OutPath.Value())
+	if !cmd.OutPath.Exists() {
+		fmt.Fprint(os.Stdout, stdoutBuffer.String())
+	} else {
+		path := cmd.OutPath.Value()
+		file, err := os.OpenFile(path, os.O_WRONLY|os.O_CREATE|os.O_TRUNC, 0644)
 		if err != nil {
 			return err
 		}
+		fmt.Fprint(file, stdoutBuffer.String())
+		file.Close()
 	}
 
 	return nil
