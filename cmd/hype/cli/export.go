@@ -23,6 +23,7 @@ type Export struct {
 
 	// a folder containing all chapters of a book, for example
 	File    string        // optional file name to preview
+	OutPath OutPath       // path to a file to write the output on success; default: nil
 	Timeout time.Duration // default: 30s
 	Parser  *hype.Parser  // If nil, a default parser is used.
 	Verbose bool          // default: false
@@ -91,6 +92,7 @@ Examples:
 	hype export -format html
 	hype export -f README.md -format html
 	hype export -f README.md -format markdown -timeout=10s
+	hype export -f input.md -format markdown -o README.md
 `
 
 	if err := cmd.validate(); err != nil {
@@ -110,6 +112,7 @@ Examples:
 	cmd.flags.StringVar(&cmd.File, "f", "hype.md", "optional file name to preview, if not provided, defaults to hype.md")
 	cmd.flags.BoolVar(&cmd.Verbose, "v", false, "enable verbose output for debugging")
 	cmd.flags.StringVar(&cmd.Format, "format", "markdown", "content type to export to: markdown, html")
+	cmd.flags.Var(&cmd.OutPath, "o", "path to the output file; if not provided, output is written to stdout")
 
 	cmd.flags.Usage = func() {
 		fmt.Fprintf(stderr, "Usage of %s:\n", os.Args[0])
@@ -145,6 +148,8 @@ func (cmd *Export) main(ctx context.Context, pwd string, args []string) error {
 		return err
 	}
 
+	cmd.initOutputFilePath()
+
 	flags, err := cmd.Flags(cmd.Stderr())
 	if err != nil {
 		return err
@@ -153,6 +158,21 @@ func (cmd *Export) main(ctx context.Context, pwd string, args []string) error {
 	if err := flags.Parse(args); err != nil {
 		return err
 	}
+
+	if cmd.OutPath.Exists() {
+		tmpPath := cmd.OutPath.Value() + ".tmp"
+		tmpFile, err := os.OpenFile(tmpPath, os.O_WRONLY|os.O_CREATE, 0644)
+		if err != nil {
+			return err
+		}
+
+		defer func() {
+			_ = tmpFile.Close()
+			_ = os.Remove(tmpPath)
+		}()
+		cmd.setOut(tmpFile)
+	}
+
 	if cmd.Verbose {
 		// enable debugging
 		slog.SetDefault(slog.New(slog.NewTextHandler(os.Stderr, &slog.HandlerOptions{Level: slog.LevelDebug})))
@@ -173,7 +193,27 @@ func (cmd *Export) main(ctx context.Context, pwd string, args []string) error {
 		return err
 	}
 
+	if cmd.OutPath.Exists() {
+		tmpPath := cmd.OutPath.Value() + ".tmp"
+		err := os.Rename(tmpPath, cmd.OutPath.Value())
+		if err != nil {
+			return err
+		}
+	}
+
 	return nil
+}
+
+func (cmd *Export) initOutputFilePath() {
+	cmd.mu.Lock()
+	cmd.OutPath = OutPath{val: nil}
+	cmd.mu.Unlock()
+}
+
+func (cmd *Export) setOut(writer io.Writer) {
+	cmd.mu.Lock()
+	cmd.Out = writer
+	cmd.mu.Unlock()
 }
 
 func (cmd *Export) execute(ctx context.Context, pwd string) error {
