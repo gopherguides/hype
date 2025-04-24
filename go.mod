@@ -1,8 +1,8 @@
 module github.com/gopherguides/hype
 
-go 1.22
+go 1.24
 
-toolchain go1.22.0
+toolchain go1.24.0
 
 require (
 	github.com/gobuffalo/flect v1.0.2
@@ -18,9 +18,9 @@ require (
 	github.com/markbates/table v0.0.0-20230314205021-441ed58296d1
 	github.com/mattn/go-shellwords v1.0.12
 	github.com/russross/blackfriday/v2 v2.1.0
-	github.com/stretchr/testify v1.9.0
-	golang.org/x/net v0.22.0
-	golang.org/x/sync v0.6.0
+	github.com/stretchr/testify v1.10.0
+	golang.org/x/net v0.39.0
+	golang.org/x/sync v0.13.0
 )
 
 require (

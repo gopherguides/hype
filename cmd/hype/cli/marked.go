@@ -100,7 +100,7 @@ func (cmd *Marked) Flags() (*flag.FlagSet, error) {
 	cmd.flags = flag.NewFlagSet("marked", flag.ContinueOnError)
 	cmd.flags.SetOutput(io.Discard)
 	cmd.flags.BoolVar(&cmd.ParseOnly, "p", cmd.ParseOnly, "if true, only parse the file and exit")
-	cmd.flags.DurationVar(&cmd.Timeout, "timeout", DefaultTimeout(), "timeout for execution")
+	cmd.flags.DurationVar(&cmd.Timeout, "timeout", DefaultTimeout, "timeout for execution")
 	cmd.flags.StringVar(&cmd.ContextPath, "context", cmd.ContextPath, "a folder containing all chapters of a book, for example")
 	cmd.flags.StringVar(&cmd.File, "f", cmd.File, "optional file name to preview, if not provided, defaults to hype.md")
 	cmd.flags.IntVar(&cmd.Section, "section", 0, "")
@@ -118,7 +118,7 @@ func (cmd *Marked) Main(ctx context.Context, pwd string, args []string) error {
 	cmd.mu.Lock()
 	to := cmd.Timeout
 	if to == 0 {
-		to = DefaultTimeout()
+		to = DefaultTimeout
 		cmd.Timeout = to
 	}
 	cmd.mu.Unlock()
@@ -127,13 +127,6 @@ func (cmd *Marked) Main(ctx context.Context, pwd string, args []string) error {
 	defer cancel()
 
 	var mu sync.Mutex
-
-	go func() {
-		// mu.Lock()
-		// // err = err
-		// mu.Unlock()
-		cancel()
-	}()
 
 	<-ctx.Done()
 
@@ -168,7 +161,7 @@ func (cmd *Marked) main(ctx context.Context, pwd string, args []string) error {
 		slog.SetDefault(slog.New(slog.NewTextHandler(os.Stderr, &slog.HandlerOptions{Level: slog.LevelDebug})))
 	}
 
-	err = WithTimeout(ctx, cmd.Timeout, func(ctx context.Context) error {
+	return WithTimeout(ctx, cmd.Timeout, func(ctx context.Context) error {
 		// TODO Document what this does
 		if mo, ok := os.LookupEnv("MARKED_ORIGIN"); ok {
 			pwd = mo
@@ -178,12 +171,6 @@ func (cmd *Marked) main(ctx context.Context, pwd string, args []string) error {
 			return cmd.execute(ctx, pwd)
 		})
 	})
-
-	if err != nil {
-		return err
-	}
-
-	return nil
 }
 
 func (cmd *Marked) execute(ctx context.Context, pwd string) error {
@@ -266,7 +253,7 @@ func (cmd *Marked) validate() error {
 	defer cmd.mu.Unlock()
 
 	if cmd.Timeout == 0 {
-		cmd.Timeout = DefaultTimeout()
+		cmd.Timeout = DefaultTimeout
 	}
 
 	return nil

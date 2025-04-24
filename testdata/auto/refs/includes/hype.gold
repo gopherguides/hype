@@ -19,8 +19,8 @@
 <cmd data-go-version="go.test" doc="-short context.Canceled" exec="go doc -short context.Canceled" figure-id="ref1"><pre><code class="language-shell" language="shell">$ go doc -short context.Canceled
 
 var Canceled = errors.New(&#34;context canceled&#34;)
-    Canceled is the error returned by [Context.Err] when the context is
-    canceled.
+    Canceled is the error returned by [Context.Err] when the context is canceled
+    for some reason other than its deadline passing.
 
 --------------------------------------------------------------------------------
 Go Version: go.test

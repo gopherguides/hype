@@ -57,9 +57,7 @@ func Test_Marked_Errors(t *testing.T) {
 			r.Contains(act, tc.exp)
 
 		})
-
 	}
-
 }
 
 func Test_Marked_Timeout(t *testing.T) {
