@@ -15,6 +15,10 @@ import (
 	"github.com/markbates/plugins/plugcmd"
 )
 
+const (
+	DefaultTimeout = time.Second * 30
+)
+
 type App struct {
 	cleo.Cmd
 
@@ -169,10 +173,6 @@ func Garlic(root string) (*App, error) {
 	return New(root), nil
 }
 
-func DefaultTimeout() time.Duration {
-	return time.Second * 30
-}
-
 func WithinDir(dir string, f func() error) error {
 	if len(dir) == 0 || dir == "." {
 		return f()
@@ -193,7 +193,7 @@ func WithinDir(dir string, f func() error) error {
 
 func WithTimeout(ctx context.Context, timeout time.Duration, f func(context.Context) error) error {
 	if timeout == 0 {
-		timeout = DefaultTimeout()
+		timeout = DefaultTimeout
 	}
 
 	cltx, cancel := context.WithTimeout(ctx, timeout)
@@ -209,7 +209,7 @@ func WithTimeout(ctx context.Context, timeout time.Duration, f func(context.Cont
 	case <-cltx.Done():
 		err := cltx.Err()
 		if errors.Is(err, context.DeadlineExceeded) {
-			return fmt.Errorf("Context exceeded set deadline after %v", timeout)
+			return fmt.Errorf("context exceeded set deadline after %v: %w", timeout, err)
 		}
 		return err
 	case err := <-errCh:

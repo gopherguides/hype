@@ -39,6 +39,9 @@ func Test_Cli_Error(t *testing.T) {
 	r.NoError(err)
 
 	args := []string{"export", "-format=markdown", "-f", "hype.md"}
+
+	t.Logf("Running command: %s %s, root: %s", binPath, strings.Join(args, " "), root)
+
 	hypeCmd := exec.Command(binPath, args...)
 	var stderr bytes.Buffer
 	var stdout bytes.Buffer
@@ -69,6 +72,7 @@ func Test_Cli_Success(t *testing.T) {
 	r.NoError(err)
 
 	args := []string{"export", "-format=markdown", "-f", "hype.md"}
+	t.Logf("Running command: %s %s", binPath, strings.Join(args, " "))
 	hypeCmd := exec.Command(binPath, args...)
 	var stderr bytes.Buffer
 	var stdout bytes.Buffer

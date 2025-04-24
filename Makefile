@@ -1,7 +1,7 @@
 default: test install hype
 
 test:
-	go test -timeout 10s -race -cover ./...
+	go test -timeout 10s -count 1 -race -cover $$(go list ./... | grep -v /docs/)
 
 cov:
 	go test -coverprofile=coverage.out ./...

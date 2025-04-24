@@ -127,7 +127,7 @@ $ go run .
 Hello World
 
 --------------------------------------------------------------------------------
-Go Version: go1.23.8
+Go Version: go1.24.2
 
 ```
 
@@ -160,7 +160,7 @@ $ go run .
 Hello World
 
 --------------------------------------------------------------------------------
-Go Version: go1.23.8
+Go Version: go1.24.2
 
 ```
 
@@ -189,7 +189,7 @@ $ go run .
 Hello World
 
 --------------------------------------------------------------------------------
-Go Version: go1.23.8
+Go Version: go1.24.2
 
 ```
 
@@ -219,7 +219,7 @@ $ go run .
 ./main.go:7:6: undefined: fmt.Prin
 
 --------------------------------------------------------------------------------
-Go Version: go1.23.8
+Go Version: go1.24.2
 
 ```
 
@@ -256,7 +256,7 @@ type Context interface{ ... }
     func WithoutCancel(parent Context) Context
 
 --------------------------------------------------------------------------------
-Go Version: go1.23.8
+Go Version: go1.24.2
 
 ```
 
@@ -270,16 +270,16 @@ Here is the output for the above command:
 $ go doc -short context.WithCancel
 
 func WithCancel(parent Context) (ctx Context, cancel CancelFunc)
-    WithCancel returns a copy of parent with a new Done channel. The returned
-    context's Done channel is closed when the returned cancel function is called
-    or when the parent context's Done channel is closed, whichever happens
-    first.
+    WithCancel returns a derived context that points to the parent context but
+    has a new Done channel. The returned context's Done channel is closed when
+    the returned cancel function is called or when the parent context's Done
+    channel is closed, whichever happens first.
 
     Canceling this context releases resources associated with it, so code should
     call cancel as soon as the operations running in this Context complete.
 
 --------------------------------------------------------------------------------
-Go Version: go1.23.8
+Go Version: go1.24.2
 
 ```
 
@@ -422,7 +422,7 @@ jobs:
       - name: Set up Go
         uses: actions/setup-go@v4
         with:
-          go-version: "1.23.x"
+          go-version: "1.24.x"
           cache-dependency-path: subdir/go.sum
       - name: Install hype
         run: go install github.com/gopherguides/hype/cmd/hype@latest

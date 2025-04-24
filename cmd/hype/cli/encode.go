@@ -54,7 +54,7 @@ func (cmd *Encode) Flags() (*flag.FlagSet, error) {
 	cmd.flags = flag.NewFlagSet("marked", flag.ContinueOnError)
 	cmd.flags.SetOutput(io.Discard)
 	cmd.flags.BoolVar(&cmd.ParseOnly, "p", cmd.ParseOnly, "if true, only parse the file and exit")
-	cmd.flags.DurationVar(&cmd.Timeout, "timeout", DefaultTimeout(), "timeout for execution")
+	cmd.flags.DurationVar(&cmd.Timeout, "timeout", DefaultTimeout, "timeout for execution")
 	cmd.flags.StringVar(&cmd.File, "f", cmd.File, "optional file name to preview")
 
 	return cmd.flags, nil

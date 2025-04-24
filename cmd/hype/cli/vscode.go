@@ -43,7 +43,7 @@ func (cmd *VSCode) Flags() (*flag.FlagSet, error) {
 
 	cmd.flags = flag.NewFlagSet("vscode", flag.ContinueOnError)
 	cmd.flags.SetOutput(io.Discard)
-	cmd.flags.DurationVar(&cmd.Timeout, "timeout", DefaultTimeout(), "timeout for execution")
+	cmd.flags.DurationVar(&cmd.Timeout, "timeout", DefaultTimeout, "timeout for execution")
 	cmd.flags.StringVar(&cmd.Host, "host", "", "host to serve on")
 
 	return cmd.flags, nil
@@ -204,7 +204,7 @@ func (cmd *VSCode) validate() error {
 	}
 
 	if cmd.Timeout == 0 {
-		cmd.Timeout = DefaultTimeout()
+		cmd.Timeout = DefaultTimeout
 	}
 
 	return nil
