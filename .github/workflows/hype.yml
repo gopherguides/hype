@@ -1,5 +1,8 @@
 name: Generate README with Hype
-on: [pull_request]
+on:
+  push:
+    branches:
+      - main
 jobs:
   build:
     runs-on: ubuntu-latest
