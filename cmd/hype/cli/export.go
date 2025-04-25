@@ -184,15 +184,19 @@ func (cmd *Export) main(ctx context.Context, pwd string, args []string) error {
 	}
 
 	if !cmd.OutPath.Exists() {
-		fmt.Fprint(os.Stdout, stdoutBuffer.String())
+		_, err := stdoutBuffer.WriteTo(os.Stdout)
+		if err != nil {
+			return fmt.Errorf("failed to write to os.Stdout: %s", err)
+		}
 	} else {
 		path := cmd.OutPath.Value()
 		file, err := os.OpenFile(path, os.O_WRONLY|os.O_CREATE|os.O_TRUNC, 0644)
 		if err != nil {
 			return err
 		}
-		fmt.Fprint(file, stdoutBuffer.String())
-		file.Close()
+		defer file.Close()
+
+		_, err = stdoutBuffer.WriteTo(file)
 	}
 
 	return nil
