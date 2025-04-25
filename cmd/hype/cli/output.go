@@ -23,10 +23,7 @@ func (o *OutPath) Value() string {
 }
 
 func (o *OutPath) Exists() bool {
-	if o.val == nil {
-		return false
-	}
-	return true
+	return o.val != nil
 }
 
 func dirExists(path string) error {
