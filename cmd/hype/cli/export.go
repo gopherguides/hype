@@ -197,6 +197,9 @@ func (cmd *Export) main(ctx context.Context, pwd string, args []string) error {
 		defer file.Close()
 
 		_, err = stdoutBuffer.WriteTo(file)
+		if err != nil {
+			return fmt.Errorf("failed to write to %s: %v", path, err)
+		}
 	}
 
 	return nil
