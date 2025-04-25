@@ -43,7 +43,7 @@ func TestCleanPath(t *testing.T) {
 			expected: "/",
 		},
 		{
-			input:    "../nonexistent/", // <-- filepath sanitizes the last '/' aways unless it's root path
+			input:    "../nonexistent/", // <-- filepath sanitizes the last '/' always unless it's root path
 			expected: filepath.Join(cwd, "../", "nonexistent/"),
 		},
 	}
