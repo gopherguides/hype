@@ -28,22 +28,20 @@ func getProjectWd() string {
 }
 
 func Test_Cli_Error(t *testing.T) {
-	t.Parallel()
 	r := require.New(t)
 
 	binPath := filepath.Join(t.TempDir(), "hype")
 	buildBin(binPath)
 
 	root := filepath.Join(getProjectWd(), "testdata", "to_md", "source_code", "broken")
-	err := os.Chdir(root)
-	r.NoError(err)
+	t.Chdir(root)
 
 	args := []string{"export", "-format=markdown", "-f", "hype.md"}
 
 	t.Logf("Running command: %s %s, root: %s", binPath, strings.Join(args, " "), root)
 
 	hypeCmd, stdout, _ := setupCmd(binPath, args)
-	err = hypeCmd.Run()
+	err := hypeCmd.Run()
 	r.Error(err)
 
 	r.Equal(0, stdout.Len())
@@ -66,22 +64,20 @@ func setupCmd(binPath string, args []string) (*exec.Cmd, *bytes.Buffer, *bytes.B
 }
 
 func Test_Cli_Success(t *testing.T) {
-	t.Parallel()
 	r := require.New(t)
 
 	binPath := filepath.Join(t.TempDir(), "hype")
 	buildBin(binPath)
 
 	root := filepath.Join(getProjectWd(), "testdata", "to_md", "source_code", "full")
-	err := os.Chdir(root)
-	r.NoError(err)
+	t.Chdir(root)
 
 	args := []string{"export", "-format=markdown", "-f", "hype.md"}
 
 	t.Logf("Running command: %s %s", binPath, strings.Join(args, " "))
 
 	hypeCmd, stdout, stderr := setupCmd(binPath, args)
-	err = hypeCmd.Run()
+	err := hypeCmd.Run()
 	if err != nil {
 		fmt.Printf("%s\n", stderr.String())
 	}
@@ -101,22 +97,20 @@ func Test_Cli_Success(t *testing.T) {
 }
 
 func Test_Output_Flag_Error(t *testing.T) {
-	t.Parallel()
 	r := require.New(t)
 
 	binPath := filepath.Join(t.TempDir(), "hype")
 	buildBin(binPath)
 
 	root := filepath.Join(getProjectWd(), "testdata", "to_md", "source_code", "broken")
-	err := os.Chdir(root)
-	r.NoError(err)
+	t.Chdir(root)
 
 	inputFile := "hype.md"
 	outputFile := inputFile
 
 	args := []string{"export", "-format=markdown", "-f", inputFile, "-o", outputFile}
 	hypeCmd, _, _ := setupCmd(binPath, args)
-	err = hypeCmd.Run()
+	err := hypeCmd.Run()
 	r.Error(err)
 
 	info, err := os.Stat(filepath.Join(root, inputFile))
@@ -126,22 +120,20 @@ func Test_Output_Flag_Error(t *testing.T) {
 }
 
 func Test_Output_Flag_Success(t *testing.T) {
-	t.Parallel()
 	r := require.New(t)
 
 	binPath := filepath.Join(t.TempDir(), "hype")
 	buildBin(binPath)
 
 	root := filepath.Join(getProjectWd(), "testdata", "to_md", "source_code", "full")
-	err := os.Chdir(root)
-	r.NoError(err)
+	t.Chdir(root)
 
 	inputFile := "hype.md"
 	outputFile := filepath.Join(t.TempDir(), "output.md")
 
 	args := []string{"export", "-format=markdown", "-f", inputFile, "-o", outputFile}
 	hypeCmd, _, _ := setupCmd(binPath, args)
-	err = hypeCmd.Run()
+	err := hypeCmd.Run()
 	r.NoError(err)
 
 	info, err := os.Stat(outputFile)
