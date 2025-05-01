@@ -308,7 +308,7 @@ $ tree
     └── hello
         └── main.go
 
-4 directories, 4 files
+3 directories, 4 files
 ```
 
 # The Export Command
@@ -375,7 +375,7 @@ $ tree ./docs
         └── hello
             └── main.go
 
-5 directories, 6 files
+4 directories, 6 files
 ```
 ---
 
@@ -410,7 +410,10 @@ The current action is set to only generate the readme on a pull request and comm
 
 ```yml
 name: Generate README with Hype
-on: [pull_request]
+on:
+  push:
+    branches:
+      - main
 jobs:
   build:
     runs-on: ubuntu-latest
@@ -427,7 +430,7 @@ jobs:
       - name: Install hype
         run: go install github.com/gopherguides/hype/cmd/hype@latest
       - name: Run hype
-        run: hype export -format=markdown -f hype.md > README.md
+        run: hype export -format=markdown -f hype.md -o README.md
       - name: Commit README back to the repo
         run: |-
           git rev-parse --abbrev-ref HEAD
