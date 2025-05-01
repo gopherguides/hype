@@ -308,7 +308,7 @@ $ tree
     └── hello
         └── main.go
 
-3 directories, 4 files
+4 directories, 4 files
 ```
 
 # The Export Command
@@ -375,7 +375,7 @@ $ tree ./docs
         └── hello
             └── main.go
 
-4 directories, 6 files
+5 directories, 6 files
 ```
 ---
 
@@ -411,17 +411,18 @@ The current action is set to only generate the readme on a pull request and comm
 ```yml
 name: Generate README with Hype
 on:
-  push:
-    branches:
-      - main
+  pull_request:
+    types: [opened, synchronize, reopened]
 jobs:
   build:
     runs-on: ubuntu-latest
+    permissions:
+      contents: write
+      pull-requests: write
     steps:
       - uses: actions/checkout@v4
         with:
-          repository: ${{ github.event.pull_request.head.repo.full_name }}
-          ref: ${{ github.event.pull_request.head.ref }}
+          ref: ${{ github.head_ref }}
       - name: Set up Go
         uses: actions/setup-go@v4
         with:
@@ -431,13 +432,18 @@ jobs:
         run: go install github.com/gopherguides/hype/cmd/hype@latest
       - name: Run hype
         run: hype export -format=markdown -f hype.md -o README.md
-      - name: Commit README back to the repo
-        run: |-
-          git rev-parse --abbrev-ref HEAD
-          git config user.name 'GitHub Actions'
-          git config user.email 'actions@github.com'
-          git diff --quiet || (git add README.md && git commit -am "Updated README")
-          git push origin ${{github.event.pull_request.head.ref}}
+      - name: Check for changes
+        id: git-check
+        run: |
+          git diff --quiet README.md || echo "changed=true" >> $GITHUB_OUTPUT
+      - name: Commit README changes if any
+        if: steps.git-check.outputs.changed == 'true'
+        run: |
+          git config --local user.email "github-actions[bot]@users.noreply.github.com"
+          git config --local user.name "github-actions[bot]"
+          git add README.md
+          git commit -m "Update README.md with latest Hype changes"
+          git push
 ```
 > *source: .github/workflows/hype.yml*
 
