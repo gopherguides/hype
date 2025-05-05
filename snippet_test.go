@@ -27,6 +27,11 @@ func Test_Parse_Snippets(t *testing.T) {
 	const rbexp = "def goodbye\n  puts \"Goodbye, World!\"\nend"
 	const jsexp = "function goodbye() {\n    console.log('Goodbye, World!');\n}"
 	const htmlexp = "<p>Goodbye World</p>"
+	const yamlexp = "address:\n  street: 123 Main St\n  city: Springfield\n  zip: 12345"
+	const ymlexp = "address:\n  street: 123 Main St\n  city: Springfield\n  zip: 12345"
+	const shexp = "echo \"Goodbye, World!\""
+	const envexp = "GOODBYE=\"goodbye\""
+	const envrcexp = "export GOODBYE=\"goodbye\""
 
 	table := []struct {
 		path  string
@@ -39,6 +44,11 @@ func Test_Parse_Snippets(t *testing.T) {
 		{path: "snippets.rb", lang: "rb", start: 7, end: 11, exp: rbexp},
 		{path: "snippets.js", lang: "js", start: 7, end: 11, exp: jsexp},
 		{path: "snippets.html", lang: "html", start: 16, end: 18, exp: htmlexp},
+		{path: "snippets.yaml", lang: "yaml", start: 5, end: 10, exp: yamlexp},
+		{path: "snippets.yml", lang: "yml", start: 5, end: 10, exp: ymlexp},
+		{path: "snippets.sh", lang: "sh", start: 3, end: 5, exp: shexp},
+		{path: "snippets.env", lang: "env", start: 1, end: 3, exp: envexp},
+		{path: ".envrc", lang: "envrc", start: 1, end: 3, exp: envrcexp},
 	}
 
 	for _, tc := range table {

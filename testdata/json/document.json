@@ -262,12 +262,17 @@
   "section_id": 1,
   "snippets": {
     "rules": {
+      ".env": "# %s",
+      ".envrc": "# %s",
       ".go": "// %s",
       ".html": "\u003c!-- %s --\u003e",
       ".js": "// %s",
       ".md": "\u003c!-- %s --\u003e",
       ".rb": "# %s",
-      ".ts": "// %s"
+      ".sh": "# %s",
+      ".ts": "// %s",
+      ".yaml": "# %s",
+      ".yml": "# %s"
     },
     "snippets": {
       "src/main.ts": {
