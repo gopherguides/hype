@@ -125,12 +125,17 @@ func (sm *Snippets) init() {
 
 		if sm.rules == nil {
 			sm.rules = map[string]string{
-				".go":   "// %s",
-				".html": "<!-- %s -->",
-				".js":   "// %s",
-				".md":   "<!-- %s -->",
-				".rb":   "# %s",
-				".ts":   "// %s",
+				".go":    "// %s",
+				".html":  "<!-- %s -->",
+				".js":    "// %s",
+				".md":    "<!-- %s -->",
+				".rb":    "# %s",
+				".ts":    "// %s",
+				".sh":    "# %s",
+				".yaml":  "# %s",
+				".yml":   "# %s",
+				".env":   "# %s",
+				".envrc": "# %s",
 			}
 		}
 	})

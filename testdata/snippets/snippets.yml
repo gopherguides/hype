@@ -1,0 +1,17 @@
+---
+name: Jane Doe
+age: 30
+isEmployed: true
+# snippet: goodbye
+address:
+  street: 123 Main St
+  city: Springfield
+  zip: 12345
+# snippet: goodbye
+pets:
+  - type: dog
+    name: Rex
+# snippet: hello
+  - type: cat
+    name: Whiskers
+# snippet: hello
