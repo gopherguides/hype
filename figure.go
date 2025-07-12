@@ -1,12 +1,15 @@
 package hype
 
 import (
+	"bytes"
 	"encoding/json"
-	"errors"
 	"fmt"
+	"io"
 	"strings"
 
 	"github.com/gobuffalo/flect"
+	"github.com/gopherguides/hype/mdx"
+	"golang.org/x/net/html"
 )
 
 type Figure struct {
@@ -115,30 +118,99 @@ func NewFigure(p *Parser, el *Element) (*Figure, error) {
 		return f, nil
 	}
 
+	// Create a sub-parser for processing the nodes
 	p2, err := p.Sub(".")
 	if err != nil {
 		return nil, f.WrapErr(err)
 	}
 
-	nodes, err := p2.ParseFragment(strings.NewReader(body))
+	// Parse figure content directly as HTML to avoid Markdown preprocessing issues
+	// that can cause figcaption elements to be lost
+	nodes, err := f.parseContentDirectly(p2, body)
 	if err != nil {
-		if !errors.Is(err, ErrNilFigure) {
-			return nil, f.WrapErr(err)
+		return nil, f.WrapErr(err)
+	}
+
+	f.Nodes = nodes
+	return f, nil
+}
+
+// parseContentDirectly parses figure content with markdown preprocessing but avoids
+// the paragraph extraction that can lose figcaption elements
+func (f *Figure) parseContentDirectly(p *Parser, body string) (Nodes, error) {
+	// Create a custom markdown preprocessor with DisablePages = true to avoid
+	// wrapping figure content in <page> tags
+
+	// Create a reader from the body content
+	r := strings.NewReader(body)
+
+	// Create a custom markdown preprocessor that doesn't add page tags
+	md := mdx.New()
+	md.DisablePages = true
+
+	// Read the content
+	b, err := io.ReadAll(r)
+	if err != nil {
+		return nil, err
+	}
+
+	// Process with markdown (handles ``` code blocks, etc.)
+	b = bytes.ReplaceAll(b, []byte("\\n"), []byte("  \n"))
+
+	b, err = md.Parse(b)
+	if err != nil {
+		return nil, err
+	}
+
+	// Apply the same post-processing as the main markdown processor
+	b = bytes.ReplaceAll(b, []byte("&rsquo;"), []byte("'"))
+	b = bytes.ReplaceAll(b, []byte("&ldquo;"), []byte("\""))
+	b = bytes.ReplaceAll(b, []byte("&rdquo;"), []byte("\""))
+
+	// Parse the markdown-processed content as HTML
+	htmlDoc, err := html.Parse(bytes.NewReader(b))
+	if err != nil {
+		return nil, err
+	}
+
+	// Find the body element and extract its children
+	// The structure should be: html -> head, body -> content
+	var bodyElement *html.Node
+	var findBody func(*html.Node)
+	findBody = func(node *html.Node) {
+		if node.Type == html.ElementNode && node.Data == "body" {
+			bodyElement = node
+			return
+		}
+		for child := node.FirstChild; child != nil; child = child.NextSibling {
+			findBody(child)
+			if bodyElement != nil {
+				return
+			}
 		}
 	}
+	findBody(htmlDoc)
 
-	pages := ByType[*Page](nodes)
-	if len(pages) == 0 {
-		f.Nodes = nodes
-
-		return f, nil
+	if bodyElement == nil {
+		return nil, fmt.Errorf("could not find body element")
 	}
 
-	page := pages[0]
+	// Parse each child of the body as a node, skipping pure whitespace text nodes
+	var nodes Nodes
+	for child := bodyElement.FirstChild; child != nil; child = child.NextSibling {
+		// Skip text nodes that contain only whitespace
+		if child.Type == html.TextNode && strings.TrimSpace(child.Data) == "" {
+			continue
+		}
 
-	f.Nodes = page.Nodes
+		node, err := p.ParseHTMLNode(child, f)
+		if err != nil {
+			return nil, err
+		}
+		nodes = append(nodes, node)
+	}
 
-	return f, nil
+	return nodes, nil
 }
 
 func NewFigureNodes(p *Parser, el *Element) (Nodes, error) {
