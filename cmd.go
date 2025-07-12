@@ -166,6 +166,13 @@ func (c *Cmd) newError(err error) error {
 	}
 }
 
+func (c *Cmd) String() string {
+	if c == nil || c.Element == nil {
+		return ""
+	}
+	return c.StartTag() + c.Children().String() + c.EndTag()
+}
+
 func NewCmd(el *Element) (*Cmd, error) {
 	if el == nil {
 		return nil, ErrIsNil("element")

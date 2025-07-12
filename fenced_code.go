@@ -62,6 +62,22 @@ func (code *FencedCode) Lang() string {
 	return Language(code.Attrs(), lang)
 }
 
+func (code *FencedCode) String() string {
+	if code == nil || code.Element == nil {
+		return "<pre><code></code></pre>"
+	}
+
+	bb := &bytes.Buffer{}
+	fmt.Fprintf(bb, "<pre><code class=\"language-%s\" language=\"%s\">", code.Lang(), code.Lang())
+
+	body := code.Children().String()
+	body = html.UnescapeString(body)
+	fmt.Fprint(bb, body)
+
+	fmt.Fprint(bb, "</code></pre>")
+	return bb.String()
+}
+
 func NewFencedCode(el *Element) (*FencedCode, error) {
 	if el == nil {
 		return nil, ErrIsNil("element")

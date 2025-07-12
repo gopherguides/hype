@@ -3,9 +3,10 @@
 
 <p>In a lot of object oriented languages, such as C# and Java, you have to <em>explicitly</em> declare that your type is implementing a very specific interface.</p>
 
-<p>In C#, <ref id="figure-1-1"><a href="#figure-1-1">Figure 1.1</a></ref>, you declare that you are using the <code>Performer</code> interface by using the <code>:</code> operator after the class name and listing the interfaces you want to use.</p>
+<p>In C#, <a href="#figure-1-1">Figure 1.1</a>, you declare that you are using the <code>Performer</code> interface by using the <code>:</code> operator after the class name and listing the interfaces you want to use.</p>
 
 <figure id="figure-1-1">
+
 
 ```c#
 interface Performer {
@@ -20,13 +21,15 @@ class Musician : Performer {
 ```
 
 <figcaption><em class="figure-name">Figure 1.1:</em> Example C# implementation of the `Performer` interface.</figcaption>
+
 </figure>
 
-<p>In Java, <ref id="figure-1-2"><a href="#figure-1-2">Figure 1.2</a></ref>, you use the <code>implements</code> keyword after the class name to tell the compiler that your type wants to implement the <code>Performer</code> interface.</p>
+<p>In Java, <a href="#figure-1-2">Figure 1.2</a>, you use the <code>implements</code> keyword after the class name to tell the compiler that your type wants to implement the <code>Performer</code> interface.</p>
 
 <div>
 
 <figure id="figure-1-2">
+
 
 ```java
 interface Performer {
@@ -40,6 +43,7 @@ class Musician implements Performer {
 ```
 
 <figcaption><em class="figure-name">Figure 1.2:</em> Example Java implementation of `Performer` interface.</figcaption>
+
 </figure>
 
 </div>

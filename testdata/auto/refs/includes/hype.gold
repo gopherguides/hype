@@ -1,9 +1,10 @@
 <html><head></head><body><page>
 <h1>Simple References</h1>
 
-<p>In <ref id="figure-1-1"><a href="#figure-1-1">Figure 1.1</a></ref> we see the reference.</p>
+<p>In <a href="#figure-1-1">Figure 1.1</a> we see the reference.</p>
 
 <figure id="figure-1-1">
+
 
 <pre><code class="language-go" language="go" src="src/greet/main.go#example">fmt.Println("Hello, World!")</code></pre>
 
@@ -11,16 +12,17 @@
 
 <figcaption><em class="figure-name">Figure 1.1:</em> Optional caption</figcaption>
 
+
 </figure>
 </page>
 <page>
 <h1>Include References</h1>
 
-<p>This <ref id="figure-1-1"><a href="#figure-1-1">Figure 1.1</a></ref> is in an included file.</p>
+<p>This <a href="#figure-1-1">Figure 1.1</a> is in an included file.</p>
 
 <cmd data-go-version="go.test" doc="-short context.Canceled" exec="go doc -short context.Canceled" figure-id="ref1"><pre><code class="language-shell" language="shell">$ go doc -short context.Canceled
 
-var Canceled = errors.New(&#34;context canceled&#34;)
+var Canceled = errors.New("context canceled")
     Canceled is the error returned by [Context.Err] when the context is canceled
     for some reason other than its deadline passing.
 
@@ -28,21 +30,21 @@ var Canceled = errors.New(&#34;context canceled&#34;)
 Go Version: go.test
 </code></pre></cmd>
 
-<p>More included text that references <ref id="figure-1-1"><a href="#figure-1-1">Figure 1.1</a></ref>.</p>
+<p>More included text that references <a href="#figure-1-1">Figure 1.1</a>.</p>
 
-<pre><code class="language-go" language="go">package main
+<pre><pre><code class="language-go" language="go">package main
 
 import "fmt"
 
 func main() {
     fmt.Println("Howdy!")
 }
-</code></pre>
+</code></pre></pre>
 
 <p>end note</p>
 </page>
 
 <page>
-<p>Some more text that references <ref id="figure-1-1"><a href="#figure-1-1">Figure 1.1</a></ref>.</p>
+<p>Some more text that references <a href="#figure-1-1">Figure 1.1</a>.</p>
 </page>
 </body></html>

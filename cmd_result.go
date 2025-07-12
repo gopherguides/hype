@@ -13,7 +13,6 @@ import (
 	"text/tabwriter"
 
 	"github.com/gobuffalo/flect"
-	"github.com/gopherguides/hype/atomx"
 	"github.com/markbates/clam"
 )
 
@@ -61,6 +60,13 @@ func (c *CmdResult) MD() string {
 	return c.Children().MD()
 }
 
+func (c *CmdResult) String() string {
+	if c == nil || c.Element == nil {
+		return ""
+	}
+	return c.Children().String()
+}
+
 func NewCmdResult(p *Parser, c *Cmd, res *clam.Result) (*CmdResult, error) {
 	if res == nil {
 		return nil, c.WrapErr(ErrIsNil("result"))
@@ -104,9 +110,8 @@ func NewCmdResult(p *Parser, c *Cmd, res *clam.Result) (*CmdResult, error) {
 		return nil, c.WrapErr(err)
 	}
 
-	pre := NewEl(atomx.Pre, cmd)
 	cel := &FencedCode{
-		Element: NewEl(atomx.Code, pre),
+		Element: NewEl("code", cmd),
 	}
 
 	if err := cel.Set("language", lang); err != nil {
@@ -119,14 +124,6 @@ func NewCmdResult(p *Parser, c *Cmd, res *clam.Result) (*CmdResult, error) {
 
 	body = strings.TrimSpace(body)
 	cel.Nodes = append(cel.Nodes, Text(body))
-
-	if _, ok := c.Get("hide-data"); ok {
-		pre.Nodes = append(pre.Nodes, cel)
-
-		cmd.Nodes = Nodes{pre}
-
-		return cmd, nil
-	}
 
 	type dt struct {
 		key string
@@ -189,9 +186,7 @@ func NewCmdResult(p *Parser, c *Cmd, res *clam.Result) (*CmdResult, error) {
 		cel.Nodes = append(cel.Nodes, Text(text))
 	}
 
-	pre.Nodes = append(pre.Nodes, cel)
-
-	cmd.Nodes = Nodes{pre}
+	cmd.Nodes = Nodes{cel}
 
 	return cmd, nil
 }

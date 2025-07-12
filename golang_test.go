@@ -103,7 +103,7 @@ func Test_Golang_Sym(t *testing.T) {
 	exp := `<html><head></head><body><page>
 <cmd exec="go doc -cmd -u -src -short Foo" figure-id="xyz" hide-cmd="" language="go" src="sym" sym="Foo"><pre><code class="language-go" language="go">// Foo is a foo.
 func Foo() string {
-	return &#34;foo&#34;
+	return "foo"
 }</code></pre></cmd>
 </page>
 </body></html>`

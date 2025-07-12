@@ -3,6 +3,7 @@
 
 <figure id="figure-1-1">
 
+
 <img alt="1" src="assets/nodes.svg"></img>
 
 <img alt="2" src="assets/nodes.svg"></img>
@@ -12,6 +13,7 @@
 Hello</code></pre></cmd>
 
 <figcaption><em class="figure-name">Figure 1.1:</em> Image caption</figcaption>
+
 
 </figure>
 </page>

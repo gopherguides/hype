@@ -6,7 +6,7 @@
 go 1.22
 </code></pre><hr></hr><cmd exec="go doc -cmd -u -src -short main" hide-cmd="" language="go" run="main.go" src="src" sym="main"><pre><code class="language-go" language="go">func main() {
 	// snippet: example
-	fmt.Println(&#34;Hello, World!&#34;)
+	fmt.Println("Hello, World!")
 	// snippet: example
 }</code></pre></cmd><cmd exec="go run main.go" hide-cmd="" language="go" run="main.go" src="src" sym="main"><pre><code class="language-go" language="go">Hello, World!</code></pre></cmd>
 </page>

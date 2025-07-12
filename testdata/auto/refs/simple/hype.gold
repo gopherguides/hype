@@ -1,9 +1,10 @@
 <html><head></head><body><page>
 <h1>Simple References</h1>
 
-<p>In <ref id="figure-1-1"><a href="#figure-1-1">Figure 1.1</a></ref> we see the reference.</p>
+<p>In <a href="#figure-1-1">Figure 1.1</a> we see the reference.</p>
 
 <figure id="figure-1-1">
+
 
 <pre><code class="language-go" language="go" src="src/greet/main.go#example">fmt.Println("Hello, World!")</code></pre>
 
@@ -11,8 +12,9 @@
 
 <figcaption><em class="figure-name">Figure 1.1:</em> Optional caption</figcaption>
 
+
 </figure>
 
-<p>Some more text that references <ref id="figure-1-1"><a href="#figure-1-1">Figure 1.1</a></ref>.</p>
+<p>Some more text that references <a href="#figure-1-1">Figure 1.1</a>.</p>
 </page>
 </body></html>

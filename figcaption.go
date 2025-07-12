@@ -40,6 +40,18 @@ func (fc *Figcaption) MD() string {
 	return bb.String()
 }
 
+func (fc *Figcaption) String() string {
+	if fc == nil || fc.Element == nil {
+		return "<figcaption></figcaption>"
+	}
+
+	bb := &strings.Builder{}
+	bb.WriteString("<figcaption>")
+	bb.WriteString(fc.Nodes.String())
+	bb.WriteString("</figcaption>")
+	return bb.String()
+}
+
 func NewFigcaption(el *Element) (*Figcaption, error) {
 	if el == nil {
 		return nil, el.WrapErr(ErrIsNil("element"))

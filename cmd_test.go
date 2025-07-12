@@ -3,6 +3,7 @@ package hype
 import (
 	"context"
 	"errors"
+	"fmt"
 	"os"
 	"path/filepath"
 	"strings"
@@ -73,6 +74,7 @@ func Test_Cmd_Execute(t *testing.T) {
 	exp := `<cmd exec="echo hello" hide-cmd=""><pre><code class="language-shell" language="shell">hello</code></pre></cmd>`
 
 	// fmt.Println(act)
+	fmt.Println("ACTUAL OUTPUT:\n", act)
 	r.Equal(exp, act)
 }
 
@@ -237,5 +239,6 @@ func Test_Cmd_HomeDirectory(t *testing.T) {
 b.txt
 c.txt</code></pre></cmd>`
 
+	fmt.Println("ACTUAL OUTPUT:\n", act)
 	r.Equal(exp, act)
 }

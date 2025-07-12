@@ -82,6 +82,20 @@ func (f *Figure) Link() string {
 	return fmt.Sprintf("#%s", id)
 }
 
+func (f *Figure) String() string {
+	if f == nil || f.Element == nil {
+		return "<figure></figure>"
+	}
+
+	bb := &strings.Builder{}
+	bb.WriteString(f.StartTag())
+	bb.WriteString("\n")
+	bb.WriteString(f.Nodes.String())
+	bb.WriteString("\n")
+	bb.WriteString(f.EndTag())
+	return bb.String()
+}
+
 func NewFigure(p *Parser, el *Element) (*Figure, error) {
 	if el == nil {
 		return nil, ErrIsNil("element")

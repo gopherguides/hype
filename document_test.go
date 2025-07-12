@@ -3,6 +3,7 @@ package hype
 import (
 	"context"
 	"errors"
+	"fmt"
 	"io/fs"
 	"strings"
 	"testing"
@@ -32,6 +33,7 @@ func Test_Document_Execute(t *testing.T) {
 
 		exp := "<html><head></head><body><page>\n<h1>Command</h1>\n\n<cmd exec=\"echo 'Hello World'\"><pre><code class=\"language-shell\" language=\"shell\">$ echo Hello World\n\nHello World</code></pre></cmd>\n</page>\n</body></html>"
 
+		fmt.Println("ACTUAL OUTPUT:\n", act)
 		r.Equal(exp, act)
 	})
 
