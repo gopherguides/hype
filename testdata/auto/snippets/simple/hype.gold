@@ -1,7 +1,7 @@
 <html><head></head><body><page>
 <h1>Lone Ranger</h1>
 
-<pre><code class="language-go" language="go" snippet="foo" src="src/main.go">func main() {
+<pre><code class="language-go" language="go" src="src/main.go" snippet="foo">func main() {
 	fmt.Println("Hello, world!")
 }</code></pre>
 </page>

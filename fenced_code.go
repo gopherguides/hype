@@ -5,6 +5,7 @@ import (
 	"encoding/json"
 	"fmt"
 	"html"
+	"strings"
 )
 
 type FencedCode struct {
@@ -68,7 +69,30 @@ func (code *FencedCode) String() string {
 	}
 
 	bb := &bytes.Buffer{}
-	fmt.Fprintf(bb, "<pre><code class=\"language-%s\" language=\"%s\">", code.Lang(), code.Lang())
+	// Build attribute string in consistent order
+	attrs := []string{}
+	lang := code.Lang()
+	if lang != "" {
+		attrs = append(attrs, fmt.Sprintf("class=\"language-%s\"", lang))
+	}
+	if lang != "" {
+		attrs = append(attrs, fmt.Sprintf("language=\"%s\"", lang))
+	}
+	if src, ok := code.Get("src"); ok && src != "" {
+		attrs = append(attrs, fmt.Sprintf("src=\"%s\"", src))
+	}
+	if snip, ok := code.Get("snippet"); ok && snip != "" {
+		attrs = append(attrs, fmt.Sprintf("snippet=\"%s\"", snip))
+	}
+	if rng, ok := code.Get("range"); ok && rng != "" {
+		attrs = append(attrs, fmt.Sprintf("range=\"%s\"", rng))
+	}
+	attrStr := ""
+	if len(attrs) > 0 {
+		attrStr = " " + strings.Join(attrs, " ")
+	}
+
+	fmt.Fprintf(bb, "<pre><code%s>", attrStr)
 
 	body := code.Children().String()
 	body = html.UnescapeString(body)

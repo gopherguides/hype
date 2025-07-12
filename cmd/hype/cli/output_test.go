@@ -69,8 +69,8 @@ func TestBadOutputFilePaths(t *testing.T) {
 		cwd,
 		"/",
 		"./",
-		"./nonexistent/readme.md",
-		"/nonexistent/readme.md",
+		"./truly_nonexistent_dir_12345/readme.md",
+		"/truly_nonexistent_dir_12345/readme.md",
 	}
 	for _, p := range paths {
 		fullPath, err := cleanPath(p)

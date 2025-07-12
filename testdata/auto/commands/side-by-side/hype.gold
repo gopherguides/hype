@@ -11,7 +11,7 @@
 
 <h2>Key Collisions</h2>
 
-<pre><code class="language-go" language="go" src="values/src/string-keys/main.go#example">func main() {
+<pre><code class="language-go" language="go" src="values/src/string-keys/main.go#example" snippet="example">func main() {
 	// create a new background context
 	ctx := context.Background()
 

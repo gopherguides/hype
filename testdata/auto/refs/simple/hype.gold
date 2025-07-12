@@ -6,7 +6,7 @@
 <figure id="figure-1-1">
 
 
-<pre><code class="language-go" language="go" src="src/greet/main.go#example">fmt.Println("Hello, World!")</code></pre>
+<pre><code class="language-go" language="go" src="src/greet/main.go#example" snippet="example">fmt.Println("Hello, World!")</code></pre>
 
 <img src="assets/foo.png"></img>
 
