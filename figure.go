@@ -2,11 +2,11 @@ package hype
 
 import (
 	"encoding/json"
-	"errors"
 	"fmt"
 	"strings"
 
 	"github.com/gobuffalo/flect"
+	"golang.org/x/net/html"
 )
 
 type Figure struct {
@@ -108,37 +108,85 @@ func NewFigure(p *Parser, el *Element) (*Figure, error) {
 		f.style = style
 	}
 
+	// Check if we need to process any markdown content (like ``` code blocks)
+	// If the figure content contains raw markdown that wasn't preprocessed,
+	// we need to process it while preserving all elements
 	body := f.Nodes.String()
-	body = strings.TrimSpace(body)
-
-	if len(body) == 0 {
-		return f, nil
-	}
-
-	p2, err := p.Sub(".")
-	if err != nil {
-		return nil, f.WrapErr(err)
-	}
-
-	nodes, err := p2.ParseFragment(strings.NewReader(body))
-	if err != nil {
-		if !errors.Is(err, ErrNilFigure) {
+	if strings.Contains(body, "```") {
+		// Process the content through markdown preprocessing but preserve
+		// the structure by re-parsing the result
+		nodes, err := f.processMarkdownContent(p, body)
+		if err != nil {
 			return nil, f.WrapErr(err)
 		}
-	}
-
-	pages := ByType[*Page](nodes)
-	if len(pages) == 0 {
 		f.Nodes = nodes
-
-		return f, nil
 	}
-
-	page := pages[0]
-
-	f.Nodes = page.Nodes
 
 	return f, nil
+}
+
+// processMarkdownContent processes figure content that contains markdown syntax
+// while preserving all elements including figcaption
+func (f *Figure) processMarkdownContent(p *Parser, body string) (Nodes, error) {
+	// Create a sub-parser with pages disabled to avoid wrapping figure content in <page> tags
+	subParser, err := p.Sub(".")
+	if err != nil {
+		return nil, err
+	}
+	subParser.DisablePages = true
+
+	// Run the content through the preprocessing pipeline to handle markdown syntax
+	r := strings.NewReader(body)
+
+	// Apply preprocessing (including markdown conversion) with pages disabled
+	processedReader, err := subParser.PreParsers.PreParse(subParser, r)
+	if err != nil {
+		return nil, err
+	}
+
+	// Parse the preprocessed content as HTML
+	htmlDoc, err := html.Parse(processedReader)
+	if err != nil {
+		return nil, err
+	}
+
+	// Extract the body content (preprocessing wraps content in <html><head></head><body>)
+	var bodyElement *html.Node
+	var findBody func(*html.Node)
+	findBody = func(node *html.Node) {
+		if node.Type == html.ElementNode && node.Data == "body" {
+			bodyElement = node
+			return
+		}
+		for child := node.FirstChild; child != nil; child = child.NextSibling {
+			findBody(child)
+			if bodyElement != nil {
+				return
+			}
+		}
+	}
+	findBody(htmlDoc)
+
+	if bodyElement == nil {
+		return nil, fmt.Errorf("could not find body element after preprocessing")
+	}
+
+	// Parse each child of the body as a hype node
+	var nodes Nodes
+	for child := bodyElement.FirstChild; child != nil; child = child.NextSibling {
+		// Skip pure whitespace text nodes for cleaner output
+		if child.Type == html.TextNode && strings.TrimSpace(child.Data) == "" {
+			continue
+		}
+
+		node, err := subParser.ParseHTMLNode(child, f)
+		if err != nil {
+			return nil, err
+		}
+		nodes = append(nodes, node)
+	}
+
+	return nodes, nil
 }
 
 func NewFigureNodes(p *Parser, el *Element) (Nodes, error) {
