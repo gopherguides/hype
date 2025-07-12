@@ -2,7 +2,6 @@ package hype
 
 import (
 	"encoding/json"
-	"errors"
 	"fmt"
 	"strings"
 
@@ -108,36 +107,10 @@ func NewFigure(p *Parser, el *Element) (*Figure, error) {
 		f.style = style
 	}
 
-	body := f.Nodes.String()
-	body = strings.TrimSpace(body)
-
-	if len(body) == 0 {
+	if len(el.Nodes) == 0 {
 		return f, nil
 	}
-
-	p2, err := p.Sub(".")
-	if err != nil {
-		return nil, f.WrapErr(err)
-	}
-
-	nodes, err := p2.ParseFragment(strings.NewReader(body))
-	if err != nil {
-		if !errors.Is(err, ErrNilFigure) {
-			return nil, f.WrapErr(err)
-		}
-	}
-
-	pages := ByType[*Page](nodes)
-	if len(pages) == 0 {
-		f.Nodes = nodes
-
-		return f, nil
-	}
-
-	page := pages[0]
-
-	f.Nodes = page.Nodes
-
+	f.Nodes = el.Nodes
 	return f, nil
 }
 

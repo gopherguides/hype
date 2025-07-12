@@ -6,7 +6,9 @@
 <p>In C#, <ref id="figure-1-1"><a href="#figure-1-1">Figure 1.1</a></ref>, you declare that you are using the <code>Performer</code> interface by using the <code>:</code> operator after the class name and listing the interfaces you want to use.</p>
 
 <figure id="figure-1-1">
-<pre><code class="language-c#" language="c#">interface Performer {
+
+```c#
+interface Performer {
 	void Perform();
 }
 
@@ -15,9 +17,9 @@ class Musician : Performer {
 	public void Perform() {}
 }
 
-</code></pre>
+```
 
-<figcaption><em class="figure-name">Figure 1.1:</em> Example C# implementation of the <code>Performer</code> interface.</figcaption>
+<figcaption><em class="figure-name">Figure 1.1:</em> Example C# implementation of the `Performer` interface.</figcaption>
 </figure>
 
 <p>In Java, <ref id="figure-1-2"><a href="#figure-1-2">Figure 1.2</a></ref>, you use the <code>implements</code> keyword after the class name to tell the compiler that your type wants to implement the <code>Performer</code> interface.</p>
@@ -25,7 +27,9 @@ class Musician : Performer {
 <div>
 
 <figure id="figure-1-2">
-<pre><code class="language-java" language="java">interface Performer {
+
+```java
+interface Performer {
 	void Perform();
 }
 
@@ -33,9 +37,9 @@ class Musician : Performer {
 class Musician implements Performer {
 	void Perform() {}
 }
-</code></pre>
+```
 
-<figcaption><em class="figure-name">Figure 1.2:</em> Example Java implementation of <code>Performer</code> interface.</figcaption>
+<figcaption><em class="figure-name">Figure 1.2:</em> Example Java implementation of `Performer` interface.</figcaption>
 </figure>
 
 </div>

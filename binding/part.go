@@ -43,8 +43,10 @@ func (parts Parts) UpdateIdent(ident flect.Ident) {
 		return
 	}
 
-	for _, part := range parts {
+	for k, v := range parts {
+		part := v
 		part.Ident = ident
+		parts[k] = part
 	}
 }
 
