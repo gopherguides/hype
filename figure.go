@@ -1,14 +1,11 @@
 package hype
 
 import (
-	"bytes"
 	"encoding/json"
 	"fmt"
-	"io"
 	"strings"
 
 	"github.com/gobuffalo/flect"
-	"github.com/gopherguides/hype/mdx"
 	"golang.org/x/net/html"
 )
 
@@ -111,70 +108,49 @@ func NewFigure(p *Parser, el *Element) (*Figure, error) {
 		f.style = style
 	}
 
+	// Check if we need to process any markdown content (like ``` code blocks)
+	// If the figure content contains raw markdown that wasn't preprocessed,
+	// we need to process it while preserving all elements
 	body := f.Nodes.String()
-	body = strings.TrimSpace(body)
-
-	if len(body) == 0 {
-		return f, nil
+	if strings.Contains(body, "```") {
+		// Process the content through markdown preprocessing but preserve
+		// the structure by re-parsing the result
+		nodes, err := f.processMarkdownContent(p, body)
+		if err != nil {
+			return nil, f.WrapErr(err)
+		}
+		f.Nodes = nodes
 	}
 
-	// Create a sub-parser for processing the nodes
-	p2, err := p.Sub(".")
-	if err != nil {
-		return nil, f.WrapErr(err)
-	}
-
-	// Parse figure content directly as HTML to avoid Markdown preprocessing issues
-	// that can cause figcaption elements to be lost
-	nodes, err := f.parseContentDirectly(p2, body)
-	if err != nil {
-		return nil, f.WrapErr(err)
-	}
-
-	f.Nodes = nodes
 	return f, nil
 }
 
-// parseContentDirectly parses figure content with markdown preprocessing but avoids
-// the paragraph extraction that can lose figcaption elements
-func (f *Figure) parseContentDirectly(p *Parser, body string) (Nodes, error) {
-	// Create a custom markdown preprocessor with DisablePages = true to avoid
-	// wrapping figure content in <page> tags
+// processMarkdownContent processes figure content that contains markdown syntax
+// while preserving all elements including figcaption
+func (f *Figure) processMarkdownContent(p *Parser, body string) (Nodes, error) {
+	// Create a sub-parser with pages disabled to avoid wrapping figure content in <page> tags
+	subParser, err := p.Sub(".")
+	if err != nil {
+		return nil, err
+	}
+	subParser.DisablePages = true
 
-	// Create a reader from the body content
+	// Run the content through the preprocessing pipeline to handle markdown syntax
 	r := strings.NewReader(body)
 
-	// Create a custom markdown preprocessor that doesn't add page tags
-	md := mdx.New()
-	md.DisablePages = true
-
-	// Read the content
-	b, err := io.ReadAll(r)
+	// Apply preprocessing (including markdown conversion) with pages disabled
+	processedReader, err := subParser.PreParsers.PreParse(subParser, r)
 	if err != nil {
 		return nil, err
 	}
 
-	// Process with markdown (handles ``` code blocks, etc.)
-	b = bytes.ReplaceAll(b, []byte("\\n"), []byte("  \n"))
-
-	b, err = md.Parse(b)
+	// Parse the preprocessed content as HTML
+	htmlDoc, err := html.Parse(processedReader)
 	if err != nil {
 		return nil, err
 	}
 
-	// Apply the same post-processing as the main markdown processor
-	b = bytes.ReplaceAll(b, []byte("&rsquo;"), []byte("'"))
-	b = bytes.ReplaceAll(b, []byte("&ldquo;"), []byte("\""))
-	b = bytes.ReplaceAll(b, []byte("&rdquo;"), []byte("\""))
-
-	// Parse the markdown-processed content as HTML
-	htmlDoc, err := html.Parse(bytes.NewReader(b))
-	if err != nil {
-		return nil, err
-	}
-
-	// Find the body element and extract its children
-	// The structure should be: html -> head, body -> content
+	// Extract the body content (preprocessing wraps content in <html><head></head><body>)
 	var bodyElement *html.Node
 	var findBody func(*html.Node)
 	findBody = func(node *html.Node) {
@@ -192,18 +168,18 @@ func (f *Figure) parseContentDirectly(p *Parser, body string) (Nodes, error) {
 	findBody(htmlDoc)
 
 	if bodyElement == nil {
-		return nil, fmt.Errorf("could not find body element")
+		return nil, fmt.Errorf("could not find body element after preprocessing")
 	}
 
-	// Parse each child of the body as a node, skipping pure whitespace text nodes
+	// Parse each child of the body as a hype node
 	var nodes Nodes
 	for child := bodyElement.FirstChild; child != nil; child = child.NextSibling {
-		// Skip text nodes that contain only whitespace
+		// Skip pure whitespace text nodes for cleaner output
 		if child.Type == html.TextNode && strings.TrimSpace(child.Data) == "" {
 			continue
 		}
 
-		node, err := p.ParseHTMLNode(child, f)
+		node, err := subParser.ParseHTMLNode(child, f)
 		if err != nil {
 			return nil, err
 		}
