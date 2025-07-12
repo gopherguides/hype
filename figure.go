@@ -124,6 +124,8 @@ func NewFigure(p *Parser, el *Element) (*Figure, error) {
 	if len(el.Nodes) == 0 {
 		return f, nil
 	}
+
+	// Use the nodes directly to preserve their types (e.g., custom nodes like <godoc>)
 	f.Nodes = el.Nodes
 	return f, nil
 }
