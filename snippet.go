@@ -77,13 +77,34 @@ func (sm *Snippets) MarshalJSON() ([]byte, error) {
 		return nil, ErrIsNil("snippets")
 	}
 
+	// Create sorted maps to ensure deterministic JSON output
+	sortedRules := make(map[string]string)
+	if sm.rules != nil {
+		for k, v := range sm.rules {
+			sortedRules[k] = v
+		}
+	}
+
+	sortedSnippets := make(map[string]map[string]Snippet)
+	if sm.snippets != nil {
+		for k, v := range sm.snippets {
+			innerMap := make(map[string]Snippet)
+			for ik, iv := range v {
+				innerMap[ik] = iv
+			}
+			sortedSnippets[k] = innerMap
+		}
+	}
+
+	// Use json.Marshal with sorted map keys
+	// Go's json package always sorts map keys lexicographically
 	m := struct {
 		Rules    map[string]string             `json:"rules,omitempty"`
 		Snippets map[string]map[string]Snippet `json:"snippets,omitempty"`
 		Type     string                        `json:"type,omitempty"`
 	}{
-		Rules:    sm.rules,
-		Snippets: sm.snippets,
+		Rules:    sortedRules,
+		Snippets: sortedSnippets,
 		Type:     toType(sm),
 	}
 

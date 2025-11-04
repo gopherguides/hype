@@ -55,7 +55,14 @@ func (el *Element) JSONMap() (map[string]any, error) {
 	}
 
 	if el.Attributes.Len() > 0 {
-		m["attributes"] = el.Attributes
+		// Convert syncx.Map to regular map for deterministic JSON marshaling
+		// Go's json package will sort map keys lexicographically
+		attrs := make(map[string]string)
+		el.Attributes.Range(func(k, v string) bool {
+			attrs[k] = v
+			return true
+		})
+		m["attributes"] = attrs
 	}
 
 	hn := el.HTMLNode

@@ -47,6 +47,14 @@ func (p *Parser) MarshalJSON() ([]byte, error) {
 	p.mu.RLock()
 	defer p.mu.RUnlock()
 
+	// Convert syncx.Map to regular map for deterministic JSON marshaling
+	// Go's json package will sort map keys lexicographically
+	vars := make(map[string]any)
+	p.Vars.Range(func(k string, v any) bool {
+		vars[k] = v
+		return true
+	})
+
 	x := struct {
 		Type         string         `json:"type,omitempty"`
 		Root         string         `json:"root,omitempty"`
@@ -59,7 +67,7 @@ func (p *Parser) MarshalJSON() ([]byte, error) {
 		Root:         p.Root,
 		DisablePages: p.DisablePages,
 		Section:      p.Section,
-		Vars:         p.Vars.Map(),
+		Vars:         vars,
 		Contents:     string(p.Contents),
 	}
 
