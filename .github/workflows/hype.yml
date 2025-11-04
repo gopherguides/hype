@@ -16,7 +16,7 @@ jobs:
       - name: Set up Go
         uses: actions/setup-go@v4
         with:
-          go-version: "1.24.x"
+          go-version-file: 'go.mod'
           cache-dependency-path: subdir/go.sum
       - name: Install hype
         run: go install github.com/gopherguides/hype/cmd/hype@latest

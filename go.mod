@@ -1,8 +1,8 @@
 module github.com/gopherguides/hype
 
-go 1.24
+go 1.25
 
-toolchain go1.24.0
+toolchain go1.25.0
 
 require (
 	github.com/gobuffalo/flect v1.0.2
