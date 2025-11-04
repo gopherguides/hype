@@ -32,12 +32,31 @@ func (doc *Document) MarshalJSON() ([]byte, error) {
 		return nil, ErrIsNil("document")
 	}
 
+	// Create sorted maps to ensure deterministic JSON output
+	sortedRules := make(map[string]string)
+	if doc.Snippets.rules != nil {
+		for k, v := range doc.Snippets.rules {
+			sortedRules[k] = v
+		}
+	}
+
+	sortedSnippets := make(map[string]map[string]Snippet)
+	if doc.Snippets.snippets != nil {
+		for k, v := range doc.Snippets.snippets {
+			innerMap := make(map[string]Snippet)
+			for ik, iv := range v {
+				innerMap[ik] = iv
+			}
+			sortedSnippets[k] = innerMap
+		}
+	}
+
 	snips := struct {
 		Rules    map[string]string             `json:"rules,omitempty"`
 		Snippets map[string]map[string]Snippet `json:"snippets,omitempty"`
 	}{
-		Rules:    doc.Snippets.rules,
-		Snippets: doc.Snippets.snippets,
+		Rules:    sortedRules,
+		Snippets: sortedSnippets,
 	}
 
 	x := struct {
