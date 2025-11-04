@@ -127,7 +127,7 @@ $ go run .
 Hello World
 
 --------------------------------------------------------------------------------
-Go Version: go1.24.9
+Go Version: go1.25.3
 
 ```
 
@@ -160,7 +160,7 @@ $ go run .
 Hello World
 
 --------------------------------------------------------------------------------
-Go Version: go1.24.9
+Go Version: go1.25.3
 
 ```
 
@@ -189,7 +189,7 @@ $ go run .
 Hello World
 
 --------------------------------------------------------------------------------
-Go Version: go1.24.9
+Go Version: go1.25.3
 
 ```
 
@@ -219,7 +219,7 @@ $ go run .
 ./main.go:7:6: undefined: fmt.Prin
 
 --------------------------------------------------------------------------------
-Go Version: go1.24.9
+Go Version: go1.25.3
 
 ```
 
@@ -256,7 +256,7 @@ type Context interface{ ... }
     func WithoutCancel(parent Context) Context
 
 --------------------------------------------------------------------------------
-Go Version: go1.24.9
+Go Version: go1.25.3
 
 ```
 
@@ -279,7 +279,7 @@ func WithCancel(parent Context) (ctx Context, cancel CancelFunc)
     call cancel as soon as the operations running in this Context complete.
 
 --------------------------------------------------------------------------------
-Go Version: go1.24.9
+Go Version: go1.25.3
 
 ```
 
@@ -427,7 +427,7 @@ jobs:
       - name: Set up Go
         uses: actions/setup-go@v4
         with:
-          go-version: "1.24.x"
+          go-version-file: 'go.mod'
           cache-dependency-path: subdir/go.sum
       - name: Install hype
         run: go install github.com/gopherguides/hype/cmd/hype@latest
