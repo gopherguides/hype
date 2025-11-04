@@ -6,18 +6,17 @@ on:
   pull_request:
 jobs:
   tests-on:
-    name: ${{matrix.go-version}} ${{matrix.os}}
+    name: ${{matrix.os}}
     runs-on: ${{ matrix.os }}
     strategy:
       matrix:
-        go-version: [1.24.x]
         os: [macos-latest, ubuntu-latest]
     steps:
       - uses: actions/checkout@v4
       - name: Set up Go
         uses: actions/setup-go@v4
         with:
-          go-version: "1.24.x"
+          go-version-file: 'go.mod'
       - name: Go Environment
         run: go env
       - name: Verify Go Modules
