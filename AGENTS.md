@@ -14,7 +14,7 @@ Core packages live at repo root (e.g., `element.go`, `parser.go`) and follow Go'
 
 ## Coding Style & Naming Conventions
 
-Use Go 1.22+ features conservatively and keep compiler warnings at zero. Format code via `gofmt` (tabs for indentation, blank lines between logical sections) and lint with `revive` using `revive.toml`. Exported identifiers should read like `Parser`, `ExecuteError`, while private helpers stay lowerCamel. Keep package boundaries focused; avoid cyclic imports by adding shared helpers to `internal/`.
+Use Go 1.25+ features conservatively and keep compiler warnings at zero. Format code via `gofmt` (tabs for indentation, blank lines between logical sections) and lint with `revive` using `revive.toml`. Exported identifiers should read like `Parser`, `ExecuteError`, while private helpers stay lowerCamel. Keep package boundaries focused; avoid cyclic imports by adding shared helpers to `internal/`.
 
 ## Testing Guidelines
 
