@@ -459,5 +459,5 @@ There are several issues that still need to be worked on. Please see the issues 
 
 # License
 
-[Hype](https://github.com/gopherguides/hype) by [Gopher Guides LLC](https://github.com/gopherguides) is licensed under [Attribution-NonCommercial-ShareAlike 4.0 International<img src="https://mirrors.creativecommons.org/presskit/icons/cc.svg?ref=chooser-v1" style="height:22px!important;margin-left:3px;vertical-align:text-bottom;"></img><img src="https://mirrors.creativecommons.org/presskit/icons/by.svg?ref=chooser-v1" style="height:22px!important;margin-left:3px;vertical-align:text-bottom;"></img><img src="https://mirrors.creativecommons.org/presskit/icons/nc.svg?ref=chooser-v1" style="height:22px!important;margin-left:3px;vertical-align:text-bottom;"></img><img src="https://mirrors.creativecommons.org/presskit/icons/sa.svg?ref=chooser-v1" style="height:22px!important;margin-left:3px;vertical-align:text-bottom;"></img>](http://creativecommons.org/licenses/by-nc-sa/4.0/?ref=chooser-v1)
+[Hype](https://github.com/gopherguides/hype) by [Gopher Guides LLC](https://github.com/gopherguides) is licensed under the [MIT License](https://opensource.org/license/mit).
 
