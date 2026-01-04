@@ -6,6 +6,7 @@ import (
 	"flag"
 	"fmt"
 	"io"
+	"io/fs"
 	"log/slog"
 	"os"
 	"path/filepath"
@@ -231,15 +232,28 @@ func (cmd *Export) execute(ctx context.Context, pwd string) error {
 	mp := os.Getenv("MARKED_PATH")
 
 	slog.Debug("execute", "pwd", pwd, "file", cmd.File, "MARKED_PATH", mp)
-	p := cmd.Parser
+	fileDir := filepath.Dir(cmd.File)
+	fileName := filepath.Base(cmd.File)
 
-	if p == nil {
-		p = hype.NewParser(cmd.FS)
+	parserFS := cmd.FS
+	if fileDir != "." && fileDir != "" {
+		subFS, err := fs.Sub(cmd.FS, fileDir)
+		if err != nil {
+			return fmt.Errorf("failed to create sub filesystem for %s: %w", fileDir, err)
+		}
+		parserFS = subFS
 	}
 
-	p.Root = filepath.Dir(mp)
+	p := cmd.Parser
+	if p == nil {
+		p = hype.NewParser(parserFS)
+	} else {
+		p.FS = parserFS
+	}
 
-	doc, err := p.ParseFile(cmd.File)
+	p.Root = filepath.Join(filepath.Dir(mp), fileDir)
+
+	doc, err := p.ParseFile(fileName)
 	if err != nil {
 		return err
 	}
