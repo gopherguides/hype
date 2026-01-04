@@ -11,6 +11,7 @@ func DefaultElements() map[Atom]ParseElementFn {
 		"godoc#a":        NewGoDocLinkNodes,
 		"now":            NewNowNodes,
 		"toc":            NewToCNodes,
+		"youtube":        NewYouTubeNodes,
 		atomx.A:          NewLinkNodes,
 		atomx.Body:       NewBodyNodes,
 		atomx.Cmd:        NewCmdNodes,

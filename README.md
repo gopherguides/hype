@@ -127,7 +127,7 @@ $ go run .
 Hello World
 
 --------------------------------------------------------------------------------
-Go Version: go1.25.3
+Go Version: go1.25.5
 
 ```
 
@@ -160,7 +160,7 @@ $ go run .
 Hello World
 
 --------------------------------------------------------------------------------
-Go Version: go1.25.3
+Go Version: go1.25.5
 
 ```
 
@@ -189,7 +189,7 @@ $ go run .
 Hello World
 
 --------------------------------------------------------------------------------
-Go Version: go1.25.3
+Go Version: go1.25.5
 
 ```
 
@@ -219,7 +219,7 @@ $ go run .
 ./main.go:7:6: undefined: fmt.Prin
 
 --------------------------------------------------------------------------------
-Go Version: go1.25.3
+Go Version: go1.25.5
 
 ```
 
@@ -256,7 +256,7 @@ type Context interface{ ... }
     func WithoutCancel(parent Context) Context
 
 --------------------------------------------------------------------------------
-Go Version: go1.25.3
+Go Version: go1.25.5
 
 ```
 
@@ -279,7 +279,7 @@ func WithCancel(parent Context) (ctx Context, cancel CancelFunc)
     call cancel as soon as the operations running in this Context complete.
 
 --------------------------------------------------------------------------------
-Go Version: go1.25.3
+Go Version: go1.25.5
 
 ```
 
@@ -309,6 +309,38 @@ $ tree
         └── main.go
 
 4 directories, 4 files
+```
+
+# Embedding YouTube Videos
+
+You can embed YouTube videos directly in your document using the `youtube` tag:
+
+```html
+<youtube id="VIDEO_ID"></youtube>
+
+```
+
+Where `VIDEO_ID` is the 11-character video ID from the YouTube URL. For example, from `https://www.youtube.com/watch?v=dQw4w9WgXcQ`, the video ID is `dQw4w9WgXcQ`.
+
+You can also add an optional title for accessibility:
+
+```html
+<youtube id="dQw4w9WgXcQ" title="Introduction to Error Handling"></youtube>
+
+```
+
+The `youtube` tag renders a responsive iframe embed with proper security attributes:
+
+```html
+<div class="youtube-embed">
+  <iframe src="https://www.youtube.com/embed/VIDEO_ID"
+    title="Video Title"
+    frameborder="0"
+    allow="accelerometer; autoplay; clipboard-write; encrypted-media; gyroscope; picture-in-picture; web-share"
+    referrerpolicy="strict-origin-when-cross-origin"
+    allowfullscreen></iframe>
+</div>
+
 ```
 
 # The Export Command
