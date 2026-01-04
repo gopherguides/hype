@@ -144,6 +144,35 @@ Here is the output:
 
 <cmd exec="tree" src="."></cmd>
 
+# Embedding YouTube Videos
+
+You can embed YouTube videos directly in your document using the `youtube` tag:
+
+```html
+<youtube id="VIDEO_ID"></youtube>
+```
+
+Where `VIDEO_ID` is the 11-character video ID from the YouTube URL. For example, from `https://www.youtube.com/watch?v=dQw4w9WgXcQ`, the video ID is `dQw4w9WgXcQ`.
+
+You can also add an optional title for accessibility:
+
+```html
+<youtube id="dQw4w9WgXcQ" title="Introduction to Error Handling"></youtube>
+```
+
+The `youtube` tag renders a responsive iframe embed with proper security attributes:
+
+```html
+<div class="youtube-embed">
+  <iframe src="https://www.youtube.com/embed/VIDEO_ID"
+    title="Video Title"
+    frameborder="0"
+    allow="accelerometer; autoplay; clipboard-write; encrypted-media; gyroscope; picture-in-picture; web-share"
+    referrerpolicy="strict-origin-when-cross-origin"
+    allowfullscreen></iframe>
+</div>
+```
+
 # The Export Command
 
 There are several options for running the `hype` command. Most notable is the `export` option:

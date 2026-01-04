@@ -1,0 +1,8 @@
+<html><head></head><body><page>
+<h1>YouTube Example</h1>
+
+<div class="youtube-embed">
+  <iframe src="https://www.youtube.com/embed/dQw4w9WgXcQ" title="Test Video" frameborder="0" allow="accelerometer; autoplay; clipboard-write; encrypted-media; gyroscope; picture-in-picture; web-share" referrerpolicy="strict-origin-when-cross-origin" allowfullscreen></iframe>
+</div>
+</page>
+</body></html>
