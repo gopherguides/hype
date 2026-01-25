@@ -408,7 +408,8 @@ $ tree ./docs
 │   │   └── theme-suspended-home.png
 │   ├── README.md
 │   └── src
-│       └── deploy.yaml
+│       ├── deploy.yaml
+│       └── structure.txt
 ├── license.md
 └── quickstart
     ├── hype.md
@@ -419,7 +420,7 @@ $ tree ./docs
         └── hello
             └── main.go
 
-8 directories, 15 files
+8 directories, 16 files
 ```
 ---
 
@@ -763,7 +764,8 @@ Then enable GitHub Pages in your repo settings (Settings > Pages > Source: GitHu
 
 ## Project Structure
 
-`mysite/
+```txt
+mysite/
 ├── config.yaml             # Site configuration
 ├── content/                # Your articles
 │   └── hello-world/
@@ -774,7 +776,9 @@ Then enable GitHub Pages in your repo settings (Settings > Pages > Source: GitHu
 ├── layouts/                # Your template overrides (optional)
 ├── static/                 # Static assets (favicon, images)
 └── public/                 # Generated output
-`
+```
+> *source: docs/blog/src/structure.txt*
+
 
 ## Article Format
 
