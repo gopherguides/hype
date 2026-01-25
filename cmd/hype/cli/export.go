@@ -5,6 +5,7 @@ import (
 	"context"
 	"flag"
 	"fmt"
+	"html"
 	"html/template"
 	"io"
 	"io/fs"
@@ -348,6 +349,7 @@ func (cmd *Export) extractTitle(doc *hype.Document) string {
 				title := docStr[idx+endTag+1 : idx+endTag+closeTag]
 				title = strings.TrimSpace(title)
 				title = stripHTMLTags(title)
+				title = html.UnescapeString(title)
 				if title != "" {
 					return title
 				}

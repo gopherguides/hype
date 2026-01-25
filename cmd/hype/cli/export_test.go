@@ -232,3 +232,30 @@ func Test_Export_HTML_InvalidCustomCSS(t *testing.T) {
 	r.Error(err)
 	r.Contains(err.Error(), "failed to read custom CSS file")
 }
+
+func Test_Export_HTML_TitleWithEntities(t *testing.T) {
+	r := require.New(t)
+
+	pwd, err := filepath.Abs("testdata/export/html")
+	r.NoError(err)
+
+	t.Setenv("MARKED_PATH", filepath.Join(pwd, "dummy.md"))
+
+	outFile := filepath.Join(t.TempDir(), "output.html")
+
+	cmd := &Export{}
+
+	ctx, cancel := context.WithTimeout(context.Background(), 30*time.Second)
+	defer cancel()
+
+	err = cmd.Main(ctx, pwd, []string{"-f", "entities.md", "-format", "html", "-o", outFile})
+
+	r.NoError(err)
+
+	act, err := os.ReadFile(outFile)
+	r.NoError(err)
+
+	output := string(act)
+	r.Contains(output, "<title>Fish &amp; Chips</title>")
+	r.NotContains(output, "&amp;amp;")
+}
