@@ -1,0 +1,15 @@
+{{define "partials/header"}}
+    <header class="border-b border-gray-800">
+        <nav class="max-w-5xl mx-auto px-4 py-4 flex justify-between items-center">
+            <a href="/" class="text-lg font-mono font-bold hover:text-emerald-400 transition-colors flex items-center gap-2">
+                <span class="text-emerald-400">></span>
+                <span>{{.Config.Title}}</span>
+            </a>
+            <div class="flex gap-4 text-sm font-mono">
+                <a href="/rss.xml" class="text-gray-400 hover:text-emerald-400 transition-colors">
+                    [rss]
+                </a>
+            </div>
+        </nav>
+    </header>
+{{end}}

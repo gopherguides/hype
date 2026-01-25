@@ -1,0 +1,58 @@
+{{define "main"}}
+        <div class="text-center mb-12">
+            <h1 class="text-4xl font-bold mb-4">{{.Config.Title}}</h1>
+            <p class="text-xl text-slate-600 dark:text-slate-400 max-w-2xl mx-auto">{{.Config.Description}}</p>
+        </div>
+
+        {{if .Articles}}
+        <div class="grid md:grid-cols-2 lg:grid-cols-3 gap-8">
+            {{range .Articles}}
+            <article class="bg-white dark:bg-slate-800 rounded-xl shadow-lg overflow-hidden hover:shadow-xl transition-shadow duration-300 flex flex-col">
+                <div class="h-2 bg-gradient-to-r from-indigo-500 via-purple-500 to-pink-500"></div>
+                <div class="p-6 flex-1 flex flex-col">
+                    {{if .Tags}}
+                    <div class="flex flex-wrap gap-2 mb-3">
+                        {{range $i, $tag := .Tags}}
+                        {{if lt $i 2}}
+                        <span class="bg-slate-100 dark:bg-slate-700 text-slate-600 dark:text-slate-300 px-2 py-0.5 rounded text-xs font-medium">{{$tag}}</span>
+                        {{end}}
+                        {{end}}
+                        {{if gt (len .Tags) 2}}
+                        <span class="text-slate-400 text-xs">+{{sub (len .Tags) 2}}</span>
+                        {{end}}
+                    </div>
+                    {{end}}
+                    <h2 class="text-xl font-bold mb-3 line-clamp-2">
+                        <a href="{{.URL}}" class="hover:text-indigo-600 dark:hover:text-indigo-400 transition-colors">
+                            {{.Title}}
+                        </a>
+                    </h2>
+                    {{if .SEODescription}}
+                    <p class="text-slate-600 dark:text-slate-400 text-sm mb-4 line-clamp-3 flex-1">{{.SEODescription}}</p>
+                    {{else}}
+                    <div class="flex-1"></div>
+                    {{end}}
+                    <div class="flex items-center justify-between pt-4 border-t border-slate-100 dark:border-slate-700">
+                        <div class="flex items-center gap-2">
+                            {{if .Author}}
+                            <div class="w-8 h-8 rounded-full bg-gradient-to-br from-indigo-500 to-purple-600 flex items-center justify-center text-white font-bold text-xs">
+                                {{slice .Author 0 1}}
+                            </div>
+                            <span class="text-sm text-slate-600 dark:text-slate-400">{{.Author}}</span>
+                            {{end}}
+                        </div>
+                        <div class="text-xs text-slate-500 dark:text-slate-500">
+                            <time datetime="{{.ISODate}}">{{.FormattedDate}}</time>
+                        </div>
+                    </div>
+                </div>
+            </article>
+            {{end}}
+        </div>
+        {{else}}
+        <div class="text-center py-12">
+            <div class="text-6xl mb-4">📝</div>
+            <p class="text-slate-600 dark:text-slate-400 text-lg">No articles yet. Check back soon!</p>
+        </div>
+        {{end}}
+{{end}}

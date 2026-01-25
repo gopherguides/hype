@@ -8,6 +8,7 @@ import (
 	"net"
 	"net/http"
 	"os"
+	"os/exec"
 	"os/signal"
 	"path/filepath"
 	"strconv"
@@ -60,12 +61,16 @@ Commands:
     build           Build the static site to public/
     serve           Start a local preview server (default: localhost:3000)
     new <slug>      Create a new article scaffold
+    theme           Manage themes (add, list, remove)
 
 Examples:
     hype blog init mysite
+    hype blog init mysite --theme developer
     hype blog build
     hype blog serve
     hype blog new hello-world
+    hype blog theme list
+    hype blog theme add suspended
 `
 
 	if err := cmd.validate(); err != nil {
@@ -136,26 +141,40 @@ func (cmd *Blog) Main(ctx context.Context, pwd string, args []string) error {
 		return cmd.runServe(ctx, pwd, subArgs)
 	case "new":
 		return cmd.runNew(ctx, pwd, subArgs)
+	case "theme":
+		return cmd.runTheme(ctx, pwd, subArgs)
 	default:
 		return fmt.Errorf("unknown subcommand: %s", subCmd)
 	}
 }
 
 func (cmd *Blog) runInit(ctx context.Context, pwd string, args []string) error {
+	var theme string
+
 	fs := flag.NewFlagSet("init", flag.ContinueOnError)
+	fs.StringVar(&theme, "theme", "suspended", "theme to use (built-in name or git URL)")
+	fs.StringVar(&theme, "t", "", "theme to use (shorthand)")
 	fs.Usage = func() {
-		fmt.Fprintln(cmd.Stdout(), `Usage: hype blog init <name>
+		fmt.Fprintln(cmd.Stdout(), `Usage: hype blog init <name> [options]
 
 Create a new blog project with the given name.
+
+Options:
+    --theme, -t    Theme to use (default: "suspended")
+                   Can be a built-in theme name or a git URL
+
+Built-in themes:
+    suspended      Minimal, typography-focused theme (default)
+    developer      Code-focused with enhanced syntax highlighting
+    cards          Card-based layout for visual blogs
 
 Arguments:
     name    Name of the blog directory to create
 
-Example:
+Examples:
     hype blog init mysite
-    cd mysite
-    hype blog new hello-world
-    hype blog build`)
+    hype blog init mysite --theme developer
+    hype blog init mysite --theme https://github.com/user/my-hype-theme`)
 	}
 
 	if err := fs.Parse(args); err != nil {
@@ -177,6 +196,20 @@ Example:
 		return fmt.Errorf("failed to create directory: %w", err)
 	}
 
+	themeName := theme
+	if strings.HasPrefix(theme, "https://") || strings.HasPrefix(theme, "git@") {
+		themeName = extractThemeName(theme)
+		if err := cloneTheme(theme, filepath.Join(dir, "themes", themeName)); err != nil {
+			return fmt.Errorf("failed to clone theme: %w", err)
+		}
+	} else if blog.IsBuiltinTheme(theme) {
+		if err := blog.CopyBuiltinTheme(theme, filepath.Join(dir, "themes", theme)); err != nil {
+			return fmt.Errorf("failed to copy theme: %w", err)
+		}
+	} else {
+		return fmt.Errorf("unknown theme: %s (use a built-in name or git URL)", theme)
+	}
+
 	configContent := fmt.Sprintf(`title: "%s"
 description: "A blog powered by hype"
 baseURL: "https://example.com"
@@ -184,7 +217,7 @@ author:
   name: "Your Name"
   email: ""
   twitter: ""
-theme: "github"
+theme: "%s"
 highlight:
   style: "monokai"
   lineNumbers: false
@@ -193,7 +226,7 @@ seo:
   twitterCard: "summary_large_image"
 contentDir: "content"
 outputDir: "public"
-`, name)
+`, name, themeName)
 
 	if err := os.WriteFile(filepath.Join(dir, "config.yaml"), []byte(configContent), 0644); err != nil {
 		return fmt.Errorf("failed to create config.yaml: %w", err)
@@ -207,7 +240,10 @@ outputDir: "public"
 		return fmt.Errorf("failed to create static/images directory: %w", err)
 	}
 
-	// Create default favicon.svg - a simple, modern "H" icon
+	if err := os.MkdirAll(filepath.Join(dir, "layouts"), 0755); err != nil {
+		return fmt.Errorf("failed to create layouts directory: %w", err)
+	}
+
 	faviconSVG := `<svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 32 32">
   <rect width="32" height="32" rx="6" fill="#1e293b"/>
   <path d="M8 8v16M24 8v16M8 16h16" stroke="#60a5fa" stroke-width="3" stroke-linecap="round"/>
@@ -224,11 +260,184 @@ outputDir: "public"
 	}
 
 	fmt.Fprintf(cmd.Stdout(), "Created new blog at %s\n", dir)
+	fmt.Fprintf(cmd.Stdout(), "Theme: %s\n", themeName)
 	fmt.Fprintf(cmd.Stdout(), "\nNext steps:\n")
 	fmt.Fprintf(cmd.Stdout(), "  cd %s\n", name)
 	fmt.Fprintf(cmd.Stdout(), "  hype blog new hello-world\n")
 	fmt.Fprintf(cmd.Stdout(), "  hype blog build\n")
 
+	return nil
+}
+
+func extractThemeName(url string) string {
+	url = strings.TrimSuffix(url, ".git")
+	parts := strings.Split(url, "/")
+	name := parts[len(parts)-1]
+	name = strings.TrimPrefix(name, "hype-theme-")
+	return name
+}
+
+func cloneTheme(url, destDir string) error {
+	if err := os.MkdirAll(filepath.Dir(destDir), 0755); err != nil {
+		return err
+	}
+	cmd := exec.Command("git", "clone", "--depth=1", url, destDir)
+	cmd.Stdout = os.Stdout
+	cmd.Stderr = os.Stderr
+	return cmd.Run()
+}
+
+func (cmd *Blog) runTheme(ctx context.Context, pwd string, args []string) error {
+	if len(args) == 0 {
+		return cmd.runThemeList(ctx, pwd, args)
+	}
+
+	subCmd := args[0]
+	subArgs := args[1:]
+
+	switch subCmd {
+	case "add":
+		return cmd.runThemeAdd(ctx, pwd, subArgs)
+	case "list":
+		return cmd.runThemeList(ctx, pwd, subArgs)
+	case "remove":
+		return cmd.runThemeRemove(ctx, pwd, subArgs)
+	default:
+		return fmt.Errorf("unknown theme command: %s (use: add, list, remove)", subCmd)
+	}
+}
+
+func (cmd *Blog) runThemeAdd(ctx context.Context, pwd string, args []string) error {
+	fs := flag.NewFlagSet("theme add", flag.ContinueOnError)
+	fs.Usage = func() {
+		fmt.Fprintln(cmd.Stdout(), `Usage: hype blog theme add <name-or-url>
+
+Add a theme to the current project.
+
+Arguments:
+    name-or-url    Built-in theme name or git URL
+
+Examples:
+    hype blog theme add developer
+    hype blog theme add https://github.com/user/hype-theme-custom`)
+	}
+
+	if err := fs.Parse(args); err != nil {
+		if err == flag.ErrHelp {
+			return nil
+		}
+		return err
+	}
+
+	if fs.NArg() == 0 {
+		fs.Usage()
+		return fmt.Errorf("missing required argument: name-or-url")
+	}
+
+	theme := fs.Arg(0)
+	themesDir := filepath.Join(pwd, "themes")
+
+	if strings.HasPrefix(theme, "https://") || strings.HasPrefix(theme, "git@") {
+		themeName := extractThemeName(theme)
+		destDir := filepath.Join(themesDir, themeName)
+		if _, err := os.Stat(destDir); err == nil {
+			return fmt.Errorf("theme %s already exists at %s", themeName, destDir)
+		}
+		if err := cloneTheme(theme, destDir); err != nil {
+			return fmt.Errorf("failed to clone theme: %w", err)
+		}
+		fmt.Fprintf(cmd.Stdout(), "Added theme %s from %s\n", themeName, theme)
+		fmt.Fprintf(cmd.Stdout(), "Update config.yaml to use this theme: theme: \"%s\"\n", themeName)
+	} else if blog.IsBuiltinTheme(theme) {
+		destDir := filepath.Join(themesDir, theme)
+		if _, err := os.Stat(destDir); err == nil {
+			return fmt.Errorf("theme %s already exists at %s", theme, destDir)
+		}
+		if err := blog.CopyBuiltinTheme(theme, destDir); err != nil {
+			return fmt.Errorf("failed to copy theme: %w", err)
+		}
+		fmt.Fprintf(cmd.Stdout(), "Added built-in theme %s\n", theme)
+		fmt.Fprintf(cmd.Stdout(), "Update config.yaml to use this theme: theme: \"%s\"\n", theme)
+	} else {
+		return fmt.Errorf("unknown theme: %s (use a built-in name or git URL)", theme)
+	}
+
+	return nil
+}
+
+func (cmd *Blog) runThemeList(ctx context.Context, pwd string, args []string) error {
+	fmt.Fprintln(cmd.Stdout(), "Built-in themes:")
+	for _, t := range blog.ListBuiltinThemes() {
+		desc := ""
+		switch t {
+		case "suspended":
+			desc = "Minimal, typography-focused theme"
+		case "developer":
+			desc = "Code-focused with enhanced syntax highlighting"
+		case "cards":
+			desc = "Card-based layout for visual blogs"
+		}
+		fmt.Fprintf(cmd.Stdout(), "  %-12s %s\n", t, desc)
+	}
+
+	themesDir := filepath.Join(pwd, "themes")
+	if entries, err := os.ReadDir(themesDir); err == nil && len(entries) > 0 {
+		fmt.Fprintln(cmd.Stdout(), "\nInstalled themes:")
+		for _, entry := range entries {
+			if !entry.IsDir() {
+				continue
+			}
+			themeDir := filepath.Join(themesDir, entry.Name())
+			info, _ := blog.LoadThemeInfo(themeDir)
+			desc := info.Description
+			if desc == "" {
+				desc = "(no description)"
+			}
+			fmt.Fprintf(cmd.Stdout(), "  %-12s %s\n", entry.Name(), desc)
+		}
+	}
+
+	return nil
+}
+
+func (cmd *Blog) runThemeRemove(ctx context.Context, pwd string, args []string) error {
+	fs := flag.NewFlagSet("theme remove", flag.ContinueOnError)
+	fs.Usage = func() {
+		fmt.Fprintln(cmd.Stdout(), `Usage: hype blog theme remove <name>
+
+Remove an installed theme from the project.
+
+Arguments:
+    name    Name of the theme to remove
+
+Example:
+    hype blog theme remove custom-theme`)
+	}
+
+	if err := fs.Parse(args); err != nil {
+		if err == flag.ErrHelp {
+			return nil
+		}
+		return err
+	}
+
+	if fs.NArg() == 0 {
+		fs.Usage()
+		return fmt.Errorf("missing required argument: name")
+	}
+
+	theme := fs.Arg(0)
+	themeDir := filepath.Join(pwd, "themes", theme)
+
+	if _, err := os.Stat(themeDir); os.IsNotExist(err) {
+		return fmt.Errorf("theme %s not found at %s", theme, themeDir)
+	}
+
+	if err := os.RemoveAll(themeDir); err != nil {
+		return fmt.Errorf("failed to remove theme: %w", err)
+	}
+
+	fmt.Fprintf(cmd.Stdout(), "Removed theme %s\n", theme)
 	return nil
 }
 
@@ -245,6 +454,11 @@ The build process:
     3. Processes markdown with hype (code execution, includes, etc.)
     4. Generates HTML with syntax highlighting
     5. Creates RSS feed, sitemap, and robots.txt
+
+Template lookup order:
+    1. layouts/ (your project overrides)
+    2. themes/<theme>/layouts/ (theme templates)
+    3. Built-in defaults (fallback)
 
 Example:
     hype blog build`)
@@ -316,7 +530,6 @@ Example:
 		}
 	}
 
-	// Find an available port
 	finalAddr, triedPorts := findAvailablePort(addr)
 	if len(triedPorts) > 0 {
 		fmt.Fprintf(cmd.Stdout(), "Ports in use: %s\n", strings.Join(triedPorts, ", "))
@@ -333,12 +546,10 @@ Example:
 		Handler: http.FileServer(http.Dir(publicDir)),
 	}
 
-	// Handle graceful shutdown on Ctrl+C
 	done := make(chan bool, 1)
 	quit := make(chan os.Signal, 1)
 	signal.Notify(quit, os.Interrupt, syscall.SIGTERM)
 
-	// Start file watcher if enabled
 	var watcher *fsnotify.Watcher
 	if watch {
 		watcher, err = cmd.startWatcher(ctx, pwd, b)
@@ -377,6 +588,8 @@ func (cmd *Blog) startWatcher(ctx context.Context, pwd string, b *blog.Blog) (*f
 
 	contentDir := filepath.Join(pwd, b.Config.ContentDir)
 	staticDir := filepath.Join(pwd, "static")
+	layoutsDir := filepath.Join(pwd, "layouts")
+	themesDir := filepath.Join(pwd, "themes")
 
 	if err := addWatchRecursive(watcher, contentDir); err != nil {
 		watcher.Close()
@@ -387,6 +600,20 @@ func (cmd *Blog) startWatcher(ctx context.Context, pwd string, b *blog.Blog) (*f
 		if err := addWatchRecursive(watcher, staticDir); err != nil {
 			watcher.Close()
 			return nil, fmt.Errorf("failed to watch static directory: %w", err)
+		}
+	}
+
+	if _, err := os.Stat(layoutsDir); err == nil {
+		if err := addWatchRecursive(watcher, layoutsDir); err != nil {
+			watcher.Close()
+			return nil, fmt.Errorf("failed to watch layouts directory: %w", err)
+		}
+	}
+
+	if _, err := os.Stat(themesDir); err == nil {
+		if err := addWatchRecursive(watcher, themesDir); err != nil {
+			watcher.Close()
+			return nil, fmt.Errorf("failed to watch themes directory: %w", err)
 		}
 	}
 
@@ -512,7 +739,6 @@ func (cmd *Blog) watchLoop(ctx context.Context, watcher *fsnotify.Watcher, pwd s
 func findAvailablePort(addr string) (string, []string) {
 	var triedPorts []string
 
-	// Parse the port from addr (e.g., ":3000" -> 3000)
 	port := 3000
 	if strings.HasPrefix(addr, ":") {
 		if p, err := strconv.Atoi(addr[1:]); err == nil {
@@ -532,7 +758,6 @@ func findAvailablePort(addr string) (string, []string) {
 		port++
 	}
 
-	// If we couldn't find a port after maxAttempts, return the last tried
 	return fmt.Sprintf(":%d", port), triedPorts
 }
 

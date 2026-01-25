@@ -100,7 +100,10 @@ func (b *Blog) Build(ctx context.Context) error {
 		return fmt.Errorf("failed to create output directory: %w", err)
 	}
 
-	renderer := NewRenderer(b)
+	renderer, err := NewRenderer(b)
+	if err != nil {
+		return fmt.Errorf("failed to create renderer: %w", err)
+	}
 
 	if err := renderer.RenderIndex(outDir); err != nil {
 		return fmt.Errorf("failed to render index: %w", err)
@@ -122,6 +125,17 @@ func (b *Blog) Build(ctx context.Context) error {
 
 	if err := renderer.RenderRobots(outDir); err != nil {
 		return fmt.Errorf("failed to render robots.txt: %w", err)
+	}
+
+	theme := b.Config.Theme
+	if theme == "" {
+		theme = "suspended"
+	}
+	themeStaticDir := filepath.Join(b.root, "themes", theme, "static")
+	if _, err := os.Stat(themeStaticDir); err == nil {
+		if err := copyDir(themeStaticDir, outDir); err != nil {
+			return fmt.Errorf("failed to copy theme static files: %w", err)
+		}
 	}
 
 	staticDir := filepath.Join(b.root, "static")

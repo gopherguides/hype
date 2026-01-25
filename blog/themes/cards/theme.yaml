@@ -1,0 +1,6 @@
+name: "Cards"
+description: "Card-based layout with visual hierarchy for image-rich blogs"
+author: "Gopher Guides"
+version: "1.0.0"
+repository: "https://github.com/gopherguides/hype-theme-cards"
+preview: "https://cards-demo.gopherguides.com"
