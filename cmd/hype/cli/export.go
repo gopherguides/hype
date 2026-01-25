@@ -5,15 +5,19 @@ import (
 	"context"
 	"flag"
 	"fmt"
+	"html"
+	"html/template"
 	"io"
 	"io/fs"
 	"log/slog"
 	"os"
 	"path/filepath"
+	"strings"
 	"sync"
 	"time"
 
 	"github.com/gopherguides/hype"
+	"github.com/gopherguides/hype/themes"
 	"github.com/markbates/cleo"
 	"github.com/markbates/plugins"
 )
@@ -30,6 +34,11 @@ type Export struct {
 	Parser  *hype.Parser  // If nil, a default parser is used.
 	Verbose bool          // default: false
 	Format  string        // default:markdown
+
+	Theme      string // theme name for HTML export; default: "github"
+	CustomCSS  string // path to custom CSS file
+	NoCSS      bool   // output raw HTML without styling
+	ListThemes bool   // list available themes and exit
 
 	flags *flag.FlagSet
 
@@ -93,6 +102,10 @@ Usage: hype export [options]
 Examples:
 	hype export -format html
 	hype export -f README.md -format html
+	hype export -f README.md -format html -theme solarized-dark
+	hype export -f README.md -format html -css ./custom.css
+	hype export -f README.md -format html -no-css
+	hype export -themes
 	hype export -f README.md -format markdown -timeout=10s
 	hype export -f input.md -format markdown -o README.md
 `
@@ -115,6 +128,10 @@ Examples:
 	cmd.flags.BoolVar(&cmd.Verbose, "v", false, "enable verbose output for debugging")
 	cmd.flags.StringVar(&cmd.Format, "format", "markdown", "content type to export to: markdown, html")
 	cmd.flags.Var(&cmd.OutPath, "o", "path to the output file; if not provided, output is written to stdout")
+	cmd.flags.StringVar(&cmd.Theme, "theme", themes.DefaultTheme, "theme for HTML export (e.g., github, solarized-dark)")
+	cmd.flags.StringVar(&cmd.CustomCSS, "css", "", "path to custom CSS file for HTML export")
+	cmd.flags.BoolVar(&cmd.NoCSS, "no-css", false, "output raw HTML without styling")
+	cmd.flags.BoolVar(&cmd.ListThemes, "themes", false, "list available themes and exit")
 
 	cmd.flags.Usage = func() {
 		fmt.Fprintf(stderr, "Usage of %s:\n", os.Args[0])
@@ -159,6 +176,10 @@ func (cmd *Export) main(ctx context.Context, pwd string, args []string) error {
 
 	if err := flags.Parse(args); err != nil {
 		return err
+	}
+
+	if cmd.ListThemes {
+		return cmd.printThemes()
 	}
 
 	var stdoutBuffer bytes.Buffer
@@ -266,13 +287,96 @@ func (cmd *Export) execute(ctx context.Context, pwd string) error {
 	case "markdown":
 		fmt.Fprintln(cmd.Stdout(), doc.MD())
 	case "html":
-		fmt.Fprintln(cmd.Stdout(), doc.String())
-		return nil
+		if cmd.NoCSS {
+			fmt.Fprintln(cmd.Stdout(), doc.String())
+			return nil
+		}
+		return cmd.renderStyledHTML(doc)
 	default:
 		return fmt.Errorf("unsupported format: %s", cmd.Format)
 	}
 	return nil
+}
 
+func (cmd *Export) printThemes() error {
+	themeList := themes.ListThemes()
+	fmt.Fprintln(os.Stdout, "Available themes:")
+	for _, theme := range themeList {
+		if theme == themes.DefaultTheme {
+			fmt.Fprintf(os.Stdout, "  %s (default)\n", theme)
+		} else {
+			fmt.Fprintf(os.Stdout, "  %s\n", theme)
+		}
+	}
+	return nil
+}
+
+func (cmd *Export) renderStyledHTML(doc *hype.Document) error {
+	var css string
+	var err error
+
+	if cmd.CustomCSS != "" {
+		css, err = themes.LoadCustomCSS(cmd.CustomCSS)
+		if err != nil {
+			return err
+		}
+	} else {
+		css, err = themes.GetCSS(cmd.Theme)
+		if err != nil {
+			return err
+		}
+	}
+
+	title := cmd.extractTitle(doc)
+
+	data := themes.RenderData{
+		Title: title,
+		CSS:   template.CSS(css),
+		Body:  template.HTML(doc.String()),
+	}
+
+	return themes.Render(cmd.Stdout(), data)
+}
+
+func (cmd *Export) extractTitle(doc *hype.Document) string {
+	docStr := doc.String()
+
+	if idx := strings.Index(docStr, "<h1"); idx != -1 {
+		endTag := strings.Index(docStr[idx:], ">")
+		if endTag != -1 {
+			closeTag := strings.Index(docStr[idx+endTag:], "</h1>")
+			if closeTag != -1 {
+				title := docStr[idx+endTag+1 : idx+endTag+closeTag]
+				title = strings.TrimSpace(title)
+				title = stripHTMLTags(title)
+				title = html.UnescapeString(title)
+				if title != "" {
+					return title
+				}
+			}
+		}
+	}
+
+	return filepath.Base(cmd.File)
+}
+
+func stripHTMLTags(s string) string {
+	var result strings.Builder
+	inTag := false
+	for _, r := range s {
+		if r == '<' {
+			inTag = true
+			continue
+		}
+		if r == '>' {
+			inTag = false
+			continue
+		}
+		if !inTag {
+			result.WriteRune(r)
+		}
+	}
+	return result.String()
 }
 
 func (cmd *Export) validate() error {
