@@ -397,6 +397,15 @@ $ tree ./docs
 
 ./docs
 ├── badges.md
+├── blog
+│   ├── README.md
+│   └── images
+│       ├── theme-cards-article.png
+│       ├── theme-cards-home.png
+│       ├── theme-developer-article.png
+│       ├── theme-developer-home.png
+│       ├── theme-suspended-article.png
+│       └── theme-suspended-home.png
 ├── license.md
 └── quickstart
     ├── hype.md
@@ -407,7 +416,7 @@ $ tree ./docs
         └── hello
             └── main.go
 
-5 directories, 6 files
+7 directories, 13 files
 ```
 ---
 
