@@ -3,6 +3,7 @@ package blog
 import (
 	"context"
 	"fmt"
+	"html"
 	"html/template"
 	"io/fs"
 	"math"
@@ -184,8 +185,29 @@ func (ap *ArticleParser) ParseArticle(ctx context.Context, dir string) (Article,
 	return a, nil
 }
 
-func (ap *ArticleParser) processCodeBlocks(html string) string {
-	return html
+var codeBlockPattern = regexp.MustCompile(`<pre><code class="language-(\w+)"[^>]*>([\s\S]*?)</code></pre>`)
+
+func (ap *ArticleParser) processCodeBlocks(htmlContent string) string {
+	if ap.highlighter == nil {
+		return htmlContent
+	}
+
+	return codeBlockPattern.ReplaceAllStringFunc(htmlContent, func(match string) string {
+		submatches := codeBlockPattern.FindStringSubmatch(match)
+		if len(submatches) < 3 {
+			return match
+		}
+
+		language := submatches[1]
+		code := html.UnescapeString(submatches[2])
+
+		highlighted, err := ap.highlighter.Highlight(code, language)
+		if err != nil {
+			return match
+		}
+
+		return highlighted
+	})
 }
 
 var detailsPattern = regexp.MustCompile(`(?s)<details[^>]*>.*?</details>`)
