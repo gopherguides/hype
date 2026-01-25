@@ -5,6 +5,7 @@ import (
 	"flag"
 	"fmt"
 	"io"
+	"net/http"
 	"os"
 	"path/filepath"
 	"sync"
@@ -51,11 +52,13 @@ Usage: hype blog <command> [options]
 Commands:
     init <name>     Create a new blog project
     build           Build the static site to public/
+    serve           Start a local preview server (default: localhost:3000)
     new <slug>      Create a new article scaffold
 
 Examples:
     hype blog init mysite
     hype blog build
+    hype blog serve
     hype blog new hello-world
 `
 
@@ -103,13 +106,16 @@ func (cmd *Blog) Main(ctx context.Context, pwd string, args []string) error {
 	}
 
 	if err := flags.Parse(args); err != nil {
+		if err == flag.ErrHelp {
+			return nil
+		}
 		return err
 	}
 
 	remaining := flags.Args()
 	if len(remaining) == 0 {
 		flags.Usage()
-		return fmt.Errorf("no subcommand provided")
+		return nil
 	}
 
 	subCmd := remaining[0]
@@ -120,6 +126,8 @@ func (cmd *Blog) Main(ctx context.Context, pwd string, args []string) error {
 		return cmd.runInit(ctx, pwd, subArgs)
 	case "build":
 		return cmd.runBuild(ctx, pwd, subArgs)
+	case "serve":
+		return cmd.runServe(ctx, pwd, subArgs)
 	case "new":
 		return cmd.runNew(ctx, pwd, subArgs)
 	default:
@@ -128,11 +136,35 @@ func (cmd *Blog) Main(ctx context.Context, pwd string, args []string) error {
 }
 
 func (cmd *Blog) runInit(ctx context.Context, pwd string, args []string) error {
-	if len(args) == 0 {
-		return fmt.Errorf("usage: hype blog init <name>")
+	fs := flag.NewFlagSet("init", flag.ContinueOnError)
+	fs.Usage = func() {
+		fmt.Fprintln(cmd.Stdout(), `Usage: hype blog init <name>
+
+Create a new blog project with the given name.
+
+Arguments:
+    name    Name of the blog directory to create
+
+Example:
+    hype blog init mysite
+    cd mysite
+    hype blog new hello-world
+    hype blog build`)
 	}
 
-	name := args[0]
+	if err := fs.Parse(args); err != nil {
+		if err == flag.ErrHelp {
+			return nil
+		}
+		return err
+	}
+
+	if fs.NArg() == 0 {
+		fs.Usage()
+		return fmt.Errorf("missing required argument: name")
+	}
+
+	name := fs.Arg(0)
 	dir := filepath.Join(pwd, name)
 
 	if err := os.MkdirAll(dir, 0755); err != nil {
@@ -186,6 +218,30 @@ outputDir: "public"
 }
 
 func (cmd *Blog) runBuild(ctx context.Context, pwd string, args []string) error {
+	fs := flag.NewFlagSet("build", flag.ContinueOnError)
+	fs.Usage = func() {
+		fmt.Fprintln(cmd.Stdout(), `Usage: hype blog build
+
+Build the static site from content/ to public/.
+
+The build process:
+    1. Reads config.yaml for site settings
+    2. Discovers articles in content/ directory
+    3. Processes markdown with hype (code execution, includes, etc.)
+    4. Generates HTML with syntax highlighting
+    5. Creates RSS feed, sitemap, and robots.txt
+
+Example:
+    hype blog build`)
+	}
+
+	if err := fs.Parse(args); err != nil {
+		if err == flag.ErrHelp {
+			return nil
+		}
+		return err
+	}
+
 	b, err := blog.New(pwd)
 	if err != nil {
 		return err
@@ -199,12 +255,90 @@ func (cmd *Blog) runBuild(ctx context.Context, pwd string, args []string) error 
 	return nil
 }
 
-func (cmd *Blog) runNew(ctx context.Context, pwd string, args []string) error {
-	if len(args) == 0 {
-		return fmt.Errorf("usage: hype blog new <slug>")
+func (cmd *Blog) runServe(ctx context.Context, pwd string, args []string) error {
+	var addr string
+
+	fs := flag.NewFlagSet("serve", flag.ContinueOnError)
+	fs.StringVar(&addr, "addr", ":3000", "address to serve on (default :3000)")
+	fs.StringVar(&addr, "a", ":3000", "address to serve on (shorthand)")
+	fs.Usage = func() {
+		fmt.Fprintln(cmd.Stdout(), `Usage: hype blog serve [options]
+
+Start a local HTTP server to preview the built site.
+
+If public/ doesn't exist, the site will be built first.
+
+Options:
+    -addr, -a    Address to serve on (default ":3000")
+
+Example:
+    hype blog serve
+    hype blog serve -addr :8080`)
 	}
 
-	slug := args[0]
+	if err := fs.Parse(args); err != nil {
+		if err == flag.ErrHelp {
+			return nil
+		}
+		return err
+	}
+
+	b, err := blog.New(pwd)
+	if err != nil {
+		return err
+	}
+
+	publicDir := filepath.Join(pwd, b.Config.OutputDir)
+	if _, err := os.Stat(publicDir); os.IsNotExist(err) {
+		fmt.Fprintf(cmd.Stdout(), "Building site first...\n")
+		if err := b.Build(ctx); err != nil {
+			return err
+		}
+	}
+
+	fmt.Fprintf(cmd.Stdout(), "Serving %s at http://localhost%s\n", publicDir, addr)
+	fmt.Fprintf(cmd.Stdout(), "Press Ctrl+C to stop\n")
+
+	server := &http.Server{
+		Addr:    addr,
+		Handler: http.FileServer(http.Dir(publicDir)),
+	}
+
+	return server.ListenAndServe()
+}
+
+func (cmd *Blog) runNew(ctx context.Context, pwd string, args []string) error {
+	fs := flag.NewFlagSet("new", flag.ContinueOnError)
+	fs.Usage = func() {
+		fmt.Fprintln(cmd.Stdout(), `Usage: hype blog new <slug>
+
+Create a new article scaffold with the given slug.
+
+Arguments:
+    slug    URL-friendly identifier for the article (e.g., my-first-post)
+
+Creates:
+    content/<slug>/module.md    Article content file
+    content/<slug>/src/         Directory for source code files
+
+Example:
+    hype blog new my-first-post
+    hype blog new go-concurrency-patterns`)
+	}
+
+	if err := fs.Parse(args); err != nil {
+		if err == flag.ErrHelp {
+			return nil
+		}
+		return err
+	}
+
+	if fs.NArg() == 0 {
+		fs.Usage()
+		return fmt.Errorf("missing required argument: slug")
+	}
+
+	slug := fs.Arg(0)
 	articleDir := filepath.Join(pwd, "content", slug)
 
 	if err := os.MkdirAll(articleDir, 0755); err != nil {
