@@ -145,6 +145,12 @@ openskills install gopherguides/hype --universal
 
 The skill activates automatically when working with hype documents.
 
+---
+
+<include src="docs/blog/hype.md"></include>
+
+---
+
 # Issues
 
 There are several issues that still need to be worked on. Please see the issues tab if you are interested in helping.
