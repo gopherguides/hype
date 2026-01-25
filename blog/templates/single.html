@@ -1,0 +1,136 @@
+<!DOCTYPE html>
+<html lang="en" class="scroll-smooth">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>{{.Article.Title}} | {{.Config.Title}}</title>
+
+    <meta name="description" content="{{if .Article.SEODescription}}{{.Article.SEODescription}}{{else}}{{.Config.Description}}{{end}}">
+    <link rel="canonical" href="{{.Config.BaseURL}}{{.Article.URL}}">
+
+    <!-- OpenGraph -->
+    <meta property="og:type" content="article">
+    <meta property="og:title" content="{{.Article.Title}}">
+    <meta property="og:description" content="{{if .Article.SEODescription}}{{.Article.SEODescription}}{{else}}{{.Config.Description}}{{end}}">
+    <meta property="og:url" content="{{.Config.BaseURL}}{{.Article.URL}}">
+    {{if .Article.OGImage}}<meta property="og:image" content="{{.Config.BaseURL}}{{.Article.OGImage}}">{{else if .Config.SEO.OGImage}}<meta property="og:image" content="{{.Config.BaseURL}}{{.Config.SEO.OGImage}}">{{end}}
+
+    <!-- Twitter Card -->
+    <meta name="twitter:card" content="{{.Config.SEO.TwitterCard}}">
+    <meta name="twitter:title" content="{{.Article.Title}}">
+    <meta name="twitter:description" content="{{if .Article.SEODescription}}{{.Article.SEODescription}}{{else}}{{.Config.Description}}{{end}}">
+    {{if .Config.Author.Twitter}}<meta name="twitter:creator" content="{{.Config.Author.Twitter}}">{{end}}
+    {{if .Article.OGImage}}<meta name="twitter:image" content="{{.Config.BaseURL}}{{.Article.OGImage}}">{{else if .Config.SEO.OGImage}}<meta name="twitter:image" content="{{.Config.BaseURL}}{{.Config.SEO.OGImage}}">{{end}}
+
+    <!-- JSON-LD -->
+    <script type="application/ld+json">
+    {
+        "@context": "https://schema.org",
+        "@type": "Article",
+        "headline": "{{.Article.Title}}",
+        "author": {
+            "@type": "Person",
+            "name": "{{if .Article.Author}}{{.Article.Author}}{{else}}{{.Config.Author.Name}}{{end}}"
+        },
+        "datePublished": "{{.Article.ISODate}}",
+        "publisher": {
+            "@type": "Organization",
+            "name": "{{.Config.Title}}"
+        }
+    }
+    </script>
+
+    <link rel="alternate" type="application/rss+xml" title="{{.Config.Title}}" href="{{.Config.BaseURL}}/rss.xml">
+
+    <script src="https://cdn.tailwindcss.com"></script>
+    <script>
+        tailwind.config = {
+            darkMode: 'media',
+        }
+    </script>
+    <script src="https://cdn.tailwindcss.com?plugins=typography"></script>
+
+    <style type="text/css">
+        {{.HighlightCSS}}
+    </style>
+
+    <style>
+        .prose pre {
+            background-color: #272822;
+            padding: 1rem;
+            border-radius: 0.5rem;
+            overflow-x: auto;
+        }
+        .prose code {
+            background-color: #f3f4f6;
+            padding: 0.125rem 0.25rem;
+            border-radius: 0.25rem;
+            font-size: 0.875em;
+        }
+        @media (prefers-color-scheme: dark) {
+            .prose code {
+                background-color: #374151;
+            }
+        }
+        .prose pre code {
+            background-color: transparent;
+            padding: 0;
+        }
+    </style>
+</head>
+<body class="bg-white dark:bg-gray-900 text-gray-900 dark:text-gray-100 min-h-screen flex flex-col">
+    <header class="border-b border-gray-200 dark:border-gray-700">
+        <nav class="max-w-4xl mx-auto px-4 py-4 flex justify-between items-center">
+            <a href="/" class="text-xl font-bold hover:text-blue-600 dark:hover:text-blue-400">
+                {{.Config.Title}}
+            </a>
+            <div class="flex gap-4">
+                <a href="/rss.xml" class="text-gray-600 dark:text-gray-400 hover:text-blue-600 dark:hover:text-blue-400">
+                    RSS
+                </a>
+            </div>
+        </nav>
+    </header>
+
+    <main class="flex-grow max-w-4xl mx-auto px-4 py-8 w-full">
+        <article class="prose dark:prose-invert max-w-none">
+            <header class="mb-8">
+                <h1 class="text-4xl font-bold mb-4">{{.Article.Title}}</h1>
+                <div class="flex flex-wrap gap-4 text-gray-600 dark:text-gray-400 text-sm">
+                    <time datetime="{{.Article.ISODate}}">{{.Article.FormattedDate}}</time>
+                    {{if .Article.Author}}
+                    <span>&middot;</span>
+                    <span>{{.Article.Author}}</span>
+                    {{end}}
+                    {{if .Article.ReadingTime}}
+                    <span>&middot;</span>
+                    <span>{{.Article.ReadingTime}} min read</span>
+                    {{end}}
+                </div>
+                {{if .Article.Tags}}
+                <div class="flex flex-wrap gap-2 mt-4">
+                    {{range .Article.Tags}}
+                    <span class="bg-gray-100 dark:bg-gray-800 text-gray-700 dark:text-gray-300 px-2 py-1 rounded text-xs">{{.}}</span>
+                    {{end}}
+                </div>
+                {{end}}
+            </header>
+
+            <div class="article-content">
+                {{.Article.Body}}
+            </div>
+        </article>
+
+        <nav class="mt-12 pt-8 border-t border-gray-200 dark:border-gray-700">
+            <a href="/" class="text-blue-600 dark:text-blue-400 hover:underline">&larr; Back to all articles</a>
+        </nav>
+    </main>
+
+    <footer class="border-t border-gray-200 dark:border-gray-700 mt-auto">
+        <div class="max-w-4xl mx-auto px-4 py-6 text-center text-gray-600 dark:text-gray-400">
+            <p>&copy; {{.CurrentYear}} {{.Config.Title}}. All rights reserved.</p>
+            {{if .Config.Author.Name}}<p class="mt-2">By {{.Config.Author.Name}}</p>{{end}}
+        </div>
+    </footer>
+</body>
+</html>

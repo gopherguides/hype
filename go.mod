@@ -5,6 +5,7 @@ go 1.25
 toolchain go1.25.0
 
 require (
+	github.com/alecthomas/chroma/v2 v2.23.1
 	github.com/gobuffalo/flect v1.0.2
 	github.com/gofrs/uuid/v5 v5.0.0
 	github.com/markbates/clam v0.0.0-20240219024730-b98cdab94ec3
@@ -21,12 +22,13 @@ require (
 	github.com/stretchr/testify v1.10.0
 	golang.org/x/net v0.39.0
 	golang.org/x/sync v0.13.0
+	gopkg.in/yaml.v3 v3.0.1
 )
 
 require (
 	github.com/davecgh/go-spew v1.1.1 // indirect
+	github.com/dlclark/regexp2 v1.11.5 // indirect
 	github.com/markbates/hepa v0.0.0-20211129002629-856d16f89b9d // indirect
 	github.com/pmezard/go-difflib v1.0.0 // indirect
 	golang.org/x/exp v0.0.0-20240222234643-814bf88cf225 // indirect
-	gopkg.in/yaml.v3 v3.0.1 // indirect
 )

@@ -152,6 +152,14 @@ func New(root string) *App {
 		Parser: p,
 	}
 
+	bl := &Blog{
+		Cmd: cleo.Cmd{
+			Name:    "blog",
+			Aliases: []string{"b"},
+			Desc:    "static blog generator commands (init, build, new)",
+		},
+	}
+
 	app := &App{
 		Cmd: cleo.Cmd{
 			Name: "hype",
@@ -161,6 +169,7 @@ func New(root string) *App {
 				"preview": mp,
 				"slides":  sl,
 				"export":  e,
+				"blog":    bl,
 			},
 		},
 		Parser: p,
