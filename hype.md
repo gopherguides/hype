@@ -47,37 +47,37 @@ Install the hype skill globally for your preferred AI tool with a single command
 ### Claude Code
 
 ```bash
-mkdir -p ~/.claude/skills && curl -sL https://github.com/gopherguides/hype/archive/main.tar.gz | tar -xz --strip-components=2 -C ~/.claude/skills hype-main/.agent/skills/hype
+mkdir -p ~/.claude/skills && curl -sL https://github.com/gopherguides/hype/archive/main.tar.gz | tar -xz --strip-components=3 -C ~/.claude/skills hype-main/.agent/skills/hype
 ```
 
 ### OpenAI Codex
 
 ```bash
-mkdir -p ~/.codex/skills && curl -sL https://github.com/gopherguides/hype/archive/main.tar.gz | tar -xz --strip-components=2 -C ~/.codex/skills hype-main/.agent/skills/hype
+mkdir -p ~/.codex/skills && curl -sL https://github.com/gopherguides/hype/archive/main.tar.gz | tar -xz --strip-components=3 -C ~/.codex/skills hype-main/.agent/skills/hype
 ```
 
 ### Gemini CLI
 
 ```bash
-mkdir -p ~/.gemini/skills && curl -sL https://github.com/gopherguides/hype/archive/main.tar.gz | tar -xz --strip-components=2 -C ~/.gemini/skills hype-main/.agent/skills/hype
+mkdir -p ~/.gemini/skills && curl -sL https://github.com/gopherguides/hype/archive/main.tar.gz | tar -xz --strip-components=3 -C ~/.gemini/skills hype-main/.agent/skills/hype
 ```
 
 ### Cursor
 
 ```bash
-mkdir -p ~/.cursor/skills && curl -sL https://github.com/gopherguides/hype/archive/main.tar.gz | tar -xz --strip-components=2 -C ~/.cursor/skills hype-main/.agent/skills/hype
+mkdir -p ~/.cursor/skills && curl -sL https://github.com/gopherguides/hype/archive/main.tar.gz | tar -xz --strip-components=3 -C ~/.cursor/skills hype-main/.agent/skills/hype
 ```
 
 ### GitHub Copilot
 
 ```bash
-mkdir -p ~/.copilot/skills && curl -sL https://github.com/gopherguides/hype/archive/main.tar.gz | tar -xz --strip-components=2 -C ~/.copilot/skills hype-main/.agent/skills/hype
+mkdir -p ~/.copilot/skills && curl -sL https://github.com/gopherguides/hype/archive/main.tar.gz | tar -xz --strip-components=3 -C ~/.copilot/skills hype-main/.agent/skills/hype
 ```
 
 ### Universal (vendor-agnostic)
 
 ```bash
-mkdir -p ~/.agent/skills && curl -sL https://github.com/gopherguides/hype/archive/main.tar.gz | tar -xz --strip-components=2 -C ~/.agent/skills hype-main/.agent/skills/hype
+mkdir -p ~/.agent/skills && curl -sL https://github.com/gopherguides/hype/archive/main.tar.gz | tar -xz --strip-components=3 -C ~/.agent/skills hype-main/.agent/skills/hype
 ```
 
 ## Windows (PowerShell)
@@ -126,7 +126,7 @@ To install the skill for a specific project only:
 
 **macOS / Linux:**
 ```bash
-mkdir -p .agent/skills && curl -sL https://github.com/gopherguides/hype/archive/main.tar.gz | tar -xz --strip-components=2 -C .agent/skills hype-main/.agent/skills/hype
+mkdir -p .agent/skills && curl -sL https://github.com/gopherguides/hype/archive/main.tar.gz | tar -xz --strip-components=3 -C .agent/skills hype-main/.agent/skills/hype
 ```
 
 **Windows (PowerShell):**
