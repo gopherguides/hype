@@ -8,18 +8,20 @@ import (
 	"os"
 	"path/filepath"
 	"strings"
+	texttemplate "text/template"
 )
 
 //go:embed templates/*
 var defaultTemplates embed.FS
 
 type Renderer struct {
-	blog      *Blog
-	templates *template.Template
+	blog         *Blog
+	htmlTemplates *template.Template
+	xmlTemplates  *texttemplate.Template
 }
 
 func NewRenderer(b *Blog) *Renderer {
-	funcMap := template.FuncMap{
+	htmlFuncMap := template.FuncMap{
 		"safeHTML": func(s string) template.HTML {
 			return template.HTML(s)
 		},
@@ -29,13 +31,20 @@ func NewRenderer(b *Blog) *Renderer {
 		"join": strings.Join,
 	}
 
-	tmpl := template.New("").Funcs(funcMap)
+	xmlFuncMap := texttemplate.FuncMap{
+		"join": strings.Join,
+	}
 
-	tmpl, _ = tmpl.ParseFS(defaultTemplates, "templates/*.html", "templates/*.xml")
+	htmlTmpl := template.New("").Funcs(htmlFuncMap)
+	htmlTmpl, _ = htmlTmpl.ParseFS(defaultTemplates, "templates/*.html")
+
+	xmlTmpl := texttemplate.New("").Funcs(xmlFuncMap)
+	xmlTmpl, _ = xmlTmpl.ParseFS(defaultTemplates, "templates/*.xml")
 
 	return &Renderer{
-		blog:      b,
-		templates: tmpl,
+		blog:         b,
+		htmlTemplates: htmlTmpl,
+		xmlTemplates:  xmlTmpl,
 	}
 }
 
@@ -60,7 +69,7 @@ func (r *Renderer) RenderIndex(outDir string) error {
 	data := r.newPageData()
 
 	var buf bytes.Buffer
-	if err := r.templates.ExecuteTemplate(&buf, "list.html", data); err != nil {
+	if err := r.htmlTemplates.ExecuteTemplate(&buf, "list.html", data); err != nil {
 		return fmt.Errorf("failed to execute list template: %w", err)
 	}
 
@@ -73,7 +82,7 @@ func (r *Renderer) RenderArticle(outDir string, article Article) error {
 	data.Article = &article
 
 	var buf bytes.Buffer
-	if err := r.templates.ExecuteTemplate(&buf, "single.html", data); err != nil {
+	if err := r.htmlTemplates.ExecuteTemplate(&buf, "single.html", data); err != nil {
 		return fmt.Errorf("failed to execute single template: %w", err)
 	}
 
@@ -90,7 +99,7 @@ func (r *Renderer) RenderRSS(outDir string) error {
 	data := r.newPageData()
 
 	var buf bytes.Buffer
-	if err := r.templates.ExecuteTemplate(&buf, "rss.xml", data); err != nil {
+	if err := r.xmlTemplates.ExecuteTemplate(&buf, "rss.xml", data); err != nil {
 		return fmt.Errorf("failed to execute RSS template: %w", err)
 	}
 
@@ -102,7 +111,7 @@ func (r *Renderer) RenderSitemap(outDir string) error {
 	data := r.newPageData()
 
 	var buf bytes.Buffer
-	if err := r.templates.ExecuteTemplate(&buf, "sitemap.xml", data); err != nil {
+	if err := r.xmlTemplates.ExecuteTemplate(&buf, "sitemap.xml", data); err != nil {
 		return fmt.Errorf("failed to execute sitemap template: %w", err)
 	}
 
