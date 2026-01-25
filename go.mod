@@ -6,6 +6,7 @@ toolchain go1.25.0
 
 require (
 	github.com/alecthomas/chroma/v2 v2.23.1
+	github.com/fsnotify/fsnotify v1.9.0
 	github.com/gobuffalo/flect v1.0.2
 	github.com/gofrs/uuid/v5 v5.0.0
 	github.com/markbates/clam v0.0.0-20240219024730-b98cdab94ec3
@@ -31,4 +32,5 @@ require (
 	github.com/markbates/hepa v0.0.0-20211129002629-856d16f89b9d // indirect
 	github.com/pmezard/go-difflib v1.0.0 // indirect
 	golang.org/x/exp v0.0.0-20240222234643-814bf88cf225 // indirect
+	golang.org/x/sys v0.32.0 // indirect
 )

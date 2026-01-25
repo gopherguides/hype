@@ -16,6 +16,7 @@ import (
 	"syscall"
 	"time"
 
+	"github.com/fsnotify/fsnotify"
 	"github.com/gopherguides/hype/blog"
 	"github.com/markbates/cleo"
 	"github.com/markbates/plugins"
@@ -271,10 +272,13 @@ Example:
 
 func (cmd *Blog) runServe(ctx context.Context, pwd string, args []string) error {
 	var addr string
+	var watch bool
 
 	fs := flag.NewFlagSet("serve", flag.ContinueOnError)
 	fs.StringVar(&addr, "addr", ":3000", "address to serve on (default :3000)")
 	fs.StringVar(&addr, "a", ":3000", "address to serve on (shorthand)")
+	fs.BoolVar(&watch, "watch", false, "watch for file changes and rebuild")
+	fs.BoolVar(&watch, "w", false, "watch for file changes and rebuild (shorthand)")
 	fs.Usage = func() {
 		fmt.Fprintln(cmd.Stdout(), `Usage: hype blog serve [options]
 
@@ -284,10 +288,12 @@ If public/ doesn't exist, the site will be built first.
 
 Options:
     -addr, -a    Address to serve on (default ":3000")
+    -watch, -w   Watch for file changes and rebuild automatically
 
 Example:
     hype blog serve
-    hype blog serve -addr :8080`)
+    hype blog serve -watch
+    hype blog serve -addr :8080 -w`)
 	}
 
 	if err := fs.Parse(args); err != nil {
@@ -317,6 +323,9 @@ Example:
 	}
 
 	fmt.Fprintf(cmd.Stdout(), "Serving %s at http://localhost%s\n", publicDir, finalAddr)
+	if watch {
+		fmt.Fprintf(cmd.Stdout(), "Watching for changes...\n")
+	}
 	fmt.Fprintf(cmd.Stdout(), "Press Ctrl+C to stop\n")
 
 	server := &http.Server{
@@ -328,6 +337,16 @@ Example:
 	done := make(chan bool, 1)
 	quit := make(chan os.Signal, 1)
 	signal.Notify(quit, os.Interrupt, syscall.SIGTERM)
+
+	// Start file watcher if enabled
+	var watcher *fsnotify.Watcher
+	if watch {
+		watcher, err = cmd.startWatcher(ctx, pwd, b)
+		if err != nil {
+			return fmt.Errorf("failed to start file watcher: %w", err)
+		}
+		defer watcher.Close()
+	}
 
 	go func() {
 		<-quit
@@ -348,6 +367,146 @@ Example:
 
 	<-done
 	return nil
+}
+
+func (cmd *Blog) startWatcher(ctx context.Context, pwd string, b *blog.Blog) (*fsnotify.Watcher, error) {
+	watcher, err := fsnotify.NewWatcher()
+	if err != nil {
+		return nil, err
+	}
+
+	contentDir := filepath.Join(pwd, b.Config.ContentDir)
+	staticDir := filepath.Join(pwd, "static")
+
+	if err := addWatchRecursive(watcher, contentDir); err != nil {
+		watcher.Close()
+		return nil, fmt.Errorf("failed to watch content directory: %w", err)
+	}
+
+	if _, err := os.Stat(staticDir); err == nil {
+		if err := addWatchRecursive(watcher, staticDir); err != nil {
+			watcher.Close()
+			return nil, fmt.Errorf("failed to watch static directory: %w", err)
+		}
+	}
+
+	configPath := filepath.Join(pwd, "config.yaml")
+	if _, err := os.Stat(configPath); err == nil {
+		if err := watcher.Add(configPath); err != nil {
+			watcher.Close()
+			return nil, fmt.Errorf("failed to watch config.yaml: %w", err)
+		}
+	}
+
+	configPathYml := filepath.Join(pwd, "config.yml")
+	if _, err := os.Stat(configPathYml); err == nil {
+		if err := watcher.Add(configPathYml); err != nil {
+			watcher.Close()
+			return nil, fmt.Errorf("failed to watch config.yml: %w", err)
+		}
+	}
+
+	go cmd.watchLoop(ctx, watcher, pwd)
+
+	return watcher, nil
+}
+
+func addWatchRecursive(watcher *fsnotify.Watcher, dir string) error {
+	return filepath.Walk(dir, func(path string, info os.FileInfo, err error) error {
+		if err != nil {
+			return err
+		}
+		if info.IsDir() {
+			if strings.HasPrefix(info.Name(), ".") && path != dir {
+				return filepath.SkipDir
+			}
+			return watcher.Add(path)
+		}
+		return nil
+	})
+}
+
+func (cmd *Blog) watchLoop(ctx context.Context, watcher *fsnotify.Watcher, pwd string) {
+	var debounceTimer *time.Timer
+	var mu sync.Mutex
+	var changedFiles []string
+	debounceDelay := 500 * time.Millisecond
+
+	rebuild := func() {
+		mu.Lock()
+		files := changedFiles
+		changedFiles = nil
+		mu.Unlock()
+
+		fmt.Fprintf(cmd.Stdout(), "\n")
+		for _, f := range files {
+			relPath, err := filepath.Rel(pwd, f)
+			if err != nil {
+				relPath = f
+			}
+			fmt.Fprintf(cmd.Stdout(), "Changed: %s\n", relPath)
+		}
+		fmt.Fprintf(cmd.Stdout(), "Rebuilding site...\n")
+
+		b, err := blog.New(pwd)
+		if err != nil {
+			fmt.Fprintf(cmd.Stderr(), "Rebuild error: %v\n", err)
+			return
+		}
+		if err := b.Build(ctx); err != nil {
+			fmt.Fprintf(cmd.Stderr(), "Rebuild error: %v\n", err)
+			return
+		}
+		fmt.Fprintf(cmd.Stdout(), "Rebuilt %d articles\n", len(b.Articles))
+	}
+
+	for {
+		select {
+		case <-ctx.Done():
+			return
+		case event, ok := <-watcher.Events:
+			if !ok {
+				return
+			}
+
+			if event.Has(fsnotify.Write) || event.Has(fsnotify.Create) || event.Has(fsnotify.Remove) || event.Has(fsnotify.Rename) {
+				if strings.Contains(event.Name, "public") {
+					continue
+				}
+				if strings.HasPrefix(filepath.Base(event.Name), ".") {
+					continue
+				}
+
+				mu.Lock()
+				found := false
+				for _, f := range changedFiles {
+					if f == event.Name {
+						found = true
+						break
+					}
+				}
+				if !found {
+					changedFiles = append(changedFiles, event.Name)
+				}
+				if debounceTimer != nil {
+					debounceTimer.Stop()
+				}
+				debounceTimer = time.AfterFunc(debounceDelay, rebuild)
+				mu.Unlock()
+
+				if event.Has(fsnotify.Create) {
+					if info, err := os.Stat(event.Name); err == nil && info.IsDir() {
+						watcher.Add(event.Name)
+					}
+				}
+			}
+		case err, ok := <-watcher.Errors:
+			if !ok {
+				return
+			}
+			fmt.Fprintf(cmd.Stderr(), "Watcher error: %v\n", err)
+		}
+	}
 }
 
 func findAvailablePort(addr string) (string, []string) {
