@@ -1,0 +1,211 @@
+/* Swiss Markdown CSS */
+/* Minimalist Swiss typography inspired theme */
+
+:root {
+    --text-color: #111;
+    --bg-color: #fff;
+    --accent-color: #e00;
+    --muted-color: #666;
+    --border-color: #ddd;
+    --code-bg: #f5f5f5;
+}
+
+.markdown-body {
+    font-family: "Helvetica Neue", Helvetica, Arial, sans-serif;
+    font-size: 16px;
+    line-height: 1.7;
+    word-wrap: break-word;
+    color: var(--text-color);
+    background-color: var(--bg-color);
+    max-width: 700px;
+    margin: 0 auto;
+    padding: 60px 20px;
+}
+
+@media (max-width: 767px) {
+    .markdown-body {
+        padding: 30px 15px;
+    }
+}
+
+.markdown-body > *:first-child {
+    margin-top: 0 !important;
+}
+
+.markdown-body > *:last-child {
+    margin-bottom: 0 !important;
+}
+
+.markdown-body a {
+    color: var(--accent-color);
+    text-decoration: none;
+    border-bottom: 1px solid var(--accent-color);
+}
+
+.markdown-body a:hover {
+    background-color: var(--accent-color);
+    color: var(--bg-color);
+}
+
+.markdown-body strong {
+    font-weight: 700;
+}
+
+.markdown-body h1,
+.markdown-body h2,
+.markdown-body h3,
+.markdown-body h4,
+.markdown-body h5,
+.markdown-body h6 {
+    margin-top: 2em;
+    margin-bottom: 0.5em;
+    font-weight: 700;
+    line-height: 1.2;
+    letter-spacing: -0.02em;
+}
+
+.markdown-body h1 {
+    font-size: 2.5em;
+    border-bottom: 4px solid var(--text-color);
+    padding-bottom: 0.2em;
+}
+
+.markdown-body h2 {
+    font-size: 1.75em;
+    border-bottom: 2px solid var(--text-color);
+    padding-bottom: 0.2em;
+}
+
+.markdown-body h3 {
+    font-size: 1.25em;
+}
+
+.markdown-body h4 {
+    font-size: 1em;
+    text-transform: uppercase;
+    letter-spacing: 0.1em;
+}
+
+.markdown-body h5 {
+    font-size: 0.875em;
+    text-transform: uppercase;
+    letter-spacing: 0.1em;
+}
+
+.markdown-body h6 {
+    font-size: 0.75em;
+    text-transform: uppercase;
+    letter-spacing: 0.1em;
+    color: var(--muted-color);
+}
+
+.markdown-body p {
+    margin-top: 0;
+    margin-bottom: 1.5em;
+}
+
+.markdown-body blockquote {
+    margin: 0 0 1.5em 0;
+    padding: 0 0 0 1.5em;
+    color: var(--muted-color);
+    border-left: 4px solid var(--accent-color);
+    font-style: italic;
+}
+
+.markdown-body ul,
+.markdown-body ol {
+    margin-top: 0;
+    margin-bottom: 1.5em;
+    padding-left: 1.5em;
+}
+
+.markdown-body li + li {
+    margin-top: 0.25em;
+}
+
+.markdown-body code,
+.markdown-body tt {
+    padding: 0.2em 0.4em;
+    margin: 0;
+    font-size: 85%;
+    white-space: break-spaces;
+    background-color: var(--code-bg);
+    border-radius: 0;
+    font-family: "SF Mono", Consolas, "Liberation Mono", Menlo, monospace;
+}
+
+.markdown-body pre {
+    margin-top: 0;
+    margin-bottom: 1.5em;
+    word-wrap: normal;
+    padding: 1em;
+    overflow: auto;
+    font-size: 85%;
+    line-height: 1.5;
+    color: var(--text-color);
+    background-color: var(--code-bg);
+    border-radius: 0;
+    border-left: 4px solid var(--text-color);
+}
+
+.markdown-body pre code,
+.markdown-body pre tt {
+    display: inline;
+    padding: 0;
+    margin: 0;
+    overflow: visible;
+    line-height: inherit;
+    word-wrap: normal;
+    background-color: transparent;
+    border: 0;
+}
+
+.markdown-body table {
+    border-spacing: 0;
+    border-collapse: collapse;
+    display: block;
+    width: max-content;
+    max-width: 100%;
+    overflow: auto;
+    margin-top: 0;
+    margin-bottom: 1.5em;
+}
+
+.markdown-body td,
+.markdown-body th {
+    padding: 0.5em 1em;
+    border: 1px solid var(--border-color);
+}
+
+.markdown-body th {
+    font-weight: 700;
+    text-transform: uppercase;
+    font-size: 0.85em;
+    letter-spacing: 0.05em;
+    background-color: var(--code-bg);
+}
+
+.markdown-body img {
+    max-width: 100%;
+    box-sizing: content-box;
+}
+
+.markdown-body hr {
+    height: 4px;
+    padding: 0;
+    margin: 3em 0;
+    background-color: var(--text-color);
+    border: 0;
+}
+
+.markdown-body figure {
+    margin: 2em 0;
+}
+
+.markdown-body figcaption {
+    font-size: 0.85em;
+    color: var(--muted-color);
+    text-align: center;
+    margin-top: 0.75em;
+    font-style: italic;
+}

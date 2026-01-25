@@ -1,0 +1,215 @@
+/* Air Markdown CSS */
+/* Clean, centered layout with generous whitespace */
+
+:root {
+    --text-color: #374151;
+    --heading-color: #111827;
+    --bg-color: #fff;
+    --accent-color: #3b82f6;
+    --muted-color: #6b7280;
+    --border-color: #e5e7eb;
+    --code-bg: #f9fafb;
+}
+
+.markdown-body {
+    font-family: -apple-system, BlinkMacSystemFont, "Segoe UI", Roboto, "Helvetica Neue", Arial, sans-serif;
+    font-size: 18px;
+    line-height: 1.8;
+    word-wrap: break-word;
+    color: var(--text-color);
+    background-color: var(--bg-color);
+    max-width: 680px;
+    margin: 0 auto;
+    padding: 80px 24px;
+}
+
+@media (max-width: 767px) {
+    .markdown-body {
+        font-size: 16px;
+        padding: 40px 16px;
+    }
+}
+
+.markdown-body > *:first-child {
+    margin-top: 0 !important;
+}
+
+.markdown-body > *:last-child {
+    margin-bottom: 0 !important;
+}
+
+.markdown-body a {
+    color: var(--accent-color);
+    text-decoration: none;
+}
+
+.markdown-body a:hover {
+    text-decoration: underline;
+}
+
+.markdown-body strong {
+    font-weight: 600;
+    color: var(--heading-color);
+}
+
+.markdown-body h1,
+.markdown-body h2,
+.markdown-body h3,
+.markdown-body h4,
+.markdown-body h5,
+.markdown-body h6 {
+    margin-top: 2.5em;
+    margin-bottom: 0.75em;
+    font-weight: 700;
+    line-height: 1.3;
+    color: var(--heading-color);
+}
+
+.markdown-body h1 {
+    font-size: 2.25em;
+    margin-top: 0;
+    padding-bottom: 0.5em;
+    border-bottom: 1px solid var(--border-color);
+}
+
+.markdown-body h2 {
+    font-size: 1.5em;
+    padding-bottom: 0.3em;
+    border-bottom: 1px solid var(--border-color);
+}
+
+.markdown-body h3 {
+    font-size: 1.25em;
+}
+
+.markdown-body h4 {
+    font-size: 1em;
+}
+
+.markdown-body h5 {
+    font-size: 0.875em;
+}
+
+.markdown-body h6 {
+    font-size: 0.85em;
+    color: var(--muted-color);
+}
+
+.markdown-body p {
+    margin-top: 0;
+    margin-bottom: 1.5em;
+}
+
+.markdown-body blockquote {
+    margin: 0 0 1.5em 0;
+    padding: 1em 1.5em;
+    color: var(--muted-color);
+    background-color: var(--code-bg);
+    border-left: 4px solid var(--accent-color);
+    border-radius: 0 8px 8px 0;
+}
+
+.markdown-body blockquote p:last-child {
+    margin-bottom: 0;
+}
+
+.markdown-body ul,
+.markdown-body ol {
+    margin-top: 0;
+    margin-bottom: 1.5em;
+    padding-left: 2em;
+}
+
+.markdown-body li + li {
+    margin-top: 0.5em;
+}
+
+.markdown-body code,
+.markdown-body tt {
+    padding: 0.2em 0.5em;
+    margin: 0;
+    font-size: 85%;
+    white-space: break-spaces;
+    background-color: var(--code-bg);
+    border-radius: 6px;
+    font-family: ui-monospace, SFMono-Regular, "SF Mono", Menlo, Consolas, monospace;
+    color: var(--heading-color);
+}
+
+.markdown-body pre {
+    margin-top: 0;
+    margin-bottom: 1.5em;
+    word-wrap: normal;
+    padding: 1.25em;
+    overflow: auto;
+    font-size: 85%;
+    line-height: 1.6;
+    color: var(--text-color);
+    background-color: var(--code-bg);
+    border-radius: 8px;
+}
+
+.markdown-body pre code,
+.markdown-body pre tt {
+    display: inline;
+    padding: 0;
+    margin: 0;
+    overflow: visible;
+    line-height: inherit;
+    word-wrap: normal;
+    background-color: transparent;
+    border: 0;
+}
+
+.markdown-body table {
+    border-spacing: 0;
+    border-collapse: collapse;
+    display: block;
+    width: max-content;
+    max-width: 100%;
+    overflow: auto;
+    margin-top: 0;
+    margin-bottom: 1.5em;
+    border-radius: 8px;
+    overflow: hidden;
+}
+
+.markdown-body td,
+.markdown-body th {
+    padding: 0.75em 1em;
+    border: 1px solid var(--border-color);
+}
+
+.markdown-body th {
+    font-weight: 600;
+    background-color: var(--code-bg);
+}
+
+.markdown-body tr:nth-child(2n) {
+    background-color: var(--code-bg);
+}
+
+.markdown-body img {
+    max-width: 100%;
+    box-sizing: content-box;
+    border-radius: 8px;
+}
+
+.markdown-body hr {
+    height: 1px;
+    padding: 0;
+    margin: 3em 0;
+    background-color: var(--border-color);
+    border: 0;
+}
+
+.markdown-body figure {
+    margin: 2em 0;
+}
+
+.markdown-body figcaption {
+    font-size: 0.875em;
+    color: var(--muted-color);
+    text-align: center;
+    margin-top: 1em;
+}
