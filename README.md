@@ -34,184 +34,6 @@ You can also use a [github action](#using-github-actions-to-update-your-readme) 
 
 ---
 
-# Hype Blog Generator
-
-Create beautiful static blogs with hype's signature code execution feature. Write articles in markdown, include runnable code examples, and deploy to GitHub Pages with a single workflow.
-
-**Live Demo:** [gopherguides.github.io/hype-blog-sample](https://gopherguides.github.io/hype-blog-sample)
-
-## Quick Start
-
-```bash
-# Install hype
-go install github.com/gopherguides/hype/cmd/hype@latest
-
-# Create a new blog
-hype blog init mysite
-cd mysite
-
-# Create your first article
-hype blog new hello-world
-
-# Build and preview
-hype blog build
-hype blog serve
-
-```
-
-Your site is now live at `http://localhost:3000`.
-
-## Features
-
-
-* **Code Execution** - Run code blocks and include real output (hype's signature feature)
-* **3 Built-in Themes** - suspended (minimal), developer (terminal-style), cards (grid layout)
-* **Hugo-style Templates** - Layered template system with easy customization
-* **Live Reload** - `--watch` flag for automatic rebuilds during development
-* **SEO Ready** - Meta tags, Open Graph, Twitter cards, sitemap, RSS feed
-* **GitHub Pages** - Deploy automatically with the included workflow
-
-
-## Commands
-
-| Command | Description |
-| ------- | ----------- |
-| 
-`hype blog init <name>`
- | Create a new blog project |
-| 
-`hype blog new <slug>`
- | Create a new article |
-| 
-`hype blog build`
- | Build the static site |
-| 
-`hype blog serve`
- | Start local preview server |
-| 
-`hype blog serve –watch`
- | Preview with live reload |
-| 
-`hype blog theme list`
- | List available themes |
-| 
-`hype blog theme add <name>`
- | Add a theme to your project |
-
-
-## Themes
-
-### Suspended (Default)
-
-Minimal, typography-focused theme perfect for technical writing.
-
-<img alt="Suspended Theme" src="docs/blog/images/theme-suspended-home.png"></img>
-
-### Developer
-
-Dark, terminal-inspired theme for code-heavy blogs.
-
-<img alt="Developer Theme" src="docs/blog/images/theme-developer-home.png"></img>
-
-### Cards
-
-Modern card-based layout with visual hierarchy.
-
-<img alt="Cards Theme" src="docs/blog/images/theme-cards-home.png"></img>
-
-Switch themes by updating `config.yaml`:
-
-```yaml
-theme: "developer"
-
-```
-
-## Deploy to GitHub Pages
-
-Add this workflow to `.github/workflows/deploy.yaml`:
-
-```yaml
-name: Deploy to GitHub Pages
-
-on:
-  push:
-    branches: [main]
-
-permissions:
-  contents: read
-  pages: write
-  id-token: write
-
-jobs:
-  build:
-    runs-on: ubuntu-latest
-    steps:
-      - uses: actions/checkout@v4
-      - uses: actions/setup-go@v5
-        with:
-          go-version: '1.23'
-      - run: go install github.com/gopherguides/hype/cmd/hype@v0.5.0
-      - run: hype blog build
-      - uses: actions/configure-pages@v4
-      - uses: actions/upload-pages-artifact@v3
-        with:
-          path: './public'
-
-  deploy:
-    environment:
-      name: github-pages
-      url: ${{ steps.deployment.outputs.page_url }}
-    runs-on: ubuntu-latest
-    needs: build
-    steps:
-      - uses: actions/deploy-pages@v4
-        id: deployment
-```
-> *source: docs/blog/src/deploy.yaml*
-
-
-Then enable GitHub Pages in your repo settings (Settings > Pages > Source: GitHub Actions).
-
-## Project Structure
-
-`mysite/
-├── config.yaml             # Site configuration
-├── content/                # Your articles
-│   └── hello-world/
-│       ├── module.md       # Article content
-│       └── src/            # Code files for the article
-├── themes/                 # Installed themes
-│   └── suspended/
-├── layouts/                # Your template overrides (optional)
-├── static/                 # Static assets (favicon, images)
-└── public/                 # Generated output
-`
-
-## Article Format
-
-Articles use a `<details>` block for metadata:
-
-```markdown
-# My Article Title
-
-<details>
-slug: my-article
-published: 01/25/2026
-author: Your Name
-seo_description: Brief description for SEO
-tags: go, tutorial
-</details>
-
-Your content here...
-
-```
-
-## Full Documentation
-
-For complete documentation including theme customization, template overrides, and advanced features, see [docs/blog/README.md](docs/blog/README.md).
-
----
-
 # Quick Start Guide
 
 For more in depth examples, you can read our quick start guide
@@ -305,7 +127,7 @@ $ go run .
 Hello World
 
 --------------------------------------------------------------------------------
-Go Version: go1.25.5
+Go Version: go1.25.6
 
 ```
 
@@ -338,7 +160,7 @@ $ go run .
 Hello World
 
 --------------------------------------------------------------------------------
-Go Version: go1.25.5
+Go Version: go1.25.6
 
 ```
 
@@ -367,7 +189,7 @@ $ go run .
 Hello World
 
 --------------------------------------------------------------------------------
-Go Version: go1.25.5
+Go Version: go1.25.6
 
 ```
 
@@ -397,7 +219,7 @@ $ go run .
 ./main.go:7:6: undefined: fmt.Prin
 
 --------------------------------------------------------------------------------
-Go Version: go1.25.5
+Go Version: go1.25.6
 
 ```
 
@@ -434,7 +256,7 @@ type Context interface{ ... }
     func WithoutCancel(parent Context) Context
 
 --------------------------------------------------------------------------------
-Go Version: go1.25.5
+Go Version: go1.25.6
 
 ```
 
@@ -457,7 +279,7 @@ func WithCancel(parent Context) (ctx Context, cancel CancelFunc)
     call cancel as soon as the operations running in this Context complete.
 
 --------------------------------------------------------------------------------
-Go Version: go1.25.5
+Go Version: go1.25.6
 
 ```
 
@@ -576,17 +398,14 @@ $ tree ./docs
 ./docs
 ├── badges.md
 ├── blog
-│   ├── hype.md
-│   ├── images
-│   │   ├── theme-cards-article.png
-│   │   ├── theme-cards-home.png
-│   │   ├── theme-developer-article.png
-│   │   ├── theme-developer-home.png
-│   │   ├── theme-suspended-article.png
-│   │   └── theme-suspended-home.png
 │   ├── README.md
-│   └── src
-│       └── deploy.yaml
+│   └── images
+│       ├── theme-cards-article.png
+│       ├── theme-cards-home.png
+│       ├── theme-developer-article.png
+│       ├── theme-developer-home.png
+│       ├── theme-suspended-article.png
+│       └── theme-suspended-home.png
 ├── license.md
 └── quickstart
     ├── hype.md
@@ -597,7 +416,7 @@ $ tree ./docs
         └── hello
             └── main.go
 
-8 directories, 15 files
+7 directories, 13 files
 ```
 ---
 
