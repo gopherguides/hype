@@ -206,6 +206,15 @@ outputDir: "public"
 		return fmt.Errorf("failed to create static/images directory: %w", err)
 	}
 
+	// Create default favicon.svg - a simple, modern "H" icon
+	faviconSVG := `<svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 32 32">
+  <rect width="32" height="32" rx="6" fill="#1e293b"/>
+  <path d="M8 8v16M24 8v16M8 16h16" stroke="#60a5fa" stroke-width="3" stroke-linecap="round"/>
+</svg>`
+	if err := os.WriteFile(filepath.Join(dir, "static", "favicon.svg"), []byte(faviconSVG), 0644); err != nil {
+		return fmt.Errorf("failed to create favicon.svg: %w", err)
+	}
+
 	gitignoreContent := `public/
 .DS_Store
 `
