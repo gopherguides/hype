@@ -81,19 +81,7 @@ Then enable GitHub Pages in your repo settings (Settings > Pages > Source: GitHu
 
 ## Project Structure
 
-```
-mysite/
-├── config.yaml             # Site configuration
-├── content/                # Your articles
-│   └── hello-world/
-│       ├── module.md       # Article content
-│       └── src/            # Code files for the article
-├── themes/                 # Installed themes
-│   └── suspended/
-├── layouts/                # Your template overrides (optional)
-├── static/                 # Static assets (favicon, images)
-└── public/                 # Generated output
-```
+<code src="src/structure.txt"></code>
 
 ## Article Format
 
