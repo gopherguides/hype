@@ -134,11 +134,11 @@ func New(root string) *App {
 		Parser: p,
 	}
 
-	mp := &Marked{
+	pv := &Preview{
 		Cmd: cleo.Cmd{
 			Name:    "preview",
 			Aliases: []string{"p"},
-			Desc:    "outputs HTML for previwing document in a browser",
+			Desc:    "live preview server with file watching and auto-reload",
 		},
 		Parser: p,
 	}
@@ -166,7 +166,7 @@ func New(root string) *App {
 			FS:   cab,
 			Commands: map[string]cleo.Commander{
 				"marked":  m,
-				"preview": mp,
+				"preview": pv,
 				"slides":  sl,
 				"export":  e,
 				"blog":    bl,

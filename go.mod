@@ -6,6 +6,7 @@ toolchain go1.25.0
 
 require (
 	github.com/alecthomas/chroma/v2 v2.23.1
+	github.com/bmatcuk/doublestar/v4 v4.10.0
 	github.com/fsnotify/fsnotify v1.9.0
 	github.com/gobuffalo/flect v1.0.2
 	github.com/gofrs/uuid/v5 v5.0.0
