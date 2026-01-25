@@ -7,6 +7,7 @@ import (
 	"io/fs"
 	"math"
 	"path/filepath"
+	"regexp"
 	"strings"
 	"time"
 
@@ -162,6 +163,7 @@ func (ap *ArticleParser) ParseArticle(ctx context.Context, dir string) (Article,
 	}
 
 	bodyStr := body.String()
+	bodyStr = stripDetailsBlocks(bodyStr)
 	bodyStr = ap.processCodeBlocks(bodyStr)
 	a.Body = template.HTML(bodyStr)
 
@@ -184,6 +186,12 @@ func (ap *ArticleParser) ParseArticle(ctx context.Context, dir string) (Article,
 
 func (ap *ArticleParser) processCodeBlocks(html string) string {
 	return html
+}
+
+var detailsPattern = regexp.MustCompile(`(?s)<details[^>]*>.*?</details>`)
+
+func stripDetailsBlocks(html string) string {
+	return detailsPattern.ReplaceAllString(html, "")
 }
 
 func calculateReadingTime(content string) int {

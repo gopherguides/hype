@@ -8,10 +8,12 @@ import (
 	"net"
 	"net/http"
 	"os"
+	"os/signal"
 	"path/filepath"
 	"strconv"
 	"strings"
 	"sync"
+	"syscall"
 	"time"
 
 	"github.com/gopherguides/hype/blog"
@@ -313,7 +315,30 @@ Example:
 		Handler: http.FileServer(http.Dir(publicDir)),
 	}
 
-	return server.ListenAndServe()
+	// Handle graceful shutdown on Ctrl+C
+	done := make(chan bool, 1)
+	quit := make(chan os.Signal, 1)
+	signal.Notify(quit, os.Interrupt, syscall.SIGTERM)
+
+	go func() {
+		<-quit
+		fmt.Fprintf(cmd.Stdout(), "\nShutting down server...\n")
+
+		ctx, cancel := context.WithTimeout(context.Background(), 5*time.Second)
+		defer cancel()
+
+		if err := server.Shutdown(ctx); err != nil {
+			fmt.Fprintf(cmd.Stderr(), "Server shutdown error: %v\n", err)
+		}
+		close(done)
+	}()
+
+	if err := server.ListenAndServe(); err != nil && err != http.ErrServerClosed {
+		return err
+	}
+
+	<-done
+	return nil
 }
 
 func findAvailablePort(addr string) (string, []string) {
