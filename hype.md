@@ -36,6 +36,54 @@ Here is the current structure that we are using to create this readme:
 
 <include src=".github/workflows/hype.md"></include>
 
+# AI Assistant Integration
+
+Hype includes an [Agent Skill](https://agentskills.io) to help AI coding assistants write hype-compatible documentation. The skill is located in `.agent/skills/hype/`.
+
+## Quick Install (any tool)
+
+Using [openskills](https://www.npmjs.com/package/openskills):
+
+```bash
+npm install -g openskills
+openskills install gopherguides/hype --universal
+```
+
+## Manual Install by Tool
+
+### Claude Code
+
+```bash
+cp -r .agent/skills/hype .claude/skills/
+# Or globally: cp -r .agent/skills/hype ~/.claude/skills/
+```
+
+### OpenAI Codex
+
+```bash
+cp -r .agent/skills/hype ~/.codex/skills/
+```
+
+### Gemini CLI
+
+```bash
+cp -r .agent/skills/hype ~/.gemini/skills/
+```
+
+### Cursor / VS Code
+
+```bash
+cp -r .agent/skills/hype .cursor/skills/
+```
+
+### GitHub Copilot
+
+```bash
+cp -r .agent/skills/hype .github/skills/
+```
+
+The skill activates automatically when working with hype documents.
+
 # Issues
 
 There are several issues that still need to be worked on. Please see the issues tab if you are interested in helping.
