@@ -88,6 +88,10 @@ func (b *Blog) Build(ctx context.Context) error {
 
 	outDir := filepath.Join(b.root, b.Config.OutputDir)
 
+	if err := validateOutputDir(b.root, outDir); err != nil {
+		return err
+	}
+
 	if err := os.RemoveAll(outDir); err != nil {
 		return fmt.Errorf("failed to clean output directory: %w", err)
 	}
@@ -154,4 +158,30 @@ func copyDir(src, dst string) error {
 
 		return os.WriteFile(dstPath, data, info.Mode())
 	})
+}
+
+func validateOutputDir(root, outDir string) error {
+	if outDir == "" {
+		return fmt.Errorf("output directory cannot be empty")
+	}
+
+	absRoot, err := filepath.Abs(root)
+	if err != nil {
+		return fmt.Errorf("failed to resolve root path: %w", err)
+	}
+
+	absOut, err := filepath.Abs(outDir)
+	if err != nil {
+		return fmt.Errorf("failed to resolve output path: %w", err)
+	}
+
+	if absOut == absRoot {
+		return fmt.Errorf("output directory cannot be the project root")
+	}
+
+	if !strings.HasPrefix(absOut, absRoot+string(filepath.Separator)) {
+		return fmt.Errorf("output directory must be inside the project root")
+	}
+
+	return nil
 }

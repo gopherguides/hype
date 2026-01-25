@@ -121,7 +121,7 @@ func (ap *ArticleParser) ParseArticle(ctx context.Context, dir string) (Article,
 		return a, fmt.Errorf("published date is not a string in %s", a.File)
 	}
 
-	t, err := time.Parse("01/02/2006", pb)
+	t, err := time.ParseInLocation("01/02/2006", pb, time.Local)
 	if err != nil {
 		return a, fmt.Errorf("invalid published date format in %s: %w", a.File, err)
 	}
