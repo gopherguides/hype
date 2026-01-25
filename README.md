@@ -487,51 +487,68 @@ jobs:
 
 Hype includes an [Agent Skill](https://agentskills.io) to help AI coding assistants write hype-compatible documentation. The skill is located in `.agent/skills/hype/`.
 
-## Quick Install (any tool)
+## One-Line Install (curl)
 
-Using [openskills](https://www.npmjs.com/package/openskills):
-
-```bash
-npm install -g openskills
-openskills install gopherguides/hype --universal
-
-```
-
-## Manual Install by Tool
+Install the hype skill globally for your preferred AI tool with a single command:
 
 ### Claude Code
 
 ```bash
-cp -r .agent/skills/hype .claude/skills/
-# Or globally: cp -r .agent/skills/hype ~/.claude/skills/
+mkdir -p ~/.claude/skills && curl -sL https://github.com/gopherguides/hype/archive/main.tar.gz | tar -xz --strip-components=2 -C ~/.claude/skills hype-main/.agent/skills/hype
 
 ```
 
 ### OpenAI Codex
 
 ```bash
-cp -r .agent/skills/hype ~/.codex/skills/
+mkdir -p ~/.codex/skills && curl -sL https://github.com/gopherguides/hype/archive/main.tar.gz | tar -xz --strip-components=2 -C ~/.codex/skills hype-main/.agent/skills/hype
 
 ```
 
 ### Gemini CLI
 
 ```bash
-cp -r .agent/skills/hype ~/.gemini/skills/
+mkdir -p ~/.gemini/skills && curl -sL https://github.com/gopherguides/hype/archive/main.tar.gz | tar -xz --strip-components=2 -C ~/.gemini/skills hype-main/.agent/skills/hype
 
 ```
 
-### Cursor / VS Code
+### Cursor
 
 ```bash
-cp -r .agent/skills/hype .cursor/skills/
+mkdir -p ~/.cursor/skills && curl -sL https://github.com/gopherguides/hype/archive/main.tar.gz | tar -xz --strip-components=2 -C ~/.cursor/skills hype-main/.agent/skills/hype
 
 ```
 
 ### GitHub Copilot
 
 ```bash
-cp -r .agent/skills/hype .github/skills/
+mkdir -p ~/.copilot/skills && curl -sL https://github.com/gopherguides/hype/archive/main.tar.gz | tar -xz --strip-components=2 -C ~/.copilot/skills hype-main/.agent/skills/hype
+
+```
+
+### Universal (vendor-agnostic)
+
+```bash
+mkdir -p ~/.agent/skills && curl -sL https://github.com/gopherguides/hype/archive/main.tar.gz | tar -xz --strip-components=2 -C ~/.agent/skills hype-main/.agent/skills/hype
+
+```
+
+## Project-Local Install
+
+To install the skill for a specific project only:
+
+```bash
+mkdir -p .agent/skills && curl -sL https://github.com/gopherguides/hype/archive/main.tar.gz | tar -xz --strip-components=2 -C .agent/skills hype-main/.agent/skills/hype
+
+```
+
+## Using openskills
+
+Alternatively, use [openskills](https://www.npmjs.com/package/openskills) for cross-tool installation:
+
+```bash
+npm install -g openskills
+openskills install gopherguides/hype --universal
 
 ```
 
