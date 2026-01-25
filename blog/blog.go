@@ -138,6 +138,7 @@ func (b *Blog) Build(ctx context.Context) error {
 		}
 	}
 
+
 	staticDir := filepath.Join(b.root, "static")
 	if _, err := os.Stat(staticDir); err == nil {
 		if err := copyDir(staticDir, outDir); err != nil {

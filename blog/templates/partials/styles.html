@@ -1,0 +1,64 @@
+{{define "partials/styles"}}
+    <script src="https://cdn.tailwindcss.com"></script>
+    <script>
+        tailwind.config = {
+            darkMode: 'media',
+        }
+    </script>
+    <script src="https://cdn.tailwindcss.com?plugins=typography"></script>
+
+    <style type="text/css">
+        {{.HighlightCSS}}
+    </style>
+
+    <style>
+        .prose pre {
+            background-color: #272822;
+            padding: 1rem;
+            border-radius: 0.5rem;
+            overflow-x: auto;
+        }
+        .prose code {
+            background-color: #f3f4f6;
+            padding: 0.125rem 0.25rem;
+            border-radius: 0.25rem;
+            font-size: 0.875em;
+        }
+        @media (prefers-color-scheme: dark) {
+            .prose code {
+                background-color: #374151;
+            }
+        }
+        .prose pre code {
+            background-color: transparent;
+            padding: 0;
+        }
+        /* Code block wrapper with copy button */
+        .code-block-wrapper {
+            position: relative;
+        }
+        .code-block-wrapper .copy-btn {
+            position: absolute;
+            top: 0.5rem;
+            right: 0.5rem;
+            padding: 0.5rem;
+            background-color: rgba(255, 255, 255, 0.1);
+            border: none;
+            border-radius: 0.375rem;
+            cursor: pointer;
+            opacity: 0;
+            transition: opacity 0.2s, background-color 0.2s;
+            color: #a0aec0;
+        }
+        .code-block-wrapper:hover .copy-btn {
+            opacity: 1;
+        }
+        .code-block-wrapper .copy-btn:hover {
+            background-color: rgba(255, 255, 255, 0.2);
+            color: #fff;
+        }
+        .code-block-wrapper .copy-btn.copied {
+            color: #48bb78;
+        }
+    </style>
+{{end}}
