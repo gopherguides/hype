@@ -41,7 +41,7 @@ func DefaultConfig() Config {
 	return Config{
 		Title:       "My Blog",
 		Description: "A blog powered by hype",
-		Theme:       "github",
+		Theme:       "suspended",
 		Highlight: Highlight{
 			Style:       "monokai",
 			LineNumbers: false,

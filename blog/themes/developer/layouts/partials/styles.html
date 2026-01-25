@@ -1,0 +1,72 @@
+{{define "partials/styles"}}
+    <script src="https://cdn.tailwindcss.com"></script>
+    <script>
+        tailwind.config = {
+            darkMode: 'class',
+        }
+    </script>
+    <script src="https://cdn.tailwindcss.com?plugins=typography,line-clamp"></script>
+
+    <style type="text/css">
+        {{.HighlightCSS}}
+    </style>
+
+    <style>
+        .prose pre {
+            background-color: #0d1117;
+            padding: 1rem;
+            border-radius: 0.5rem;
+            overflow-x: auto;
+            border: 1px solid #30363d;
+            font-size: 0.875rem;
+        }
+        .prose code {
+            background-color: #1f2937;
+            padding: 0.125rem 0.375rem;
+            border-radius: 0.25rem;
+            font-size: 0.875em;
+            color: #10b981;
+        }
+        .prose pre code {
+            background-color: transparent;
+            padding: 0;
+            color: inherit;
+        }
+        .prose h1, .prose h2, .prose h3, .prose h4 {
+            font-family: ui-monospace, SFMono-Regular, Menlo, Monaco, Consolas, monospace;
+        }
+        .prose a {
+            color: #10b981;
+            text-decoration: none;
+        }
+        .prose a:hover {
+            text-decoration: underline;
+        }
+        .code-block-wrapper {
+            position: relative;
+        }
+        .code-block-wrapper .copy-btn {
+            position: absolute;
+            top: 0.5rem;
+            right: 0.5rem;
+            padding: 0.5rem;
+            background-color: #30363d;
+            border: 1px solid #484f58;
+            border-radius: 0.375rem;
+            cursor: pointer;
+            opacity: 0;
+            transition: opacity 0.2s, background-color 0.2s;
+            color: #8b949e;
+        }
+        .code-block-wrapper:hover .copy-btn {
+            opacity: 1;
+        }
+        .code-block-wrapper .copy-btn:hover {
+            background-color: #484f58;
+            color: #c9d1d9;
+        }
+        .code-block-wrapper .copy-btn.copied {
+            color: #10b981;
+        }
+    </style>
+{{end}}

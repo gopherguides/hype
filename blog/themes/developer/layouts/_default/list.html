@@ -1,0 +1,53 @@
+{{define "main"}}
+        <div class="mb-10">
+            <div class="flex items-center gap-2 text-emerald-400 text-sm mb-4 font-mono">
+                <span class="text-gray-500">$</span>
+                <span>ls -la articles/</span>
+            </div>
+            <h1 class="text-3xl font-bold mb-2 font-mono">{{.Config.Title}}</h1>
+            <p class="text-gray-400 font-mono text-sm">// {{.Config.Description}}</p>
+        </div>
+
+        {{if .Articles}}
+        <div class="space-y-4">
+            <div class="text-gray-500 text-xs font-mono pb-2 border-b border-gray-800">
+                total {{len .Articles}}
+            </div>
+            {{range .Articles}}
+            <article class="group py-4 border-b border-gray-800 hover:bg-gray-900/50 transition-colors -mx-4 px-4">
+                <div class="flex items-start gap-4">
+                    <div class="text-gray-500 text-xs font-mono whitespace-nowrap pt-1">
+                        {{.FormattedDate}}
+                    </div>
+                    <div class="flex-1 min-w-0">
+                        <h2 class="text-lg font-mono mb-1">
+                            <a href="{{.URL}}" class="text-white hover:text-emerald-400 transition-colors">
+                                {{.Title}}
+                            </a>
+                        </h2>
+                        {{if .SEODescription}}
+                        <p class="text-gray-400 text-sm line-clamp-2">{{.SEODescription}}</p>
+                        {{end}}
+                        <div class="flex items-center gap-4 mt-2 text-xs text-gray-500 font-mono">
+                            {{if .Author}}<span>@{{.Author}}</span>{{end}}
+                            {{if .ReadingTime}}<span>~{{.ReadingTime}}m</span>{{end}}
+                            {{if .Tags}}
+                            <div class="flex gap-1">
+                                {{range .Tags}}<span class="text-emerald-600">#{{.}}</span>{{end}}
+                            </div>
+                            {{end}}
+                        </div>
+                    </div>
+                    <a href="{{.URL}}" class="text-emerald-400 opacity-0 group-hover:opacity-100 transition-opacity font-mono text-sm">
+                        &rarr;
+                    </a>
+                </div>
+            </article>
+            {{end}}
+        </div>
+        {{else}}
+        <div class="text-gray-500 font-mono">
+            <span class="text-red-400">error:</span> no articles found
+        </div>
+        {{end}}
+{{end}}

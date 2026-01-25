@@ -1,0 +1,20 @@
+{{define "partials/footer"}}
+    <footer class="bg-white dark:bg-slate-800 border-t border-slate-200 dark:border-slate-700 mt-auto">
+        <div class="max-w-6xl mx-auto px-4 py-8">
+            <div class="flex flex-col md:flex-row justify-between items-center gap-4">
+                <div class="text-slate-600 dark:text-slate-400">
+                    <span>&copy; {{.CurrentYear}} {{.Config.Title}}</span>
+                    {{if .Config.Author.Name}}
+                    <span class="mx-2">&middot;</span>
+                    <span>By {{.Config.Author.Name}}</span>
+                    {{end}}
+                </div>
+                <div class="flex gap-6">
+                    <a href="/rss.xml" class="text-slate-500 hover:text-indigo-600 dark:text-slate-400 dark:hover:text-indigo-400 transition-colors text-sm">
+                        RSS Feed
+                    </a>
+                </div>
+            </div>
+        </div>
+    </footer>
+{{end}}

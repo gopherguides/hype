@@ -1,0 +1,8 @@
+{{define "partials/footer"}}
+    <footer class="border-t border-gray-200 dark:border-gray-700 mt-auto">
+        <div class="max-w-4xl mx-auto px-4 py-6 text-center text-gray-600 dark:text-gray-400">
+            <p>&copy; {{.CurrentYear}} {{.Config.Title}}. All rights reserved.</p>
+            {{if .Config.Author.Name}}<p class="mt-2">By {{.Config.Author.Name}}</p>{{end}}
+        </div>
+    </footer>
+{{end}}

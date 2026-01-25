@@ -1,0 +1,6 @@
+name: "Developer"
+description: "Code-focused theme with enhanced syntax highlighting and monospace aesthetics"
+author: "Gopher Guides"
+version: "1.0.0"
+repository: "https://github.com/gopherguides/hype-theme-developer"
+preview: "https://developer-demo.gopherguides.com"

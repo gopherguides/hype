@@ -1,0 +1,6 @@
+name: "Suspended"
+description: "A minimal, typography-focused theme for technical writing"
+author: "Gopher Guides"
+version: "1.0.0"
+repository: "https://github.com/gopherguides/hype-theme-suspended"
+preview: "https://suspended-demo.gopherguides.com"

@@ -1,0 +1,21 @@
+{{define "baseof"}}
+<!DOCTYPE html>
+<html lang="en" class="dark">
+<head>
+    {{template "partials/head" .}}
+    {{template "partials/seo" .}}
+    {{template "partials/styles" .}}
+    {{block "head" .}}{{end}}
+</head>
+<body class="bg-gray-950 text-gray-100 min-h-screen flex flex-col font-mono">
+    {{template "partials/header" .}}
+
+    <main class="flex-grow max-w-5xl mx-auto px-4 py-8 w-full">
+        {{block "main" .}}{{end}}
+    </main>
+
+    {{template "partials/footer" .}}
+    {{template "partials/scripts" .}}
+</body>
+</html>
+{{end}}
