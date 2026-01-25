@@ -24,6 +24,8 @@ hype export -format=markdown -f hype.md > ../README.md
 
 You can also use a [github action](#using-github-actions-to-update-your-readme) to automatically update your README as well.
 
+<include src="docs/html-export.md"></include>
+
 <include src="docs/quickstart/hype.md"></include>
 
 # README Source
