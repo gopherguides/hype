@@ -269,6 +269,12 @@ func (s *Server) watchLoop(ctx context.Context, watcher *fsnotify.Watcher, pwd s
 				return
 			}
 
+			if event.Has(fsnotify.Create) {
+				if info, err := os.Stat(event.Name); err == nil && info.IsDir() {
+					_ = s.addWatchRecursive(watcher, event.Name)
+				}
+			}
+
 			if !s.shouldWatch(event.Name, pwd) {
 				continue
 			}
@@ -290,12 +296,6 @@ func (s *Server) watchLoop(ctx context.Context, watcher *fsnotify.Watcher, pwd s
 				}
 				debounceTimer = time.AfterFunc(s.config.DebounceDelay, rebuild)
 				mu.Unlock()
-
-				if event.Has(fsnotify.Create) {
-					if info, err := os.Stat(event.Name); err == nil && info.IsDir() {
-						_ = s.addWatchRecursive(watcher, event.Name)
-					}
-				}
 			}
 		case err, ok := <-watcher.Errors:
 			if !ok {
