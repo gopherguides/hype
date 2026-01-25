@@ -11,13 +11,14 @@ import (
 	texttemplate "text/template"
 )
 
-//go:embed templates/*
+//go:embed templates/* templates/partials/*
 var defaultTemplates embed.FS
 
 type Renderer struct {
 	blog         *Blog
-	htmlTemplates *template.Template
-	xmlTemplates  *texttemplate.Template
+	singleTmpl   *template.Template
+	listTmpl     *template.Template
+	xmlTemplates *texttemplate.Template
 }
 
 func NewRenderer(b *Blog) *Renderer {
@@ -35,16 +36,24 @@ func NewRenderer(b *Blog) *Renderer {
 		"join": strings.Join,
 	}
 
-	htmlTmpl := template.New("").Funcs(htmlFuncMap)
-	htmlTmpl, _ = htmlTmpl.ParseFS(defaultTemplates, "templates/*.html")
+	baseTmpl := template.New("").Funcs(htmlFuncMap)
+	baseTmpl, _ = baseTmpl.ParseFS(defaultTemplates, "templates/partials/*.html")
+	baseTmpl, _ = baseTmpl.ParseFS(defaultTemplates, "templates/baseof.html")
+
+	singleTmpl, _ := baseTmpl.Clone()
+	singleTmpl, _ = singleTmpl.ParseFS(defaultTemplates, "templates/single.html")
+
+	listTmpl, _ := baseTmpl.Clone()
+	listTmpl, _ = listTmpl.ParseFS(defaultTemplates, "templates/list.html")
 
 	xmlTmpl := texttemplate.New("").Funcs(xmlFuncMap)
 	xmlTmpl, _ = xmlTmpl.ParseFS(defaultTemplates, "templates/*.xml")
 
 	return &Renderer{
 		blog:         b,
-		htmlTemplates: htmlTmpl,
-		xmlTemplates:  xmlTmpl,
+		singleTmpl:   singleTmpl,
+		listTmpl:     listTmpl,
+		xmlTemplates: xmlTmpl,
 	}
 }
 
@@ -69,7 +78,7 @@ func (r *Renderer) RenderIndex(outDir string) error {
 	data := r.newPageData()
 
 	var buf bytes.Buffer
-	if err := r.htmlTemplates.ExecuteTemplate(&buf, "list.html", data); err != nil {
+	if err := r.listTmpl.ExecuteTemplate(&buf, "baseof", data); err != nil {
 		return fmt.Errorf("failed to execute list template: %w", err)
 	}
 
@@ -82,7 +91,7 @@ func (r *Renderer) RenderArticle(outDir string, article Article) error {
 	data.Article = &article
 
 	var buf bytes.Buffer
-	if err := r.htmlTemplates.ExecuteTemplate(&buf, "single.html", data); err != nil {
+	if err := r.singleTmpl.ExecuteTemplate(&buf, "baseof", data); err != nil {
 		return fmt.Errorf("failed to execute single template: %w", err)
 	}
 

@@ -1,0 +1,54 @@
+{{define "partials/seo"}}
+    {{if .Article}}
+    <!-- Article SEO -->
+    <meta name="description" content="{{if .Article.SEODescription}}{{.Article.SEODescription}}{{else}}{{.Config.Description}}{{end}}">
+    <link rel="canonical" href="{{.Config.BaseURL}}{{.Article.URL}}">
+
+    <!-- OpenGraph -->
+    <meta property="og:type" content="article">
+    <meta property="og:title" content="{{.Article.Title}}">
+    <meta property="og:description" content="{{if .Article.SEODescription}}{{.Article.SEODescription}}{{else}}{{.Config.Description}}{{end}}">
+    <meta property="og:url" content="{{.Config.BaseURL}}{{.Article.URL}}">
+    {{if .Article.OGImage}}<meta property="og:image" content="{{.Config.BaseURL}}{{.Article.OGImage}}">{{else if .Config.SEO.OGImage}}<meta property="og:image" content="{{.Config.BaseURL}}{{.Config.SEO.OGImage}}">{{end}}
+
+    <!-- Twitter Card -->
+    <meta name="twitter:card" content="{{.Config.SEO.TwitterCard}}">
+    <meta name="twitter:title" content="{{.Article.Title}}">
+    <meta name="twitter:description" content="{{if .Article.SEODescription}}{{.Article.SEODescription}}{{else}}{{.Config.Description}}{{end}}">
+    {{if .Config.Author.Twitter}}<meta name="twitter:creator" content="{{.Config.Author.Twitter}}">{{end}}
+    {{if .Article.OGImage}}<meta name="twitter:image" content="{{.Config.BaseURL}}{{.Article.OGImage}}">{{else if .Config.SEO.OGImage}}<meta name="twitter:image" content="{{.Config.BaseURL}}{{.Config.SEO.OGImage}}">{{end}}
+
+    <!-- JSON-LD -->
+    <script type="application/ld+json">
+    {
+        "@context": "https://schema.org",
+        "@type": "Article",
+        "headline": "{{.Article.Title}}",
+        "author": {
+            "@type": "Person",
+            "name": "{{if .Article.Author}}{{.Article.Author}}{{else}}{{.Config.Author.Name}}{{end}}"
+        },
+        "datePublished": "{{.Article.ISODate}}",
+        "publisher": {
+            "@type": "Organization",
+            "name": "{{.Config.Title}}"
+        }
+    }
+    </script>
+    {{else}}
+    <!-- Site SEO -->
+    <meta name="description" content="{{.Config.Description}}">
+    <link rel="canonical" href="{{.Config.BaseURL}}/">
+
+    <meta property="og:type" content="website">
+    <meta property="og:title" content="{{.Config.Title}}">
+    <meta property="og:description" content="{{.Config.Description}}">
+    <meta property="og:url" content="{{.Config.BaseURL}}/">
+    {{if .Config.SEO.OGImage}}<meta property="og:image" content="{{.Config.BaseURL}}{{.Config.SEO.OGImage}}">{{end}}
+
+    <meta name="twitter:card" content="{{.Config.SEO.TwitterCard}}">
+    <meta name="twitter:title" content="{{.Config.Title}}">
+    <meta name="twitter:description" content="{{.Config.Description}}">
+    {{if .Config.Author.Twitter}}<meta name="twitter:creator" content="{{.Config.Author.Twitter}}">{{end}}
+    {{end}}
+{{end}}

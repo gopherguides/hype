@@ -1,0 +1,14 @@
+{{define "partials/header"}}
+    <header class="border-b border-gray-200 dark:border-gray-700">
+        <nav class="max-w-4xl mx-auto px-4 py-4 flex justify-between items-center">
+            <a href="/" class="text-xl font-bold hover:text-blue-600 dark:hover:text-blue-400">
+                {{.Config.Title}}
+            </a>
+            <div class="flex gap-4">
+                <a href="/rss.xml" class="text-gray-600 dark:text-gray-400 hover:text-blue-600 dark:hover:text-blue-400">
+                    RSS
+                </a>
+            </div>
+        </nav>
+    </header>
+{{end}}

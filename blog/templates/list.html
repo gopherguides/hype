@@ -1,83 +1,4 @@
-<!DOCTYPE html>
-<html lang="en" class="scroll-smooth">
-<head>
-    <meta charset="UTF-8">
-    <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <title>{{.Config.Title}}</title>
-
-    <meta name="description" content="{{.Config.Description}}">
-    <link rel="canonical" href="{{.Config.BaseURL}}/">
-
-    <meta property="og:type" content="website">
-    <meta property="og:title" content="{{.Config.Title}}">
-    <meta property="og:description" content="{{.Config.Description}}">
-    <meta property="og:url" content="{{.Config.BaseURL}}/">
-    {{if .Config.SEO.OGImage}}<meta property="og:image" content="{{.Config.BaseURL}}{{.Config.SEO.OGImage}}">{{end}}
-
-    <meta name="twitter:card" content="{{.Config.SEO.TwitterCard}}">
-    <meta name="twitter:title" content="{{.Config.Title}}">
-    <meta name="twitter:description" content="{{.Config.Description}}">
-    {{if .Config.Author.Twitter}}<meta name="twitter:creator" content="{{.Config.Author.Twitter}}">{{end}}
-
-    <link rel="alternate" type="application/rss+xml" title="{{.Config.Title}}" href="{{.Config.BaseURL}}/rss.xml">
-
-    <!-- Favicon - custom favicon.svg/ico from static/ will override this default -->
-    <link rel="icon" type="image/svg+xml" href="/favicon.svg">
-    <link rel="icon" type="image/png" sizes="32x32" href="/favicon-32x32.png">
-    <link rel="icon" type="image/png" sizes="16x16" href="/favicon-16x16.png">
-    <link rel="apple-touch-icon" sizes="180x180" href="/apple-touch-icon.png">
-
-    <script src="https://cdn.tailwindcss.com"></script>
-    <script>
-        tailwind.config = {
-            darkMode: 'media',
-        }
-    </script>
-    <script src="https://cdn.tailwindcss.com?plugins=typography"></script>
-
-    <style type="text/css">
-        {{.HighlightCSS}}
-    </style>
-
-    <style>
-        .prose pre {
-            background-color: #272822;
-            padding: 1rem;
-            border-radius: 0.5rem;
-            overflow-x: auto;
-        }
-        .prose code {
-            background-color: #f3f4f6;
-            padding: 0.125rem 0.25rem;
-            border-radius: 0.25rem;
-            font-size: 0.875em;
-        }
-        @media (prefers-color-scheme: dark) {
-            .prose code {
-                background-color: #374151;
-            }
-        }
-        .prose pre code {
-            background-color: transparent;
-            padding: 0;
-        }
-    </style>
-</head>
-<body class="bg-white dark:bg-gray-900 text-gray-900 dark:text-gray-100 min-h-screen flex flex-col">
-    <header class="border-b border-gray-200 dark:border-gray-700">
-        <nav class="max-w-4xl mx-auto px-4 py-4 flex justify-between items-center">
-            <a href="/" class="text-xl font-bold hover:text-blue-600 dark:hover:text-blue-400">
-                {{.Config.Title}}
-            </a>
-            <div class="flex gap-4">
-                <a href="/rss.xml" class="text-gray-600 dark:text-gray-400 hover:text-blue-600 dark:hover:text-blue-400">
-                    RSS
-                </a>
-            </div>
-        </nav>
-    </header>
-
-    <main class="flex-grow max-w-4xl mx-auto px-4 py-8 w-full">
+{{define "main"}}
         <div class="mb-8">
             <h1 class="text-3xl font-bold mb-2">{{.Config.Title}}</h1>
             <p class="text-gray-600 dark:text-gray-400">{{.Config.Description}}</p>
@@ -122,13 +43,4 @@
         {{else}}
         <p class="text-gray-600 dark:text-gray-400">No articles yet.</p>
         {{end}}
-    </main>
-
-    <footer class="border-t border-gray-200 dark:border-gray-700 mt-auto">
-        <div class="max-w-4xl mx-auto px-4 py-6 text-center text-gray-600 dark:text-gray-400">
-            <p>&copy; {{.CurrentYear}} {{.Config.Title}}. All rights reserved.</p>
-            {{if .Config.Author.Name}}<p class="mt-2">By {{.Config.Author.Name}}</p>{{end}}
-        </div>
-    </footer>
-</body>
-</html>
+{{end}}
