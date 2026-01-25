@@ -11,6 +11,7 @@ import (
 	"testing"
 	"time"
 
+	"github.com/gopherguides/hype/themes"
 	"github.com/stretchr/testify/require"
 )
 
@@ -28,12 +29,17 @@ func TestDefaultConfig(t *testing.T) {
 	r.NotEmpty(cfg.ExcludeGlobs)
 }
 
-func TestWrapHTML(t *testing.T) {
+func TestServer_wrapHTML(t *testing.T) {
 	r := require.New(t)
+
+	cfg := DefaultConfig()
+	cfg.Theme = "github"
+	srv := New(cfg, nil)
 
 	content := "<h1>Test</h1><p>Hello World</p>"
 
-	html := wrapHTML(content, "github")
+	html, err := srv.wrapHTML(content)
+	r.NoError(err)
 
 	r.Contains(html, "<!DOCTYPE html>")
 	r.Contains(html, "<title>Hype Preview</title>")
@@ -42,49 +48,95 @@ func TestWrapHTML(t *testing.T) {
 	r.Contains(html, "WebSocket")
 }
 
-func TestWrapHTML_DarkTheme(t *testing.T) {
+func TestServer_wrapHTML_DifferentTheme(t *testing.T) {
 	r := require.New(t)
+
+	cfg := DefaultConfig()
+	cfg.Theme = "github-dark"
+	srv := New(cfg, nil)
 
 	content := "<h1>Test</h1>"
 
-	html := wrapHTML(content, "github-dark")
+	html, err := srv.wrapHTML(content)
+	r.NoError(err)
 
-	r.Contains(html, "background: #0d1117")
-	r.Contains(html, "color: #c9d1d9")
+	r.Contains(html, "<!DOCTYPE html>")
+	r.Contains(html, content)
 }
 
-func TestGetThemeCSS(t *testing.T) {
+func TestServer_wrapHTML_CustomCSS(t *testing.T) {
+	r := require.New(t)
+
+	tmpDir := t.TempDir()
+	cssFile := filepath.Join(tmpDir, "custom.css")
+	err := os.WriteFile(cssFile, []byte("body { color: red; }"), 0644)
+	r.NoError(err)
+
+	cfg := DefaultConfig()
+	cfg.CustomCSS = cssFile
+	srv := New(cfg, nil)
+
+	content := "<h1>Test</h1>"
+
+	html, err := srv.wrapHTML(content)
+	r.NoError(err)
+
+	r.Contains(html, "body { color: red; }")
+	r.Contains(html, content)
+}
+
+func TestServer_getCSS(t *testing.T) {
 	tests := []struct {
-		name     string
-		theme    string
-		contains []string
+		name      string
+		theme     string
+		customCSS string
+		wantErr   bool
 	}{
 		{
-			name:     "github theme",
-			theme:    "github",
-			contains: []string{"background: #fff", "color: #24292f"},
+			name:    "builtin github theme",
+			theme:   "github",
+			wantErr: false,
 		},
 		{
-			name:     "github-dark theme",
-			theme:    "github-dark",
-			contains: []string{"background: #0d1117", "color: #c9d1d9"},
+			name:    "builtin github-dark theme",
+			theme:   "github-dark",
+			wantErr: false,
 		},
 		{
-			name:     "unknown theme defaults to github",
-			theme:    "unknown",
-			contains: []string{"background: #fff", "color: #24292f"},
+			name:    "unknown theme returns error",
+			theme:   "unknown",
+			wantErr: true,
 		},
 	}
 
 	for _, tc := range tests {
 		t.Run(tc.name, func(t *testing.T) {
 			r := require.New(t)
-			css := getThemeCSS(tc.theme)
-			for _, want := range tc.contains {
-				r.Contains(css, want)
+
+			cfg := Config{Theme: tc.theme, CustomCSS: tc.customCSS}
+			srv := New(cfg, nil)
+
+			css, err := srv.getCSS()
+			if tc.wantErr {
+				r.Error(err)
+			} else {
+				r.NoError(err)
+				r.NotEmpty(css)
 			}
 		})
 	}
+}
+
+func TestThemesIntegration(t *testing.T) {
+	r := require.New(t)
+
+	availableThemes := themes.ListThemes()
+	r.NotEmpty(availableThemes)
+	r.Contains(availableThemes, "github")
+	r.Contains(availableThemes, "github-dark")
+
+	r.True(themes.IsBuiltinTheme("github"))
+	r.False(themes.IsBuiltinTheme("nonexistent"))
 }
 
 func TestServer_handlePreview(t *testing.T) {

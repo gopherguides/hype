@@ -16,6 +16,7 @@ import (
 
 	"github.com/gopherguides/hype"
 	"github.com/gopherguides/hype/preview"
+	"github.com/gopherguides/hype/themes"
 	"github.com/markbates/cleo"
 	"github.com/markbates/plugins"
 )
@@ -36,6 +37,8 @@ type Preview struct {
 	Verbose       bool
 	OpenBrowser   bool
 	Theme         string
+	CustomCSS     string
+	ListThemes    bool
 	Timeout       time.Duration
 
 	Parser *hype.Parser
@@ -101,14 +104,17 @@ Usage: hype preview [options]
 
 Starts a live preview server with file watching and auto-reload.
 
+Available themes: ` + strings.Join(themes.ListThemes(), ", ") + `
+
 Examples:
     hype preview -f hype.md
-    hype preview -f hype.md -port 8080
+    hype preview -f hype.md -port 8080 -theme solarized-dark
+    hype preview -f hype.md -css ./custom.css
     hype preview -f hype.md -w ./src -w ./images
     hype preview -f hype.md -e md,html,go,png,jpg
     hype preview -f hype.md -i "**/*.md" -i "**/*.go"
     hype preview -f hype.md -x "**/vendor/**" -x "**/tmp/**"
-    hype preview -f hype.md -open -theme github-dark
+    hype preview -themes
 `
 
 	if err := cmd.validate(); err != nil {
@@ -141,7 +147,9 @@ Examples:
 	cmd.flags.BoolVar(&cmd.Verbose, "v", false, "verbose output (log file changes)")
 	cmd.flags.BoolVar(&cmd.Verbose, "verbose", false, "verbose output (log file changes)")
 	cmd.flags.BoolVar(&cmd.OpenBrowser, "open", false, "auto-open browser on start")
-	cmd.flags.StringVar(&cmd.Theme, "theme", "github", "preview theme (github, github-dark)")
+	cmd.flags.StringVar(&cmd.Theme, "theme", themes.DefaultTheme, "preview theme name")
+	cmd.flags.StringVar(&cmd.CustomCSS, "css", "", "path to custom CSS file (overrides -theme)")
+	cmd.flags.BoolVar(&cmd.ListThemes, "themes", false, "list available themes and exit")
 	cmd.flags.DurationVar(&cmd.Timeout, "timeout", 0, "timeout for document execution (0 = no timeout)")
 
 	cmd.flags.Usage = func() {
@@ -171,12 +179,25 @@ func (cmd *Preview) Main(ctx context.Context, pwd string, args []string) error {
 		return err
 	}
 
+	if cmd.ListThemes {
+		_, _ = fmt.Fprintln(cmd.Stdout(), "Available themes:")
+		for _, t := range themes.ListThemes() {
+			_, _ = fmt.Fprintf(cmd.Stdout(), "  %s\n", t)
+		}
+		return nil
+	}
+
+	if cmd.Theme != "" && cmd.CustomCSS == "" && !themes.IsBuiltinTheme(cmd.Theme) {
+		return fmt.Errorf("unknown theme: %s (use -themes to list available themes)", cmd.Theme)
+	}
+
 	cfg := preview.DefaultConfig()
 	cfg.File = cmd.File
 	cfg.Port = cmd.Port
 	cfg.Verbose = cmd.Verbose
 	cfg.OpenBrowser = cmd.OpenBrowser
 	cfg.Theme = cmd.Theme
+	cfg.CustomCSS = cmd.CustomCSS
 	cfg.DebounceDelay = cmd.DebounceDelay
 
 	if len(cmd.WatchDirs) > 0 {

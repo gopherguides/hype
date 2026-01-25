@@ -12,6 +12,7 @@ import (
 	"github.com/bmatcuk/doublestar/v4"
 	"github.com/fsnotify/fsnotify"
 	"github.com/gopherguides/hype"
+	"github.com/gopherguides/hype/themes"
 )
 
 var defaultExtensions = []string{
@@ -42,6 +43,7 @@ type Config struct {
 	Verbose        bool
 	OpenBrowser    bool
 	Theme          string
+	CustomCSS      string
 }
 
 func DefaultConfig() Config {
@@ -52,7 +54,7 @@ func DefaultConfig() Config {
 		Extensions:    defaultExtensions,
 		ExcludeGlobs:  defaultExcludes,
 		DebounceDelay: 300 * time.Millisecond,
-		Theme:         "github",
+		Theme:         themes.DefaultTheme,
 	}
 }
 
@@ -161,7 +163,11 @@ func (s *Server) build(ctx context.Context, pwd string) error {
 		return fmt.Errorf("execute error: %w", err)
 	}
 
-	s.currentHTML = wrapHTML(doc.String(), s.config.Theme)
+	html, err := s.wrapHTML(doc.String())
+	if err != nil {
+		return fmt.Errorf("wrap HTML error: %w", err)
+	}
+	s.currentHTML = html
 	return nil
 }
 
@@ -344,41 +350,26 @@ func (s *Server) shouldWatch(path string, pwd string) bool {
 	return true
 }
 
-func wrapHTML(content, theme string) string {
-	themeCSS := getThemeCSS(theme)
+func (s *Server) wrapHTML(content string) (string, error) {
+	css, err := s.getCSS()
+	if err != nil {
+		return "", err
+	}
+
 	return fmt.Sprintf(`<!DOCTYPE html>
-<html>
+<html lang="en">
 <head>
-    <meta charset="utf-8">
-    <meta name="viewport" content="width=device-width, initial-scale=1">
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
     <title>Hype Preview</title>
     <style>
-        %s
-        body {
-            max-width: 900px;
-            margin: 0 auto;
-            padding: 2rem;
-            font-family: -apple-system, BlinkMacSystemFont, "Segoe UI", Helvetica, Arial, sans-serif;
-            line-height: 1.6;
-        }
-        pre {
-            background: #f6f8fa;
-            padding: 1rem;
-            border-radius: 6px;
-            overflow-x: auto;
-        }
-        code {
-            font-family: "SFMono-Regular", Consolas, "Liberation Mono", Menlo, monospace;
-            font-size: 0.9em;
-        }
-        img {
-            max-width: 100%%;
-            height: auto;
-        }
+%s
     </style>
 </head>
 <body>
+    <article class="markdown-body">
 %s
+    </article>
 <script>
 (function() {
     var ws = new WebSocket('ws://' + location.host + '/_livereload');
@@ -399,26 +390,12 @@ func wrapHTML(content, theme string) string {
 })();
 </script>
 </body>
-</html>`, themeCSS, content)
+</html>`, css, content), nil
 }
 
-func getThemeCSS(theme string) string {
-	switch theme {
-	case "github-dark":
-		return `
-        body { background: #0d1117; color: #c9d1d9; }
-        pre { background: #161b22; }
-        a { color: #58a6ff; }
-        h1, h2, h3, h4, h5, h6 { color: #c9d1d9; border-bottom-color: #21262d; }
-        `
-	case "github":
-		fallthrough
-	default:
-		return `
-        body { background: #fff; color: #24292f; }
-        pre { background: #f6f8fa; }
-        a { color: #0969da; }
-        h1, h2, h3, h4, h5, h6 { border-bottom: 1px solid #d0d7de; padding-bottom: 0.3em; }
-        `
+func (s *Server) getCSS() (string, error) {
+	if s.config.CustomCSS != "" {
+		return themes.LoadCustomCSS(s.config.CustomCSS)
 	}
+	return themes.GetCSS(s.config.Theme)
 }
