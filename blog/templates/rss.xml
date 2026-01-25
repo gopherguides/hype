@@ -1,0 +1,22 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<rss version="2.0" xmlns:atom="http://www.w3.org/2005/Atom">
+    <channel>
+        <title>{{.Config.Title}}</title>
+        <link>{{.Config.BaseURL}}/</link>
+        <description>{{.Config.Description}}</description>
+        <language>en-us</language>
+        <atom:link href="{{.Config.BaseURL}}/rss.xml" rel="self" type="application/rss+xml"/>
+        {{if .Config.Author.Name}}<managingEditor>{{if .Config.Author.Email}}{{.Config.Author.Email}} ({{.Config.Author.Name}}){{else}}{{.Config.Author.Name}}{{end}}</managingEditor>{{end}}
+        {{range .Articles}}
+        <item>
+            <title>{{.Title}}</title>
+            <link>{{$.Config.BaseURL}}{{.URL}}</link>
+            <description>{{if .SEODescription}}{{.SEODescription}}{{else}}{{.Title}}{{end}}</description>
+            <pubDate>{{.Published.Format "Mon, 02 Jan 2006 15:04:05 -0700"}}</pubDate>
+            <guid isPermaLink="true">{{$.Config.BaseURL}}{{.URL}}</guid>
+            {{if .Author}}<author>{{.Author}}</author>{{end}}
+            {{range .Tags}}<category>{{.}}</category>{{end}}
+        </item>
+        {{end}}
+    </channel>
+</rss>
