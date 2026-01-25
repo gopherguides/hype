@@ -5,9 +5,12 @@ import (
 	"flag"
 	"fmt"
 	"io"
+	"net"
 	"net/http"
 	"os"
 	"path/filepath"
+	"strconv"
+	"strings"
 	"sync"
 	"time"
 
@@ -296,15 +299,48 @@ Example:
 		}
 	}
 
-	fmt.Fprintf(cmd.Stdout(), "Serving %s at http://localhost%s\n", publicDir, addr)
+	// Find an available port
+	finalAddr, triedPorts := findAvailablePort(addr)
+	if len(triedPorts) > 0 {
+		fmt.Fprintf(cmd.Stdout(), "Ports in use: %s\n", strings.Join(triedPorts, ", "))
+	}
+
+	fmt.Fprintf(cmd.Stdout(), "Serving %s at http://localhost%s\n", publicDir, finalAddr)
 	fmt.Fprintf(cmd.Stdout(), "Press Ctrl+C to stop\n")
 
 	server := &http.Server{
-		Addr:    addr,
+		Addr:    finalAddr,
 		Handler: http.FileServer(http.Dir(publicDir)),
 	}
 
 	return server.ListenAndServe()
+}
+
+func findAvailablePort(addr string) (string, []string) {
+	var triedPorts []string
+
+	// Parse the port from addr (e.g., ":3000" -> 3000)
+	port := 3000
+	if strings.HasPrefix(addr, ":") {
+		if p, err := strconv.Atoi(addr[1:]); err == nil {
+			port = p
+		}
+	}
+
+	maxAttempts := 100
+	for i := 0; i < maxAttempts; i++ {
+		testAddr := fmt.Sprintf(":%d", port)
+		ln, err := net.Listen("tcp", testAddr)
+		if err == nil {
+			ln.Close()
+			return testAddr, triedPorts
+		}
+		triedPorts = append(triedPorts, strconv.Itoa(port))
+		port++
+	}
+
+	// If we couldn't find a port after maxAttempts, return the last tried
+	return fmt.Sprintf(":%d", port), triedPorts
 }
 
 func (cmd *Blog) runNew(ctx context.Context, pwd string, args []string) error {
