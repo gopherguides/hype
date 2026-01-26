@@ -177,10 +177,16 @@ func (s *Server) build(ctx context.Context, pwd string) error {
 	fileDir := filepath.Dir(s.config.File)
 	fileName := filepath.Base(s.config.File)
 
-	var parserFS = os.DirFS(pwd)
-	if fileDir != "." && fileDir != "" {
-		parserFS = os.DirFS(filepath.Join(pwd, fileDir))
+	var rootDir string
+	if filepath.IsAbs(fileDir) {
+		rootDir = fileDir
+	} else if fileDir != "." && fileDir != "" {
+		rootDir = filepath.Join(pwd, fileDir)
+	} else {
+		rootDir = pwd
 	}
+
+	parserFS := os.DirFS(rootDir)
 
 	p := s.parser
 	if p == nil {
@@ -188,7 +194,7 @@ func (s *Server) build(ctx context.Context, pwd string) error {
 	} else {
 		p.FS = parserFS
 	}
-	p.Root = filepath.Join(pwd, fileDir)
+	p.Root = rootDir
 
 	doc, err := p.ParseFile(fileName)
 	if err != nil {
@@ -265,10 +271,22 @@ func (s *Server) startWatcher(ctx context.Context, pwd string) (*fsnotify.Watche
 		watchDirs = []string{"."}
 	}
 
+	fileDir := filepath.Dir(s.config.File)
+	if fileDir != "." && fileDir != "" {
+		if filepath.IsAbs(fileDir) {
+			watchDirs = []string{fileDir}
+		} else {
+			watchDirs = []string{fileDir}
+		}
+	}
+
 	for _, dir := range watchDirs {
 		absDir := dir
 		if !filepath.IsAbs(dir) {
 			absDir = filepath.Join(pwd, dir)
+		}
+		if s.config.Verbose {
+			s.stdout("Watching directory: %s\n", absDir)
 		}
 		if err := s.addWatchRecursive(watcher, absDir); err != nil {
 			_ = watcher.Close()
@@ -296,12 +314,18 @@ func (s *Server) addWatchRecursive(watcher *fsnotify.Watcher, dir string) error 
 		}
 		relPath = filepath.ToSlash(relPath)
 
+		// Don't skip the root directory we're explicitly watching
+		isRoot := relPath == "."
+
 		for _, pattern := range s.config.ExcludeGlobs {
 			if matched, _ := doublestar.Match(pattern, relPath); matched {
 				return filepath.SkipDir
 			}
-			if matched, _ := doublestar.Match(pattern, info.Name()); matched {
-				return filepath.SkipDir
+			// Only check directory name for non-root directories
+			if !isRoot {
+				if matched, _ := doublestar.Match(pattern, info.Name()); matched {
+					return filepath.SkipDir
+				}
 			}
 		}
 
@@ -394,9 +418,13 @@ func (s *Server) shouldWatch(path string, pwd string) bool {
 	}
 	relPath = filepath.ToSlash(relPath)
 
-	for _, pattern := range s.config.ExcludeGlobs {
-		if matched, _ := doublestar.Match(pattern, relPath); matched {
-			return false
+	// Only apply exclude patterns for paths within pwd (not starting with ..)
+	// Paths outside pwd shouldn't be subject to project-specific excludes
+	if !strings.HasPrefix(relPath, "..") {
+		for _, pattern := range s.config.ExcludeGlobs {
+			if matched, _ := doublestar.Match(pattern, relPath); matched {
+				return false
+			}
 		}
 	}
 
