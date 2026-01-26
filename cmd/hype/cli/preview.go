@@ -237,6 +237,15 @@ func (cmd *Preview) Main(ctx context.Context, pwd string, args []string) error {
 		cancel()
 	}()
 
+	if cmd.OpenBrowser {
+		cfg.OnReady = func(port int) {
+			go func() {
+				time.Sleep(100 * time.Millisecond)
+				_ = openBrowser(fmt.Sprintf("http://localhost:%d", port))
+			}()
+		}
+	}
+
 	srv := preview.New(cfg, cmd.Parser)
 	srv.SetOutput(
 		func(format string, args ...any) {
@@ -246,13 +255,6 @@ func (cmd *Preview) Main(ctx context.Context, pwd string, args []string) error {
 			_, _ = fmt.Fprintf(cmd.Stderr(), format, args...)
 		},
 	)
-
-	if cmd.OpenBrowser {
-		go func() {
-			time.Sleep(500 * time.Millisecond)
-			_ = openBrowser(fmt.Sprintf("http://localhost:%d", cfg.Port))
-		}()
-	}
 
 	return srv.Run(ctx, pwd)
 }

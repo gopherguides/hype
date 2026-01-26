@@ -13,6 +13,7 @@ import (
 	"github.com/bmatcuk/doublestar/v4"
 	"github.com/fsnotify/fsnotify"
 	"github.com/gopherguides/hype"
+	"github.com/gopherguides/hype/internal/portutil"
 	"github.com/gopherguides/hype/themes"
 )
 
@@ -54,6 +55,7 @@ type Config struct {
 	Theme         string
 	CustomCSS     string
 	Timeout       time.Duration
+	OnReady       func(port int)
 }
 
 func DefaultConfig() Config {
@@ -103,6 +105,12 @@ func (s *Server) SetOutput(stdout, stderr func(format string, args ...any)) {
 	s.stderr = stderr
 }
 
+func (s *Server) Port() int {
+	s.mu.RLock()
+	defer s.mu.RUnlock()
+	return s.config.Port
+}
+
 func (s *Server) Run(ctx context.Context, pwd string) error {
 	s.liveReload = NewLiveReload()
 	s.pwd = pwd
@@ -118,19 +126,35 @@ func (s *Server) Run(ctx context.Context, pwd string) error {
 	s.watcher = watcher
 	defer func() { _ = watcher.Close() }()
 
+	port, triedPorts := portutil.FindAvailablePort(s.config.Port)
+	if len(triedPorts) > 0 {
+		s.stdout("Ports in use: ")
+		for i, p := range triedPorts {
+			if i > 0 {
+				s.stdout(", ")
+			}
+			s.stdout("%d", p)
+		}
+		s.stdout("\n")
+	}
+	s.config.Port = port
+
 	mux := http.NewServeMux()
 	mux.HandleFunc("/_livereload", s.liveReload.HandleWebSocket)
 	mux.HandleFunc("/", s.handleRequest)
 
 	s.httpServer = &http.Server{
-		Addr:    fmt.Sprintf(":%d", s.config.Port),
+		Addr:    fmt.Sprintf(":%d", port),
 		Handler: mux,
 	}
 
 	serverErr := make(chan error, 1)
 	go func() {
-		s.stdout("Starting preview server at http://localhost:%d\n", s.config.Port)
+		s.stdout("Starting preview server at http://localhost:%d\n", port)
 		s.stdout("Watching for changes... (Press Ctrl+C to stop)\n")
+		if s.config.OnReady != nil {
+			s.config.OnReady(port)
+		}
 		if err := s.httpServer.ListenAndServe(); err != nil && err != http.ErrServerClosed {
 			serverErr <- err
 		}

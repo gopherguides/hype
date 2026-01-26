@@ -5,13 +5,11 @@ import (
 	"flag"
 	"fmt"
 	"io"
-	"net"
 	"net/http"
 	"os"
 	"os/exec"
 	"os/signal"
 	"path/filepath"
-	"strconv"
 	"strings"
 	"sync"
 	"syscall"
@@ -19,6 +17,7 @@ import (
 
 	"github.com/fsnotify/fsnotify"
 	"github.com/gopherguides/hype/blog"
+	"github.com/gopherguides/hype/internal/portutil"
 	"github.com/markbates/cleo"
 	"github.com/markbates/plugins"
 )
@@ -530,7 +529,7 @@ Example:
 		}
 	}
 
-	finalAddr, triedPorts := findAvailablePort(addr)
+	finalAddr, triedPorts := portutil.FindAvailable(addr)
 	if len(triedPorts) > 0 {
 		fmt.Fprintf(cmd.Stdout(), "Ports in use: %s\n", strings.Join(triedPorts, ", "))
 	}
@@ -734,31 +733,6 @@ func (cmd *Blog) watchLoop(ctx context.Context, watcher *fsnotify.Watcher, pwd s
 			fmt.Fprintf(cmd.Stderr(), "Watcher error: %v\n", err)
 		}
 	}
-}
-
-func findAvailablePort(addr string) (string, []string) {
-	var triedPorts []string
-
-	port := 3000
-	if strings.HasPrefix(addr, ":") {
-		if p, err := strconv.Atoi(addr[1:]); err == nil {
-			port = p
-		}
-	}
-
-	maxAttempts := 100
-	for i := 0; i < maxAttempts; i++ {
-		testAddr := fmt.Sprintf(":%d", port)
-		ln, err := net.Listen("tcp", testAddr)
-		if err == nil {
-			ln.Close()
-			return testAddr, triedPorts
-		}
-		triedPorts = append(triedPorts, strconv.Itoa(port))
-		port++
-	}
-
-	return fmt.Sprintf(":%d", port), triedPorts
 }
 
 func (cmd *Blog) runNew(ctx context.Context, pwd string, args []string) error {
