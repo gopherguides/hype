@@ -388,6 +388,51 @@ func TestServer_handleRequest_RootPath(t *testing.T) {
 	r.Contains(string(body), "Root Preview")
 }
 
+func TestServer_handleRequest_PathTraversal(t *testing.T) {
+	tests := []struct {
+		name       string
+		path       string
+		wantStatus int
+	}{
+		{
+			name:       "path traversal with ..",
+			path:       "/../../../etc/passwd",
+			wantStatus: http.StatusForbidden,
+		},
+		{
+			name:       "encoded path traversal",
+			path:       "/%2e%2e/etc/passwd",
+			wantStatus: http.StatusForbidden,
+		},
+		{
+			name:       "double dot in middle",
+			path:       "/foo/../../../etc/passwd",
+			wantStatus: http.StatusForbidden,
+		},
+	}
+
+	for _, tc := range tests {
+		t.Run(tc.name, func(t *testing.T) {
+			r := require.New(t)
+
+			tmpDir := t.TempDir()
+
+			cfg := DefaultConfig()
+			srv := New(cfg, nil)
+			srv.pwd = tmpDir
+			srv.currentHTML = "<html><body>Preview</body></html>"
+
+			req := httptest.NewRequest("GET", tc.path, nil)
+			w := httptest.NewRecorder()
+
+			srv.handleRequest(w, req)
+
+			resp := w.Result()
+			r.Equal(tc.wantStatus, resp.StatusCode)
+		})
+	}
+}
+
 func TestServer_Build_WithTimeout(t *testing.T) {
 	r := require.New(t)
 

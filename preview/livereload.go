@@ -43,9 +43,13 @@ func (lr *LiveReload) HandleWebSocket(w http.ResponseWriter, r *http.Request) {
 
 func (lr *LiveReload) Reload() {
 	lr.mu.RLock()
-	defer lr.mu.RUnlock()
-
+	clients := make([]*websocket.Conn, 0, len(lr.clients))
 	for client := range lr.clients {
+		clients = append(clients, client)
+	}
+	lr.mu.RUnlock()
+
+	for _, client := range clients {
 		_ = websocket.Message.Send(client, "reload")
 	}
 }

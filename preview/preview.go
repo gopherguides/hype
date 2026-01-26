@@ -196,9 +196,18 @@ func (s *Server) handleRequest(w http.ResponseWriter, r *http.Request) {
 		return
 	}
 
-	filePath := filepath.Join(s.pwd, filepath.Clean(r.URL.Path))
+	urlPath := strings.TrimPrefix(r.URL.Path, "/")
+	cleanPath := filepath.Clean(urlPath)
 
-	if !strings.HasPrefix(filePath, s.pwd) {
+	if strings.HasPrefix(cleanPath, "..") || strings.Contains(cleanPath, ".."+string(filepath.Separator)) {
+		http.Error(w, "Forbidden", http.StatusForbidden)
+		return
+	}
+
+	filePath := filepath.Join(s.pwd, cleanPath)
+
+	relPath, err := filepath.Rel(s.pwd, filePath)
+	if err != nil || strings.HasPrefix(relPath, "..") {
 		http.Error(w, "Forbidden", http.StatusForbidden)
 		return
 	}
@@ -261,6 +270,7 @@ func (s *Server) addWatchRecursive(watcher *fsnotify.Watcher, dir string) error 
 		if relPath == "" {
 			relPath = "."
 		}
+		relPath = filepath.ToSlash(relPath)
 
 		for _, pattern := range s.config.ExcludeGlobs {
 			if matched, _ := doublestar.Match(pattern, relPath); matched {
@@ -358,6 +368,7 @@ func (s *Server) shouldWatch(path string, pwd string) bool {
 	if err != nil {
 		relPath = path
 	}
+	relPath = filepath.ToSlash(relPath)
 
 	for _, pattern := range s.config.ExcludeGlobs {
 		if matched, _ := doublestar.Match(pattern, relPath); matched {

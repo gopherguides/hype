@@ -203,9 +203,13 @@ func (cmd *Preview) Main(ctx context.Context, pwd string, args []string) error {
 	}
 
 	if cmd.Extensions != "" {
-		cfg.Extensions = strings.Split(cmd.Extensions, ",")
-		for i, ext := range cfg.Extensions {
-			cfg.Extensions[i] = strings.TrimSpace(ext)
+		parts := strings.Split(cmd.Extensions, ",")
+		cfg.Extensions = make([]string, 0, len(parts))
+		for _, ext := range parts {
+			ext = strings.TrimSpace(ext)
+			if ext != "" {
+				cfg.Extensions = append(cfg.Extensions, ext)
+			}
 		}
 	}
 
