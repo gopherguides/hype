@@ -391,8 +391,9 @@ func (s *Server) shouldWatch(path string, pwd string) bool {
 	}
 
 	if len(s.config.Extensions) > 0 {
+		extLower := strings.ToLower(ext)
 		for _, e := range s.config.Extensions {
-			if ext == e {
+			if extLower == strings.ToLower(e) {
 				return true
 			}
 		}

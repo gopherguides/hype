@@ -203,6 +203,18 @@ func TestServer_shouldWatch(t *testing.T) {
 			path: "/project/file.xyz",
 			want: true,
 		},
+		{
+			name:       "case insensitive extension match uppercase",
+			path:       "/project/README.MD",
+			extensions: []string{"md", "go"},
+			want:       true,
+		},
+		{
+			name:       "case insensitive extension match mixed case",
+			path:       "/project/image.PNG",
+			extensions: []string{"png", "jpg"},
+			want:       true,
+		},
 	}
 
 	for _, tc := range tests {
