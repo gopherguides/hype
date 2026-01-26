@@ -240,8 +240,8 @@ hype preview -f hype.md -open
 # Different port
 hype preview -f hype.md -port 8080
 
-# Watch additional directories
-hype preview -f hype.md -w ./src -w ./images
+# Watch directories (include . to watch source file location)
+hype preview -f hype.md -w . -w ./src -w ./images
 
 # Filter by extensions
 hype preview -f hype.md -e md,html,go,png
