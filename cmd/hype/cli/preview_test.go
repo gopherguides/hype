@@ -265,3 +265,18 @@ func Test_Preview_WithPlugins(t *testing.T) {
 	r.Error(err)
 	r.Contains(err.Error(), "preview is nil")
 }
+
+func Test_Preview_Flags_Timeout(t *testing.T) {
+	r := require.New(t)
+
+	cmd := &Preview{}
+	var buf bytes.Buffer
+
+	flags, err := cmd.Flags(&buf)
+	r.NoError(err)
+
+	err = flags.Parse([]string{"-timeout", "30s"})
+	r.NoError(err)
+
+	r.Equal(30*time.Second, cmd.Timeout)
+}

@@ -6,6 +6,7 @@ import (
 	"net/http"
 	"os"
 	"path/filepath"
+	"strings"
 	"sync"
 	"time"
 
@@ -20,6 +21,15 @@ var defaultExtensions = []string{
 }
 
 var defaultExcludes = []string{
+	".git",
+	".hg",
+	".svn",
+	".idea",
+	".vscode",
+	"node_modules",
+	"vendor",
+	"tmp",
+	"__pycache__",
 	"**/.git/**",
 	"**/.hg/**",
 	"**/.svn/**",
@@ -32,18 +42,18 @@ var defaultExcludes = []string{
 }
 
 type Config struct {
-	File           string
-	Port           int
-	WatchDirs      []string
-	Extensions     []string
-	IncludeGlobs   []string
-	ExcludeGlobs   []string
-	PollInterval   time.Duration
-	DebounceDelay  time.Duration
-	Verbose        bool
-	OpenBrowser    bool
-	Theme          string
-	CustomCSS      string
+	File          string
+	Port          int
+	WatchDirs     []string
+	Extensions    []string
+	IncludeGlobs  []string
+	ExcludeGlobs  []string
+	DebounceDelay time.Duration
+	Verbose       bool
+	OpenBrowser   bool
+	Theme         string
+	CustomCSS     string
+	Timeout       time.Duration
 }
 
 func DefaultConfig() Config {
@@ -66,6 +76,7 @@ type Server struct {
 	liveReload *LiveReload
 
 	currentHTML string
+	pwd         string
 	mu          sync.RWMutex
 
 	stdout func(format string, args ...any)
@@ -94,6 +105,7 @@ func (s *Server) SetOutput(stdout, stderr func(format string, args ...any)) {
 
 func (s *Server) Run(ctx context.Context, pwd string) error {
 	s.liveReload = NewLiveReload()
+	s.pwd = pwd
 
 	if err := s.build(ctx, pwd); err != nil {
 		return fmt.Errorf("initial build failed: %w", err)
@@ -107,8 +119,8 @@ func (s *Server) Run(ctx context.Context, pwd string) error {
 	defer func() { _ = watcher.Close() }()
 
 	mux := http.NewServeMux()
-	mux.HandleFunc("/", s.handlePreview)
 	mux.HandleFunc("/_livereload", s.liveReload.HandleWebSocket)
+	mux.HandleFunc("/", s.handleRequest)
 
 	s.httpServer = &http.Server{
 		Addr:    fmt.Sprintf(":%d", s.config.Port),
@@ -159,7 +171,14 @@ func (s *Server) build(ctx context.Context, pwd string) error {
 		return fmt.Errorf("parse error: %w", err)
 	}
 
-	if err := doc.Execute(ctx); err != nil {
+	execCtx := ctx
+	if s.config.Timeout > 0 {
+		var cancel context.CancelFunc
+		execCtx, cancel = context.WithTimeout(ctx, s.config.Timeout)
+		defer cancel()
+	}
+
+	if err := doc.Execute(execCtx); err != nil {
 		return fmt.Errorf("execute error: %w", err)
 	}
 
@@ -169,6 +188,28 @@ func (s *Server) build(ctx context.Context, pwd string) error {
 	}
 	s.currentHTML = html
 	return nil
+}
+
+func (s *Server) handleRequest(w http.ResponseWriter, r *http.Request) {
+	if r.URL.Path == "/" || r.URL.Path == "" {
+		s.handlePreview(w, r)
+		return
+	}
+
+	filePath := filepath.Join(s.pwd, filepath.Clean(r.URL.Path))
+
+	if !strings.HasPrefix(filePath, s.pwd) {
+		http.Error(w, "Forbidden", http.StatusForbidden)
+		return
+	}
+
+	info, err := os.Stat(filePath)
+	if err != nil || info.IsDir() {
+		s.handlePreview(w, r)
+		return
+	}
+
+	http.ServeFile(w, r, filePath)
 }
 
 func (s *Server) handlePreview(w http.ResponseWriter, r *http.Request) {

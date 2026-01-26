@@ -311,9 +311,102 @@ func TestDefaultExtensions(t *testing.T) {
 func TestDefaultExcludes(t *testing.T) {
 	r := require.New(t)
 
+	r.Contains(defaultExcludes, ".git")
+	r.Contains(defaultExcludes, "node_modules")
+	r.Contains(defaultExcludes, "vendor")
 	r.Contains(defaultExcludes, "**/.git/**")
 	r.Contains(defaultExcludes, "**/node_modules/**")
 	r.Contains(defaultExcludes, "**/vendor/**")
+}
+
+func TestServer_handleRequest_StaticFile(t *testing.T) {
+	r := require.New(t)
+
+	tmpDir := t.TempDir()
+	imgFile := filepath.Join(tmpDir, "test.png")
+	err := os.WriteFile(imgFile, []byte("PNG content"), 0644)
+	r.NoError(err)
+
+	cfg := DefaultConfig()
+	srv := New(cfg, nil)
+	srv.pwd = tmpDir
+	srv.currentHTML = "<html><body>Preview</body></html>"
+
+	req := httptest.NewRequest("GET", "/test.png", nil)
+	w := httptest.NewRecorder()
+
+	srv.handleRequest(w, req)
+
+	resp := w.Result()
+	body, _ := io.ReadAll(resp.Body)
+
+	r.Equal(http.StatusOK, resp.StatusCode)
+	r.Equal("PNG content", string(body))
+}
+
+func TestServer_handleRequest_FallbackToPreview(t *testing.T) {
+	r := require.New(t)
+
+	tmpDir := t.TempDir()
+
+	cfg := DefaultConfig()
+	srv := New(cfg, nil)
+	srv.pwd = tmpDir
+	srv.currentHTML = "<html><body>Preview Content</body></html>"
+
+	req := httptest.NewRequest("GET", "/nonexistent.png", nil)
+	w := httptest.NewRecorder()
+
+	srv.handleRequest(w, req)
+
+	resp := w.Result()
+	body, _ := io.ReadAll(resp.Body)
+
+	r.Equal(http.StatusOK, resp.StatusCode)
+	r.Contains(string(body), "Preview Content")
+}
+
+func TestServer_handleRequest_RootPath(t *testing.T) {
+	r := require.New(t)
+
+	tmpDir := t.TempDir()
+
+	cfg := DefaultConfig()
+	srv := New(cfg, nil)
+	srv.pwd = tmpDir
+	srv.currentHTML = "<html><body>Root Preview</body></html>"
+
+	req := httptest.NewRequest("GET", "/", nil)
+	w := httptest.NewRecorder()
+
+	srv.handleRequest(w, req)
+
+	resp := w.Result()
+	body, _ := io.ReadAll(resp.Body)
+
+	r.Equal(http.StatusOK, resp.StatusCode)
+	r.Contains(string(body), "Root Preview")
+}
+
+func TestServer_Build_WithTimeout(t *testing.T) {
+	r := require.New(t)
+
+	tmpDir := t.TempDir()
+	mdFile := filepath.Join(tmpDir, "test.md")
+	err := os.WriteFile(mdFile, []byte("# Hello\n\nSimple content."), 0644)
+	r.NoError(err)
+
+	cfg := DefaultConfig()
+	cfg.File = "test.md"
+	cfg.Timeout = 5 * time.Second
+
+	srv := New(cfg, nil)
+
+	ctx := context.Background()
+	err = srv.build(ctx, tmpDir)
+	r.NoError(err)
+
+	r.Contains(srv.currentHTML, "Hello")
 }
 
 type stringSlice []string

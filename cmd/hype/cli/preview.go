@@ -32,7 +32,6 @@ type Preview struct {
 	Extensions    string
 	IncludeGlobs  stringSlice
 	ExcludeGlobs  stringSlice
-	PollInterval  time.Duration
 	DebounceDelay time.Duration
 	Verbose       bool
 	OpenBrowser   bool
@@ -141,7 +140,6 @@ Examples:
 	cmd.flags.Var(&cmd.IncludeGlobs, "include", "glob patterns to include (repeatable)")
 	cmd.flags.Var(&cmd.ExcludeGlobs, "x", "glob patterns to exclude (repeatable)")
 	cmd.flags.Var(&cmd.ExcludeGlobs, "exclude", "glob patterns to exclude (repeatable)")
-	cmd.flags.DurationVar(&cmd.PollInterval, "poll", 0, "use polling with specified interval (e.g., 500ms)")
 	cmd.flags.DurationVar(&cmd.DebounceDelay, "d", 300*time.Millisecond, "debounce delay before rebuild")
 	cmd.flags.DurationVar(&cmd.DebounceDelay, "debounce", 300*time.Millisecond, "debounce delay before rebuild")
 	cmd.flags.BoolVar(&cmd.Verbose, "v", false, "verbose output (log file changes)")
@@ -219,8 +217,8 @@ func (cmd *Preview) Main(ctx context.Context, pwd string, args []string) error {
 		cfg.ExcludeGlobs = append(cfg.ExcludeGlobs, cmd.ExcludeGlobs...)
 	}
 
-	if cmd.PollInterval > 0 {
-		cfg.PollInterval = cmd.PollInterval
+	if cmd.Timeout > 0 {
+		cfg.Timeout = cmd.Timeout
 	}
 
 	ctx, cancel := context.WithCancel(ctx)
