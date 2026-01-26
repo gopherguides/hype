@@ -26,6 +26,8 @@ You can also use a [github action](#using-github-actions-to-update-your-readme) 
 
 <include src="docs/html-export.md"></include>
 
+<include src="docs/preview.md"></include>
+
 <include src="docs/quickstart/hype.md"></include>
 
 # README Source
