@@ -23,10 +23,10 @@ The command is designed to be called by Marked 2 automatically:
 hype marked
 ```
 
-For manual testing:
+For manual testing (run from your document's directory):
 
 ```bash
-hype marked -f /path/to/file.md
+hype marked -f hype.md
 ```
 
 ## Flags Reference
@@ -57,7 +57,7 @@ hype marked -f /path/to/file.md
 
 ## Page Breaks
 
-Hype inserts `<!--BREAK-->` comments between pages, which Marked 2 can use for pagination in exported documents.
+Hype inserts page break comments between pages (`&lt;!--BREAK--&gt;`), which Marked 2 can use for pagination in exported documents.
 
 ## Troubleshooting
 
