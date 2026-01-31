@@ -201,8 +201,104 @@ hype export -format=markdown -f docs/guide.md -o output.md
 ### Export to HTML
 
 ```bash
+# Export with default GitHub theme
 hype export -format=html -f document.md > output.html
+
+# Export with a specific theme
+hype export -format=html -theme solarized-dark -f document.md -o output.html
+
+# Use custom CSS
+hype export -format=html -css ./my-styles.css -f document.md -o output.html
+
+# Raw HTML without styling
+hype export -format=html -no-css -f document.md
+
+# List available themes
+hype export -themes
 ```
+
+**Built-in Themes:** `github` (default, auto light/dark), `github-dark`, `solarized-light`, `solarized-dark`, `swiss`, `air`, `retro`
+
+| Flag | Description |
+|------|-------------|
+| `-theme <name>` | Select a built-in theme (default: `github`) |
+| `-css <path>` | Use a custom CSS file (overrides -theme) |
+| `-no-css` | Output raw HTML without styling |
+| `-themes` | List available themes and exit |
+
+### Live Preview
+
+Start a live preview server with automatic file watching and browser reload:
+
+```bash
+# Basic preview
+hype preview -f hype.md
+
+# Auto-open browser
+hype preview -f hype.md -open
+
+# Different port
+hype preview -f hype.md -port 8080
+
+# Watch directories (include . to watch source file location)
+hype preview -f hype.md -w . -w ./src -w ./images
+
+# Filter by extensions
+hype preview -f hype.md -e md,html,go,png
+
+# Include/exclude patterns
+hype preview -f hype.md -i "**/*.md" -x "**/vendor/**"
+
+# Use a theme
+hype preview -f hype.md -theme solarized-dark
+
+# List themes
+hype preview -themes
+```
+
+| Flag | Alias | Default | Description |
+|------|-------|---------|-------------|
+| `-f` | | `hype.md` | Source file to preview |
+| `-port` | | `3000` | Server port |
+| `-w` | `-watch` | | Directories to watch (repeatable) |
+| `-e` | `-ext` | | File extensions to watch (comma-separated) |
+| `-i` | `-include` | | Glob patterns to include (repeatable) |
+| `-x` | `-exclude` | | Glob patterns to exclude (repeatable) |
+| `-d` | `-debounce` | `300ms` | Debounce delay before rebuild |
+| `-v` | `-verbose` | `false` | Log file changes |
+| `-open` | | `false` | Auto-open browser |
+| `-theme` | | `github` | Preview theme |
+| `-css` | | | Custom CSS file |
+| `-themes` | | | List themes and exit |
+| `-timeout` | | `0` | Execution timeout |
+
+### Blog Generator
+
+Create static blogs with code execution:
+
+```bash
+# Create new blog
+hype blog init mysite
+cd mysite
+
+# Create article
+hype blog new hello-world
+
+# Build and serve
+hype blog build
+hype blog serve
+
+# Live reload during development
+hype blog serve --watch
+
+# Theme management
+hype blog theme list
+hype blog theme add developer
+```
+
+**Built-in Blog Themes:** `suspended` (minimal), `developer` (terminal-style), `cards` (grid layout)
+
+For full blog documentation, see [blog/README.md](https://github.com/gopherguides/hype/blob/main/blog/README.md).
 
 ## Best Practices
 
