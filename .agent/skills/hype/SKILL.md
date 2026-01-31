@@ -142,6 +142,31 @@ Embed YouTube videos in documentation.
 
 The `id` must be exactly 11 alphanumeric characters (the video ID from YouTube URLs).
 
+### Mermaid Diagrams - ASCII Art Diagrams
+
+Include [Mermaid](https://mermaid.js.org/) diagrams that render as ASCII art. Use standard fenced code blocks with the `mermaid` language:
+
+    ```mermaid
+    graph LR
+        A[Start] --> B{Decision}
+        B -->|Yes| C[Action]
+        B -->|No| D[End]
+    ```
+
+This renders as ASCII art in both HTML and Markdown output:
+
+```
+┌──────────┐     ┌─────────────┐
+│ A[Start] ├────►│ B{Decision} │
+└──────────┘     └─────────────┘
+```
+
+**Supported diagram types:**
+- Flowcharts/Graphs (`graph LR`, `graph TD`, `flowchart LR`, `flowchart TD`)
+- Sequence diagrams (`sequenceDiagram`)
+
+**Limitations:** Subgraphs, class diagrams, state diagrams, Gantt charts, and pie charts are not supported.
+
 ## Snippet System
 
 Snippets let you extract specific portions of code files. Mark regions with comments:
