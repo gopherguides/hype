@@ -114,6 +114,10 @@ func Test_Mermaid_String(t *testing.T) {
 	// Should be wrapped in pre/code tags
 	r.Contains(html, "<pre><code")
 	r.Contains(html, "</code></pre>")
+
+	// Should NOT have nested pre tags (bug fix verification)
+	r.NotContains(html, "<pre><pre>")
+	r.NotContains(html, "</pre></pre>")
 }
 
 func Test_Mermaid_MarshalJSON(t *testing.T) {

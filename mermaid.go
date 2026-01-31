@@ -6,9 +6,15 @@ import (
 	"encoding/json"
 	"fmt"
 	"html"
+	"strings"
+	"sync"
 
 	mermaidcmd "github.com/AlexanderGrooff/mermaid-ascii/cmd"
 )
+
+// mermaidMu protects concurrent access to the mermaid-ascii library
+// which uses package-level globals during rendering.
+var mermaidMu sync.Mutex
 
 // Mermaid is a tag that renders Mermaid diagrams as ASCII art.
 // It processes fenced code blocks with the "mermaid" language identifier
@@ -71,6 +77,8 @@ func (m *Mermaid) MD() string {
 }
 
 // String returns the HTML representation of the rendered Mermaid diagram.
+// It returns just the code element content since the parent pre element
+// is already provided by the markdown parser.
 func (m *Mermaid) String() string {
 	if m == nil {
 		return ""
@@ -83,7 +91,8 @@ func (m *Mermaid) String() string {
 		return ""
 	}
 
-	return fmt.Sprintf("<pre><code class=\"language-plain\">%s</code></pre>",
+	// Return just the code element - the parent pre is already in the DOM
+	return fmt.Sprintf("<code class=\"language-plain\">%s</code>",
 		html.EscapeString(m.Rendered))
 }
 
@@ -104,12 +113,14 @@ func (m *Mermaid) Execute(ctx context.Context, doc *Document) error {
 	m.Lock()
 	defer m.Unlock()
 
-	// Render the diagram using default config (nil)
-	// The mermaid-ascii library uses sensible defaults:
-	// - Unicode box-drawing characters
-	// - 5px horizontal/vertical padding between nodes
-	// - LR (left-to-right) direction
-	output, err := mermaidcmd.RenderDiagram(m.Source, nil)
+	// Trim whitespace from source to avoid parsing issues
+	source := strings.TrimSpace(m.Source)
+
+	// Serialize access to mermaid-ascii library which uses package-level globals
+	mermaidMu.Lock()
+	output, err := mermaidcmd.RenderDiagram(source, nil)
+	mermaidMu.Unlock()
+
 	if err != nil {
 		return m.WrapErr(fmt.Errorf("failed to render mermaid diagram: %w", err))
 	}
@@ -132,7 +143,7 @@ func NewMermaid(el *Element) (*Mermaid, error) {
 	// Extract the mermaid source from the element's children (text content)
 	m.Source = html.UnescapeString(el.Children().String())
 
-	if len(m.Source) == 0 {
+	if len(strings.TrimSpace(m.Source)) == 0 {
 		return nil, m.WrapErr(fmt.Errorf("mermaid diagram source is empty"))
 	}
 
