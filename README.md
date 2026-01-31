@@ -412,6 +412,202 @@ In Markdown export, they appear as plain code blocks (without language specifier
 
 ---
 
+# Marked 2 Integration
+
+Hype integrates with [Marked 2](https://marked2app.com/), a powerful Markdown preview and export application for macOS.
+
+## Overview
+
+The `marked` command outputs hype documents in a format compatible with Marked 2's custom preprocessor feature. This allows you to preview hype documents directly in Marked 2, including dynamic code execution and includes.
+
+## Setup
+
+
+1. Open Marked 2 Preferences
+1. Go to the "Advanced" tab
+1. In "Custom Processor", set the path to the hype binary and enable "Preprocessing"
+1. Enter the path: `/path/to/hype marked`
+
+
+Marked 2 will set the `MARKED_PATH` and `MARKED_ORIGIN` environment variables automatically, telling hype which file to process.
+
+## Basic Usage
+
+The command is designed to be called by Marked 2 automatically:
+
+```bash
+hype marked
+
+```
+
+For manual testing:
+
+```bash
+MARKED_PATH=/path/to/file.md hype marked
+
+```
+
+## Flags Reference
+
+| Flag | Default | Description |
+| ---- | ------- | ----------- |
+| 
+`-f`
+ |  | Optional file name to preview (if not provided, uses MARKED_PATH) |
+| 
+`-p`
+ | 
+`false`
+ | Parse only mode - parse the file but don't execute commands |
+| 
+`-timeout`
+ | 
+`30s`
+ | Timeout for command execution |
+| 
+`-context`
+ |  | A folder containing all chapters of a book, for example |
+| 
+`-section`
+ | 
+`0`
+ | Target section number |
+| 
+`-v`
+ | 
+`false`
+ | Enable verbose output for debugging |
+
+
+## Environment Variables
+
+| Variable | Description |
+| -------- | ----------- |
+| 
+`MARKED_PATH`
+ | Set by Marked 2 - the absolute path to the current file |
+| 
+`MARKED_ORIGIN`
+ | Set by Marked 2 - the directory of the file being previewed |
+
+
+## How It Works
+
+
+1. Marked 2 detects a file change and calls hype as a preprocessor
+1. Hype reads the file specified in `MARKED_PATH`
+1. Hype processes all includes, executes code blocks, and renders the document
+1. The processed Markdown is output to stdout
+1. Marked 2 renders the processed Markdown
+
+
+## Page Breaks
+
+Hype inserts " comments between pages, which Marked 2 can use for pagination in exported documents.
+
+## Troubleshooting
+
+**Document not updating:**
+- Ensure `MARKED_PATH` is being set correctly
+- Try running with `-v` flag for verbose output
+- Check that hype is installed and accessible
+
+**Timeout errors:**
+- Increase the timeout with `-timeout 30s` for documents with slow-running commands
+- Use `-p` to test parsing without execution
+
+**Includes not resolving:**
+- Verify all include paths are relative to the document
+- Check that the source files exist
+
+---
+
+# Slides
+
+Hype can generate web-based presentations from your markdown documents using the `slides` command.
+
+## Basic Usage
+
+```bash
+# Start slides server on default port (3000)
+hype slides -f presentation.md
+
+# Or specify the file as an argument
+hype slides presentation.md
+
+# Use a different port
+hype slides -port 8080 presentation.md
+
+```
+
+Once started, open your browser to `http://localhost:3000` to view your presentation.
+
+## Creating Slides
+
+Slides are created using the standard hype `<page>` element. Each `<page>` becomes a slide in your presentation:
+
+```markdown
+<page>
+
+# Slide 1
+
+Welcome to my presentation!
+
+</page>
+
+<page>
+
+# Slide 2
+
+## Key Points
+
+- Point one
+- Point two
+- Point three
+
+</page>
+
+<page>
+
+# Code Example
+
+<go src="example" run></go>
+
+</page>
+
+```
+
+## Features
+
+
+* **Live Code Execution**: Code blocks with `run` attribute execute and display output
+* **Syntax Highlighting**: Code blocks are automatically highlighted
+* **Navigation**: Use keyboard arrows or click to navigate between slides
+* **Web-based**: No additional software required - just a browser
+
+
+## Flags Reference
+
+| Flag | Default | Description |
+| ---- | ------- | ----------- |
+| 
+`-port`
+ | 
+`3000`
+ | Port for the slides server |
+
+
+## Tips
+
+
+1. **Keep slides focused**: One main idea per slide works best
+1. **Use code examples**: Hype's ability to execute code makes live demos easy
+1. **Test navigation**: Check that your slides flow well before presenting
+1. **Local images**: Images are served from the document's directory
+
+
+---
+
 # CLI Reference
 
 Hype provides several commands for working with dynamic markdown documents.
@@ -921,7 +1117,7 @@ $ go run .
 Hello World
 
 --------------------------------------------------------------------------------
-Go Version: go1.25.6
+Go Version: go1.25.5
 
 ```
 
@@ -954,7 +1150,7 @@ $ go run .
 Hello World
 
 --------------------------------------------------------------------------------
-Go Version: go1.25.6
+Go Version: go1.25.5
 
 ```
 
@@ -983,7 +1179,7 @@ $ go run .
 Hello World
 
 --------------------------------------------------------------------------------
-Go Version: go1.25.6
+Go Version: go1.25.5
 
 ```
 
@@ -1013,7 +1209,7 @@ $ go run .
 ./main.go:7:6: undefined: fmt.Prin
 
 --------------------------------------------------------------------------------
-Go Version: go1.25.6
+Go Version: go1.25.5
 
 ```
 
@@ -1050,7 +1246,7 @@ type Context interface{ ... }
     func WithoutCancel(parent Context) Context
 
 --------------------------------------------------------------------------------
-Go Version: go1.25.6
+Go Version: go1.25.5
 
 ```
 
@@ -1073,7 +1269,7 @@ func WithCancel(parent Context) (ctx Context, cancel CancelFunc)
     call cancel as soon as the operations running in this Context complete.
 
 --------------------------------------------------------------------------------
-Go Version: go1.25.6
+Go Version: go1.25.5
 
 ```
 
@@ -1192,7 +1388,6 @@ $ tree ./docs
 ./docs
 ├── badges.md
 ├── blog
-│   ├── README.md
 │   ├── hype.md
 │   ├── images
 │   │   ├── theme-cards-article.png
@@ -1201,24 +1396,27 @@ $ tree ./docs
 │   │   ├── theme-developer-home.png
 │   │   ├── theme-suspended-article.png
 │   │   └── theme-suspended-home.png
+│   ├── README.md
 │   └── src
 │       ├── deploy.yaml
 │       └── structure.txt
 ├── cli-reference.md
 ├── html-export.md
 ├── license.md
+├── marked.md
 ├── mermaid.md
 ├── preview.md
-└── quickstart
-    ├── hype.md
-    ├── includes.md
-    └── src
-        ├── broken
-        │   └── main.go
-        └── hello
-            └── main.go
+├── quickstart
+│   ├── hype.md
+│   ├── includes.md
+│   └── src
+│       ├── broken
+│       │   └── main.go
+│       └── hello
+│           └── main.go
+└── slides.md
 
-8 directories, 20 files
+8 directories, 22 files
 ```
 ---
 

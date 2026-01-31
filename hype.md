@@ -30,6 +30,10 @@ You can also use a [github action](#using-github-actions-to-update-your-readme) 
 
 <include src="docs/mermaid.md"></include>
 
+<include src="docs/marked.md"></include>
+
+<include src="docs/slides.md"></include>
+
 <include src="docs/cli-reference.md"></include>
 
 <include src="docs/quickstart/hype.md"></include>
