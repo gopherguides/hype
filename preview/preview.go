@@ -6,7 +6,6 @@ import (
 	"net/http"
 	"os"
 	"path/filepath"
-	"slices"
 	"strings"
 	"sync"
 	"time"
@@ -63,7 +62,7 @@ func DefaultConfig() Config {
 	return Config{
 		File:          "hype.md",
 		Port:          3000,
-		WatchDirs:     []string{"."},
+		WatchDirs:     nil,
 		Extensions:    defaultExtensions,
 		ExcludeGlobs:  defaultExcludes,
 		DebounceDelay: 300 * time.Millisecond,
@@ -267,29 +266,44 @@ func (s *Server) startWatcher(ctx context.Context, pwd string) (*fsnotify.Watche
 		return nil, err
 	}
 
-	watchDirs := s.config.WatchDirs
 	fileDir := filepath.Dir(s.config.File)
 	if fileDir == "" {
 		fileDir = "."
 	}
 
-	if len(watchDirs) == 0 {
-		watchDirs = []string{fileDir}
-	} else if fileDir != "." && !slices.Contains(watchDirs, fileDir) {
-		watchDirs = append(watchDirs, fileDir)
-	}
+	// Normalize all paths to absolute and deduplicate
+	seen := make(map[string]bool)
+	var watchDirs []string
 
-	for _, dir := range watchDirs {
+	// Always include the source file's directory first
+	absFileDir := fileDir
+	if !filepath.IsAbs(fileDir) {
+		absFileDir = filepath.Join(pwd, fileDir)
+	}
+	absFileDir = filepath.Clean(absFileDir)
+	seen[absFileDir] = true
+	watchDirs = append(watchDirs, absFileDir)
+
+	// Add user-specified directories, deduplicating
+	for _, dir := range s.config.WatchDirs {
 		absDir := dir
 		if !filepath.IsAbs(dir) {
 			absDir = filepath.Join(pwd, dir)
 		}
+		absDir = filepath.Clean(absDir)
+		if !seen[absDir] {
+			seen[absDir] = true
+			watchDirs = append(watchDirs, absDir)
+		}
+	}
+
+	for _, absDir := range watchDirs {
 		if s.config.Verbose {
 			s.stdout("Watching directory: %s\n", absDir)
 		}
 		if err := s.addWatchRecursive(watcher, absDir); err != nil {
 			_ = watcher.Close()
-			return nil, fmt.Errorf("failed to watch %s: %w", dir, err)
+			return nil, fmt.Errorf("failed to watch %s: %w", absDir, err)
 		}
 	}
 
