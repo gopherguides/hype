@@ -21,6 +21,74 @@ Hype follows the same principals that we use for coding:
 * asset validation - ensure local assets like images, etc actually exist
 
 
+---
+
+## Installation
+
+### Quick Install (Recommended)
+
+**macOS / Linux:**
+
+```bash
+curl -fsSL https://raw.githubusercontent.com/gopherguides/hype/main/install.sh | bash
+
+```
+
+To install a specific version:
+
+```bash
+curl -fsSL https://raw.githubusercontent.com/gopherguides/hype/main/install.sh | bash -s v0.5.0
+
+```
+
+**Windows (PowerShell):**
+
+```powershell
+irm https://raw.githubusercontent.com/gopherguides/hype/main/install.ps1 | iex
+
+```
+
+To install a specific version:
+
+```powershell
+.\install.ps1 -Version v0.5.0
+
+```
+
+### Go Install
+
+If you have Go installed:
+
+```bash
+go install github.com/gopherguides/hype/cmd/hype@latest
+
+```
+
+### Homebrew (Coming Soon)
+
+```bash
+brew install gopherguides/tap/hype
+
+```
+
+### Build from Source
+
+```bash
+git clone https://github.com/gopherguides/hype.git
+cd hype
+go install ./cmd/hype
+
+```
+
+### Verify Installation
+
+```bash
+hype version
+
+```
+
+---
+
 ## Created with Hype
 
 This README was created with hype. Here was the command we used to create it:
@@ -505,7 +573,7 @@ $ go run .
 Hello World
 
 --------------------------------------------------------------------------------
-Go Version: go1.25.6
+Go Version: go1.25.5
 
 ```
 
@@ -538,7 +606,7 @@ $ go run .
 Hello World
 
 --------------------------------------------------------------------------------
-Go Version: go1.25.6
+Go Version: go1.25.5
 
 ```
 
@@ -567,7 +635,7 @@ $ go run .
 Hello World
 
 --------------------------------------------------------------------------------
-Go Version: go1.25.6
+Go Version: go1.25.5
 
 ```
 
@@ -597,7 +665,7 @@ $ go run .
 ./main.go:7:6: undefined: fmt.Prin
 
 --------------------------------------------------------------------------------
-Go Version: go1.25.6
+Go Version: go1.25.5
 
 ```
 
@@ -634,7 +702,7 @@ type Context interface{ ... }
     func WithoutCancel(parent Context) Context
 
 --------------------------------------------------------------------------------
-Go Version: go1.25.6
+Go Version: go1.25.5
 
 ```
 
@@ -657,7 +725,7 @@ func WithCancel(parent Context) (ctx Context, cancel CancelFunc)
     call cancel as soon as the operations running in this Context complete.
 
 --------------------------------------------------------------------------------
-Go Version: go1.25.6
+Go Version: go1.25.5
 
 ```
 
@@ -776,7 +844,6 @@ $ tree ./docs
 ./docs
 ├── badges.md
 ├── blog
-│   ├── README.md
 │   ├── hype.md
 │   ├── images
 │   │   ├── theme-cards-article.png
@@ -785,10 +852,12 @@ $ tree ./docs
 │   │   ├── theme-developer-home.png
 │   │   ├── theme-suspended-article.png
 │   │   └── theme-suspended-home.png
+│   ├── README.md
 │   └── src
 │       ├── deploy.yaml
 │       └── structure.txt
 ├── html-export.md
+├── installation.md
 ├── license.md
 ├── mermaid.md
 ├── preview.md
@@ -801,7 +870,7 @@ $ tree ./docs
         └── hello
             └── main.go
 
-8 directories, 19 files
+8 directories, 20 files
 ```
 ---
 
