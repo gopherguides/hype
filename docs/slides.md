@@ -52,7 +52,7 @@ Welcome to my presentation!
 
 - **Live Code Execution**: Code blocks with `run` attribute execute and display output
 - **Syntax Highlighting**: Code blocks are automatically highlighted
-- **Navigation**: Use keyboard arrows or click to navigate between slides
+- **Navigation**: Use left/right arrow keys to navigate between slides
 - **Web-based**: No additional software required - just a browser
 
 ## Flags Reference
@@ -66,4 +66,4 @@ Welcome to my presentation!
 1. **Keep slides focused**: One main idea per slide works best
 2. **Use code examples**: Hype's ability to execute code makes live demos easy
 3. **Test navigation**: Check that your slides flow well before presenting
-4. **Local images**: Images are served from the document's directory
+4. **Assets**: Place images in an `assets/` folder in your working directory

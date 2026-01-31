@@ -579,7 +579,7 @@ Welcome to my presentation!
 
 * **Live Code Execution**: Code blocks with `run` attribute execute and display output
 * **Syntax Highlighting**: Code blocks are automatically highlighted
-* **Navigation**: Use keyboard arrows or click to navigate between slides
+* **Navigation**: Use left/right arrow keys to navigate between slides
 * **Web-based**: No additional software required - just a browser
 
 
@@ -600,7 +600,7 @@ Welcome to my presentation!
 1. **Keep slides focused**: One main idea per slide works best
 1. **Use code examples**: Hype's ability to execute code makes live demos easy
 1. **Test navigation**: Check that your slides flow well before presenting
-1. **Local images**: Images are served from the document's directory
+1. **Assets**: Place images in an `assets/` folder in your working directory
 
 
 ---
@@ -1114,7 +1114,7 @@ $ go run .
 Hello World
 
 --------------------------------------------------------------------------------
-Go Version: go1.25.6
+Go Version: go1.25.5
 
 ```
 
@@ -1147,7 +1147,7 @@ $ go run .
 Hello World
 
 --------------------------------------------------------------------------------
-Go Version: go1.25.6
+Go Version: go1.25.5
 
 ```
 
@@ -1176,7 +1176,7 @@ $ go run .
 Hello World
 
 --------------------------------------------------------------------------------
-Go Version: go1.25.6
+Go Version: go1.25.5
 
 ```
 
@@ -1206,7 +1206,7 @@ $ go run .
 ./main.go:7:6: undefined: fmt.Prin
 
 --------------------------------------------------------------------------------
-Go Version: go1.25.6
+Go Version: go1.25.5
 
 ```
 
@@ -1243,7 +1243,7 @@ type Context interface{ ... }
     func WithoutCancel(parent Context) Context
 
 --------------------------------------------------------------------------------
-Go Version: go1.25.6
+Go Version: go1.25.5
 
 ```
 
@@ -1266,7 +1266,7 @@ func WithCancel(parent Context) (ctx Context, cancel CancelFunc)
     call cancel as soon as the operations running in this Context complete.
 
 --------------------------------------------------------------------------------
-Go Version: go1.25.6
+Go Version: go1.25.5
 
 ```
 
@@ -1385,7 +1385,6 @@ $ tree ./docs
 ./docs
 ├── badges.md
 ├── blog
-│   ├── README.md
 │   ├── hype.md
 │   ├── images
 │   │   ├── theme-cards-article.png
@@ -1394,6 +1393,7 @@ $ tree ./docs
 │   │   ├── theme-developer-home.png
 │   │   ├── theme-suspended-article.png
 │   │   └── theme-suspended-home.png
+│   ├── README.md
 │   └── src
 │       ├── deploy.yaml
 │       └── structure.txt
