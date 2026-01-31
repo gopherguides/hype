@@ -453,7 +453,7 @@ hype marked -f hype.md
 | ---- | ------- | ----------- |
 | 
 `-f`
- |  | Optional file name to preview (if not provided, uses MARKED_PATH) |
+ |  | File to process (if not provided, reads from stdin) |
 | 
 `-p`
  | 
@@ -485,7 +485,7 @@ hype marked -f hype.md
 | -------- | ----------- |
 | 
 `MARKED_PATH`
- | Set by Marked 2 - the absolute path to the current file |
+ | Set by Marked 2 - used for file context and relative path resolution |
 | 
 `MARKED_ORIGIN`
  | Set by Marked 2 - the directory of the file being previewed |

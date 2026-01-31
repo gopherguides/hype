@@ -33,7 +33,7 @@ hype marked -f hype.md
 
 | Flag | Default | Description |
 |------|---------|-------------|
-| `-f` | | Optional file name to preview (if not provided, uses MARKED_PATH) |
+| `-f` | | File to process (if not provided, reads from stdin) |
 | `-p` | `false` | Parse only mode - parse the file but don't execute commands |
 | `-timeout` | `30s` | Timeout for command execution |
 | `-context` | | A folder containing all chapters of a book, for example |
@@ -44,7 +44,7 @@ hype marked -f hype.md
 
 | Variable | Description |
 |----------|-------------|
-| `MARKED_PATH` | Set by Marked 2 - the absolute path to the current file |
+| `MARKED_PATH` | Set by Marked 2 - used for file context and relative path resolution |
 | `MARKED_ORIGIN` | Set by Marked 2 - the directory of the file being previewed |
 
 ## How It Works
