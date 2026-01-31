@@ -6,6 +6,7 @@ import (
 	"net/http"
 	"os"
 	"path/filepath"
+	"slices"
 	"strings"
 	"sync"
 	"time"
@@ -267,17 +268,15 @@ func (s *Server) startWatcher(ctx context.Context, pwd string) (*fsnotify.Watche
 	}
 
 	watchDirs := s.config.WatchDirs
-	if len(watchDirs) == 0 {
-		watchDirs = []string{"."}
+	fileDir := filepath.Dir(s.config.File)
+	if fileDir == "" {
+		fileDir = "."
 	}
 
-	fileDir := filepath.Dir(s.config.File)
-	if fileDir != "." && fileDir != "" {
-		if filepath.IsAbs(fileDir) {
-			watchDirs = []string{fileDir}
-		} else {
-			watchDirs = []string{fileDir}
-		}
+	if len(watchDirs) == 0 {
+		watchDirs = []string{fileDir}
+	} else if fileDir != "." && !slices.Contains(watchDirs, fileDir) {
+		watchDirs = append(watchDirs, fileDir)
 	}
 
 	for _, dir := range watchDirs {
