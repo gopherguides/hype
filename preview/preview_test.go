@@ -22,7 +22,7 @@ func TestDefaultConfig(t *testing.T) {
 
 	r.Equal("hype.md", cfg.File)
 	r.Equal(3000, cfg.Port)
-	r.Equal([]string{"."}, cfg.WatchDirs)
+	r.Nil(cfg.WatchDirs)
 	r.Equal(300*time.Millisecond, cfg.DebounceDelay)
 	r.Equal("github", cfg.Theme)
 	r.NotEmpty(cfg.Extensions)
