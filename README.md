@@ -162,15 +162,15 @@ The preview server watches for file changes and automatically rebuilds the docum
 
 ### Watch Directories
 
-By default, the preview server watches the current directory (`.`). Use `-w` to specify which directories to watch:
+By default, the preview server watches the directory containing the source file. Use `-w` to watch additional directories:
 
 ```bash
-# Watch multiple directories (replaces default, so include . to watch source file)
-hype preview -f hype.md -w . -w ./src -w ./images
+# Watch additional directories alongside the source file's directory
+hype preview -f hype.md -w ./src -w ./images
 
 ```
 
-**Note:** The `-w` flag replaces the default watch directory rather than adding to it. If your source file is in the current directory and you want to watch additional directories, include `.` in your watch list to ensure changes to the source file trigger rebuilds.
+**Note:** The source file's directory is always watched automatically. When you specify `-w` flags, those directories are watched in addition to the source file's directory.
 
 ### File Extensions
 
