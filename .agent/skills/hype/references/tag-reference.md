@@ -126,3 +126,51 @@ The video ID is the 11-character string from YouTube URLs:
 - `https://youtu.be/dQw4w9WgXcQ` → `id="dQw4w9WgXcQ"`
 
 Valid characters: `a-z`, `A-Z`, `0-9`, `-`, `_`
+
+## Mermaid Diagrams
+
+Render Mermaid diagrams as ASCII art using fenced code blocks.
+
+### Syntax
+
+Use standard markdown fenced code blocks with `mermaid` as the language:
+
+    ```mermaid
+    graph LR
+        A[Start] --> B{Decision}
+        B -->|Yes| C[Action]
+        B -->|No| D[End]
+    ```
+
+### Supported Diagram Types
+
+| Type | Directive | Description |
+|------|-----------|-------------|
+| Flowchart | `graph LR`, `graph TD` | Left-to-right or top-down flowcharts |
+| Flowchart | `flowchart LR`, `flowchart TD` | Alternative flowchart syntax |
+| Sequence | `sequenceDiagram` | Interaction between participants |
+
+### Graph Directions
+
+| Direction | Description |
+|-----------|-------------|
+| `LR` | Left to Right |
+| `TD` / `TB` | Top Down / Top to Bottom |
+
+### Output Format
+
+- **HTML export**: Rendered as `<pre><code class="language-plain">...</code></pre>`
+- **Markdown export**: Rendered as plain fenced code block with ASCII art
+
+### Limitations
+
+The ASCII rendering is provided by [mermaid-ascii](https://github.com/AlexanderGrooff/mermaid-ascii). Not all Mermaid features are supported:
+
+**Not supported:**
+- Subgraph nesting
+- Non-rectangular node shapes (diamonds render as rectangles)
+- Class diagrams
+- State diagrams
+- Gantt charts
+- Pie charts
+- Diagonal arrows

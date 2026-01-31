@@ -28,6 +28,8 @@ You can also use a [github action](#using-github-actions-to-update-your-readme) 
 
 <include src="docs/preview.md"></include>
 
+<include src="docs/mermaid.md"></include>
+
 <include src="docs/quickstart/hype.md"></include>
 
 # README Source

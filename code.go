@@ -16,5 +16,11 @@ func NewCodeNodes(p *Parser, el *Element) (Nodes, error) {
 		return NewSourceCodeNodes(p, el)
 	}
 
+	// Check if this is a mermaid code block
+	lang := Language(ats, "")
+	if lang == "mermaid" {
+		return NewMermaidNodes(p, el)
+	}
+
 	return NewFencedCodeNodes(p, el)
 }
