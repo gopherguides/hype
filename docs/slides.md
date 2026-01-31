@@ -6,9 +6,6 @@ Hype can generate web-based presentations from your markdown documents using the
 
 ```bash
 # Start slides server on default port (3000)
-hype slides -f presentation.md
-
-# Or specify the file as an argument
 hype slides presentation.md
 
 # Use a different port

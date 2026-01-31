@@ -26,7 +26,7 @@ hype marked
 For manual testing:
 
 ```bash
-MARKED_PATH=/path/to/file.md hype marked
+hype marked -f /path/to/file.md
 ```
 
 ## Flags Reference

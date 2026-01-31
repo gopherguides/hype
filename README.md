@@ -443,7 +443,7 @@ hype marked
 For manual testing:
 
 ```bash
-MARKED_PATH=/path/to/file.md hype marked
+hype marked -f /path/to/file.md
 
 ```
 
@@ -530,9 +530,6 @@ Hype can generate web-based presentations from your markdown documents using the
 
 ```bash
 # Start slides server on default port (3000)
-hype slides -f presentation.md
-
-# Or specify the file as an argument
 hype slides presentation.md
 
 # Use a different port
