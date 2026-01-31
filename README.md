@@ -495,7 +495,8 @@ hype marked -f hype.md
 
 
 1. Marked 2 detects a file change and calls hype as a preprocessor
-1. Hype reads the file specified in `MARKED_PATH`
+1. Marked 2 pipes the file contents to hype via stdin
+1. Hype uses `MARKED_PATH` for context and relative path resolution
 1. Hype processes all includes, executes code blocks, and renders the document
 1. The processed Markdown is output to stdout
 1. Marked 2 renders the processed Markdown
