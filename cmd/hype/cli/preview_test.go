@@ -280,3 +280,28 @@ func Test_Preview_Flags_Timeout(t *testing.T) {
 
 	r.Equal(30*time.Second, cmd.Timeout)
 }
+
+func Test_Preview_VersionInfo(t *testing.T) {
+	r := require.New(t)
+
+	info := VersionInfo{Version: "v1.0.0", Commit: "abc1234", Date: "2025-01-31"}
+	cmd := &Preview{Info: info}
+
+	r.Equal("v1.0.0", cmd.Info.Version)
+	r.Equal("abc1234", cmd.Info.Commit)
+	r.Equal("2025-01-31", cmd.Info.Date)
+	r.Equal("hype version v1.0.0 (commit: abc1234, built: 2025-01-31)", cmd.Info.String())
+}
+
+func Test_Preview_VersionInfo_FromNew(t *testing.T) {
+	r := require.New(t)
+
+	info := VersionInfo{Version: "v2.0.0", Commit: "def5678", Date: "2025-02-01"}
+	app := New(".", info)
+
+	pv, ok := app.Commands["preview"].(*Preview)
+	r.True(ok, "preview command should exist")
+	r.Equal("v2.0.0", pv.Info.Version)
+	r.Equal("def5678", pv.Info.Commit)
+	r.Equal("2025-02-01", pv.Info.Date)
+}

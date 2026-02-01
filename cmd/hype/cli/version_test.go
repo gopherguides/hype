@@ -7,6 +7,35 @@ import (
 	"testing"
 )
 
+func Test_VersionInfo_String(t *testing.T) {
+	t.Parallel()
+
+	tests := []struct {
+		name string
+		info VersionInfo
+		want string
+	}{
+		{
+			name: "dev defaults",
+			info: VersionInfo{Version: "dev", Commit: "none", Date: "unknown"},
+			want: "hype version dev (commit: none, built: unknown)",
+		},
+		{
+			name: "release",
+			info: VersionInfo{Version: "v0.5.0", Commit: "abc1234", Date: "2025-01-31"},
+			want: "hype version v0.5.0 (commit: abc1234, built: 2025-01-31)",
+		},
+	}
+
+	for _, tt := range tests {
+		t.Run(tt.name, func(t *testing.T) {
+			if got := tt.info.String(); got != tt.want {
+				t.Errorf("got %q, want %q", got, tt.want)
+			}
+		})
+	}
+}
+
 func Test_Version_Main(t *testing.T) {
 	t.Parallel()
 
