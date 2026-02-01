@@ -111,7 +111,17 @@ func (cmd *App) init(pwd string, args []string) error {
 	return cmd.initErr
 }
 
-func New(root string) *App {
+type VersionInfo struct {
+	Version string
+	Commit  string
+	Date    string
+}
+
+func (v VersionInfo) String() string {
+	return fmt.Sprintf("hype version %s (commit: %s, built: %s)", v.Version, v.Commit, v.Date)
+}
+
+func New(root string, info VersionInfo) *App {
 	cab := os.DirFS(root)
 
 	p := hype.NewParser(cab)
@@ -141,6 +151,7 @@ func New(root string) *App {
 			Desc:    "live preview server with file watching and auto-reload",
 		},
 		Parser: p,
+		Info:   info,
 	}
 
 	sl := &Slides{
@@ -158,6 +169,16 @@ func New(root string) *App {
 			Aliases: []string{"b"},
 			Desc:    "static blog generator commands (init, build, new)",
 		},
+		Info: info,
+	}
+
+	ver := &Version{
+		Cmd: cleo.Cmd{
+			Name:    "version",
+			Aliases: []string{"v"},
+			Desc:    "print version information",
+		},
+		Info: info,
 	}
 
 	app := &App{
@@ -170,6 +191,7 @@ func New(root string) *App {
 				"slides":  sl,
 				"export":  e,
 				"blog":    bl,
+				"version": ver,
 			},
 		},
 		Parser: p,
@@ -178,8 +200,8 @@ func New(root string) *App {
 	return app
 }
 
-func Garlic(root string) (*App, error) {
-	return New(root), nil
+func Garlic(root string, info VersionInfo) (*App, error) {
+	return New(root, info), nil
 }
 
 func WithinDir(dir string, f func() error) error {
