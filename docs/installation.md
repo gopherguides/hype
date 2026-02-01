@@ -34,10 +34,10 @@ If you have Go installed:
 go install github.com/gopherguides/hype/cmd/hype@latest
 ```
 
-### Homebrew
+### Homebrew (Coming Soon)
 
 ```bash
-brew install gopherguides/hype/hype-md
+brew install gopherguides/tap/hype
 ```
 
 ### Build from Source
@@ -51,5 +51,5 @@ go install ./cmd/hype
 ### Verify Installation
 
 ```bash
-hype --help
+hype version
 ```

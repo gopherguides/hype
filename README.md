@@ -64,10 +64,10 @@ go install github.com/gopherguides/hype/cmd/hype@latest
 
 ```
 
-### Homebrew
+### Homebrew (Coming Soon)
 
 ```bash
-brew install gopherguides/hype/hype-md
+brew install gopherguides/tap/hype
 
 ```
 
@@ -83,7 +83,7 @@ go install ./cmd/hype
 ### Verify Installation
 
 ```bash
-hype --help
+hype version
 
 ```
 
@@ -1454,6 +1454,7 @@ $ tree ./docs
 ./docs
 ├── badges.md
 ├── blog
+│   ├── README.md
 │   ├── hype.md
 │   ├── images
 │   │   ├── theme-cards-article.png
@@ -1462,7 +1463,6 @@ $ tree ./docs
 │   │   ├── theme-developer-home.png
 │   │   ├── theme-suspended-article.png
 │   │   └── theme-suspended-home.png
-│   ├── README.md
 │   └── src
 │       ├── deploy.yaml
 │       └── structure.txt
