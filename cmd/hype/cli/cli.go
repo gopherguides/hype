@@ -117,7 +117,7 @@ type VersionInfo struct {
 	Date    string
 }
 
-func New(root string, vi ...VersionInfo) *App {
+func New(root string, info VersionInfo) *App {
 	cab := os.DirFS(root)
 
 	p := hype.NewParser(cab)
@@ -140,21 +140,14 @@ func New(root string, vi ...VersionInfo) *App {
 		Parser: p,
 	}
 
-	var versionInfo VersionInfo
-	if len(vi) > 0 {
-		versionInfo = vi[0]
-	} else {
-		versionInfo = VersionInfo{Version: "dev", Commit: "none", Date: "unknown"}
-	}
-
 	pv := &Preview{
 		Cmd: cleo.Cmd{
 			Name:    "preview",
 			Aliases: []string{"p"},
 			Desc:    "live preview server with file watching and auto-reload",
 		},
-		Parser:  p,
-		Version: versionInfo.Version,
+		Parser: p,
+		Info:   info,
 	}
 
 	sl := &Slides{
@@ -174,7 +167,14 @@ func New(root string, vi ...VersionInfo) *App {
 		},
 	}
 
-	ver := NewVersion(versionInfo.Version, versionInfo.Commit, versionInfo.Date)
+	ver := &Version{
+		Cmd: cleo.Cmd{
+			Name:    "version",
+			Aliases: []string{"v"},
+			Desc:    "print version information",
+		},
+		Info: info,
+	}
 
 	app := &App{
 		Cmd: cleo.Cmd{
@@ -195,8 +195,8 @@ func New(root string, vi ...VersionInfo) *App {
 	return app
 }
 
-func Garlic(root string) (*App, error) {
-	return New(root), nil
+func Garlic(root string, info VersionInfo) (*App, error) {
+	return New(root, info), nil
 }
 
 func WithinDir(dir string, f func() error) error {

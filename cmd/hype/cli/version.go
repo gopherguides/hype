@@ -10,22 +10,7 @@ import (
 type Version struct {
 	cleo.Cmd
 
-	version string
-	commit  string
-	date    string
-}
-
-func NewVersion(version, commit, date string) *Version {
-	return &Version{
-		Cmd: cleo.Cmd{
-			Name:    "version",
-			Aliases: []string{"v"},
-			Desc:    "print version information",
-		},
-		version: version,
-		commit:  commit,
-		date:    date,
-	}
+	Info VersionInfo
 }
 
 func (cmd *Version) Main(ctx context.Context, pwd string, args []string) error {
@@ -33,6 +18,6 @@ func (cmd *Version) Main(ctx context.Context, pwd string, args []string) error {
 		return err
 	}
 
-	fmt.Fprintf(cmd.Stdout(), "hype version %s (commit: %s, built: %s)\n", cmd.version, cmd.commit, cmd.date)
+	fmt.Fprintf(cmd.Stdout(), "hype version %s (commit: %s, built: %s)\n", cmd.Info.Version, cmd.Info.Commit, cmd.Info.Date)
 	return nil
 }
