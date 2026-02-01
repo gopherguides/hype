@@ -29,6 +29,7 @@ type Blog struct {
 
 	Timeout time.Duration
 	Verbose bool
+	Info    VersionInfo
 
 	flags *flag.FlagSet
 	mu    sync.RWMutex
@@ -519,6 +520,10 @@ Example:
 	b, err := blog.New(pwd)
 	if err != nil {
 		return err
+	}
+
+	if cmd.Info.Version != "" {
+		fmt.Fprintln(cmd.Stderr(), cmd.Info)
 	}
 
 	publicDir := filepath.Join(pwd, b.Config.OutputDir)

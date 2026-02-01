@@ -169,6 +169,7 @@ func New(root string, info VersionInfo) *App {
 			Aliases: []string{"b"},
 			Desc:    "static blog generator commands (init, build, new)",
 		},
+		Info: info,
 	}
 
 	ver := &Version{
