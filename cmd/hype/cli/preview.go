@@ -39,6 +39,7 @@ type Preview struct {
 	CustomCSS     string
 	ListThemes    bool
 	Timeout       time.Duration
+	Version       string
 
 	Parser *hype.Parser
 
@@ -187,6 +188,10 @@ func (cmd *Preview) Main(ctx context.Context, pwd string, args []string) error {
 
 	if cmd.Theme != "" && cmd.CustomCSS == "" && !themes.IsBuiltinTheme(cmd.Theme) {
 		return fmt.Errorf("unknown theme: %s (use -themes to list available themes)", cmd.Theme)
+	}
+
+	if cmd.Version != "" {
+		_, _ = fmt.Fprintf(cmd.Stderr(), "hype %s\n", cmd.Version)
 	}
 
 	cfg := preview.DefaultConfig()

@@ -12,6 +12,12 @@ import (
 	"github.com/markbates/garlic"
 )
 
+var (
+	version = "dev"
+	commit  = "none"
+	date    = "unknown"
+)
+
 func main() {
 	args := os.Args[1:]
 
@@ -20,7 +26,11 @@ func main() {
 		log.Fatal(err)
 	}
 
-	app := cli.New(pwd)
+	app := cli.New(pwd, cli.VersionInfo{
+		Version: version,
+		Commit:  commit,
+		Date:    date,
+	})
 	app.Name = "hype"
 
 	ctx := context.Background()

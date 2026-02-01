@@ -111,7 +111,13 @@ func (cmd *App) init(pwd string, args []string) error {
 	return cmd.initErr
 }
 
-func New(root string) *App {
+type VersionInfo struct {
+	Version string
+	Commit  string
+	Date    string
+}
+
+func New(root string, vi ...VersionInfo) *App {
 	cab := os.DirFS(root)
 
 	p := hype.NewParser(cab)
@@ -134,13 +140,21 @@ func New(root string) *App {
 		Parser: p,
 	}
 
+	var versionInfo VersionInfo
+	if len(vi) > 0 {
+		versionInfo = vi[0]
+	} else {
+		versionInfo = VersionInfo{Version: "dev", Commit: "none", Date: "unknown"}
+	}
+
 	pv := &Preview{
 		Cmd: cleo.Cmd{
 			Name:    "preview",
 			Aliases: []string{"p"},
 			Desc:    "live preview server with file watching and auto-reload",
 		},
-		Parser: p,
+		Parser:  p,
+		Version: versionInfo.Version,
 	}
 
 	sl := &Slides{
@@ -160,6 +174,8 @@ func New(root string) *App {
 		},
 	}
 
+	ver := NewVersion(versionInfo.Version, versionInfo.Commit, versionInfo.Date)
+
 	app := &App{
 		Cmd: cleo.Cmd{
 			Name: "hype",
@@ -170,6 +186,7 @@ func New(root string) *App {
 				"slides":  sl,
 				"export":  e,
 				"blog":    bl,
+				"version": ver,
 			},
 		},
 		Parser: p,
