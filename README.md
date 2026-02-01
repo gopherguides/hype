@@ -1454,6 +1454,7 @@ $ tree ./docs
 ./docs
 ├── badges.md
 ├── blog
+│   ├── README.md
 │   ├── hype.md
 │   ├── images
 │   │   ├── theme-cards-article.png
@@ -1462,7 +1463,6 @@ $ tree ./docs
 │   │   ├── theme-developer-home.png
 │   │   ├── theme-suspended-article.png
 │   │   └── theme-suspended-home.png
-│   ├── README.md
 │   └── src
 │       ├── deploy.yaml
 │       └── structure.txt
