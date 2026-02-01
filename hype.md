@@ -12,6 +12,8 @@ Hype follows the same principals that we use for coding:
 - validation - like tests, but validate all your code samples are valid (or not if that is what you expect).
 - asset validation - ensure local assets like images, etc actually exist
 
+<include src="docs/installation.md"></include>
+
 ## Created with Hype
 
 This README was created with hype. Here was the command we used to create it:
