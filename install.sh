@@ -55,6 +55,17 @@ main() {
     echo "Extracting..."
     tar -xzf "${tmpdir}/${archive_name}" -C "$tmpdir"
 
+    # Ensure install directory exists
+    if [ ! -d "$INSTALL_DIR" ]; then
+        echo "Creating ${INSTALL_DIR}..."
+        if mkdir -p "$INSTALL_DIR" 2>/dev/null; then
+            : # Directory created successfully
+        else
+            echo "Creating ${INSTALL_DIR} (requires sudo)..."
+            sudo mkdir -p "$INSTALL_DIR"
+        fi
+    fi
+
     if [ ! -w "$INSTALL_DIR" ]; then
         echo "Installing to ${INSTALL_DIR} (requires sudo)..."
         sudo mv "${tmpdir}/hype" "$INSTALL_DIR/hype"
@@ -69,7 +80,8 @@ main() {
     echo "hype installed successfully!"
     echo ""
     if command -v hype >/dev/null 2>&1; then
-        hype version
+        echo "hype is available in your PATH"
+        echo "Run 'hype --help' for usage information"
     else
         echo "Note: ${INSTALL_DIR} may not be in your PATH"
         echo "Add it with: export PATH=\"\$PATH:${INSTALL_DIR}\""
