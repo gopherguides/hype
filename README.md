@@ -1483,7 +1483,7 @@ $ tree ./docs
 │           └── main.go
 └── slides.md
 
-8 directories, 22 files
+8 directories, 23 files
 ```
 ---
 
