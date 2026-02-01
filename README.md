@@ -480,6 +480,616 @@ In Markdown export, they appear as plain code blocks (without language specifier
 
 ---
 
+# Marked 2 Integration
+
+Hype integrates with [Marked 2](https://marked2app.com/), a powerful Markdown preview and export application for macOS.
+
+## Overview
+
+The `marked` command outputs hype documents in a format compatible with Marked 2's custom preprocessor feature. This allows you to preview hype documents directly in Marked 2, including dynamic code execution and includes.
+
+## Setup
+
+
+1. Open Marked 2 Preferences
+1. Go to the "Advanced" tab
+1. In "Custom Processor", set the path to the hype binary and enable "Preprocessing"
+1. Enter the path: `/path/to/hype marked`
+
+
+Marked 2 will set the `MARKED_PATH` and `MARKED_ORIGIN` environment variables automatically, telling hype which file to process.
+
+## Basic Usage
+
+The command is designed to be called by Marked 2 automatically:
+
+```bash
+hype marked
+
+```
+
+For manual testing (run from your document's directory):
+
+```bash
+hype marked -f hype.md
+
+```
+
+## Flags Reference
+
+| Flag | Default | Description |
+| ---- | ------- | ----------- |
+| 
+`-f`
+ |  | File to process (if not provided, reads from stdin) |
+| 
+`-p`
+ | 
+`false`
+ | Parse only mode - parse the file but don't execute commands |
+| 
+`-timeout`
+ | 
+`30s`
+ | Timeout for command execution |
+| 
+`-context`
+ |  | A folder containing all chapters of a book, for example |
+| 
+`-section`
+ | 
+`0`
+ | Target section number |
+| 
+`-v`
+ | 
+`false`
+ | Enable verbose output for debugging |
+
+
+## Environment Variables
+
+| Variable | Description |
+| -------- | ----------- |
+| 
+`MARKED_PATH`
+ | Set by Marked 2 - used for file context and relative path resolution |
+| 
+`MARKED_ORIGIN`
+ | Set by Marked 2 - the directory of the file being previewed |
+
+
+## How It Works
+
+
+1. Marked 2 detects a file change and calls hype as a preprocessor
+1. Marked 2 pipes the file contents to hype via stdin
+1. Hype uses `MARKED_PATH` for context and relative path resolution
+1. Hype processes all includes, executes code blocks, and renders the document
+1. The processed Markdown is output to stdout
+1. Marked 2 renders the processed Markdown
+
+
+## Page Breaks
+
+Hype inserts page break comments between pages (`&lt;!--BREAK--&gt;`), which Marked 2 can use for pagination in exported documents.
+
+## Troubleshooting
+
+**Document not updating:**
+- Ensure `MARKED_PATH` is being set correctly
+- Try running with `-v` flag for verbose output
+- Check that hype is installed and accessible
+
+**Timeout errors:**
+- Increase the timeout with `-timeout 30s` for documents with slow-running commands
+- Use `-p` to test parsing without execution
+
+**Includes not resolving:**
+- Verify all include paths are relative to the document
+- Check that the source files exist
+
+---
+
+# Slides
+
+Hype can generate web-based presentations from your markdown documents using the `slides` command.
+
+## Basic Usage
+
+```bash
+# Start slides server on default port (3000)
+hype slides presentation.md
+
+# Use a different port
+hype slides -port 8080 presentation.md
+
+```
+
+Once started, open your browser to `http://localhost:3000` to view your presentation.
+
+## Creating Slides
+
+Slides are created using the standard hype `<page>` element. Each `<page>` becomes a slide in your presentation:
+
+```markdown
+<page>
+
+# Slide 1
+
+Welcome to my presentation!
+
+</page>
+
+<page>
+
+# Slide 2
+
+## Key Points
+
+- Point one
+- Point two
+- Point three
+
+</page>
+
+<page>
+
+# Code Example
+
+<go src="example" run></go>
+
+</page>
+
+```
+
+## Features
+
+
+* **Live Code Execution**: Code blocks with `run` attribute execute and display output
+* **Syntax Highlighting**: Code blocks are automatically highlighted
+* **Navigation**: Use left/right arrow keys to navigate between slides
+* **Web-based**: No additional software required - just a browser
+
+
+## Flags Reference
+
+| Flag | Default | Description |
+| ---- | ------- | ----------- |
+| 
+`-port`
+ | 
+`3000`
+ | Port for the slides server |
+
+
+## Tips
+
+
+1. **Keep slides focused**: One main idea per slide works best
+1. **Use code examples**: Hype's ability to execute code makes live demos easy
+1. **Test navigation**: Check that your slides flow well before presenting
+1. **Assets**: Place images in an `assets/` folder in your working directory
+
+
+---
+
+# CLI Reference
+
+Hype provides several commands for working with dynamic markdown documents.
+
+## Commands Overview
+
+| Command | Description |
+| ------- | ----------- |
+| 
+`export`
+ | Export documents to different formats (markdown, HTML) |
+| 
+`preview`
+ | Start a live preview server with auto-reload |
+| 
+`marked`
+ | Integration with Marked 2 app |
+| 
+`slides`
+ | Web-based presentation server |
+| 
+`blog`
+ | Static blog generator |
+
+
+---
+
+## export
+
+Export hype documents to markdown or HTML.
+
+```bash
+hype export [options]
+
+```
+
+### Options
+
+| Flag | Default | Description |
+| ---- | ------- | ----------- |
+| 
+`-f`
+ | 
+`hype.md`
+ | Input file to process |
+| 
+`-format`
+ | 
+`markdown`
+ | Output format: `markdown` or `html` |
+| 
+`-o`
+ | stdout | Output file path |
+| 
+`-theme`
+ | 
+`github`
+ | Theme for HTML export |
+| 
+`-css`
+ |  | Path to custom CSS file |
+| 
+`-no-css`
+ | 
+`false`
+ | Output raw HTML without styling |
+| 
+`-themes`
+ |  | List available themes and exit |
+| 
+`-timeout`
+ | 
+`30s`
+ | Execution timeout |
+| 
+`-v`
+ | 
+`false`
+ | Verbose output |
+
+
+### Examples
+
+```bash
+# Export to markdown (default)
+hype export -f hype.md > README.md
+
+# Export to HTML
+hype export -f docs.md -format html > docs.html
+
+# Export with a theme
+hype export -f docs.md -format html -theme solarized-dark
+
+# Export with custom CSS
+hype export -f docs.md -format html -css ./styles.css
+
+# Export raw HTML (no styling)
+hype export -f docs.md -format html -no-css
+
+# List available themes
+hype export -themes
+
+# Output directly to file
+hype export -f hype.md -format markdown -o README.md
+
+```
+
+---
+
+## preview
+
+Start a live preview server with file watching and auto-reload.
+
+```bash
+hype preview [options]
+
+```
+
+### Options
+
+| Flag | Alias | Default | Description |
+| ---- | ----- | ------- | ----------- |
+| 
+`-f`
+ |  | 
+`hype.md`
+ | Source file to preview |
+| 
+`-port`
+ |  | 
+`3000`
+ | Server port |
+| 
+`-w`
+ | 
+`-watch`
+ |  | Additional directories to watch (repeatable) |
+| 
+`-e`
+ | 
+`-ext`
+ |  | File extensions to watch (comma-separated) |
+| 
+`-i`
+ | 
+`-include`
+ |  | Glob patterns to include (repeatable) |
+| 
+`-x`
+ | 
+`-exclude`
+ |  | Glob patterns to exclude (repeatable) |
+| 
+`-d`
+ | 
+`-debounce`
+ | 
+`300ms`
+ | Debounce delay before rebuild |
+| 
+`-v`
+ | 
+`-verbose`
+ | 
+`false`
+ | Verbose output |
+| 
+`-open`
+ |  | 
+`false`
+ | Auto-open browser on start |
+| 
+`-theme`
+ |  | 
+`github`
+ | Preview theme |
+| 
+`-css`
+ |  |  | Custom CSS file path |
+| 
+`-themes`
+ |  |  | List available themes |
+| 
+`-timeout`
+ |  | 
+`0`
+ | Execution timeout |
+
+
+### Examples
+
+```bash
+# Basic preview
+hype preview -f hype.md
+
+# Open browser automatically
+hype preview -f hype.md -open
+
+# Watch additional directories
+hype preview -f hype.md -w ./src -w ./images
+
+# Filter by extension
+hype preview -f hype.md -e md,go,html
+
+# Use a dark theme
+hype preview -f hype.md -theme solarized-dark
+
+```
+
+---
+
+## marked
+
+Integration with [Marked 2](https://marked2app.com/) for macOS.
+
+```bash
+hype marked [options]
+
+```
+
+### Options
+
+| Flag | Default | Description |
+| ---- | ------- | ----------- |
+| 
+`-f`
+ |  | Input file (uses `MARKED_PATH` if not set) |
+| 
+`-p`
+ | 
+`false`
+ | Parse only (no execution) |
+| 
+`-timeout`
+ | 
+`5s`
+ | Execution timeout |
+| 
+`-context`
+ |  | Context folder path |
+| 
+`-section`
+ | 
+`0`
+ | Target section number |
+| 
+`-v`
+ | 
+`false`
+ | Verbose output |
+
+
+### Environment Variables
+
+
+* `MARKED_PATH` - Set by Marked 2 to the current file path
+* `MARKED_ORIGIN` - Set by Marked 2 to the file's directory
+
+
+---
+
+## slides
+
+Web-based presentation server.
+
+```bash
+hype slides [options] [file]
+
+```
+
+### Options
+
+| Flag | Default | Description |
+| ---- | ------- | ----------- |
+| 
+`-port`
+ | 
+`3000`
+ | Server port |
+
+
+### Examples
+
+```bash
+# Start slides server
+hype slides presentation.md
+
+# Use a different port
+hype slides -port 8080 presentation.md
+
+```
+
+---
+
+## blog
+
+Static blog generator with theming support.
+
+```bash
+hype blog <command> [options]
+
+```
+
+### Subcommands
+
+| Command | Description |
+| ------- | ----------- |
+| 
+`init <name>`
+ | Create a new blog project |
+| 
+`build`
+ | Build static site to `public/` |
+| 
+`serve`
+ | Start local preview server |
+| 
+`new <slug>`
+ | Create a new article |
+| 
+`theme`
+ | Manage themes (add, list, remove) |
+
+
+### Options
+
+| Flag | Default | Description |
+| ---- | ------- | ----------- |
+| 
+`-timeout`
+ | 
+`30s`
+ | Execution timeout |
+| 
+`-v`
+ | 
+`false`
+ | Verbose output |
+
+
+### Examples
+
+```bash
+# Create a new blog
+hype blog init mysite
+
+# Create with a theme
+hype blog init mysite --theme developer
+
+# Build the site
+hype blog build
+
+# Start preview server
+hype blog serve
+
+# Create a new article
+hype blog new hello-world
+
+# List available themes
+hype blog theme list
+
+# Add a theme
+hype blog theme add suspended
+
+```
+
+---
+
+## Common Options
+
+These options are available across most commands:
+
+| Flag | Description |
+| ---- | ----------- |
+| 
+`-f`
+ | Input file path |
+| 
+`-timeout`
+ | Execution timeout for code blocks |
+| 
+`-v`
+ | Enable verbose/debug output |
+
+
+---
+
+## Exit Codes
+
+| Code | Meaning |
+| ---- | ------- |
+| 
+`0`
+ | Success |
+| 
+`1`
+ | General error |
+
+
+---
+
+## Getting Help
+
+```bash
+# Show available commands
+hype
+
+# Show help for a specific command
+hype export --help
+hype preview --help
+hype blog --help
+
+```
+
+---
+
 # Quick Start Guide
 
 For more in depth examples, you can read our quick start guide
@@ -856,21 +1466,24 @@ $ tree ./docs
 │   └── src
 │       ├── deploy.yaml
 │       └── structure.txt
+├── cli-reference.md
 ├── html-export.md
 ├── installation.md
 ├── license.md
+├── marked.md
 ├── mermaid.md
 ├── preview.md
-└── quickstart
-    ├── hype.md
-    ├── includes.md
-    └── src
-        ├── broken
-        │   └── main.go
-        └── hello
-            └── main.go
+├── quickstart
+│   ├── hype.md
+│   ├── includes.md
+│   └── src
+│       ├── broken
+│       │   └── main.go
+│       └── hello
+│           └── main.go
+└── slides.md
 
-8 directories, 20 files
+8 directories, 22 files
 ```
 ---
 
