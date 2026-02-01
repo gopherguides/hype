@@ -191,7 +191,7 @@ func (cmd *Preview) Main(ctx context.Context, pwd string, args []string) error {
 	}
 
 	if cmd.Info.Version != "" {
-		_, _ = fmt.Fprintf(cmd.Stderr(), "hype %s\n", cmd.Info.Version)
+		_, _ = fmt.Fprintln(cmd.Stderr(), cmd.Info)
 	}
 
 	cfg := preview.DefaultConfig()

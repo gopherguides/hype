@@ -117,6 +117,10 @@ type VersionInfo struct {
 	Date    string
 }
 
+func (v VersionInfo) String() string {
+	return fmt.Sprintf("hype version %s (commit: %s, built: %s)", v.Version, v.Commit, v.Date)
+}
+
 func New(root string, info VersionInfo) *App {
 	cab := os.DirFS(root)
 

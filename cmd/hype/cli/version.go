@@ -18,6 +18,6 @@ func (cmd *Version) Main(ctx context.Context, pwd string, args []string) error {
 		return err
 	}
 
-	fmt.Fprintf(cmd.Stdout(), "hype version %s (commit: %s, built: %s)\n", cmd.Info.Version, cmd.Info.Commit, cmd.Info.Date)
+	fmt.Fprintln(cmd.Stdout(), cmd.Info)
 	return nil
 }
