@@ -97,6 +97,7 @@ From the `.hype` directory, run:
 
 ```
 hype export -format=markdown -f hype.md > ../README.md
+
 ```
 
 You can also use a [github action](#using-github-actions-to-update-your-readme) to automatically update your README as well.
@@ -409,14 +410,15 @@ Hype supports [Mermaid](https://mermaid.js.org/) diagrams, which are automatical
 
 Use standard fenced code blocks with the `mermaid` language identifier:
 
-```
+````
 ```mermaid
 graph LR
     A[Start] --> B{Decision}
     B -->|Yes| C[Action]
     B -->|No| D[End]
 ```
-```
+
+````
 
 When processed by Hype, this will be rendered as ASCII art:
 
@@ -426,6 +428,7 @@ When processed by Hype, this will be rendered as ASCII art:
 │ A[Start] ├────►│ B{Decision} │
 │          │     │             │
 └──────────┘     └─────────────┘
+
 ```
 
 ## Supported Diagram Types
@@ -436,7 +439,7 @@ Both `graph` and `flowchart` directives are supported with these directions:
 - `LR` - Left to Right
 - `TD` / `TB` - Top Down / Top to Bottom
 
-```
+````
 ```mermaid
 graph TD
     Client --> API
@@ -444,19 +447,21 @@ graph TD
     API --> Database
     Auth --> Database
 ```
-```
+
+````
 
 ### Sequence Diagrams
 
 Sequence diagrams show interactions between participants:
 
-```
+````
 ```mermaid
 sequenceDiagram
     Alice->>Bob: Hello Bob
     Bob-->>Alice: Hi Alice
 ```
-```
+
+````
 
 ## Limitations
 
@@ -1106,6 +1111,7 @@ This is the syntax to include a code sample in your document:
 
 ```
 <code src="src/hello/main.go" snippet="example"></code>
+
 ```
 
 The above code snippet does the following:
@@ -1135,6 +1141,7 @@ Notice the use of the `snippet` comment. The format for the comment is:
 
 ```
 // snippet: <snippet_name_here>
+
 ```
 
 You must have a beginning and an ending snippet for the code to work.
@@ -1181,6 +1188,7 @@ The following command will include the go source code, run it, and include the o
 
 ```
 <go src="src/hello" run="."></go>
+
 ```
 
 Here is the result that will be included in your document from the above command:
@@ -1201,6 +1209,7 @@ If you want to both run and show the code with the same tag, you can add the `co
 
 ```
 <go src="src/hello" run="." code="main.go"></go>
+
 ```
 
 Now the source code is includes, as well as the output of the program:
@@ -1235,6 +1244,7 @@ You can also specify the snippet in a `go` tag as well. The result is that it wi
 
 ```
 <go src="src/hello" run="." code="main.go#example"></go>
+
 ```
 
 You can see now that only the snippet is included, but the output is still the same:
@@ -1265,6 +1275,7 @@ What if you want to include an example of code that does not compile? We still w
 
 ```
 <go src="src/broken" run="." code="main.go#example" exit="1"></go>
+
 ```
 
 The result now includes the snippet, and the error output from trying to compile the invalid source code.
@@ -1298,6 +1309,7 @@ Here is the basic usage first:
 
 ```
 <go doc="-short context"></go>
+
 ```
 
 Here is the output for the above command:
@@ -1332,6 +1344,7 @@ You can also be more specific.
 
 ```
 <go doc="-short context.WithCancel"></go>
+
 ```
 
 Here is the output for the above command:
@@ -1434,6 +1447,7 @@ Examples:
  hype export -format html
  hype export -f README.md -format html
  hype export -f README.md -format markdown -timeout=10s
+
 ```
 
 This allows you to see your compiled document either as a single markdown, or as an html document that you can preview in the browser.
