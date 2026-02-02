@@ -9,6 +9,76 @@
 
 # Hype
 
+---
+
+## Quick Reference
+
+> **Hype** is a Markdown content generator with dynamic code execution, includes, and validation.
+
+### Install
+
+```bash
+go install github.com/gopherguides/hype/cmd/hype@latest
+
+```
+
+Or via Homebrew: `brew install gopherguides/hype/hype-md`
+
+### Common Commands
+
+| Command | Description |
+| ------- | ----------- |
+| 
+`hype export -format=markdown -f doc.md`
+ | Export to markdown (stdout) |
+| 
+`hype export -format=html -f doc.md -o doc.html`
+ | Export to HTML file |
+| 
+`hype preview -f doc.md -open`
+ | Live preview with hot reload |
+| 
+`hype validate -f doc.md`
+ | Validate document structure |
+
+
+### Key Tags
+
+| Tag | Purpose | Example |
+| --- | ------- | ------- |
+| 
+`<include>`
+ | Include another file | 
+`<include src=&#34;other.md&#34;>`
+ |
+| 
+`<code>`
+ | Show file contents | 
+`<code src=&#34;main.go&#34;>`
+ |
+| 
+`<go>`
+ | Run Go code, show output | 
+`<go run=&#34;main.go&#34;>`
+ |
+| 
+`<cmd>`
+ | Run shell command | 
+`<cmd exec=&#34;ls -la&#34;>`
+ |
+| 
+`<img>`
+ | Include image | 
+`<img src=&#34;diagram.png&#34;>`
+ |
+
+
+### AI Assistants
+
+For detailed skill documentation, see [`.agent/skills/hype/`](.agent/skills/hype/).
+
+---
+
 Hype is a content generation tool that use traditional Markdown syntax, and allows it to be extended for almost any use to create dynamic, rich, automated output that is easily maintainable and reusable.
 
 Hype follows the same principals that we use for coding:
@@ -89,14 +159,144 @@ hype version
 
 ---
 
+# AI Assistant Integration
+
+Hype includes an [Agent Skill](https://agentskills.io) to help AI coding assistants write hype-compatible documentation. The skill is located in `.agent/skills/hype/`.
+
+## macOS / Linux
+
+Install the hype skill globally for your preferred AI tool with a single command:
+
+### Claude Code
+
+```bash
+mkdir -p ~/.claude/skills && curl -sL https://github.com/gopherguides/hype/archive/main.tar.gz | tar -xz --strip-components=3 -C ~/.claude/skills hype-main/.agent/skills/hype
+
+```
+
+### OpenAI Codex
+
+```bash
+mkdir -p ~/.codex/skills && curl -sL https://github.com/gopherguides/hype/archive/main.tar.gz | tar -xz --strip-components=3 -C ~/.codex/skills hype-main/.agent/skills/hype
+
+```
+
+### Gemini CLI
+
+```bash
+mkdir -p ~/.gemini/skills && curl -sL https://github.com/gopherguides/hype/archive/main.tar.gz | tar -xz --strip-components=3 -C ~/.gemini/skills hype-main/.agent/skills/hype
+
+```
+
+### Cursor
+
+```bash
+mkdir -p ~/.cursor/skills && curl -sL https://github.com/gopherguides/hype/archive/main.tar.gz | tar -xz --strip-components=3 -C ~/.cursor/skills hype-main/.agent/skills/hype
+
+```
+
+### GitHub Copilot
+
+```bash
+mkdir -p ~/.copilot/skills && curl -sL https://github.com/gopherguides/hype/archive/main.tar.gz | tar -xz --strip-components=3 -C ~/.copilot/skills hype-main/.agent/skills/hype
+
+```
+
+### Universal (vendor-agnostic)
+
+```bash
+mkdir -p ~/.agent/skills && curl -sL https://github.com/gopherguides/hype/archive/main.tar.gz | tar -xz --strip-components=3 -C ~/.agent/skills hype-main/.agent/skills/hype
+
+```
+
+## Windows (PowerShell)
+
+Run these commands in PowerShell to install the hype skill:
+
+### Claude Code
+
+```powershell
+$tmp="$env:TEMP\hype-skill"; Invoke-WebRequest -Uri "https://github.com/gopherguides/hype/archive/main.zip" -OutFile "$tmp.zip"; Expand-Archive -Path "$tmp.zip" -DestinationPath $tmp -Force; New-Item -ItemType Directory -Force -Path "$env:USERPROFILE\.claude\skills" | Out-Null; Copy-Item -Path "$tmp\hype-main\.agent\skills\hype" -Destination "$env:USERPROFILE\.claude\skills\hype" -Recurse -Force; Remove-Item -Path "$tmp.zip","$tmp" -Recurse -Force
+
+```
+
+### OpenAI Codex
+
+```powershell
+$tmp="$env:TEMP\hype-skill"; Invoke-WebRequest -Uri "https://github.com/gopherguides/hype/archive/main.zip" -OutFile "$tmp.zip"; Expand-Archive -Path "$tmp.zip" -DestinationPath $tmp -Force; New-Item -ItemType Directory -Force -Path "$env:USERPROFILE\.codex\skills" | Out-Null; Copy-Item -Path "$tmp\hype-main\.agent\skills\hype" -Destination "$env:USERPROFILE\.codex\skills\hype" -Recurse -Force; Remove-Item -Path "$tmp.zip","$tmp" -Recurse -Force
+
+```
+
+### Gemini CLI
+
+```powershell
+$tmp="$env:TEMP\hype-skill"; Invoke-WebRequest -Uri "https://github.com/gopherguides/hype/archive/main.zip" -OutFile "$tmp.zip"; Expand-Archive -Path "$tmp.zip" -DestinationPath $tmp -Force; New-Item -ItemType Directory -Force -Path "$env:USERPROFILE\.gemini\skills" | Out-Null; Copy-Item -Path "$tmp\hype-main\.agent\skills\hype" -Destination "$env:USERPROFILE\.gemini\skills\hype" -Recurse -Force; Remove-Item -Path "$tmp.zip","$tmp" -Recurse -Force
+
+```
+
+### Cursor
+
+```powershell
+$tmp="$env:TEMP\hype-skill"; Invoke-WebRequest -Uri "https://github.com/gopherguides/hype/archive/main.zip" -OutFile "$tmp.zip"; Expand-Archive -Path "$tmp.zip" -DestinationPath $tmp -Force; New-Item -ItemType Directory -Force -Path "$env:USERPROFILE\.cursor\skills" | Out-Null; Copy-Item -Path "$tmp\hype-main\.agent\skills\hype" -Destination "$env:USERPROFILE\.cursor\skills\hype" -Recurse -Force; Remove-Item -Path "$tmp.zip","$tmp" -Recurse -Force
+
+```
+
+### GitHub Copilot
+
+```powershell
+$tmp="$env:TEMP\hype-skill"; Invoke-WebRequest -Uri "https://github.com/gopherguides/hype/archive/main.zip" -OutFile "$tmp.zip"; Expand-Archive -Path "$tmp.zip" -DestinationPath $tmp -Force; New-Item -ItemType Directory -Force -Path "$env:USERPROFILE\.copilot\skills" | Out-Null; Copy-Item -Path "$tmp\hype-main\.agent\skills\hype" -Destination "$env:USERPROFILE\.copilot\skills\hype" -Recurse -Force; Remove-Item -Path "$tmp.zip","$tmp" -Recurse -Force
+
+```
+
+### Universal (vendor-agnostic)
+
+```powershell
+$tmp="$env:TEMP\hype-skill"; Invoke-WebRequest -Uri "https://github.com/gopherguides/hype/archive/main.zip" -OutFile "$tmp.zip"; Expand-Archive -Path "$tmp.zip" -DestinationPath $tmp -Force; New-Item -ItemType Directory -Force -Path "$env:USERPROFILE\.agent\skills" | Out-Null; Copy-Item -Path "$tmp\hype-main\.agent\skills\hype" -Destination "$env:USERPROFILE\.agent\skills\hype" -Recurse -Force; Remove-Item -Path "$tmp.zip","$tmp" -Recurse -Force
+
+```
+
+## Project-Local Install
+
+To install the skill for a specific project only:
+
+**macOS / Linux:**
+
+```bash
+mkdir -p .agent/skills && curl -sL https://github.com/gopherguides/hype/archive/main.tar.gz | tar -xz --strip-components=3 -C .agent/skills hype-main/.agent/skills/hype
+
+```
+
+**Windows (PowerShell):**
+
+```powershell
+$tmp="$env:TEMP\hype-skill"; Invoke-WebRequest -Uri "https://github.com/gopherguides/hype/archive/main.zip" -OutFile "$tmp.zip"; Expand-Archive -Path "$tmp.zip" -DestinationPath $tmp -Force; New-Item -ItemType Directory -Force -Path ".agent\skills" | Out-Null; Copy-Item -Path "$tmp\hype-main\.agent\skills\hype" -Destination ".agent\skills\hype" -Recurse -Force; Remove-Item -Path "$tmp.zip","$tmp" -Recurse -Force
+
+```
+
+## Using openskills
+
+Alternatively, use [openskills](https://www.npmjs.com/package/openskills) for cross-platform installation:
+
+```bash
+npm install -g openskills
+openskills install gopherguides/hype --universal
+
+```
+
+The skill activates automatically when working with hype documents.
+
+---
+
 ## Created with Hype
 
 This README was created with hype. Here was the command we used to create it:
 
 From the `.hype` directory, run:
 
-`hype export -format=markdown -f hype.md > ../README.md
-`
+```plain
+hype export -format=markdown -f hype.md > ../README.md
+
+```
 
 You can also use a [github action](#using-github-actions-to-update-your-readme) to automatically update your README as well.
 
@@ -408,22 +608,26 @@ Hype supports [Mermaid](https://mermaid.js.org/) diagrams, which are automatical
 
 Use standard fenced code blocks with the `mermaid` language identifier:
 
-````mermaid
+~~~plain
+```mermaid
 graph LR
     A[Start] --> B{Decision}
     B -->|Yes| C[Action]
     B -->|No| D[End]
 ```
-`
+
+~~~
 
 When processed by Hype, this will be rendered as ASCII art:
 
-`┌──────────┐     ┌─────────────┐
+```plain
+┌──────────┐     ┌─────────────┐
 │          │     │             │
 │ A[Start] ├────►│ B{Decision} │
 │          │     │             │
 └──────────┘     └─────────────┘
-`
+
+```
 
 ## Supported Diagram Types
 
@@ -433,25 +637,29 @@ Both `graph` and `flowchart` directives are supported with these directions:
 - `LR` - Left to Right
 - `TD` / `TB` - Top Down / Top to Bottom
 
-````mermaid
+~~~plain
+```mermaid
 graph TD
     Client --> API
     API --> Auth
     API --> Database
     Auth --> Database
 ```
-`
+
+~~~
 
 ### Sequence Diagrams
 
 Sequence diagrams show interactions between participants:
 
-````mermaid
+~~~plain
+```mermaid
 sequenceDiagram
     Alice->>Bob: Hello Bob
     Bob-->>Alice: Hi Alice
 ```
-`
+
+~~~
 
 ## Limitations
 
@@ -482,11 +690,13 @@ In Markdown export, they appear as plain code blocks (without language specifier
 
 When documenting mermaid syntax (as this file does), use 4-space indentation to create indented code blocks:
 
-`    ```mermaid
+~~~plain
+    ```mermaid
     graph LR
         A --> B
     ```
-`
+
+~~~
 
 Hype automatically uses tilde fences (`~~~`) in the markdown output when code content contains triple backticks. This follows CommonMark best practice: tildes and backticks ignore each other, allowing safe nesting.
 
@@ -1111,8 +1321,10 @@ For more in depth examples, you can read our quick start guide
 
 This is the syntax to include a code sample in your document:
 
-`<code src="src/hello/main.go" snippet="example"></code>
-`
+```plain
+<code src="src/hello/main.go" snippet="example"></code>
+
+```
 
 The above code snippet does the following:
 
@@ -1139,8 +1351,10 @@ func main() {
 
 Notice the use of the `snippet` comment. The format for the comment is:
 
-`// snippet: <snippet_name_here>
-`
+```plain
+// snippet: <snippet_name_here>
+
+```
 
 You must have a beginning and an ending snippet for the code to work.
 
@@ -1184,8 +1398,10 @@ Here is the source code of the Go file we are going to include. Notice the use o
 
 The following command will include the go source code, run it, and include the output of the program as well:
 
-`<go src="src/hello" run="."></go>
-`
+```plain
+<go src="src/hello" run="."></go>
+
+```
 
 Here is the result that will be included in your document from the above command:
 
@@ -1195,7 +1411,7 @@ $ go run .
 Hello World
 
 --------------------------------------------------------------------------------
-Go Version: go1.25.6
+Go Version: go1.25.5
 
 ```
 
@@ -1203,8 +1419,10 @@ Go Version: go1.25.6
 
 If you want to both run and show the code with the same tag, you can add the `code` attribute to the tag:
 
-`<go src="src/hello" run="." code="main.go"></go>
-`
+```plain
+<go src="src/hello" run="." code="main.go"></go>
+
+```
 
 Now the source code is includes, as well as the output of the program:
 
@@ -1228,7 +1446,7 @@ $ go run .
 Hello World
 
 --------------------------------------------------------------------------------
-Go Version: go1.25.6
+Go Version: go1.25.5
 
 ```
 
@@ -1236,8 +1454,10 @@ Go Version: go1.25.6
 
 You can also specify the snippet in a `go` tag as well. The result is that it will only include the code snippet in the included source:
 
-`<go src="src/hello" run="." code="main.go#example"></go>
-`
+```plain
+<go src="src/hello" run="." code="main.go#example"></go>
+
+```
 
 You can see now that only the snippet is included, but the output is still the same:
 
@@ -1257,7 +1477,7 @@ $ go run .
 Hello World
 
 --------------------------------------------------------------------------------
-Go Version: go1.25.6
+Go Version: go1.25.5
 
 ```
 
@@ -1265,8 +1485,10 @@ Go Version: go1.25.6
 
 What if you want to include an example of code that does not compile? We still want the code to be parsed and included, even though the code doesn't compile. For this, we can state the expected output of the program.
 
-`<go src="src/broken" run="." code="main.go#example" exit="1"></go>
-`
+```plain
+<go src="src/broken" run="." code="main.go#example" exit="1"></go>
+
+```
 
 The result now includes the snippet, and the error output from trying to compile the invalid source code.
 
@@ -1287,7 +1509,7 @@ $ go run .
 ./main.go:7:6: undefined: fmt.Prin
 
 --------------------------------------------------------------------------------
-Go Version: go1.25.6
+Go Version: go1.25.5
 
 ```
 
@@ -1297,8 +1519,10 @@ While there are a number of `godoc` commands that will allow you to put your doc
 
 Here is the basic usage first:
 
-`<go doc="-short context"></go>
-`
+```plain
+<go doc="-short context"></go>
+
+```
 
 Here is the output for the above command:
 
@@ -1324,14 +1548,16 @@ type Context interface{ ... }
     func WithoutCancel(parent Context) Context
 
 --------------------------------------------------------------------------------
-Go Version: go1.25.6
+Go Version: go1.25.5
 
 ```
 
 You can also be more specific.
 
-`<go doc="-short context.WithCancel"></go>
-`
+```plain
+<go doc="-short context.WithCancel"></go>
+
+```
 
 Here is the output for the above command:
 ```shell
@@ -1347,7 +1573,7 @@ func WithCancel(parent Context) (ctx Context, cancel CancelFunc)
     call cancel as soon as the operations running in this Context complete.
 
 --------------------------------------------------------------------------------
-Go Version: go1.25.6
+Go Version: go1.25.5
 
 ```
 
@@ -1415,7 +1641,8 @@ The `youtube` tag renders a responsive iframe embed with proper security attribu
 
 There are several options for running the `hype` command. Most notable is the `export` option:
 
-`$ hype export -h
+```plain
+$ hype export -h
 
 Usage of hype:
   -f string
@@ -1432,7 +1659,8 @@ Examples:
  hype export -format html
  hype export -f README.md -format html
  hype export -f README.md -format markdown -timeout=10s
-`
+
+```
 
 This allows you to see your compiled document either as a single markdown, or as an html document that you can preview in the browser.
 
@@ -1466,7 +1694,6 @@ $ tree ./docs
 ./docs
 ├── badges.md
 ├── blog
-│   ├── README.md
 │   ├── hype.md
 │   ├── images
 │   │   ├── theme-cards-article.png
@@ -1475,6 +1702,7 @@ $ tree ./docs
 │   │   ├── theme-developer-home.png
 │   │   ├── theme-suspended-article.png
 │   │   └── theme-suspended-home.png
+│   ├── README.md
 │   └── src
 │       ├── deploy.yaml
 │       └── structure.txt
@@ -1485,6 +1713,7 @@ $ tree ./docs
 ├── marked.md
 ├── mermaid.md
 ├── preview.md
+├── quick-reference.md
 ├── quickstart
 │   ├── hype.md
 │   ├── includes.md
@@ -1495,7 +1724,7 @@ $ tree ./docs
 │           └── main.go
 └── slides.md
 
-8 directories, 23 files
+8 directories, 24 files
 ```
 ---
 
@@ -1568,134 +1797,6 @@ jobs:
 ```
 > *source: .github/workflows/hype.yml*
 
-
----
-
-# AI Assistant Integration
-
-Hype includes an [Agent Skill](https://agentskills.io) to help AI coding assistants write hype-compatible documentation. The skill is located in `.agent/skills/hype/`.
-
-## macOS / Linux
-
-Install the hype skill globally for your preferred AI tool with a single command:
-
-### Claude Code
-
-```bash
-mkdir -p ~/.claude/skills && curl -sL https://github.com/gopherguides/hype/archive/main.tar.gz | tar -xz --strip-components=3 -C ~/.claude/skills hype-main/.agent/skills/hype
-
-```
-
-### OpenAI Codex
-
-```bash
-mkdir -p ~/.codex/skills && curl -sL https://github.com/gopherguides/hype/archive/main.tar.gz | tar -xz --strip-components=3 -C ~/.codex/skills hype-main/.agent/skills/hype
-
-```
-
-### Gemini CLI
-
-```bash
-mkdir -p ~/.gemini/skills && curl -sL https://github.com/gopherguides/hype/archive/main.tar.gz | tar -xz --strip-components=3 -C ~/.gemini/skills hype-main/.agent/skills/hype
-
-```
-
-### Cursor
-
-```bash
-mkdir -p ~/.cursor/skills && curl -sL https://github.com/gopherguides/hype/archive/main.tar.gz | tar -xz --strip-components=3 -C ~/.cursor/skills hype-main/.agent/skills/hype
-
-```
-
-### GitHub Copilot
-
-```bash
-mkdir -p ~/.copilot/skills && curl -sL https://github.com/gopherguides/hype/archive/main.tar.gz | tar -xz --strip-components=3 -C ~/.copilot/skills hype-main/.agent/skills/hype
-
-```
-
-### Universal (vendor-agnostic)
-
-```bash
-mkdir -p ~/.agent/skills && curl -sL https://github.com/gopherguides/hype/archive/main.tar.gz | tar -xz --strip-components=3 -C ~/.agent/skills hype-main/.agent/skills/hype
-
-```
-
-## Windows (PowerShell)
-
-Run these commands in PowerShell to install the hype skill:
-
-### Claude Code
-
-```powershell
-$tmp="$env:TEMP\hype-skill"; Invoke-WebRequest -Uri "https://github.com/gopherguides/hype/archive/main.zip" -OutFile "$tmp.zip"; Expand-Archive -Path "$tmp.zip" -DestinationPath $tmp -Force; New-Item -ItemType Directory -Force -Path "$env:USERPROFILE\.claude\skills" | Out-Null; Copy-Item -Path "$tmp\hype-main\.agent\skills\hype" -Destination "$env:USERPROFILE\.claude\skills\hype" -Recurse -Force; Remove-Item -Path "$tmp.zip","$tmp" -Recurse -Force
-
-```
-
-### OpenAI Codex
-
-```powershell
-$tmp="$env:TEMP\hype-skill"; Invoke-WebRequest -Uri "https://github.com/gopherguides/hype/archive/main.zip" -OutFile "$tmp.zip"; Expand-Archive -Path "$tmp.zip" -DestinationPath $tmp -Force; New-Item -ItemType Directory -Force -Path "$env:USERPROFILE\.codex\skills" | Out-Null; Copy-Item -Path "$tmp\hype-main\.agent\skills\hype" -Destination "$env:USERPROFILE\.codex\skills\hype" -Recurse -Force; Remove-Item -Path "$tmp.zip","$tmp" -Recurse -Force
-
-```
-
-### Gemini CLI
-
-```powershell
-$tmp="$env:TEMP\hype-skill"; Invoke-WebRequest -Uri "https://github.com/gopherguides/hype/archive/main.zip" -OutFile "$tmp.zip"; Expand-Archive -Path "$tmp.zip" -DestinationPath $tmp -Force; New-Item -ItemType Directory -Force -Path "$env:USERPROFILE\.gemini\skills" | Out-Null; Copy-Item -Path "$tmp\hype-main\.agent\skills\hype" -Destination "$env:USERPROFILE\.gemini\skills\hype" -Recurse -Force; Remove-Item -Path "$tmp.zip","$tmp" -Recurse -Force
-
-```
-
-### Cursor
-
-```powershell
-$tmp="$env:TEMP\hype-skill"; Invoke-WebRequest -Uri "https://github.com/gopherguides/hype/archive/main.zip" -OutFile "$tmp.zip"; Expand-Archive -Path "$tmp.zip" -DestinationPath $tmp -Force; New-Item -ItemType Directory -Force -Path "$env:USERPROFILE\.cursor\skills" | Out-Null; Copy-Item -Path "$tmp\hype-main\.agent\skills\hype" -Destination "$env:USERPROFILE\.cursor\skills\hype" -Recurse -Force; Remove-Item -Path "$tmp.zip","$tmp" -Recurse -Force
-
-```
-
-### GitHub Copilot
-
-```powershell
-$tmp="$env:TEMP\hype-skill"; Invoke-WebRequest -Uri "https://github.com/gopherguides/hype/archive/main.zip" -OutFile "$tmp.zip"; Expand-Archive -Path "$tmp.zip" -DestinationPath $tmp -Force; New-Item -ItemType Directory -Force -Path "$env:USERPROFILE\.copilot\skills" | Out-Null; Copy-Item -Path "$tmp\hype-main\.agent\skills\hype" -Destination "$env:USERPROFILE\.copilot\skills\hype" -Recurse -Force; Remove-Item -Path "$tmp.zip","$tmp" -Recurse -Force
-
-```
-
-### Universal (vendor-agnostic)
-
-```powershell
-$tmp="$env:TEMP\hype-skill"; Invoke-WebRequest -Uri "https://github.com/gopherguides/hype/archive/main.zip" -OutFile "$tmp.zip"; Expand-Archive -Path "$tmp.zip" -DestinationPath $tmp -Force; New-Item -ItemType Directory -Force -Path "$env:USERPROFILE\.agent\skills" | Out-Null; Copy-Item -Path "$tmp\hype-main\.agent\skills\hype" -Destination "$env:USERPROFILE\.agent\skills\hype" -Recurse -Force; Remove-Item -Path "$tmp.zip","$tmp" -Recurse -Force
-
-```
-
-## Project-Local Install
-
-To install the skill for a specific project only:
-
-**macOS / Linux:**
-
-```bash
-mkdir -p .agent/skills && curl -sL https://github.com/gopherguides/hype/archive/main.tar.gz | tar -xz --strip-components=3 -C .agent/skills hype-main/.agent/skills/hype
-
-```
-
-**Windows (PowerShell):**
-
-```powershell
-$tmp="$env:TEMP\hype-skill"; Invoke-WebRequest -Uri "https://github.com/gopherguides/hype/archive/main.zip" -OutFile "$tmp.zip"; Expand-Archive -Path "$tmp.zip" -DestinationPath $tmp -Force; New-Item -ItemType Directory -Force -Path ".agent\skills" | Out-Null; Copy-Item -Path "$tmp\hype-main\.agent\skills\hype" -Destination ".agent\skills\hype" -Recurse -Force; Remove-Item -Path "$tmp.zip","$tmp" -Recurse -Force
-
-```
-
-## Using openskills
-
-Alternatively, use [openskills](https://www.npmjs.com/package/openskills) for cross-platform installation:
-
-```bash
-npm install -g openskills
-openskills install gopherguides/hype --universal
-
-```
-
-The skill activates automatically when working with hype documents.
 
 ---
 
