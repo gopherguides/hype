@@ -19,7 +19,7 @@ jobs:
           go-version-file: 'go.mod'
           cache-dependency-path: subdir/go.sum
       - name: Install hype
-        run: go install ./cmd/hype
+        run: go install github.com/gopherguides/hype/cmd/hype@latest
       - name: Run hype
         run: hype export -format=markdown -f hype.md -o README.md
       - name: Check for changes
