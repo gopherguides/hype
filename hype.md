@@ -2,6 +2,10 @@
 
 # Hype
 
+<include src="docs/quick-reference.md"></include>
+
+---
+
 Hype is a content generation tool that use traditional Markdown syntax, and allows it to be extended for almost any use to create dynamic, rich, automated output that is easily maintainable and reusable.
 
 Hype follows the same principals that we use for coding:
@@ -13,42 +17,6 @@ Hype follows the same principals that we use for coding:
 - asset validation - ensure local assets like images, etc actually exist
 
 <include src="docs/installation.md"></include>
-
-## Created with Hype
-
-This README was created with hype. Here was the command we used to create it:
-
-From the `.hype` directory, run:
-
-```
-hype export -format=markdown -f hype.md > ../README.md
-```
-
-You can also use a [github action](#using-github-actions-to-update-your-readme) to automatically update your README as well.
-
-<include src="docs/html-export.md"></include>
-
-<include src="docs/preview.md"></include>
-
-<include src="docs/mermaid.md"></include>
-
-<include src="docs/marked.md"></include>
-
-<include src="docs/slides.md"></include>
-
-<include src="docs/cli-reference.md"></include>
-
-<include src="docs/quickstart/hype.md"></include>
-
-# README Source
-
-You can view the source for this entire readme in the [.hype](https://github.com/gopherguides/corp/tree/main/.hype) directory.
-
-Here is the current structure that we are using to create this readme:
-
-<cmd exec="tree ./docs" src=".">
-
-<include src=".github/workflows/hype.md"></include>
 
 # AI Assistant Integration
 
@@ -158,6 +126,44 @@ openskills install gopherguides/hype --universal
 ```
 
 The skill activates automatically when working with hype documents.
+
+---
+
+## Created with Hype
+
+This README was created with hype. Here was the command we used to create it:
+
+From the `.hype` directory, run:
+
+```
+hype export -format=markdown -f hype.md > ../README.md
+```
+
+You can also use a [github action](#using-github-actions-to-update-your-readme) to automatically update your README as well.
+
+<include src="docs/html-export.md"></include>
+
+<include src="docs/preview.md"></include>
+
+<include src="docs/mermaid.md"></include>
+
+<include src="docs/marked.md"></include>
+
+<include src="docs/slides.md"></include>
+
+<include src="docs/cli-reference.md"></include>
+
+<include src="docs/quickstart/hype.md"></include>
+
+# README Source
+
+You can view the source for this entire readme in the [.hype](https://github.com/gopherguides/corp/tree/main/.hype) directory.
+
+Here is the current structure that we are using to create this readme:
+
+<cmd exec="tree ./docs" src=".">
+
+<include src=".github/workflows/hype.md"></include>
 
 ---
 
