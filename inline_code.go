@@ -56,7 +56,15 @@ func (code *InlineCode) MD() string {
 
 	// Multi-line content should be rendered as a fenced code block
 	if strings.Contains(content, "\n") {
-		return fmt.Sprintf("```\n%s\n```", strings.TrimSpace(content))
+		// Use a fence longer than any backtick sequence in the content
+		maxTicks := countMaxConsecutiveBackticks(content)
+		fenceLen := 3
+		if maxTicks >= 3 {
+			fenceLen = maxTicks + 1
+		}
+		fence := strings.Repeat("`", fenceLen)
+		// Preserve whitespace - don't trim content
+		return fmt.Sprintf("%s\n%s\n%s", fence, content, fence)
 	}
 
 	// Content with backticks needs special handling

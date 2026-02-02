@@ -60,7 +60,12 @@ func Test_InlineCode_MD(t *testing.T) {
 		{
 			name:     "mermaid example syntax",
 			content:  "```mermaid\ngraph LR\n    A --> B\n```",
-			expected: "```\n```mermaid\ngraph LR\n    A --> B\n```\n```",
+			expected: "````\n```mermaid\ngraph LR\n    A --> B\n```\n````",
+		},
+		{
+			name:     "preserves leading/trailing whitespace",
+			content:  "  indented\n    more indent\n",
+			expected: "```\n  indented\n    more indent\n\n```",
 		},
 		{
 			name:     "empty content",
