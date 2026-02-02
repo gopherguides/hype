@@ -2,6 +2,7 @@ package hype
 
 import (
 	"context"
+	"errors"
 	"strings"
 	"testing"
 
@@ -141,4 +142,58 @@ func Test_Mermaid_MarshalJSON(t *testing.T) {
 	r.Contains(json, `"type"`)
 	r.Contains(json, `"source"`)
 	r.Contains(json, `"rendered"`)
+}
+
+func Test_Mermaid_Execute_ErrorPropagation(t *testing.T) {
+	t.Parallel()
+
+	t.Run("error propagates through document execute", func(t *testing.T) {
+		t.Parallel()
+		r := require.New(t)
+
+		p := testParser(t, "testdata/mermaid/invalid")
+		doc, err := p.ParseFile("hype.md")
+		r.NoError(err)
+
+		err = doc.Execute(context.Background())
+		r.Error(err)
+
+		// Verify it's wrapped in ExecuteError
+		var execErr ExecuteError
+		r.True(errors.As(err, &execErr), "error should be ExecuteError, got: %T", err)
+
+		// Verify the filename is preserved in the error
+		r.NotEmpty(execErr.Filename, "ExecuteError should contain filename")
+	})
+
+	t.Run("error contains mermaid context", func(t *testing.T) {
+		t.Parallel()
+		r := require.New(t)
+
+		p := testParser(t, "testdata/mermaid/invalid")
+		doc, err := p.ParseFile("hype.md")
+		r.NoError(err)
+
+		err = doc.Execute(context.Background())
+		r.Error(err)
+
+		// Error message should indicate mermaid rendering failure
+		errStr := err.Error()
+		r.Contains(errStr, "mermaid", "error should mention mermaid")
+	})
+
+	t.Run("error unwraps to original mermaid error", func(t *testing.T) {
+		t.Parallel()
+		r := require.New(t)
+
+		p := testParser(t, "testdata/mermaid/invalid")
+		doc, err := p.ParseFile("hype.md")
+		r.NoError(err)
+
+		err = doc.Execute(context.Background())
+		r.Error(err)
+
+		// Should be able to unwrap to get more details
+		r.NotNil(errors.Unwrap(err), "error should be unwrappable")
+	})
 }

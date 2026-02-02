@@ -73,3 +73,14 @@ The ASCII rendering is provided by [mermaid-ascii](https://github.com/AlexanderG
 In HTML export, mermaid diagrams are rendered as `<pre><code>` blocks with the ASCII art content.
 
 In Markdown export, they appear as plain code blocks (without language specifier) containing the ASCII art.
+
+## Showing Mermaid Syntax in Documentation
+
+When documenting mermaid syntax (as this file does), use 4-space indentation to create indented code blocks:
+
+        ```mermaid
+        graph LR
+            A --> B
+        ```
+
+Hype automatically uses tilde fences (`~~~`) in the markdown output when code content contains triple backticks. This follows CommonMark best practice: tildes and backticks ignore each other, allowing safe nesting.

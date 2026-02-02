@@ -5,6 +5,7 @@ import (
 	"encoding/json"
 	"fmt"
 	"html"
+	"strings"
 )
 
 type FencedCode struct {
@@ -41,14 +42,24 @@ func (code *FencedCode) MD() string {
 
 	bb := &bytes.Buffer{}
 
-	fmt.Fprintf(bb, "```%s\n", code.Lang())
-
 	body := code.Children().MD()
 	body = html.UnescapeString(body)
 
-	fmt.Fprintln(bb, body)
+	// Choose fence that doesn't appear in content
+	// Per CommonMark spec, tildes and backticks ignore each other
+	fence := "```"
+	if strings.Contains(body, "```") {
+		fence = "~~~"
+		// If body has both, use longer backtick fence
+		if strings.Contains(body, "~~~") {
+			maxTicks := countMaxConsecutiveChar(body, '`')
+			fence = strings.Repeat("`", maxTicks+1)
+		}
+	}
 
-	fmt.Fprint(bb, "```")
+	fmt.Fprintf(bb, "%s%s\n", fence, code.Lang())
+	fmt.Fprintln(bb, body)
+	fmt.Fprint(bb, fence)
 
 	return bb.String()
 }
@@ -60,6 +71,22 @@ func (code *FencedCode) Lang() string {
 	}
 
 	return Language(code.Attrs(), lang)
+}
+
+// countMaxConsecutiveChar counts the maximum consecutive occurrences of a character
+func countMaxConsecutiveChar(s string, char rune) int {
+	max, current := 0, 0
+	for _, r := range s {
+		if r == char {
+			current++
+			if current > max {
+				max = current
+			}
+		} else {
+			current = 0
+		}
+	}
+	return max
 }
 
 func NewFencedCode(el *Element) (*FencedCode, error) {

@@ -325,6 +325,49 @@ hype blog theme add developer
 
 For full blog documentation, see [blog/README.md](https://github.com/gopherguides/hype/blob/main/blog/README.md).
 
+## Code Block Handling
+
+Hype follows [CommonMark](https://spec.commonmark.org/) semantics for code blocks:
+
+### Inline vs Block Code
+
+- **Inline code** (single-line): Rendered with backticks `` `code` ``
+- **Block code** (multi-line or with language attribute): Rendered as fenced code blocks
+
+The routing happens at parse time based on content and attributes.
+
+### Showing Code Block Examples in Documentation
+
+When you need to show fenced code block syntax as an example (like documenting how to use mermaid), use **4-space indentation** in your source markdown:
+
+        ```mermaid
+        graph LR
+            A --> B
+        ```
+
+Hype outputs this using **tilde fences** (`~~~`) to avoid conflicts with the backticks in the content:
+
+```
+~~~plain
+```mermaid
+graph LR
+    A --> B
+```
+~~~
+```
+
+This follows CommonMark best practice: tildes and backticks ignore each other, so a tilde fence can safely contain content with triple backticks.
+
+### Inline Code with Backticks
+
+For inline code containing backticks, Hype uses more backticks to escape:
+
+| Content | Output |
+|---------|--------|
+| `var x = 1` | `` `var x = 1` `` |
+| Use `` `fmt.Println` `` | ```` `` Use `fmt.Println` `` ```` |
+| Has ``` `` ``` double | ````` ``` Has `` double ``` ````` |
+
 ## Best Practices
 
 ### Directory Structure

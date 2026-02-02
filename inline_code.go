@@ -5,6 +5,7 @@ import (
 	"encoding/json"
 	"fmt"
 	"html"
+	"strings"
 )
 
 type InlineCode struct {
@@ -51,7 +52,38 @@ func (code *InlineCode) MD() string {
 		return ""
 	}
 
-	return fmt.Sprintf("`%s`", code.Nodes.String())
+	content := code.Nodes.String()
+
+	// Content with backticks needs more backticks to escape
+	if strings.Contains(content, "`") {
+		maxTicks := countMaxConsecutiveBackticks(content)
+		fence := strings.Repeat("`", maxTicks+1)
+		// Add spaces when content starts/ends with backtick
+		if strings.HasPrefix(content, "`") || strings.HasSuffix(content, "`") {
+			return fmt.Sprintf("%s %s %s", fence, content, fence)
+		}
+		return fmt.Sprintf("%s%s%s", fence, content, fence)
+	}
+
+	return fmt.Sprintf("`%s`", content)
+}
+
+// countMaxConsecutiveBackticks counts the maximum number of consecutive
+// backticks in a string. This is used to determine how many backticks
+// are needed to fence inline code that contains backticks.
+func countMaxConsecutiveBackticks(s string) int {
+	max, current := 0, 0
+	for _, r := range s {
+		if r == '`' {
+			current++
+			if current > max {
+				max = current
+			}
+		} else {
+			current = 0
+		}
+	}
+	return max
 }
 
 func NewInlineCode(el *Element) (*InlineCode, error) {
