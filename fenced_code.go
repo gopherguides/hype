@@ -5,6 +5,7 @@ import (
 	"encoding/json"
 	"fmt"
 	"html"
+	"strings"
 )
 
 type FencedCode struct {
@@ -41,14 +42,19 @@ func (code *FencedCode) MD() string {
 
 	bb := &bytes.Buffer{}
 
-	fmt.Fprintf(bb, "```%s\n", code.Lang())
-
 	body := code.Children().MD()
 	body = html.UnescapeString(body)
 
-	fmt.Fprintln(bb, body)
+	// Use tildes if content contains triple backticks (CommonMark best practice)
+	// Per spec, tildes and backticks ignore each other
+	fence := "```"
+	if strings.Contains(body, "```") {
+		fence = "~~~"
+	}
 
-	fmt.Fprint(bb, "```")
+	fmt.Fprintf(bb, "%s%s\n", fence, code.Lang())
+	fmt.Fprintln(bb, body)
+	fmt.Fprint(bb, fence)
 
 	return bb.String()
 }

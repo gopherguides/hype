@@ -22,6 +22,8 @@ func Test_InlineCode_MarshalJSON(t *testing.T) {
 func Test_InlineCode_MD(t *testing.T) {
 	t.Parallel()
 
+	// Note: Multi-line content is now routed to FencedCode at parse time
+	// InlineCode only handles single-line inline code
 	tests := []struct {
 		name     string
 		content  string
@@ -31,11 +33,6 @@ func Test_InlineCode_MD(t *testing.T) {
 			name:     "simple inline code",
 			content:  "var x = 1",
 			expected: "`var x = 1`",
-		},
-		{
-			name:     "multi-line content becomes fenced block",
-			content:  "line1\nline2\nline3",
-			expected: "```\nline1\nline2\nline3\n```",
 		},
 		{
 			name:     "content with single backtick",
@@ -56,16 +53,6 @@ func Test_InlineCode_MD(t *testing.T) {
 			name:     "content ending with backtick",
 			content:  "end`",
 			expected: "`` end` ``",
-		},
-		{
-			name:     "mermaid example syntax",
-			content:  "```mermaid\ngraph LR\n    A --> B\n```",
-			expected: "````\n```mermaid\ngraph LR\n    A --> B\n```\n````",
-		},
-		{
-			name:     "preserves leading/trailing whitespace",
-			content:  "  indented\n    more indent\n",
-			expected: "```\n  indented\n    more indent\n\n```",
 		},
 		{
 			name:     "empty content",
