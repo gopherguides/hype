@@ -88,7 +88,9 @@ Execute arbitrary shell commands.
 
 ### Output Replacement
 
-Use `replace-N` and `replace-N-with` attribute pairs to stabilize dynamic output (timestamps, versions, UUIDs) that would otherwise cause spurious changes when regenerating documentation.
+Commands often produce output containing dynamic content like timestamps, version numbers, or UUIDs. When you regenerate your documentation, this dynamic content changes even though your actual code hasn't—creating noise in your version control and making it impossible to see what really changed.
+
+Use `replace-N` and `replace-N-with` attribute pairs to replace dynamic content with stable placeholders. This ensures predictable, reproducible output every time you regenerate—essential for blogs, READMEs, and any documentation you generate repeatedly.
 
 ```html
 <!-- Replace Go version -->

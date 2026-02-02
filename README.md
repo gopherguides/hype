@@ -293,8 +293,10 @@ This README was created with hype. Here was the command we used to create it:
 
 From the `.hype` directory, run:
 
-`hype export -format=markdown -f hype.md > ../README.md
-`
+```plain
+hype export -format=markdown -f hype.md > ../README.md
+
+```
 
 You can also use a [github action](#using-github-actions-to-update-your-readme) to automatically update your README as well.
 
@@ -606,22 +608,26 @@ Hype supports [Mermaid](https://mermaid.js.org/) diagrams, which are automatical
 
 Use standard fenced code blocks with the `mermaid` language identifier:
 
-````mermaid
+~~~plain
+```mermaid
 graph LR
     A[Start] --> B{Decision}
     B -->|Yes| C[Action]
     B -->|No| D[End]
 ```
-`
+
+~~~
 
 When processed by Hype, this will be rendered as ASCII art:
 
-`┌──────────┐     ┌─────────────┐
+```plain
+┌──────────┐     ┌─────────────┐
 │          │     │             │
 │ A[Start] ├────►│ B{Decision} │
 │          │     │             │
 └──────────┘     └─────────────┘
-`
+
+```
 
 ## Supported Diagram Types
 
@@ -631,25 +637,29 @@ Both `graph` and `flowchart` directives are supported with these directions:
 - `LR` - Left to Right
 - `TD` / `TB` - Top Down / Top to Bottom
 
-````mermaid
+~~~plain
+```mermaid
 graph TD
     Client --> API
     API --> Auth
     API --> Database
     Auth --> Database
 ```
-`
+
+~~~
 
 ### Sequence Diagrams
 
 Sequence diagrams show interactions between participants:
 
-````mermaid
+~~~plain
+```mermaid
 sequenceDiagram
     Alice->>Bob: Hello Bob
     Bob-->>Alice: Hi Alice
 ```
-`
+
+~~~
 
 ## Limitations
 
@@ -680,11 +690,13 @@ In Markdown export, they appear as plain code blocks (without language specifier
 
 When documenting mermaid syntax (as this file does), use 4-space indentation to create indented code blocks:
 
-`    ```mermaid
+~~~plain
+    ```mermaid
     graph LR
         A --> B
     ```
-`
+
+~~~
 
 Hype automatically uses tilde fences (`~~~`) in the markdown output when code content contains triple backticks. This follows CommonMark best practice: tildes and backticks ignore each other, allowing safe nesting.
 
@@ -1309,8 +1321,10 @@ For more in depth examples, you can read our quick start guide
 
 This is the syntax to include a code sample in your document:
 
-`<code src="src/hello/main.go" snippet="example"></code>
-`
+```plain
+<code src="src/hello/main.go" snippet="example"></code>
+
+```
 
 The above code snippet does the following:
 
@@ -1337,8 +1351,10 @@ func main() {
 
 Notice the use of the `snippet` comment. The format for the comment is:
 
-`// snippet: <snippet_name_here>
-`
+```plain
+// snippet: <snippet_name_here>
+
+```
 
 You must have a beginning and an ending snippet for the code to work.
 
@@ -1382,8 +1398,10 @@ Here is the source code of the Go file we are going to include. Notice the use o
 
 The following command will include the go source code, run it, and include the output of the program as well:
 
-`<go src="src/hello" run="."></go>
-`
+```plain
+<go src="src/hello" run="."></go>
+
+```
 
 Here is the result that will be included in your document from the above command:
 
@@ -1393,7 +1411,7 @@ $ go run .
 Hello World
 
 --------------------------------------------------------------------------------
-Go Version: go1.25.6
+Go Version: go1.25.5
 
 ```
 
@@ -1401,8 +1419,10 @@ Go Version: go1.25.6
 
 If you want to both run and show the code with the same tag, you can add the `code` attribute to the tag:
 
-`<go src="src/hello" run="." code="main.go"></go>
-`
+```plain
+<go src="src/hello" run="." code="main.go"></go>
+
+```
 
 Now the source code is includes, as well as the output of the program:
 
@@ -1426,7 +1446,7 @@ $ go run .
 Hello World
 
 --------------------------------------------------------------------------------
-Go Version: go1.25.6
+Go Version: go1.25.5
 
 ```
 
@@ -1434,8 +1454,10 @@ Go Version: go1.25.6
 
 You can also specify the snippet in a `go` tag as well. The result is that it will only include the code snippet in the included source:
 
-`<go src="src/hello" run="." code="main.go#example"></go>
-`
+```plain
+<go src="src/hello" run="." code="main.go#example"></go>
+
+```
 
 You can see now that only the snippet is included, but the output is still the same:
 
@@ -1455,7 +1477,7 @@ $ go run .
 Hello World
 
 --------------------------------------------------------------------------------
-Go Version: go1.25.6
+Go Version: go1.25.5
 
 ```
 
@@ -1463,8 +1485,10 @@ Go Version: go1.25.6
 
 What if you want to include an example of code that does not compile? We still want the code to be parsed and included, even though the code doesn't compile. For this, we can state the expected output of the program.
 
-`<go src="src/broken" run="." code="main.go#example" exit="1"></go>
-`
+```plain
+<go src="src/broken" run="." code="main.go#example" exit="1"></go>
+
+```
 
 The result now includes the snippet, and the error output from trying to compile the invalid source code.
 
@@ -1485,7 +1509,7 @@ $ go run .
 ./main.go:7:6: undefined: fmt.Prin
 
 --------------------------------------------------------------------------------
-Go Version: go1.25.6
+Go Version: go1.25.5
 
 ```
 
@@ -1495,8 +1519,10 @@ While there are a number of `godoc` commands that will allow you to put your doc
 
 Here is the basic usage first:
 
-`<go doc="-short context"></go>
-`
+```plain
+<go doc="-short context"></go>
+
+```
 
 Here is the output for the above command:
 
@@ -1522,14 +1548,16 @@ type Context interface{ ... }
     func WithoutCancel(parent Context) Context
 
 --------------------------------------------------------------------------------
-Go Version: go1.25.6
+Go Version: go1.25.5
 
 ```
 
 You can also be more specific.
 
-`<go doc="-short context.WithCancel"></go>
-`
+```plain
+<go doc="-short context.WithCancel"></go>
+
+```
 
 Here is the output for the above command:
 ```shell
@@ -1545,7 +1573,7 @@ func WithCancel(parent Context) (ctx Context, cancel CancelFunc)
     call cancel as soon as the operations running in this Context complete.
 
 --------------------------------------------------------------------------------
-Go Version: go1.25.6
+Go Version: go1.25.5
 
 ```
 
@@ -1576,6 +1604,38 @@ $ tree
 
 4 directories, 4 files
 ```
+
+## Stabilizing Dynamic Output
+
+Commands often produce output containing dynamic content like timestamps, version numbers, or UUIDs. When you regenerate your documentation, this dynamic content changes even though your actual code hasn't—creating noise in your version control and making it hard to see what really changed.
+
+Use `replace-N` and `replace-N-with` attribute pairs to replace dynamic content with stable placeholders:
+
+```html
+<cmd exec="go version"
+     replace-1="go1\.\d+\.\d+"
+     replace-1-with="goX.X.X">
+</cmd>
+
+```
+
+This ensures you get predictable, reproducible output every time you regenerate. The pattern is a regular expression, and replacements are applied in numeric order (1, 2, 3, …).
+
+### Multiple Replacements
+
+You can chain multiple replacements for commands with several dynamic values:
+
+```html
+<cmd exec="./build.sh"
+     replace-1="\d{4}-\d{2}-\d{2} \d{2}:\d{2}:\d{2}"
+     replace-1-with="YYYY-MM-DD HH:MM:SS"
+     replace-2="[0-9a-f]{8}-[0-9a-f]{4}-[0-9a-f]{4}-[0-9a-f]{4}-[0-9a-f]{12}"
+     replace-2-with="[UUID]">
+</cmd>
+
+```
+
+This is essential for blogs, READMEs, and any documentation you regenerate regularly—without it, every regeneration creates a diff even when nothing meaningful changed.
 
 # Embedding YouTube Videos
 
@@ -1613,7 +1673,8 @@ The `youtube` tag renders a responsive iframe embed with proper security attribu
 
 There are several options for running the `hype` command. Most notable is the `export` option:
 
-`$ hype export -h
+```plain
+$ hype export -h
 
 Usage of hype:
   -f string
@@ -1630,7 +1691,8 @@ Examples:
  hype export -format html
  hype export -f README.md -format html
  hype export -f README.md -format markdown -timeout=10s
-`
+
+```
 
 This allows you to see your compiled document either as a single markdown, or as an html document that you can preview in the browser.
 
@@ -1664,7 +1726,6 @@ $ tree ./docs
 ./docs
 ├── badges.md
 ├── blog
-│   ├── README.md
 │   ├── hype.md
 │   ├── images
 │   │   ├── theme-cards-article.png
@@ -1673,6 +1734,7 @@ $ tree ./docs
 │   │   ├── theme-developer-home.png
 │   │   ├── theme-suspended-article.png
 │   │   └── theme-suspended-home.png
+│   ├── README.md
 │   └── src
 │       ├── deploy.yaml
 │       └── structure.txt
