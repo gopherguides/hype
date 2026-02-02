@@ -112,6 +112,20 @@ Run arbitrary shell commands and capture output.
 
 <!-- Custom timeout (default 30s) -->
 <cmd exec="long-process" timeout="120s"></cmd>
+
+<!-- Stabilize dynamic output with regex replacements -->
+<cmd exec="go version"
+     replace-1="go1\.\d+\.\d+"
+     replace-1-with="goX.X.X">
+</cmd>
+
+<!-- Multiple replacements for timestamps, versions, UUIDs -->
+<cmd exec="./build.sh"
+     replace-1="\d{4}-\d{2}-\d{2}"
+     replace-1-with="[DATE]"
+     replace-2="[0-9a-f]{8}-[0-9a-f]{4}-[0-9a-f]{4}-[0-9a-f]{4}-[0-9a-f]{12}"
+     replace-2-with="[UUID]">
+</cmd>
 ```
 
 ### `<include>` - Include Other Documents

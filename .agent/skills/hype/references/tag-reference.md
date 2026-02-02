@@ -83,6 +83,44 @@ Execute arbitrary shell commands.
 | `exit` | int | No | 0 | Expected exit code |
 | `timeout` | duration | No | 30s | Maximum execution time |
 | `environ` | string | No | - | Comma-separated environment variables |
+| `replace-N` | string | No | - | Regex pattern to match (N is 1, 2, 3, etc.) |
+| `replace-N-with` | string | No | "" | Replacement text for matched pattern |
+
+### Output Replacement
+
+Use `replace-N` and `replace-N-with` attribute pairs to stabilize dynamic output (timestamps, versions, UUIDs) that would otherwise cause spurious changes when regenerating documentation.
+
+```html
+<!-- Replace Go version -->
+<cmd exec="go version"
+     replace-1="go1\.\d+\.\d+"
+     replace-1-with="goX.X.X">
+</cmd>
+
+<!-- Replace timestamps -->
+<cmd exec="./build.sh"
+     replace-1="\d{4}-\d{2}-\d{2} \d{2}:\d{2}:\d{2}"
+     replace-1-with="YYYY-MM-DD HH:MM:SS">
+</cmd>
+
+<!-- Multiple replacements (applied in numeric order) -->
+<cmd exec="go run main.go"
+     replace-1="go1\.\d+\.\d+"
+     replace-1-with="goX.X.X"
+     replace-2="\d{4}-\d{2}-\d{2}"
+     replace-2-with="[DATE]"
+     replace-3="[0-9a-f]{8}-[0-9a-f]{4}-[0-9a-f]{4}-[0-9a-f]{4}-[0-9a-f]{12}"
+     replace-3-with="[UUID]">
+</cmd>
+
+<!-- Remove content (replace with empty) -->
+<cmd exec="cat version.txt"
+     replace-1=" \(build .*?\)"
+     replace-1-with="">
+</cmd>
+```
+
+Replacements are applied before HTML escaping, in numeric order (1, 2, 3, ...). Invalid regex patterns cause an error at export time.
 
 ### Exit Code Handling
 
