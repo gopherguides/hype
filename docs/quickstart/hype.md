@@ -144,6 +144,36 @@ Here is the output:
 
 <cmd exec="tree" src="."></cmd>
 
+## Stabilizing Dynamic Output
+
+Commands often produce output containing dynamic content like timestamps, version numbers, or UUIDs. When you regenerate your documentation, this dynamic content changes even though your actual code hasn't—creating noise in your version control and making it hard to see what really changed.
+
+Use `replace-N` and `replace-N-with` attribute pairs to replace dynamic content with stable placeholders:
+
+```html
+<cmd exec="go version"
+     replace-1="go1\.\d+\.\d+"
+     replace-1-with="goX.X.X">
+</cmd>
+```
+
+This ensures you get predictable, reproducible output every time you regenerate. The pattern is a regular expression, and replacements are applied in numeric order (1, 2, 3, ...).
+
+### Multiple Replacements
+
+You can chain multiple replacements for commands with several dynamic values:
+
+```html
+<cmd exec="./build.sh"
+     replace-1="\d{4}-\d{2}-\d{2} \d{2}:\d{2}:\d{2}"
+     replace-1-with="YYYY-MM-DD HH:MM:SS"
+     replace-2="[0-9a-f]{8}-[0-9a-f]{4}-[0-9a-f]{4}-[0-9a-f]{4}-[0-9a-f]{12}"
+     replace-2-with="[UUID]">
+</cmd>
+```
+
+This is essential for blogs, READMEs, and any documentation you regenerate regularly—without it, every regeneration creates a diff even when nothing meaningful changed.
+
 # Embedding YouTube Videos
 
 You can embed YouTube videos directly in your document using the `youtube` tag:

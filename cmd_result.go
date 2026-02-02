@@ -7,6 +7,7 @@ import (
 	"html"
 	"os"
 	"path/filepath"
+	"regexp"
 	"sort"
 	"strconv"
 	"strings"
@@ -208,6 +209,12 @@ func resultBody(res *clam.Result, ats *Attributes, body string) (string, error) 
 		body = strings.ReplaceAll(body, fp, "")
 	}
 
+	var err error
+	body, err = applyReplacements(ats, body)
+	if err != nil {
+		return "", err
+	}
+
 	body = html.EscapeString(body)
 
 	mo, ok := ats.Get("truncate")
@@ -230,4 +237,49 @@ func resultBody(res *clam.Result, ats *Attributes, body string) (string, error) 
 	}
 
 	return strings.Join(lines, "\n"), nil
+}
+
+// applyReplacements applies regex-based replacements to the output body.
+// It looks for numbered attribute pairs: replace-N="pattern" and replace-N-with="replacement"
+// Replacements are applied in numeric order (1, 2, 3, ...).
+func applyReplacements(ats *Attributes, body string) (string, error) {
+	nums := make(map[int]bool)
+	ats.Range(func(k string, v string) bool {
+		if !strings.HasPrefix(k, "replace-") {
+			return true
+		}
+		rest := strings.TrimPrefix(k, "replace-")
+		parts := strings.SplitN(rest, "-", 2)
+		if n, err := strconv.Atoi(parts[0]); err == nil {
+			nums[n] = true
+		}
+		return true
+	})
+
+	sorted := make([]int, 0, len(nums))
+	for n := range nums {
+		sorted = append(sorted, n)
+	}
+	sort.Ints(sorted)
+
+	for _, n := range sorted {
+		patternKey := fmt.Sprintf("replace-%d", n)
+		withKey := fmt.Sprintf("replace-%d-with", n)
+
+		pattern, hasPattern := ats.Get(patternKey)
+		if !hasPattern {
+			continue
+		}
+
+		replacement, _ := ats.Get(withKey)
+
+		re, err := regexp.Compile(pattern)
+		if err != nil {
+			return "", fmt.Errorf("invalid regex in %s: %w", patternKey, err)
+		}
+
+		body = re.ReplaceAllString(body, replacement)
+	}
+
+	return body, nil
 }
