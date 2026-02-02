@@ -54,4 +54,20 @@ func Test_FencedCode_MD(t *testing.T) {
 		r.Contains(md, "```mermaid")
 		r.True(md[len(md)-3:] == "~~~", "should end with tildes")
 	})
+
+	t.Run("content with both backticks and tildes uses longer fence", func(t *testing.T) {
+		r := require.New(t)
+
+		// Content has both ``` and ~~~
+		code := &FencedCode{
+			Element: NewEl("code", nil),
+		}
+		code.Nodes = Nodes{Text("Use ```backticks``` or ~~~tildes~~~ for fences")}
+
+		md := code.MD()
+		// Should use 4+ backticks since content has both ``` and ~~~
+		r.True(md[0:4] == "````", "should start with 4+ backticks, got: %s", md[0:10])
+		r.Contains(md, "```backticks```")
+		r.Contains(md, "~~~tildes~~~")
+	})
 }
