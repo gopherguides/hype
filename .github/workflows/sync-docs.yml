@@ -1,0 +1,58 @@
+name: Sync Docs to hypemd.dev
+
+on:
+  push:
+    branches: [main]
+    paths:
+      - 'docs/**'
+      - 'hype.md'
+  workflow_dispatch:
+
+jobs:
+  sync:
+    runs-on: ubuntu-latest
+    steps:
+      - name: Checkout hype repo
+        uses: actions/checkout@v4
+
+      - name: Set up Go
+        uses: actions/setup-go@v5
+        with:
+          go-version-file: go.mod
+
+      - name: Install hype
+        run: go install ./cmd/hype
+
+      - name: Run sync script
+        run: ./scripts/sync-docs.sh /tmp/docs-output
+
+      - name: Clone hypemd.dev
+        run: |
+          git clone https://x-access-token:${{ secrets.HYPEMD_PAT }}@github.com/gopherguides/hypemd.dev.git /tmp/hypemd-site
+
+      - name: Copy synced docs
+        run: |
+          # Remove old synced doc directories (flat docs-* dirs, preserve docs/ landing page)
+          find /tmp/hypemd-site/content -maxdepth 1 -type d -name 'docs-*' -exec rm -rf {} + 2>/dev/null || true
+
+          # Copy new synced docs (flat structure: docs-installation/, docs-blog/, etc.)
+          for dir in /tmp/docs-output/*/; do
+            dirname=$(basename "$dir")
+            mkdir -p "/tmp/hypemd-site/content/${dirname}"
+            cp "${dir}module.md" "/tmp/hypemd-site/content/${dirname}/module.md"
+          done
+
+      - name: Commit and push to hypemd.dev
+        run: |
+          cd /tmp/hypemd-site
+          git config user.name "github-actions[bot]"
+          git config user.email "github-actions[bot]@users.noreply.github.com"
+          git add content/
+          if git diff --cached --quiet; then
+            echo "No changes to commit"
+          else
+            git commit -m "docs: sync documentation from hype repo
+
+          Automated sync triggered by gopherguides/hype@${{ github.sha }}"
+            git push
+          fi
