@@ -8,6 +8,7 @@ import (
 	"io/fs"
 	"os"
 	"path/filepath"
+	"reflect"
 	"strings"
 	texttemplate "text/template"
 )
@@ -28,6 +29,24 @@ type templateLayer struct {
 	name string
 	fsys fs.FS
 	base string
+}
+
+func sliceItems(items any, start, end int) (any, error) {
+	v := reflect.ValueOf(items)
+	if v.Kind() != reflect.Slice {
+		return nil, fmt.Errorf("first/after: expected a slice, got %T", items)
+	}
+	length := v.Len()
+	if start < 0 {
+		start = 0
+	}
+	if start > length {
+		start = length
+	}
+	if end < 0 || end > length {
+		end = length
+	}
+	return v.Slice(start, end).Interface(), nil
 }
 
 func NewRenderer(b *Blog) (*Renderer, error) {
@@ -53,6 +72,12 @@ func NewRenderer(b *Blog) (*Renderer, error) {
 		},
 		"sub": func(a, b int) int {
 			return a - b
+		},
+		"first": func(n int, items any) (any, error) {
+			return sliceItems(items, 0, n)
+		},
+		"after": func(n int, items any) (any, error) {
+			return sliceItems(items, n, -1)
 		},
 	}
 
@@ -341,6 +366,7 @@ type PageData struct {
 	Articles     []Article
 	HighlightCSS template.CSS
 	CurrentYear  int
+	PagePath     string
 }
 
 func (r *Renderer) newPageData() PageData {
@@ -354,6 +380,7 @@ func (r *Renderer) newPageData() PageData {
 
 func (r *Renderer) RenderIndex(outDir string) error {
 	data := r.newPageData()
+	data.PagePath = "/"
 
 	var buf bytes.Buffer
 	if err := r.listTmpl.ExecuteTemplate(&buf, "baseof", data); err != nil {
@@ -361,7 +388,28 @@ func (r *Renderer) RenderIndex(outDir string) error {
 	}
 
 	indexPath := filepath.Join(outDir, "index.html")
-	return os.WriteFile(indexPath, buf.Bytes(), 0644)
+	if err := os.WriteFile(indexPath, buf.Bytes(), 0644); err != nil {
+		return err
+	}
+
+	for _, pagePath := range r.blog.Config.ListPages {
+		data.PagePath = "/" + pagePath + "/"
+		buf.Reset()
+		if err := r.listTmpl.ExecuteTemplate(&buf, "baseof", data); err != nil {
+			return fmt.Errorf("failed to execute list template for /%s/: %w", pagePath, err)
+		}
+
+		pageDir := filepath.Join(outDir, pagePath)
+		if err := os.MkdirAll(pageDir, 0755); err != nil {
+			return err
+		}
+
+		if err := os.WriteFile(filepath.Join(pageDir, "index.html"), buf.Bytes(), 0644); err != nil {
+			return err
+		}
+	}
+
+	return nil
 }
 
 func (r *Renderer) RenderArticle(outDir string, article Article) error {
