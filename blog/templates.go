@@ -393,13 +393,18 @@ func (r *Renderer) RenderIndex(outDir string) error {
 	}
 
 	for _, pagePath := range r.blog.Config.ListPages {
-		data.PagePath = "/" + pagePath + "/"
-		buf.Reset()
-		if err := r.listTmpl.ExecuteTemplate(&buf, "baseof", data); err != nil {
-			return fmt.Errorf("failed to execute list template for /%s/: %w", pagePath, err)
+		cleaned := filepath.Clean(pagePath)
+		if filepath.IsAbs(cleaned) || strings.HasPrefix(cleaned, "..") {
+			return fmt.Errorf("invalid listPages path %q: must be a relative path within the output directory", pagePath)
 		}
 
-		pageDir := filepath.Join(outDir, pagePath)
+		data.PagePath = "/" + cleaned + "/"
+		buf.Reset()
+		if err := r.listTmpl.ExecuteTemplate(&buf, "baseof", data); err != nil {
+			return fmt.Errorf("failed to execute list template for /%s/: %w", cleaned, err)
+		}
+
+		pageDir := filepath.Join(outDir, cleaned)
 		if err := os.MkdirAll(pageDir, 0755); err != nil {
 			return err
 		}
