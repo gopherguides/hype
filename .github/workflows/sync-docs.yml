@@ -38,8 +38,7 @@ jobs:
           # Copy new synced docs (flat structure: docs-installation/, docs-blog/, etc.)
           for dir in /tmp/docs-output/*/; do
             dirname=$(basename "$dir")
-            mkdir -p "/tmp/hypemd-site/content/${dirname}"
-            cp "${dir}module.md" "/tmp/hypemd-site/content/${dirname}/module.md"
+            cp -r "$dir" "/tmp/hypemd-site/content/${dirname}"
           done
 
       - name: Commit and push to hypemd.dev
