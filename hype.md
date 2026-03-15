@@ -16,6 +16,8 @@ Hype follows the same principals that we use for coding:
 - validation - like tests, but validate all your code samples are valid (or not if that is what you expect).
 - asset validation - ensure local assets like images, etc actually exist
 
+> **[hypemd.dev](https://hypemd.dev)** — Official documentation and blog for Hype.
+
 <include src="docs/installation.md"></include>
 
 # AI Assistant Integration

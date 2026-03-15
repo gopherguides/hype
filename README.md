@@ -91,6 +91,8 @@ Hype follows the same principals that we use for coding:
 * asset validation - ensure local assets like images, etc actually exist
 
 
+> **[hypemd.dev](https://hypemd.dev)** — Official documentation and blog for Hype.
+
 ---
 
 ## Installation
