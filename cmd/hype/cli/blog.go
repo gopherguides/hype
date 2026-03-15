@@ -487,12 +487,15 @@ Example:
 func (cmd *Blog) runServe(ctx context.Context, pwd string, args []string) error {
 	var addr string
 	var watch bool
+	var production bool
 
 	fs := flag.NewFlagSet("serve", flag.ContinueOnError)
 	fs.StringVar(&addr, "addr", ":3000", "address to serve on (default :3000)")
 	fs.StringVar(&addr, "a", ":3000", "address to serve on (shorthand)")
 	fs.BoolVar(&watch, "watch", false, "watch for file changes and rebuild")
 	fs.BoolVar(&watch, "w", false, "watch for file changes and rebuild (shorthand)")
+	fs.BoolVar(&production, "production", false, "use production server with compression, security headers, and caching")
+	fs.BoolVar(&production, "p", false, "use production server (shorthand)")
 	fs.Usage = func() {
 		fmt.Fprintln(cmd.Stdout(), `Usage: hype blog serve [options]
 
@@ -501,13 +504,18 @@ Start a local HTTP server to preview the built site.
 If public/ doesn't exist, the site will be built first.
 
 Options:
-    -addr, -a    Address to serve on (default ":3000")
-    -watch, -w   Watch for file changes and rebuild automatically
+    -addr, -a          Address to serve on (default ":3000")
+    -watch, -w         Watch for file changes and rebuild automatically
+    -production, -p    Use production server (compression, security headers, caching)
+
+Note: -production and -watch cannot be used together.
 
 Example:
     hype blog serve
     hype blog serve -watch
-    hype blog serve -addr :8080 -w`)
+    hype blog serve -addr :8080 -w
+    hype blog serve -production
+    hype blog serve -p -addr :8080`)
 	}
 
 	if err := fs.Parse(args); err != nil {
@@ -515,6 +523,10 @@ Example:
 			return nil
 		}
 		return err
+	}
+
+	if production && watch {
+		return fmt.Errorf("cannot use -production and -watch together")
 	}
 
 	b, err := blog.New(pwd)
@@ -539,11 +551,31 @@ Example:
 		fmt.Fprintf(cmd.Stdout(), "Ports in use: %s\n", strings.Join(triedPorts, ", "))
 	}
 
-	fmt.Fprintf(cmd.Stdout(), "Serving %s at http://localhost%s\n", publicDir, finalAddr)
+	if production {
+		fmt.Fprintf(cmd.Stdout(), "Serving %s at http://localhost%s (production mode)\n", publicDir, finalAddr)
+	} else {
+		fmt.Fprintf(cmd.Stdout(), "Serving %s at http://localhost%s\n", publicDir, finalAddr)
+	}
 	if watch {
 		fmt.Fprintf(cmd.Stdout(), "Watching for changes...\n")
 	}
 	fmt.Fprintf(cmd.Stdout(), "Press Ctrl+C to stop\n")
+
+	if production {
+		if err := blog.StartProductionServer(blog.ProductionConfig{
+			PublicDir: publicDir,
+			Addr:      finalAddr,
+		}); err != nil {
+			return fmt.Errorf("failed to start production server: %w", err)
+		}
+
+		quit := make(chan os.Signal, 1)
+		signal.Notify(quit, os.Interrupt, syscall.SIGTERM)
+		<-quit
+
+		fmt.Fprintf(cmd.Stdout(), "\nShutting down server...\n")
+		return blog.StopProductionServer()
+	}
 
 	server := &http.Server{
 		Addr:    finalAddr,
