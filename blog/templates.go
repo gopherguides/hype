@@ -49,6 +49,14 @@ func sliceItems(items any, start, end int) (any, error) {
 	return v.Slice(start, end).Interface(), nil
 }
 
+func validateListPagePath(pagePath string) error {
+	cleaned := filepath.Clean(pagePath)
+	if filepath.IsAbs(cleaned) || strings.HasPrefix(cleaned, "..") {
+		return fmt.Errorf("invalid listPages path %q: must be a relative path within the output directory", pagePath)
+	}
+	return nil
+}
+
 func NewRenderer(b *Blog) (*Renderer, error) {
 	htmlFuncMap := template.FuncMap{
 		"safeHTML": func(s string) template.HTML {
@@ -393,10 +401,10 @@ func (r *Renderer) RenderIndex(outDir string) error {
 	}
 
 	for _, pagePath := range r.blog.Config.ListPages {
-		cleaned := filepath.Clean(pagePath)
-		if filepath.IsAbs(cleaned) || strings.HasPrefix(cleaned, "..") {
-			return fmt.Errorf("invalid listPages path %q: must be a relative path within the output directory", pagePath)
+		if err := validateListPagePath(pagePath); err != nil {
+			return err
 		}
+		cleaned := filepath.Clean(pagePath)
 
 		data.PagePath = "/" + cleaned + "/"
 		buf.Reset()
