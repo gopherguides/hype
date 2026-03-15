@@ -19,6 +19,7 @@ type Config struct {
 	SEO         SEOConfig `yaml:"seo"`
 	ContentDir  string    `yaml:"contentDir"`
 	OutputDir   string    `yaml:"outputDir"`
+	ListPages   []string  `yaml:"listPages"`
 }
 
 type Author struct {
