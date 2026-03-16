@@ -26,11 +26,21 @@ type LinkValidator struct {
 }
 
 func NewLinkValidator(cfg LinkCheckConfig) *LinkValidator {
+	defaults := DefaultLinkCheckConfig()
+	if cfg.Timeout <= 0 {
+		cfg.Timeout = defaults.Timeout
+	}
+	if len(cfg.AcceptedCodes) == 0 {
+		cfg.AcceptedCodes = defaults.AcceptedCodes
+	}
 	if cfg.RatePerHost <= 0 {
-		cfg.RatePerHost = 2
+		cfg.RatePerHost = defaults.RatePerHost
 	}
 	if cfg.RateBurst <= 0 {
-		cfg.RateBurst = 1
+		cfg.RateBurst = defaults.RateBurst
+	}
+	if cfg.MaxRedirects <= 0 {
+		cfg.MaxRedirects = defaults.MaxRedirects
 	}
 
 	v := &LinkValidator{
@@ -41,7 +51,6 @@ func NewLinkValidator(cfg LinkCheckConfig) *LinkValidator {
 	}
 
 	v.client = &http.Client{
-		Timeout: cfg.Timeout,
 		CheckRedirect: func(req *http.Request, via []*http.Request) error {
 			if len(via) > cfg.MaxRedirects {
 				return fmt.Errorf("too many redirects (%d)", len(via))
@@ -85,6 +94,9 @@ func (v *LinkValidator) Check(ctx context.Context, rawURL string) error {
 	v.inflight[rawURL] = ch
 	v.mu.Unlock()
 
+	linkCtx, cancel := context.WithTimeout(ctx, v.Config.Timeout)
+	defer cancel()
+
 	u, err := url.Parse(rawURL)
 	if err != nil {
 		lce := LinkCheckError{URL: rawURL, Err: err}
@@ -93,13 +105,13 @@ func (v *LinkValidator) Check(ctx context.Context, rawURL string) error {
 	}
 
 	limiter := v.limiterFor(u.Host)
-	if err := limiter.Wait(ctx); err != nil {
+	if err := limiter.Wait(linkCtx); err != nil {
 		lce := LinkCheckError{URL: rawURL, Err: err}
 		v.finishCheck(rawURL, lce, ch)
 		return lce
 	}
 
-	checkErr := v.doCheck(ctx, rawURL)
+	checkErr := v.doCheck(linkCtx, rawURL)
 	v.finishCheck(rawURL, checkErr, ch)
 	return checkErr
 }

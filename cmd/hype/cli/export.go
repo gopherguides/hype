@@ -299,6 +299,9 @@ func (cmd *Export) execute(ctx context.Context, pwd string) error {
 		}
 		p.LinkCheck = cfg
 		p.LinkValidator = hype.NewLinkValidator(cfg)
+	} else {
+		p.LinkCheck = hype.LinkCheckConfig{}
+		p.LinkValidator = nil
 	}
 
 	p.Root = filepath.Join(filepath.Dir(mp), fileDir)
