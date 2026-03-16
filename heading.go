@@ -3,6 +3,7 @@ package hype
 import (
 	"encoding/json"
 	"fmt"
+	"regexp"
 	"strconv"
 	"strings"
 )
@@ -82,4 +83,36 @@ func NewHeadingNodes(p *Parser, el *Element) (Nodes, error) {
 	}
 
 	return Nodes{h}, nil
+}
+
+var slugRe = regexp.MustCompile(`[^a-z0-9-]+`)
+var multiHyphenRe = regexp.MustCompile(`-{2,}`)
+
+func Slug(text string) string {
+	s := strings.ToLower(strings.TrimSpace(text))
+	s = strings.ReplaceAll(s, " ", "-")
+	s = slugRe.ReplaceAllString(s, "")
+	s = multiHyphenRe.ReplaceAllString(s, "-")
+	s = strings.Trim(s, "-")
+	return s
+}
+
+func UniqueSlug(text string, seen map[string]int) string {
+	base := Slug(text)
+	if base == "" {
+		base = "heading"
+	}
+	if _, exists := seen[base]; !exists {
+		seen[base] = 1
+		return base
+	}
+	for {
+		count := seen[base]
+		candidate := fmt.Sprintf("%s-%d", base, count)
+		seen[base] = count + 1
+		if _, taken := seen[candidate]; !taken {
+			seen[candidate] = 1
+			return candidate
+		}
+	}
 }
