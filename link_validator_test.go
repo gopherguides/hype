@@ -133,6 +133,70 @@ func Test_LinkValidator_Check_ConcurrentDedup(t *testing.T) {
 	r.Equal(int32(1), hitCount.Load())
 }
 
+func Test_LinkValidator_Check_HeadForbiddenFallbackToGet(t *testing.T) {
+	t.Parallel()
+	r := require.New(t)
+
+	srv := httptest.NewServer(http.HandlerFunc(func(w http.ResponseWriter, req *http.Request) {
+		if req.Method == http.MethodHead {
+			w.WriteHeader(http.StatusForbidden)
+			return
+		}
+		w.WriteHeader(http.StatusOK)
+	}))
+	defer srv.Close()
+
+	cfg := DefaultLinkCheckConfig()
+	cfg.Enabled = true
+	v := NewLinkValidator(cfg)
+
+	err := v.Check(context.Background(), srv.URL+"/blocked-head")
+	r.NoError(err)
+}
+
+func Test_LinkValidator_Check_ProtocolRelative(t *testing.T) {
+	t.Parallel()
+	r := require.New(t)
+
+	srv := httptest.NewServer(http.HandlerFunc(func(w http.ResponseWriter, req *http.Request) {
+		w.WriteHeader(http.StatusOK)
+	}))
+	defer srv.Close()
+
+	cfg := DefaultLinkCheckConfig()
+	cfg.Enabled = true
+	v := NewLinkValidator(cfg)
+
+	r.False(v.shouldSkip("//" + srv.URL[len("http://"):] + "/page"))
+
+	err := v.Check(context.Background(), srv.URL[len("http:"):]+"/page")
+	r.Error(err)
+}
+
+func Test_LinkValidator_Check_SingleRedirectAllowed(t *testing.T) {
+	t.Parallel()
+	r := require.New(t)
+
+	var calls atomic.Int32
+	srv := httptest.NewServer(http.HandlerFunc(func(w http.ResponseWriter, req *http.Request) {
+		n := calls.Add(1)
+		if n == 1 {
+			http.Redirect(w, req, "/final", http.StatusMovedPermanently)
+			return
+		}
+		w.WriteHeader(http.StatusOK)
+	}))
+	defer srv.Close()
+
+	cfg := DefaultLinkCheckConfig()
+	cfg.Enabled = true
+	cfg.MaxRedirects = 1
+	v := NewLinkValidator(cfg)
+
+	err := v.Check(context.Background(), srv.URL+"/one-redirect")
+	r.NoError(err)
+}
+
 func Test_LinkValidator_ZeroRate(t *testing.T) {
 	t.Parallel()
 	r := require.New(t)

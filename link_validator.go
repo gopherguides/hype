@@ -43,7 +43,7 @@ func NewLinkValidator(cfg LinkCheckConfig) *LinkValidator {
 	v.client = &http.Client{
 		Timeout: cfg.Timeout,
 		CheckRedirect: func(req *http.Request, via []*http.Request) error {
-			if len(via) >= cfg.MaxRedirects {
+			if len(via) > cfg.MaxRedirects {
 				return fmt.Errorf("too many redirects (%d)", len(via))
 			}
 			return nil
@@ -54,6 +54,10 @@ func NewLinkValidator(cfg LinkCheckConfig) *LinkValidator {
 }
 
 func (v *LinkValidator) Check(ctx context.Context, rawURL string) error {
+	if strings.HasPrefix(rawURL, "//") {
+		rawURL = "https:" + rawURL
+	}
+
 	if v.shouldSkip(rawURL) {
 		return nil
 	}
@@ -117,6 +121,9 @@ func (v *LinkValidator) shouldSkip(rawURL string) bool {
 	switch u.Scheme {
 	case "http", "https":
 	case "":
+		if strings.HasPrefix(rawURL, "//") {
+			return false
+		}
 		return true
 	default:
 		return true
@@ -162,19 +169,15 @@ func (v *LinkValidator) doCheck(ctx context.Context, rawURL string) error {
 	io.Copy(io.Discard, resp.Body)
 	resp.Body.Close()
 
-	if resp.StatusCode == http.StatusMethodNotAllowed {
-		return v.doGet(ctx, rawURL)
-	}
-
 	if resp.StatusCode == http.StatusTooManyRequests {
 		return v.retryAfter(ctx, rawURL, resp)
 	}
 
-	if !v.isAccepted(resp.StatusCode) {
-		return LinkCheckError{URL: rawURL, StatusCode: resp.StatusCode}
+	if v.isAccepted(resp.StatusCode) {
+		return nil
 	}
 
-	return nil
+	return v.doGet(ctx, rawURL)
 }
 
 func (v *LinkValidator) doGet(ctx context.Context, rawURL string) error {
