@@ -157,6 +157,73 @@ func Test_ExtractTOC_Hierarchy(t *testing.T) {
 	r.True(json.Valid(b))
 }
 
+func Test_ExtractMeta_WithTOC(t *testing.T) {
+	t.Parallel()
+	r := require.New(t)
+
+	root := "testdata/json-meta/with-toc"
+	cab := os.DirFS(root)
+
+	p := NewParser(cab)
+	p.Root = root
+
+	doc, err := p.ParseFile("hype.md")
+	r.NoError(err)
+
+	ctx, cancel := context.WithTimeout(context.Background(), 5*time.Second)
+	defer cancel()
+
+	err = doc.Execute(ctx)
+	r.NoError(err)
+
+	meta := ExtractMeta(doc)
+
+	r.Len(meta.Headings, 4)
+	r.Equal("Document With ToC", meta.Headings[0].Text)
+	r.Equal("First Section", meta.Headings[1].Text)
+	r.Equal("Second Section", meta.Headings[2].Text)
+	r.Equal("Subsection", meta.Headings[3].Text)
+
+	r.NotContains(meta.Headings[0].Text, "toc-level")
+	r.NotContains(meta.Headings[1].Text, "<a ")
+
+	r.Equal("heading-0", meta.Headings[0].ID)
+	r.Equal("heading-1", meta.Headings[1].ID)
+
+	toc := ExtractTOC(doc)
+	r.Equal("Document With ToC", toc.Title)
+	r.Len(toc.TOC, 1)
+	r.Equal("Document With ToC", toc.TOC[0].Text)
+	r.NotContains(toc.TOC[0].Text, "toc-level")
+}
+
+func Test_ExtractMeta_DetailsFrontmatter(t *testing.T) {
+	t.Parallel()
+	r := require.New(t)
+
+	root := "testdata/json-meta/with-details"
+	cab := os.DirFS(root)
+
+	p := NewParser(cab)
+	p.Root = root
+
+	doc, err := p.ParseFile("hype.md")
+	r.NoError(err)
+
+	ctx, cancel := context.WithTimeout(context.Background(), 3*time.Second)
+	defer cancel()
+
+	err = doc.Execute(ctx)
+	r.NoError(err)
+
+	meta := ExtractMeta(doc)
+
+	r.Equal("custom-slug-here", meta.Slug)
+	r.Equal("Jane Smith", meta.Metadata["author"])
+	r.Equal("2026-03-01", meta.Metadata["published"])
+	r.Equal("go, testing", meta.Metadata["tags"])
+}
+
 func Test_Slugify(t *testing.T) {
 	t.Parallel()
 

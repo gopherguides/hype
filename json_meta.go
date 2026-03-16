@@ -1,6 +1,7 @@
 package hype
 
 import (
+	"fmt"
 	"math"
 	"regexp"
 	"strings"
@@ -56,8 +57,6 @@ func ExtractMeta(doc *Document) *DocumentMeta {
 		Images:       []string{},
 	}
 
-	meta.Slug = slugify(meta.Title)
-
 	mds := ByType[*Metadata](doc.Nodes)
 	for _, md := range mds {
 		for _, k := range md.Map.Keys() {
@@ -66,13 +65,25 @@ func ExtractMeta(doc *Document) *DocumentMeta {
 		}
 	}
 
+	if doc.Parser != nil {
+		for _, k := range doc.Parser.Vars.Keys() {
+			if _, exists := meta.Metadata[k]; !exists {
+				if v, ok := doc.Parser.Vars.Get(k); ok {
+					meta.Metadata[k] = fmt.Sprintf("%v", v)
+				}
+			}
+		}
+	}
+
+	if slug, ok := meta.Metadata["slug"]; ok {
+		meta.Slug = slug
+	} else {
+		meta.Slug = slugify(meta.Title)
+	}
+
 	headings := ByType[*Heading](doc.Nodes)
 	for _, h := range headings {
-		text := strings.TrimSpace(h.Children().MD())
-		id, ok := h.Get("id")
-		if !ok {
-			id = slugify(text)
-		}
+		text, id := extractHeadingTextAndID(h)
 		meta.Headings = append(meta.Headings, HeadingMeta{
 			Level: h.Level(),
 			Text:  text,
@@ -143,11 +154,7 @@ func ExtractTOC(doc *Document) *DocumentTOC {
 
 	var entries []HeadingMeta
 	for _, h := range headings {
-		text := strings.TrimSpace(h.Children().MD())
-		id, ok := h.Get("id")
-		if !ok {
-			id = slugify(text)
-		}
+		text, id := extractHeadingTextAndID(h)
 		entries = append(entries, HeadingMeta{
 			Level: h.Level(),
 			Text:  text,
@@ -157,6 +164,32 @@ func ExtractTOC(doc *Document) *DocumentTOC {
 
 	toc.TOC = buildTOCTree(entries, 0)
 	return toc
+}
+
+var tocLevelRe = regexp.MustCompile(`<toc-level>[^<]*</toc-level>\s*-\s*`)
+var anchorRe = regexp.MustCompile(`<a\s+id="([^"]*)">\s*</a>`)
+
+func extractHeadingTextAndID(h *Heading) (text string, id string) {
+	raw := h.Children().String()
+
+	if m := anchorRe.FindStringSubmatch(raw); len(m) > 1 {
+		id = m[1]
+	}
+
+	clean := anchorRe.ReplaceAllString(raw, "")
+	clean = tocLevelRe.ReplaceAllString(clean, "")
+	clean = stripHTMLFromMD(clean)
+	text = strings.TrimSpace(clean)
+
+	if id == "" {
+		if attrID, ok := h.Get("id"); ok {
+			id = attrID
+		} else {
+			id = slugify(text)
+		}
+	}
+
+	return text, id
 }
 
 func buildTOCTree(entries []HeadingMeta, start int) []TOCEntry {
