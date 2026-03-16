@@ -60,7 +60,7 @@ Write a code example or explanation once, include it everywhere — README, blog
 
 ### 3. Built-in Validation
 
-Hype validates that code samples execute, local assets exist, and links resolve. It's like a test suite for your documentation. Alternatives rely on manual review or external linting tools bolted on after the fact.
+Hype validates that code samples execute and local assets (images, source files) exist. It's like a test suite for your documentation. Alternatives rely on manual review or external linting tools bolted on after the fact.
 
 ---
 
@@ -72,7 +72,7 @@ Hype validates that code samples execute, local assets exist, and links resolve.
 |------|---------|-------|
 | Code examples rot silently — broken docs erode trust and waste contributors' time | Every code sample is executed and validated on every build, so docs stay accurate automatically | Hype runs `go run`, `go build`, or any command on your fenced code blocks and fails the build if they break |
 | Same content copy-pasted across README, blog, slides — one update, five places to fix | Write once, include everywhere — a single source of truth for every code example | Hype's `<include>` and partial system lets you compose docs from reusable Markdown packages |
-| No way to "test" documentation — broken examples ship because nobody catches them | Docs get the same validation rigor as code — CI catches doc issues before users do | Run `hype export` in CI to validate all code samples, assets, and links on every PR |
+| No way to "test" documentation — broken examples ship because nobody catches them | Docs get the same validation rigor as code — CI catches doc issues before users do | Run `hype export` in CI to validate all code samples and assets on every PR |
 | Locked into one output format — can't reuse tutorial content as slides or a blog post | One source, multiple formats — export to Markdown, HTML, or slides from the same content | `hype export -format=markdown`, `hype export -format=html`, `hype slides` |
 
 ### Short-Form Messaging
