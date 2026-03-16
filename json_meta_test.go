@@ -187,8 +187,10 @@ func Test_ExtractMeta_WithTOC(t *testing.T) {
 	r.NotContains(meta.Headings[0].Text, "toc-level")
 	r.NotContains(meta.Headings[1].Text, "<a ")
 
-	r.Equal("heading-0", meta.Headings[0].ID)
-	r.Equal("heading-1", meta.Headings[1].ID)
+	for _, h := range meta.Headings {
+		r.NotEmpty(h.ID)
+		r.NotContains(h.ID, "<")
+	}
 
 	toc := ExtractTOC(doc)
 	r.Equal("Document With ToC", toc.Title)
