@@ -181,17 +181,27 @@ func New(root string, info VersionInfo) *App {
 		Info: info,
 	}
 
+	val := &Validate{
+		Cmd: cleo.Cmd{
+			Name:    "validate",
+			Aliases: []string{"val"},
+			Desc:    "validate document integrity without full export",
+		},
+		Parser: p,
+	}
+
 	app := &App{
 		Cmd: cleo.Cmd{
 			Name: "hype",
 			FS:   cab,
 			Commands: map[string]cleo.Commander{
-				"marked":  m,
-				"preview": pv,
-				"slides":  sl,
-				"export":  e,
-				"blog":    bl,
-				"version": ver,
+				"marked":   m,
+				"preview":  pv,
+				"slides":   sl,
+				"export":   e,
+				"blog":     bl,
+				"version":  ver,
+				"validate": val,
 			},
 		},
 		Parser: p,
