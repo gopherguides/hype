@@ -177,8 +177,13 @@ func (cmd *VSCode) toc(p *hype.Parser, body *hype.Body) (string, error) {
 	seen := map[string]int{}
 	slugs := make([]string, len(headings))
 	for i, h := range headings {
-		text := h.Children().String()
-		slugs[i] = hype.UniqueSlug(text, seen)
+		if existing, ok := h.Attrs().Get("id"); ok && existing != "" {
+			slugs[i] = existing
+			seen[existing] = 1
+		} else {
+			text := h.Children().String()
+			slugs[i] = hype.UniqueSlug(text, seen)
+		}
 	}
 
 	toc, err := hype.GenerateToC(p, headings, slugs)
@@ -187,7 +192,9 @@ func (cmd *VSCode) toc(p *hype.Parser, body *hype.Body) (string, error) {
 	}
 
 	for i, h := range headings {
-		h.Set("id", slugs[i])
+		if _, ok := h.Attrs().Get("id"); !ok {
+			h.Set("id", slugs[i])
+		}
 	}
 
 	tc := toc.String()

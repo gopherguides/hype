@@ -38,17 +38,16 @@ func (toc *ToC) MD() string {
 		return ""
 	}
 
-	headings := ByType[*Heading](toc.Nodes)
-	if len(headings) == 0 {
-		bb := &bytes.Buffer{}
-		bb.WriteString(toc.StartTag())
-		bb.WriteString("\n")
-		bb.WriteString(toc.Nodes.MD())
-		bb.WriteString(toc.EndTag())
-		return bb.String()
+	if toc.mdNodes != "" {
+		return toc.mdNodes
 	}
 
-	return toc.mdNodes
+	bb := &bytes.Buffer{}
+	bb.WriteString(toc.StartTag())
+	bb.WriteString("\n")
+	bb.WriteString(toc.Nodes.MD())
+	bb.WriteString(toc.EndTag())
+	return bb.String()
 }
 
 func (toc *ToC) PostExecute(ctx context.Context, doc *Document, err error) error {
@@ -71,12 +70,19 @@ func (toc *ToC) PostExecute(ctx context.Context, doc *Document, err error) error
 
 	slugs := make([]string, len(filtered))
 	for i, h := range filtered {
-		text := h.Children().String()
-		slugs[i] = UniqueSlug(text, seen)
+		if existing, ok := h.Get("id"); ok && existing != "" {
+			slugs[i] = existing
+			seen[existing] = 1
+		} else {
+			text := h.Children().String()
+			slugs[i] = UniqueSlug(text, seen)
+		}
 	}
 
 	for i, h := range filtered {
-		h.Set("id", slugs[i])
+		if _, ok := h.Get("id"); !ok {
+			h.Set("id", slugs[i])
+		}
 	}
 
 	nodes, err := GenerateToC(doc.Parser, filtered, slugs)
@@ -159,10 +165,16 @@ func GenerateToC(p *Parser, headings []*Heading, slugs []string) (Nodes, error) 
 
 		if level > currentLevel {
 			for level > currentLevel {
+				indent := strings.Repeat("  ", currentLevel-minLevel+1)
 				bb.WriteString("\n")
-				bb.WriteString(strings.Repeat("  ", level-minLevel))
+				bb.WriteString(indent)
 				bb.WriteString("<ul>")
 				currentLevel++
+				if currentLevel < level {
+					bb.WriteString("\n")
+					bb.WriteString(strings.Repeat("  ", currentLevel-minLevel+1))
+					bb.WriteString("<li>")
+				}
 			}
 		} else {
 			bb.WriteString("</li>")

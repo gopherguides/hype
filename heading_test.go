@@ -46,6 +46,17 @@ func Test_UniqueSlug(t *testing.T) {
 	r.Equal("other-1", UniqueSlug("Other", seen))
 }
 
+func Test_UniqueSlug_EmptyFallback(t *testing.T) {
+	t.Parallel()
+	r := require.New(t)
+
+	seen := map[string]int{}
+
+	r.Equal("heading", UniqueSlug("!!!", seen))
+	r.Equal("heading-1", UniqueSlug("###", seen))
+	r.Equal("heading-2", UniqueSlug("", seen))
+}
+
 func Test_NewHeading(t *testing.T) {
 	t.Parallel()
 	r := require.New(t)

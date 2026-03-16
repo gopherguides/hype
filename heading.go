@@ -99,6 +99,9 @@ func Slug(text string) string {
 
 func UniqueSlug(text string, seen map[string]int) string {
 	base := Slug(text)
+	if base == "" {
+		base = "heading"
+	}
 	count, exists := seen[base]
 	if !exists {
 		seen[base] = 1
