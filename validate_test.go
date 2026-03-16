@@ -131,7 +131,7 @@ func Test_Validate_DuplicateIDs(t *testing.T) {
 	validateDuplicateIDs(doc, result)
 
 	r.Len(result.Issues, 1)
-	r.Equal(SeverityWarning, result.Issues[0].Severity)
+	r.Equal(SeverityError, result.Issues[0].Severity)
 	r.Equal(CategoryDuplicateID, result.Issues[0].Category)
 	r.Contains(result.Issues[0].Message, "duplicate figure id")
 	r.Contains(result.Issues[0].Message, "dup")

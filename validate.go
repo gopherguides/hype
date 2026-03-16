@@ -186,9 +186,9 @@ func validateHeadingHierarchy(doc *Document, result *ValidationResult) {
 func validateLocalLinks(doc *Document, result *ValidationResult) {
 	ids := make(map[string]bool)
 
-	figures := ByType[*Figure](doc.Nodes)
-	for _, f := range figures {
-		if id, ok := f.Get("id"); ok {
+	elements := ByType[*Element](doc.Nodes)
+	for _, el := range elements {
+		if id, ok := el.Get("id"); ok {
 			ids[id] = true
 		}
 	}
@@ -240,7 +240,7 @@ func validateDuplicateIDs(doc *Document, result *ValidationResult) {
 		}
 		if seen[id] {
 			result.Add(ValidationIssue{
-				Severity: SeverityWarning,
+				Severity: SeverityError,
 				Category: CategoryDuplicateID,
 				Filename: f.Filename,
 				Element:  f.StartTag(),
