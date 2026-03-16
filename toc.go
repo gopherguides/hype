@@ -170,11 +170,6 @@ func GenerateToC(p *Parser, headings []*Heading, slugs []string) (Nodes, error) 
 				bb.WriteString(indent)
 				bb.WriteString("<ul>")
 				currentLevel++
-				if currentLevel < level {
-					bb.WriteString("\n")
-					bb.WriteString(strings.Repeat("  ", currentLevel-minLevel+1))
-					bb.WriteString("<li>")
-				}
 			}
 		} else {
 			bb.WriteString("</li>")

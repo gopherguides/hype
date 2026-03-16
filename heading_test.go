@@ -57,6 +57,17 @@ func Test_UniqueSlug_EmptyFallback(t *testing.T) {
 	r.Equal("heading-2", UniqueSlug("", seen))
 }
 
+func Test_UniqueSlug_PreSeededCollision(t *testing.T) {
+	t.Parallel()
+	r := require.New(t)
+
+	seen := map[string]int{}
+	seen["example"] = 1
+	seen["example-1"] = 1
+
+	r.Equal("example-2", UniqueSlug("Example", seen))
+}
+
 func Test_NewHeading(t *testing.T) {
 	t.Parallel()
 	r := require.New(t)

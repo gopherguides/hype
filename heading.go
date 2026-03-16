@@ -102,11 +102,17 @@ func UniqueSlug(text string, seen map[string]int) string {
 	if base == "" {
 		base = "heading"
 	}
-	count, exists := seen[base]
-	if !exists {
+	if _, exists := seen[base]; !exists {
 		seen[base] = 1
 		return base
 	}
-	seen[base] = count + 1
-	return fmt.Sprintf("%s-%d", base, count)
+	for {
+		count := seen[base]
+		candidate := fmt.Sprintf("%s-%d", base, count)
+		seen[base] = count + 1
+		if _, taken := seen[candidate]; !taken {
+			seen[candidate] = 1
+			return candidate
+		}
+	}
 }
