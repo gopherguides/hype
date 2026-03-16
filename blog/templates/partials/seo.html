@@ -10,12 +10,18 @@
     <meta property="og:description" content="{{if .Article.SEODescription}}{{.Article.SEODescription}}{{else}}{{.Config.Description}}{{end}}">
     <meta property="og:url" content="{{.Config.BaseURL}}{{.Article.URL}}">
     {{if .Article.OGImage}}<meta property="og:image" content="{{.Config.BaseURL}}{{.Article.OGImage}}">{{else if .Config.SEO.OGImage}}<meta property="og:image" content="{{.Config.BaseURL}}{{.Config.SEO.OGImage}}">{{end}}
+    <meta property="og:site_name" content="{{if .Config.SEO.SiteName}}{{.Config.SEO.SiteName}}{{else}}{{.Config.Title}}{{end}}">
+    <meta property="og:article:published_time" content="{{.Article.ISODate}}">
+    <meta property="og:article:author" content="{{if .Article.Author}}{{.Article.Author}}{{else}}{{.Config.Author.Name}}{{end}}">
+    {{range .Article.Tags}}<meta property="og:article:tag" content="{{.}}">
+    {{end}}
 
     <!-- Twitter Card -->
     <meta name="twitter:card" content="{{.Config.SEO.TwitterCard}}">
+    {{if .Config.Author.Twitter}}<meta name="twitter:site" content="{{.Config.Author.Twitter}}">{{end}}
+    {{if .Article.AuthorTwitter}}<meta name="twitter:creator" content="{{.Article.AuthorTwitter}}">{{else if .Config.Author.Twitter}}<meta name="twitter:creator" content="{{.Config.Author.Twitter}}">{{end}}
     <meta name="twitter:title" content="{{.Article.Title}}">
     <meta name="twitter:description" content="{{if .Article.SEODescription}}{{.Article.SEODescription}}{{else}}{{.Config.Description}}{{end}}">
-    {{if .Config.Author.Twitter}}<meta name="twitter:creator" content="{{.Config.Author.Twitter}}">{{end}}
     {{if .Article.OGImage}}<meta name="twitter:image" content="{{.Config.BaseURL}}{{.Article.OGImage}}">{{else if .Config.SEO.OGImage}}<meta name="twitter:image" content="{{.Config.BaseURL}}{{.Config.SEO.OGImage}}">{{end}}
 
     <!-- JSON-LD -->
@@ -45,10 +51,11 @@
     <meta property="og:description" content="{{.Config.Description}}">
     <meta property="og:url" content="{{.Config.BaseURL}}/">
     {{if .Config.SEO.OGImage}}<meta property="og:image" content="{{.Config.BaseURL}}{{.Config.SEO.OGImage}}">{{end}}
+    <meta property="og:site_name" content="{{if .Config.SEO.SiteName}}{{.Config.SEO.SiteName}}{{else}}{{.Config.Title}}{{end}}">
 
     <meta name="twitter:card" content="{{.Config.SEO.TwitterCard}}">
+    {{if .Config.Author.Twitter}}<meta name="twitter:site" content="{{.Config.Author.Twitter}}">{{end}}
     <meta name="twitter:title" content="{{.Config.Title}}">
     <meta name="twitter:description" content="{{.Config.Description}}">
-    {{if .Config.Author.Twitter}}<meta name="twitter:creator" content="{{.Config.Author.Twitter}}">{{end}}
     {{end}}
 {{end}}

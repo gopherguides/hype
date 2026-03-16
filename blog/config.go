@@ -36,6 +36,7 @@ type Highlight struct {
 type SEOConfig struct {
 	OGImage     string `yaml:"ogImage"`
 	TwitterCard string `yaml:"twitterCard"`
+	SiteName    string `yaml:"siteName"`
 }
 
 func DefaultConfig() Config {
