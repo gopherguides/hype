@@ -25,16 +25,18 @@ type ParseElementFn func(p *Parser, el *Element) (Nodes, error)
 type Parser struct {
 	fs.FS
 
-	DisablePages bool
-	DocIDGen     func() (string, error) // default: uuid.NewV4().String()
-	Filename     string                 // only set when Parser.ParseFile() is used
-	NodeParsers  map[Atom]ParseElementFn
-	NowFn        func() time.Time // default: time.Now()
-	PreParsers   PreParsers
-	Root         string
-	Section      int
-	Vars         syncx.Map[string, any]
-	Contents     []byte // a copy of the contents being parsed - set just before parsing
+	DisablePages  bool
+	DocIDGen      func() (string, error) // default: uuid.NewV4().String()
+	Filename      string                 // only set when Parser.ParseFile() is used
+	LinkCheck     LinkCheckConfig
+	LinkValidator *LinkValidator
+	NodeParsers   map[Atom]ParseElementFn
+	NowFn         func() time.Time // default: time.Now()
+	PreParsers    PreParsers
+	Root          string
+	Section       int
+	Vars          syncx.Map[string, any]
+	Contents      []byte // a copy of the contents being parsed - set just before parsing
 
 	mu sync.RWMutex
 }
@@ -402,10 +404,12 @@ func (p *Parser) Sub(dir string) (*Parser, error) {
 	}
 
 	p2 := &Parser{
-		FS:          p.FS,
-		Root:        filepath.Join(p.Root, dir),
-		PreParsers:  p.PreParsers,
-		NodeParsers: p.NodeParsers,
+		FS:            p.FS,
+		Root:          filepath.Join(p.Root, dir),
+		PreParsers:    p.PreParsers,
+		NodeParsers:   p.NodeParsers,
+		LinkCheck:     p.LinkCheck,
+		LinkValidator: p.LinkValidator,
 	}
 
 	if len(dir) == 0 || dir == "." {

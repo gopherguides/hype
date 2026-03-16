@@ -1,6 +1,7 @@
 package hype
 
 import (
+	"context"
 	"encoding/json"
 	"fmt"
 	"strings"
@@ -54,6 +55,32 @@ func (l *Link) MD() string {
 	}
 
 	return fmt.Sprintf("[%s](%s)", l.Children().MD(), h)
+}
+
+func (l *Link) Execute(ctx context.Context, doc *Document) error {
+	if l == nil {
+		return ErrIsNil("link")
+	}
+
+	if doc == nil || doc.Parser == nil {
+		return nil
+	}
+
+	if !doc.Parser.LinkCheck.Enabled {
+		return nil
+	}
+
+	href, err := l.Href()
+	if err != nil {
+		return nil
+	}
+
+	v := doc.Parser.LinkValidator
+	if v == nil {
+		return nil
+	}
+
+	return v.Check(ctx, href)
 }
 
 func NewLink(el *Element) (*Link, error) {

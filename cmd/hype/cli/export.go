@@ -40,6 +40,11 @@ type Export struct {
 	NoCSS      bool   // output raw HTML without styling
 	ListThemes bool   // list available themes and exit
 
+	CheckLinks  bool          // enable link reachability checking
+	LinkTimeout time.Duration // per-link check timeout
+	LinkExclude string        // comma-separated URL patterns to exclude
+	LinkRate    float64       // requests per second per host
+
 	flags *flag.FlagSet
 
 	mu sync.RWMutex
@@ -108,6 +113,9 @@ Examples:
 	hype export -themes
 	hype export -f README.md -format markdown -timeout=10s
 	hype export -f input.md -format markdown -o README.md
+	hype export -f hype.md -check-links
+	hype export -f hype.md -check-links -link-timeout=20s -link-rate=1
+	hype export -f hype.md -check-links -link-exclude="https://localhost:*,https://internal.example.com/*"
 `
 
 	if err := cmd.validate(); err != nil {
@@ -132,6 +140,10 @@ Examples:
 	cmd.flags.StringVar(&cmd.CustomCSS, "css", "", "path to custom CSS file for HTML export")
 	cmd.flags.BoolVar(&cmd.NoCSS, "no-css", false, "output raw HTML without styling")
 	cmd.flags.BoolVar(&cmd.ListThemes, "themes", false, "list available themes and exit")
+	cmd.flags.BoolVar(&cmd.CheckLinks, "check-links", false, "enable URL reachability checking for links")
+	cmd.flags.DurationVar(&cmd.LinkTimeout, "link-timeout", 10*time.Second, "per-link check timeout")
+	cmd.flags.StringVar(&cmd.LinkExclude, "link-exclude", "", "comma-separated URL patterns to exclude from link checking")
+	cmd.flags.Float64Var(&cmd.LinkRate, "link-rate", 2, "max requests per second per host for link checking")
 
 	cmd.flags.Usage = func() {
 		fmt.Fprintf(stderr, "Usage of %s:\n", os.Args[0])
@@ -270,6 +282,23 @@ func (cmd *Export) execute(ctx context.Context, pwd string) error {
 		p = hype.NewParser(parserFS)
 	} else {
 		p.FS = parserFS
+	}
+
+	if cmd.CheckLinks {
+		cfg := hype.DefaultLinkCheckConfig()
+		cfg.Enabled = true
+		cfg.Timeout = cmd.LinkTimeout
+		cfg.RatePerHost = cmd.LinkRate
+		if cmd.LinkExclude != "" {
+			for _, pattern := range strings.Split(cmd.LinkExclude, ",") {
+				pattern = strings.TrimSpace(pattern)
+				if pattern != "" {
+					cfg.ExcludePatterns = append(cfg.ExcludePatterns, pattern)
+				}
+			}
+		}
+		p.LinkCheck = cfg
+		p.LinkValidator = hype.NewLinkValidator(cfg)
 	}
 
 	p.Root = filepath.Join(filepath.Dir(mp), fileDir)
