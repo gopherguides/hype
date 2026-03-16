@@ -23,6 +23,7 @@ type Article struct {
 	Tags           []string          `json:"tags"`
 	SEODescription string            `json:"seo_description"`
 	OGImage        string            `json:"og_image"`
+	AuthorTwitter  string            `json:"author_twitter"`
 	Body           template.HTML     `json:"body"`
 	Overview       template.HTML     `json:"overview"`
 	Data           map[string]string `json:"data"`
@@ -142,6 +143,12 @@ func (ap *ArticleParser) ParseArticle(ctx context.Context, dir string) (Article,
 	if v, ok := p.Vars.Get("og_image"); ok {
 		if s, ok := v.(string); ok {
 			a.OGImage = s
+		}
+	}
+
+	if v, ok := p.Vars.Get("author_twitter"); ok {
+		if s, ok := v.(string); ok {
+			a.AuthorTwitter = s
 		}
 	}
 
