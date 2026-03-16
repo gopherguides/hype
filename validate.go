@@ -183,15 +183,28 @@ func validateHeadingHierarchy(doc *Document, result *ValidationResult) {
 	}
 }
 
-func validateLocalLinks(doc *Document, result *ValidationResult) {
+func collectIDs(nodes Nodes) map[string]bool {
 	ids := make(map[string]bool)
-
-	elements := ByType[*Element](doc.Nodes)
-	for _, el := range elements {
-		if id, ok := el.Get("id"); ok {
-			ids[id] = true
+	for _, n := range nodes {
+		if _, isRef := n.(*Ref); !isRef {
+			if an, ok := n.(AttrNode); ok {
+				attrs := an.Attrs()
+				if id, ok := attrs.Get("id"); ok {
+					ids[id] = true
+				}
+			}
+		}
+		for k, v := range collectIDs(n.Children()) {
+			if v {
+				ids[k] = true
+			}
 		}
 	}
+	return ids
+}
+
+func validateLocalLinks(doc *Document, result *ValidationResult) {
+	ids := collectIDs(doc.Nodes)
 
 	links := ByType[*Link](doc.Nodes)
 	for _, l := range links {

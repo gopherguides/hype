@@ -170,7 +170,7 @@ func (cmd *Validate) execute(ctx context.Context, pwd string) error {
 			return err
 		}
 		fmt.Fprintln(out, string(b))
-	default:
+	case "text":
 		for _, issue := range result.Issues {
 			fmt.Fprintln(out, issue.String())
 		}
@@ -178,6 +178,8 @@ func (cmd *Validate) execute(ctx context.Context, pwd string) error {
 			fmt.Fprintln(out)
 		}
 		fmt.Fprintln(out, result.Summary())
+	default:
+		return fmt.Errorf("unsupported format: %s", cmd.Format)
 	}
 
 	if result.HasErrors() {
