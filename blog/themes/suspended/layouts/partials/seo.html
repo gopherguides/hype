@@ -11,9 +11,9 @@
     <meta property="og:url" content="{{.Config.BaseURL}}{{.Article.URL}}">
     {{if .Article.OGImage}}<meta property="og:image" content="{{.Config.BaseURL}}{{.Article.OGImage}}">{{else if .Config.SEO.OGImage}}<meta property="og:image" content="{{.Config.BaseURL}}{{.Config.SEO.OGImage}}">{{end}}
     <meta property="og:site_name" content="{{if .Config.SEO.SiteName}}{{.Config.SEO.SiteName}}{{else}}{{.Config.Title}}{{end}}">
-    <meta property="og:article:published_time" content="{{.Article.ISODate}}">
-    <meta property="og:article:author" content="{{if .Article.Author}}{{.Article.Author}}{{else}}{{.Config.Author.Name}}{{end}}">
-    {{range .Article.Tags}}<meta property="og:article:tag" content="{{.}}">
+    <meta property="article:published_time" content="{{.Article.ISODate}}">
+    <meta property="article:author" content="{{if .Article.Author}}{{.Article.Author}}{{else}}{{.Config.Author.Name}}{{end}}">
+    {{range .Article.Tags}}<meta property="article:tag" content="{{.}}">
     {{end}}
 
     <!-- Twitter Card -->

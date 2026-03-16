@@ -67,18 +67,18 @@ func TestSEOArticleTags(t *testing.T) {
 		require.Contains(t, out, `og:site_name" content="Hype"`)
 	})
 
-	t.Run("og:article:published_time", func(t *testing.T) {
-		require.Contains(t, out, `og:article:published_time" content="2026-03-15T00:00:00Z"`)
+	t.Run("article:published_time", func(t *testing.T) {
+		require.Contains(t, out, `article:published_time" content="2026-03-15T00:00:00Z"`)
 	})
 
-	t.Run("og:article:author", func(t *testing.T) {
-		require.Contains(t, out, `og:article:author" content="Gopher Guides"`)
+	t.Run("article:author", func(t *testing.T) {
+		require.Contains(t, out, `article:author" content="Gopher Guides"`)
 	})
 
-	t.Run("og:article:tag for each tag", func(t *testing.T) {
-		require.Contains(t, out, `og:article:tag" content="tutorial"`)
-		require.Contains(t, out, `og:article:tag" content="getting-started"`)
-		require.Contains(t, out, `og:article:tag" content="hype"`)
+	t.Run("article:tag for each tag", func(t *testing.T) {
+		require.Contains(t, out, `article:tag" content="tutorial"`)
+		require.Contains(t, out, `article:tag" content="getting-started"`)
+		require.Contains(t, out, `article:tag" content="hype"`)
 	})
 
 	t.Run("twitter:site from config", func(t *testing.T) {
@@ -131,8 +131,8 @@ func TestSEOArticleFallbacks(t *testing.T) {
 		require.Contains(t, out, `og:site_name" content="My Blog"`)
 	})
 
-	t.Run("og:article:author falls back to config author", func(t *testing.T) {
-		require.Contains(t, out, `og:article:author" content="Default Author"`)
+	t.Run("article:author falls back to config author", func(t *testing.T) {
+		require.Contains(t, out, `article:author" content="Default Author"`)
 	})
 
 	t.Run("twitter:creator falls back to config twitter", func(t *testing.T) {
@@ -143,8 +143,8 @@ func TestSEOArticleFallbacks(t *testing.T) {
 		require.Contains(t, out, `og:image" content="https://example.com/images/default.png"`)
 	})
 
-	t.Run("no og:article:tag when tags empty", func(t *testing.T) {
-		require.NotContains(t, out, `og:article:tag`)
+	t.Run("no article:tag when tags empty", func(t *testing.T) {
+		require.NotContains(t, out, `article:tag`)
 	})
 }
 
@@ -188,9 +188,9 @@ func TestSEOListPage(t *testing.T) {
 	})
 
 	t.Run("no article-specific tags on list page", func(t *testing.T) {
-		require.NotContains(t, out, `og:article:published_time`)
-		require.NotContains(t, out, `og:article:author`)
-		require.NotContains(t, out, `og:article:tag`)
+		require.NotContains(t, out, `article:published_time`)
+		require.NotContains(t, out, `article:author`)
+		require.NotContains(t, out, `article:tag`)
 	})
 }
 
