@@ -172,20 +172,24 @@ func (cmd *VSCode) execute(ctx context.Context, pwd string, name string) error {
 }
 
 func (cmd *VSCode) toc(p *hype.Parser, body *hype.Body) (string, error) {
-	toc, err := hype.GenerateToC(p, body.Children())
+	headings := hype.ByType[*hype.Heading](body.Children())
+
+	seen := map[string]int{}
+	slugs := make([]string, len(headings))
+	for i, h := range headings {
+		text := h.Children().String()
+		slugs[i] = hype.UniqueSlug(text, seen)
+	}
+
+	toc, err := hype.GenerateToC(p, headings, slugs)
 	if err != nil {
 		return "", err
 	}
 
-	headings := hype.ByType[*hype.Heading](body.Children())
-
 	for i, h := range headings {
-		x := h.Children().String()
-		link := hype.Text(fmt.Sprintf("<a id=\"heading-%d\"></a>%s", i, x))
-		h.Nodes = hype.Nodes{link}
+		h.Set("id", slugs[i])
 	}
 
-	// tc := fmt.Sprintf("<div id=\"menu\">\n%s\n</div>\n", toc.String())
 	tc := toc.String()
 
 	return tc, nil

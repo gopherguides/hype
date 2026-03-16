@@ -1,6 +1,7 @@
 {
   "atom": "toc",
   "attributes": {},
+  "depth": 6,
   "filename": "",
   "html_node": {
     "data": "toc",
@@ -10,6 +11,7 @@
     "type": "html.Node"
   },
   "nodes": [],
+  "root": true,
   "tag": "\u003ctoc\u003e",
   "type": "hype.ToC"
 }

@@ -7,6 +7,45 @@ import (
 	"golang.org/x/net/html"
 )
 
+func Test_Slug(t *testing.T) {
+	t.Parallel()
+
+	tests := []struct {
+		in   string
+		want string
+	}{
+		{"Introduction", "introduction"},
+		{"My Document", "my-document"},
+		{"Hello World!", "hello-world"},
+		{"  spaces  ", "spaces"},
+		{"Special @#$ Characters", "special-characters"},
+		{"already-slug", "already-slug"},
+		{"UPPER CASE", "upper-case"},
+		{"multiple   spaces", "multiple-spaces"},
+		{"", ""},
+	}
+
+	for _, tt := range tests {
+		t.Run(tt.in, func(t *testing.T) {
+			r := require.New(t)
+			r.Equal(tt.want, Slug(tt.in))
+		})
+	}
+}
+
+func Test_UniqueSlug(t *testing.T) {
+	t.Parallel()
+	r := require.New(t)
+
+	seen := map[string]int{}
+
+	r.Equal("example", UniqueSlug("Example", seen))
+	r.Equal("example-1", UniqueSlug("Example", seen))
+	r.Equal("example-2", UniqueSlug("Example", seen))
+	r.Equal("other", UniqueSlug("Other", seen))
+	r.Equal("other-1", UniqueSlug("Other", seen))
+}
+
 func Test_NewHeading(t *testing.T) {
 	t.Parallel()
 	r := require.New(t)
