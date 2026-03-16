@@ -210,6 +210,23 @@ func validateLocalLinks(doc *Document, result *ValidationResult) {
 			})
 		}
 	}
+
+	refs := ByType[*Ref](doc.Nodes)
+	for _, r := range refs {
+		id, ok := r.Get("id")
+		if !ok {
+			continue
+		}
+		if !ids[id] {
+			result.Add(ValidationIssue{
+				Severity: SeverityError,
+				Category: CategoryLink,
+				Filename: r.Filename,
+				Element:  r.StartTag(),
+				Message:  fmt.Sprintf("ref target not found: figure id %q", id),
+			})
+		}
+	}
 }
 
 func validateDuplicateIDs(doc *Document, result *ValidationResult) {

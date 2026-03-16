@@ -99,6 +99,25 @@ func Test_Validate_BrokenAnchor(t *testing.T) {
 	r.Contains(result.Issues[0].Message, "#nonexistent")
 }
 
+func Test_Validate_BrokenRef(t *testing.T) {
+	r := require.New(t)
+
+	cab := os.DirFS("testdata/validate/broken-ref")
+	p := NewParser(cab)
+
+	doc, err := p.ParseFile("module.md")
+	r.NoError(err)
+
+	result := &ValidationResult{}
+	validateLocalLinks(doc, result)
+
+	r.Len(result.Issues, 1)
+	r.Equal(SeverityError, result.Issues[0].Severity)
+	r.Equal(CategoryLink, result.Issues[0].Category)
+	r.Contains(result.Issues[0].Message, "ref target not found")
+	r.Contains(result.Issues[0].Message, "missing-fig")
+}
+
 func Test_Validate_DuplicateIDs(t *testing.T) {
 	r := require.New(t)
 

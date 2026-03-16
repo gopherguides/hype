@@ -152,7 +152,7 @@ func (cmd *Validate) execute(ctx context.Context, pwd string) error {
 		p.FS = parserFS
 	}
 
-	p.Root = pwd
+	p.Root = filepath.Join(pwd, fileDir)
 
 	doc, err := p.ParseFile(fileName)
 	if err != nil {
