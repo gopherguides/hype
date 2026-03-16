@@ -72,7 +72,7 @@ Hype validates that code samples execute and local assets (images, source files)
 |------|---------|-------|
 | Code examples rot silently — broken docs erode trust and waste contributors' time | Every code sample is executed and validated on every build, so docs stay accurate automatically | Hype's `<go>` and `<cmd>` tags execute code samples during export and fail the build if they break |
 | Same content copy-pasted across README, blog, slides — one update, five places to fix | Write once, include everywhere — a single source of truth for every code example | Hype's `<include>` and partial system lets you compose docs from reusable Markdown packages |
-| No way to "test" documentation — broken examples ship because nobody catches them | Docs get the same validation rigor as code — CI catches doc issues before users do | Run `hype export` in CI to validate all code samples and assets on every PR |
+| No way to "test" documentation — broken examples ship because nobody catches them | Docs get the same validation rigor as code — CI catches doc issues before users do | Run `hype export -f doc.md` in CI for each document entrypoint to validate its code samples and assets on every PR |
 | Locked into one output format — can't reuse tutorial content as slides or a blog post | One source, multiple formats — export to Markdown and HTML, present as slides, or generate a blog | `hype export -format=markdown`, `hype export -format=html`, `hype slides`, `hype blog build` |
 
 ### Short-Form Messaging
