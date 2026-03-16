@@ -15,7 +15,7 @@
 ### Gemini settings
 
 - **Model:** `gemini-3.1-flash-image-preview` (recommended) or `gemini-3-pro-image-preview` (highest quality)
-- **Aspect ratio:** `1:1` for avatar, `16:9` closest for header (or use SVG approach below)
+- **Aspect ratio:** `1:1` for avatar, `3:1` for header (1500x500, or use SVG approach below)
 - **Resolution:** `1K` or higher
 
 ### SVG source files
