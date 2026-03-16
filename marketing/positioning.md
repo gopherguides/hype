@@ -70,10 +70,10 @@ Hype validates that code samples execute and local assets (images, source files)
 
 | Pain | Outcome | Proof |
 |------|---------|-------|
-| Code examples rot silently — broken docs erode trust and waste contributors' time | Every code sample is executed and validated on every build, so docs stay accurate automatically | Hype runs `go run`, `go build`, or any command on your fenced code blocks and fails the build if they break |
+| Code examples rot silently — broken docs erode trust and waste contributors' time | Every code sample is executed and validated on every build, so docs stay accurate automatically | Hype's `<go>` and `<cmd>` tags execute code samples during export and fail the build if they break |
 | Same content copy-pasted across README, blog, slides — one update, five places to fix | Write once, include everywhere — a single source of truth for every code example | Hype's `<include>` and partial system lets you compose docs from reusable Markdown packages |
 | No way to "test" documentation — broken examples ship because nobody catches them | Docs get the same validation rigor as code — CI catches doc issues before users do | Run `hype export` in CI to validate all code samples and assets on every PR |
-| Locked into one output format — can't reuse tutorial content as slides or a blog post | One source, multiple formats — export to Markdown, HTML, or slides from the same content | `hype export -format=markdown`, `hype export -format=html`, `hype slides` |
+| Locked into one output format — can't reuse tutorial content as slides or a blog post | One source, multiple formats — export to Markdown and HTML, present as slides, or generate a blog | `hype export -format=markdown`, `hype export -format=html`, `hype slides`, `hype blog build` |
 
 ### Short-Form Messaging
 
@@ -95,13 +95,15 @@ Documentation with code examples goes stale the moment your API changes. Hype fi
 | Code execution & validation | Yes | No | No | No | Yes (notebooks) |
 | Reusable content includes | Yes | Limited (MDX imports) | No | No | Yes (includes) |
 | Asset validation | Yes | No | No | No | No |
-| Multiple export formats | Markdown, HTML, Slides | HTML | HTML | HTML, PDF | HTML, PDF, Word |
+| Multiple output formats | Markdown, HTML, Slides*, Blog | HTML | HTML | HTML, PDF | HTML, PDF, Word |
 | Blog generator | Yes (3 themes) | Yes | Plugin | No | Yes |
 | Live preview | Yes | Yes | Yes | Yes | Yes |
 | Free & open source | MIT | MIT | BSD | MPL-2.0 | GPL-2.0 |
 | Language-agnostic execution | Yes (any command) | No | No | No | Partial (kernels) |
 
-**Key advantage over Quarto:** Hype runs any shell command — not just notebook kernels. No Jupyter dependency, no language-specific setup. Fence a code block, tell Hype how to run it, done.
+*Slides are served via `hype slides` (a live presentation server), not exported as static files.
+
+**Key advantage over Quarto:** Hype runs any shell command via `<cmd>` tags — not just notebook kernels. No Jupyter dependency, no language-specific setup. Add a `<cmd>` tag, tell Hype how to run it, done.
 
 ---
 
