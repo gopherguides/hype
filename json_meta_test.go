@@ -218,10 +218,50 @@ func Test_ExtractMeta_DetailsFrontmatter(t *testing.T) {
 
 	meta := ExtractMeta(doc)
 
-	r.Equal("custom-slug-here", meta.Slug)
-	r.Equal("Jane Smith", meta.Metadata["author"])
-	r.Equal("2026-03-01", meta.Metadata["published"])
-	r.Equal("go, testing", meta.Metadata["tags"])
+	r.Equal("details-frontmatter", meta.Slug)
+	r.Empty(meta.Metadata)
+	r.Len(meta.Headings, 1)
+	r.Equal("Details Frontmatter", meta.Headings[0].Text)
+}
+
+func Test_ExtractMeta_DuplicateHeadings(t *testing.T) {
+	t.Parallel()
+	r := require.New(t)
+
+	root := "testdata/json-meta/complex-toc"
+	cab := os.DirFS(root)
+
+	p := NewParser(cab)
+	p.Root = root
+
+	doc, err := p.ParseFile("hype.md")
+	r.NoError(err)
+
+	ctx, cancel := context.WithTimeout(context.Background(), 3*time.Second)
+	defer cancel()
+
+	err = doc.Execute(ctx)
+	r.NoError(err)
+
+	meta := ExtractMeta(doc)
+
+	ids := map[string]bool{}
+	for _, h := range meta.Headings {
+		r.False(ids[h.ID], "duplicate heading ID: %s", h.ID)
+		ids[h.ID] = true
+	}
+
+	toc := ExtractTOC(doc)
+	tocIDs := map[string]bool{}
+	var collectIDs func(entries []TOCEntry)
+	collectIDs = func(entries []TOCEntry) {
+		for _, e := range entries {
+			r.False(tocIDs[e.ID], "duplicate TOC ID: %s", e.ID)
+			tocIDs[e.ID] = true
+			collectIDs(e.Children)
+		}
+	}
+	collectIDs(toc.TOC)
 }
 
 func Test_Slugify(t *testing.T) {

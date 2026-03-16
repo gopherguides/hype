@@ -7,6 +7,15 @@ import (
 	"strings"
 )
 
+func firstPageMetadata(doc *Document) []*Metadata {
+	pages := ByType[*Page](doc.Nodes)
+	if len(pages) == 0 {
+		return ByType[*Metadata](doc.Nodes)
+	}
+
+	return ByType[*Metadata](pages[0].Nodes)
+}
+
 type DocumentMeta struct {
 	Title              string            `json:"title"`
 	Slug               string            `json:"slug"`
@@ -57,21 +66,11 @@ func ExtractMeta(doc *Document) *DocumentMeta {
 		Images:       []string{},
 	}
 
-	mds := ByType[*Metadata](doc.Nodes)
+	mds := firstPageMetadata(doc)
 	for _, md := range mds {
 		for _, k := range md.Map.Keys() {
 			v, _ := md.Map.Get(k)
 			meta.Metadata[k] = v
-		}
-	}
-
-	if doc.Parser != nil {
-		for _, k := range doc.Parser.Vars.Keys() {
-			if _, exists := meta.Metadata[k]; !exists {
-				if v, ok := doc.Parser.Vars.Get(k); ok {
-					meta.Metadata[k] = fmt.Sprintf("%v", v)
-				}
-			}
 		}
 	}
 
@@ -81,9 +80,11 @@ func ExtractMeta(doc *Document) *DocumentMeta {
 		meta.Slug = slugify(meta.Title)
 	}
 
+	seenIDs := map[string]int{}
 	headings := ByType[*Heading](doc.Nodes)
 	for _, h := range headings {
 		text, id := extractHeadingTextAndID(h)
+		id = uniqueID(id, seenIDs)
 		meta.Headings = append(meta.Headings, HeadingMeta{
 			Level: h.Level(),
 			Text:  text,
@@ -152,9 +153,11 @@ func ExtractTOC(doc *Document) *DocumentTOC {
 		return toc
 	}
 
+	seenIDs := map[string]int{}
 	var entries []HeadingMeta
 	for _, h := range headings {
 		text, id := extractHeadingTextAndID(h)
+		id = uniqueID(id, seenIDs)
 		entries = append(entries, HeadingMeta{
 			Level: h.Level(),
 			Text:  text,
@@ -190,6 +193,14 @@ func extractHeadingTextAndID(h *Heading) (text string, id string) {
 	}
 
 	return text, id
+}
+
+func uniqueID(id string, seen map[string]int) string {
+	seen[id]++
+	if seen[id] == 1 {
+		return id
+	}
+	return fmt.Sprintf("%s-%d", id, seen[id]-1)
 }
 
 func buildTOCTree(entries []HeadingMeta, start int) []TOCEntry {
