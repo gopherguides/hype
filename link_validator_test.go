@@ -98,8 +98,51 @@ func Test_LinkValidator_Check_SkipExcluded(t *testing.T) {
 	cfg.ExcludePatterns = []string{srv.URL + "/*"}
 	v := NewLinkValidator(cfg)
 
-	err := v.Check(context.Background(), srv.URL+"/should-skip")
-	r.NoError(err)
+	r.NoError(v.Check(context.Background(), srv.URL+"/should-skip"))
+	r.NoError(v.Check(context.Background(), srv.URL+"/docs/v1/nested/page"))
+}
+
+func Test_LinkValidator_Check_ConcurrentDedup(t *testing.T) {
+	t.Parallel()
+	r := require.New(t)
+
+	var hitCount atomic.Int32
+	srv := httptest.NewServer(http.HandlerFunc(func(w http.ResponseWriter, req *http.Request) {
+		hitCount.Add(1)
+		time.Sleep(50 * time.Millisecond)
+		w.WriteHeader(http.StatusOK)
+	}))
+	defer srv.Close()
+
+	cfg := DefaultLinkCheckConfig()
+	cfg.Enabled = true
+	v := NewLinkValidator(cfg)
+
+	u := srv.URL + "/dedup"
+	errs := make(chan error, 5)
+	for range 5 {
+		go func() {
+			errs <- v.Check(context.Background(), u)
+		}()
+	}
+
+	for range 5 {
+		r.NoError(<-errs)
+	}
+
+	r.Equal(int32(1), hitCount.Load())
+}
+
+func Test_LinkValidator_ZeroRate(t *testing.T) {
+	t.Parallel()
+	r := require.New(t)
+
+	cfg := DefaultLinkCheckConfig()
+	cfg.Enabled = true
+	cfg.RatePerHost = 0
+	v := NewLinkValidator(cfg)
+
+	r.Equal(float64(2), v.Config.RatePerHost)
 }
 
 func Test_LinkValidator_Check_Cache(t *testing.T) {

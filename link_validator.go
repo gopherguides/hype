@@ -6,7 +6,6 @@ import (
 	"io"
 	"net/http"
 	"net/url"
-	"path"
 	"slices"
 	"strconv"
 	"strings"
@@ -22,13 +21,22 @@ type LinkValidator struct {
 
 	mu       sync.RWMutex
 	cache    map[string]error
+	inflight map[string]chan struct{}
 	limiters map[string]*rate.Limiter
 }
 
 func NewLinkValidator(cfg LinkCheckConfig) *LinkValidator {
+	if cfg.RatePerHost <= 0 {
+		cfg.RatePerHost = 2
+	}
+	if cfg.RateBurst <= 0 {
+		cfg.RateBurst = 1
+	}
+
 	v := &LinkValidator{
 		Config:   cfg,
 		cache:    make(map[string]error),
+		inflight: make(map[string]chan struct{}),
 		limiters: make(map[string]*rate.Limiter),
 	}
 
@@ -50,28 +58,54 @@ func (v *LinkValidator) Check(ctx context.Context, rawURL string) error {
 		return nil
 	}
 
-	v.mu.RLock()
+	v.mu.Lock()
 	if err, ok := v.cache[rawURL]; ok {
+		v.mu.Unlock()
+		return err
+	}
+
+	if ch, ok := v.inflight[rawURL]; ok {
+		v.mu.Unlock()
+		select {
+		case <-ch:
+		case <-ctx.Done():
+			return LinkCheckError{URL: rawURL, Err: ctx.Err()}
+		}
+		v.mu.RLock()
+		err := v.cache[rawURL]
 		v.mu.RUnlock()
 		return err
 	}
-	v.mu.RUnlock()
+
+	ch := make(chan struct{})
+	v.inflight[rawURL] = ch
+	v.mu.Unlock()
 
 	u, err := url.Parse(rawURL)
 	if err != nil {
 		lce := LinkCheckError{URL: rawURL, Err: err}
-		v.cacheResult(rawURL, lce)
+		v.finishCheck(rawURL, lce, ch)
 		return lce
 	}
 
 	limiter := v.limiterFor(u.Host)
 	if err := limiter.Wait(ctx); err != nil {
-		return LinkCheckError{URL: rawURL, Err: err}
+		lce := LinkCheckError{URL: rawURL, Err: err}
+		v.finishCheck(rawURL, lce, ch)
+		return lce
 	}
 
 	checkErr := v.doCheck(ctx, rawURL)
-	v.cacheResult(rawURL, checkErr)
+	v.finishCheck(rawURL, checkErr, ch)
 	return checkErr
+}
+
+func (v *LinkValidator) finishCheck(rawURL string, err error, ch chan struct{}) {
+	v.mu.Lock()
+	v.cache[rawURL] = err
+	delete(v.inflight, rawURL)
+	v.mu.Unlock()
+	close(ch)
 }
 
 func (v *LinkValidator) shouldSkip(rawURL string) bool {
@@ -89,12 +123,12 @@ func (v *LinkValidator) shouldSkip(rawURL string) bool {
 	}
 
 	for _, pattern := range v.Config.ExcludePatterns {
-		matched, err := path.Match(pattern, rawURL)
-		if err == nil && matched {
+		if prefix, ok := strings.CutSuffix(pattern, "*"); ok {
+			if strings.HasPrefix(rawURL, prefix) {
+				return true
+			}
+		} else if pattern == rawURL {
 			return true
-		}
-		if strings.Contains(rawURL, strings.ReplaceAll(pattern, "*", "")) {
-			continue
 		}
 	}
 
@@ -206,10 +240,4 @@ func parseRetryAfter(val string) time.Duration {
 
 func (v *LinkValidator) isAccepted(code int) bool {
 	return slices.Contains(v.Config.AcceptedCodes, code)
-}
-
-func (v *LinkValidator) cacheResult(rawURL string, err error) {
-	v.mu.Lock()
-	defer v.mu.Unlock()
-	v.cache[rawURL] = err
 }
