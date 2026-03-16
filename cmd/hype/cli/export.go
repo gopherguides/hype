@@ -3,6 +3,7 @@ package cli
 import (
 	"bytes"
 	"context"
+	"encoding/json"
 	"flag"
 	"fmt"
 	"html"
@@ -126,7 +127,7 @@ Examples:
 	cmd.flags.DurationVar(&cmd.Timeout, "timeout", DefaultTimeout, "timeout for execution, defaults to 30 seconds (30s)")
 	cmd.flags.StringVar(&cmd.File, "f", "hype.md", "optional file name to preview, if not provided, defaults to hype.md")
 	cmd.flags.BoolVar(&cmd.Verbose, "v", false, "enable verbose output for debugging")
-	cmd.flags.StringVar(&cmd.Format, "format", "markdown", "content type to export to: markdown, html")
+	cmd.flags.StringVar(&cmd.Format, "format", "markdown", "content type to export to: markdown, html, json-meta, json-toc")
 	cmd.flags.Var(&cmd.OutPath, "o", "path to the output file; if not provided, output is written to stdout")
 	cmd.flags.StringVar(&cmd.Theme, "theme", themes.DefaultTheme, "theme for HTML export (e.g., github, solarized-dark)")
 	cmd.flags.StringVar(&cmd.CustomCSS, "css", "", "path to custom CSS file for HTML export")
@@ -292,6 +293,20 @@ func (cmd *Export) execute(ctx context.Context, pwd string) error {
 			return nil
 		}
 		return cmd.renderStyledHTML(doc)
+	case "json-meta":
+		meta := hype.ExtractMeta(doc)
+		b, err := json.MarshalIndent(meta, "", "  ")
+		if err != nil {
+			return err
+		}
+		fmt.Fprintln(cmd.Stdout(), string(b))
+	case "json-toc":
+		toc := hype.ExtractTOC(doc)
+		b, err := json.MarshalIndent(toc, "", "  ")
+		if err != nil {
+			return err
+		}
+		fmt.Fprintln(cmd.Stdout(), string(b))
 	default:
 		return fmt.Errorf("unsupported format: %s", cmd.Format)
 	}
