@@ -1727,7 +1727,8 @@ $ tree ./docs
 
 ./docs
 ├── adr
-│   └── 0001-website-architecture.md
+│   ├── 0001-website-architecture.md
+│   └── 0002-marketing-site-information-architecture.md
 ├── badges.md
 ├── blog
 │   ├── README.md
@@ -1747,6 +1748,11 @@ $ tree ./docs
 ├── installation.md
 ├── license.md
 ├── marked.md
+├── marketing
+│   ├── README.md
+│   ├── content-calendar-2026-q2.md
+│   ├── domain-shortlist-validation.md
+│   └── social-profile-kit.md
 ├── mermaid.md
 ├── preview.md
 ├── quick-reference.md
@@ -1760,7 +1766,7 @@ $ tree ./docs
 │           └── main.go
 └── slides.md
 
-9 directories, 25 files
+10 directories, 30 files
 ```
 ---
 
