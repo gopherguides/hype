@@ -27,6 +27,23 @@
 | W5 | Onboarding friction from stale READMEs | Fast preview loop with `hype preview` | New user quote/community mention | Open issue / feedback |
 | W6 | Hidden maintenance cost in docs | Multi-format output workflow | Monthly recap + roadmap teaser | Subscribe / contribute |
 
-## Drafts produced this run
+## Launch window schedule (first 2 weeks)
+| Date (CT) | Slot | Post | Channel(s) | Owner | Asset needed |
+|---|---|---|---|---|---|
+| 2026-03-23 | 9:00 AM | Post 01 — Docs Drift | X + LinkedIn | Hype maintainer | drift screenshot |
+| 2026-03-25 | 11:30 AM | Post 02 — Include Reuse | X + LinkedIn | Hype maintainer | include flow diagram |
+| 2026-03-27 | 12:00 PM | W1 proof/update | X | Hype maintainer | quick metric tile |
+| 2026-03-30 | 9:00 AM | W2 problem post | X + LinkedIn | Hype maintainer | carousel/quote card |
+| 2026-04-01 | 11:30 AM | W2 how-to post | X + LinkedIn | Hype maintainer | CLI demo GIF |
+| 2026-04-03 | 12:00 PM | W2 proof/update | X | Hype maintainer | snippet screenshot |
+
+## Publishing checklist (repeatable)
+1. Add UTM-tagged primary link (`?utm_source=<channel>&utm_medium=social&utm_campaign=q2_launch`).
+2. Validate command snippets against current `main` before posting.
+3. Include alt text for every image/GIF.
+4. Reply-ready first comment prepared (docs link + quickstart).
+5. Capture post URL + engagement after 24h.
+
+## Drafts produced
 - `marketing/posts/post-01-docs-drift.md`
 - `marketing/posts/post-02-include-reuse.md`

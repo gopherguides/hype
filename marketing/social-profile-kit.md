@@ -43,6 +43,13 @@ If docs matter to your product, they should be testable.
 Start: https://hypemd.dev
 Repo: https://github.com/gopherguides/hype
 
+## Asset checklist (profile completeness)
+- Avatar: high-contrast Hype logo (square, readable at 48x48).
+- Header image: “Executable Markdown docs” tagline + URL.
+- Location: optional (`Remote`).
+- Pinned post: publish from template above.
+- Accessibility: image alt text included on each visual post.
+
 ## Voice/tone guardrails
 - Practical, technical, no hype language.
 - Prefer concrete examples over claims.
@@ -58,3 +65,10 @@ Repo: https://github.com/gopherguides/hype
 - **Feature request:** acknowledge + open/point to GitHub issue.
 - **Bug report:** ask for repro snippet + environment.
 - **Praise/mentions:** thank and ask what workflow they’re using.
+
+## 7-day launch micro-plan
+1. Day 1: refresh profile bio + header + pinned post.
+2. Day 2: publish Post 01 (docs drift).
+3. Day 4: publish Post 02 (include reuse).
+4. Day 5: reply to all comments/mentions with docs links where relevant.
+5. Day 7: recap post with one measurable outcome (clicks, stars, follows).

@@ -12,11 +12,20 @@ Hype already has a live public site at `hypemd.dev` deployed via Dokploy. We nee
 - SEO, social metadata, and reliability
 
 ## Decision
-Adopt a **Git-based static site workflow with Dokploy deployment** as the primary architecture, backed by:
+Adopt a **Git-based static site workflow with Dokploy deployment** as the primary architecture.
+
+### Selected architecture
 1. Source-controlled content + templates in the repo
 2. Build artifact generation in CI
 3. Dokploy-managed deploys to production
 4. Canonical domain routing through `hypemd.dev`
+
+## Options considered
+| Option | Summary | Pros | Cons | Decision |
+|---|---|---|---|---|
+| A. Static site + Dokploy (selected) | Build static assets from repo and deploy via Dokploy | Low ops burden, fast rollback, simple CI/CD | Limited dynamic features unless extra services added | **Chosen** |
+| B. Dynamic app framework + managed DB | Use app runtime for docs + marketing | Flexible personalization/search | Higher maintenance, runtime incidents, more moving parts | Rejected for v1 |
+| C. Third-party docs SaaS | Host docs externally and link marketing pages | Fast initial setup | Vendor lock-in, less control, fragmented brand | Rejected for v1 |
 
 ## Rationale
 - Existing live deployment already validates Dokploy as an execution path.
