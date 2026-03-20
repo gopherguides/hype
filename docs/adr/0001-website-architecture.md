@@ -68,3 +68,18 @@ Adopt a **Git-based static site workflow with Dokploy deployment** as the primar
 - Document smoke test script for post-deploy verification
 - Add architecture diagram to docs site operations page
 - Define SLO for docs uptime + publish latency
+
+## Decision drivers
+- Keep infra lightweight for a small maintainer team.
+- Preserve content portability (avoid lock-in to a hosted docs vendor).
+- Enable PR-first iteration where copy, code, and docs are reviewed together.
+
+## Non-goals (v1)
+- Personalized per-user experiences.
+- Custom search infra beyond baseline site search.
+- Multi-region active/active runtime architecture.
+
+## Rollout plan
+1. **Phase 1 (now):** stabilize IA + metadata + analytics tags.
+2. **Phase 2:** add automated smoke tests + broken-link checks in CI.
+3. **Phase 3:** evaluate optional managed search if docs volume materially grows.

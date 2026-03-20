@@ -47,3 +47,20 @@
 ## Drafts produced
 - `marketing/posts/post-01-docs-drift.md`
 - `marketing/posts/post-02-include-reuse.md`
+
+## Production readiness checklist (Posts 01-02)
+| Item | Post 01 | Post 02 | Status |
+|---|---|---|---|
+| Copy finalized for X + LinkedIn | ✅ | ✅ | Ready |
+| UTM links validated | ✅ | ✅ | Ready |
+| First comment/reply seed prepared | ✅ | ✅ | Ready |
+| Creative brief + alt text specified | ✅ | ✅ | Needs asset creation |
+| Publish slot assigned (CT) | 2026-03-23 9:00 AM | 2026-03-25 11:30 AM | Scheduled |
+
+## Metrics capture scaffold
+- Track at +24h and +7d for each post:
+  - impressions
+  - engagements
+  - profile visits
+  - link clicks
+  - net new GitHub stars (daily delta)

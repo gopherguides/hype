@@ -72,3 +72,16 @@ Repo: https://github.com/gopherguides/hype
 3. Day 4: publish Post 02 (include reuse).
 4. Day 5: reply to all comments/mentions with docs links where relevant.
 5. Day 7: recap post with one measurable outcome (clicks, stars, follows).
+
+## Channel field map (fill once, reuse quarterly)
+| Field | X/Twitter value | LinkedIn page value |
+|---|---|---|
+| Name | Hype (Markdown Docs) | Hype by Gopher Guides |
+| Tagline | Executable docs for developers | Reliable docs-as-code with executable snippets |
+| Website | https://hypemd.dev | https://hypemd.dev |
+| CTA link | https://hypemd.dev/docs | https://github.com/gopherguides/hype |
+
+## Launch week operating rhythm
+- Daily (Mon-Fri): 15-minute mention/reply triage window.
+- Twice weekly: capture FAQ patterns and convert one into post/comment copy.
+- Friday: update pinned reply with latest docs/quickstart link if changed.

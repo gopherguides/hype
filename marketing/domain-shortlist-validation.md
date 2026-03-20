@@ -42,3 +42,16 @@ Register defensive domains only if one of these occurs:
 1. Keep `hypemd.dev` as canonical domain.
 2. No immediate defensive registrations.
 3. Re-evaluate quarterly (or immediately on abuse signal).
+
+## Registrar + conflict spot-check log
+| Timestamp (UTC) | Check | Result | Notes |
+|---|---|---|---|
+| 2026-03-20 22:22 | Public DNS resolution for `hypemd.dev` | Pass | Domain resolves and serves current site. |
+| 2026-03-20 22:22 | GitHub/org collision scan for `hypedocs`/`hypecli` naming | No blocking collision found | Continue monitoring if paid campaigns begin. |
+| 2026-03-20 22:22 | Trademark quick screen (`Hype` + docs tooling context) | No obvious immediate blocker | Full legal review only if broad commercial expansion starts. |
+
+## Decision matrix issue update payload
+Use this summary in issue/PR updates:
+- Canonical domain remains `hypemd.dev` (weighted score 4.80/5).
+- Defensive domains deferred by policy unless abuse/confusion signals appear.
+- Next review checkpoint: end of Q2 2026 or sooner on incident trigger.
