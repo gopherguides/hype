@@ -55,3 +55,7 @@ Use this summary in issue/PR updates:
 - Canonical domain remains `hypemd.dev` (weighted score 4.80/5).
 - Defensive domains deferred by policy unless abuse/confusion signals appear.
 - Next review checkpoint: end of Q2 2026 or sooner on incident trigger.
+
+### Suggested issue mapping
+- Primary update target: https://github.com/gopherguides/hype/issues/83
+- Cross-reference from website architecture thread when domain implications arise: https://github.com/gopherguides/hype/issues/84

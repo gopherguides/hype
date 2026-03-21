@@ -64,3 +64,7 @@
   - profile visits
   - link clicks
   - net new GitHub stars (daily delta)
+
+## Suggested issue mapping
+- Positioning + narrative thread: https://github.com/gopherguides/hype/issues/82
+- Social execution thread: https://github.com/gopherguides/hype/issues/85

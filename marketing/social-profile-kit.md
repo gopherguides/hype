@@ -85,3 +85,7 @@ Repo: https://github.com/gopherguides/hype
 - Daily (Mon-Fri): 15-minute mention/reply triage window.
 - Twice weekly: capture FAQ patterns and convert one into post/comment copy.
 - Friday: update pinned reply with latest docs/quickstart link if changed.
+
+## Suggested issue mapping
+- Primary update target: https://github.com/gopherguides/hype/issues/85
+- Cross-reference content cadence decisions: https://github.com/gopherguides/hype/issues/82
