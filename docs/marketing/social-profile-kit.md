@@ -40,3 +40,10 @@ Start: https://hypemd.dev
 - "Start with the quickstart: https://hypemd.dev"
 - "See the repo: https://github.com/gopherguides/hype"
 - "Tell us your docs pain point; we’ll build a walkthrough."
+
+## Launch-Day Profile Setup Checklist (Concrete)
+1. Update X and LinkedIn bios to final copy above.
+2. Upload `assets/brand/twitter-avatar.png` and `assets/brand/twitter-header.png`.
+3. Publish pinned intro post and include quickstart URL.
+4. Add first two scheduled posts from `docs/marketing/content-calendar-2026-q2.md`.
+5. Verify profile links resolve to canonical `https://hypemd.dev`.

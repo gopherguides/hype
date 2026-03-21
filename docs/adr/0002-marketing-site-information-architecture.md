@@ -62,3 +62,15 @@ Social post / search result -> Home or Use Case page -> Quickstart -> Repository
 - [ ] Add route/page stubs for `/use-cases`, `/examples`, and `/changelog`.
 - [ ] Define per-page metadata checklist (title, description, OG image, canonical).
 - [ ] Add measurement plan (click-through to quickstart, docs depth, returning visitors).
+
+## Measurement Plan (v1)
+- **North-star conversion:** quickstart CTA click-through rate from home/use-cases pages.
+- **Activation proxy:** unique visitors reaching `/docs/quickstart` within same session.
+- **Retention proxy:** 7-day returning visitor ratio to docs/blog pages.
+- **Channel attribution:** UTM-tagged social links for post-level performance.
+
+## Owner Mapping
+- Marketing docs and calendars: `docs/marketing/*`
+- Architecture decisions: `docs/adr/*`
+- Brand assets: `assets/brand/*`
+- Product documentation source of truth: `docs/*`

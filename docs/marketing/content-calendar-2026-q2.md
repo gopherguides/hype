@@ -24,30 +24,63 @@
 | W3 | Metadata + SEO support | Social card and OG automation | Traffic uplift case study format | Feature request spotlight |
 | W4 | Export/validation deep dive | Dokploy deployment guide | Reliability checklist post | Office-hours / AMA prompt |
 
-## Draft Post #1 (social)
-**Working title:** Stop maintaining separate docs and blog pipelines
+## Two Concrete Drafts (PR-ready)
 
-If your docs and blog run on separate stacks, your team is paying a hidden tax in review time and breakages.
+### Draft 01 — X + LinkedIn (Week 1, Tue)
+- **Goal:** Introduce core problem/solution with a clear CTA.
+- **Primary CTA:** `https://hypemd.dev`
+- **Secondary CTA:** `https://github.com/gopherguides/hype`
 
-Hype keeps markdown-driven content in one workflow so teams can:
+**X version (<=280 chars)**
+Most docs/blog stacks break at the seams: one pipeline for docs, another for content, glue scripts everywhere.
+
+Hype keeps it markdown-native in one workflow:
+• docs + blog from the same repo
+• pre-deploy validation
+• cleaner SEO/social metadata
+
+Start: https://hypemd.dev
+
+**LinkedIn version**
+If your team maintains separate docs and blog pipelines, you’re paying a hidden tax in review overhead and deployment risk.
+
+Hype is built around one markdown-native workflow so teams can:
 - publish docs + blog from the same repo
-- validate links/content before deploy
-- ship with cleaner metadata for SEO/social
+- validate links/content before deployment
+- ship cleaner metadata for SEO and social cards
 
-If you already use GitHub + CI, it fits your existing process.
+If you already run on GitHub + CI, this fits naturally.
 
-Start here: https://hypemd.dev
+Start: https://hypemd.dev
+Repo: https://github.com/gopherguides/hype
 
-## Draft Post #2 (social)
-**Working title:** Small docs teams need fewer moving parts
+### Draft 02 — X + LinkedIn (Week 1, Thu)
+- **Goal:** Position reliability + low-ops value for small teams.
+- **Primary CTA:** Ask an engagement question to drive replies.
 
-Most docs incidents come from glue code, not writing.
+**X version (<=280 chars)**
+Small docs teams don’t need more tooling—they need fewer failure points.
 
-Hype’s direction is intentionally boring (in a good way):
-- markdown-native authoring
-- deterministic build/export paths
-- lightweight deploy model
-
-The win: fewer runtime surprises and faster iteration for tiny teams.
+Hype’s direction is intentionally boring:
+• markdown-native authoring
+• deterministic build/export paths
+• lightweight deployment model
 
 What would you automate first: validation, metadata, or deploy checks?
+
+**LinkedIn version**
+Most documentation incidents come from pipeline complexity, not writing quality.
+
+Hype aims to remove operational drag with:
+- markdown-native authoring
+- deterministic export/build behavior
+- lightweight deployment patterns
+
+The outcome for small teams: fewer runtime surprises and faster iteration.
+
+What would you automate first in your docs workflow: validation, metadata, or deploy checks?
+
+## Asset Dependencies
+- [ ] Attach one screenshot/GIF per draft (quickstart + generated output).
+- [ ] Add UTM tracking links for X and LinkedIn variants.
+- [ ] Draft first matching technical blog post for W1 proof link.
