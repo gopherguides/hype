@@ -33,6 +33,19 @@ Adopt a **docs-adjacent marketing IA** with explicit conversion path and reusabl
 6. **Changelog (`/changelog`)**
    - Release updates mapped to capability changes
 
+### IA tree (navigation)
+- `/`
+  - `/use-cases`
+    - `/use-cases/docs-teams`
+    - `/use-cases/devrel`
+    - `/use-cases/oss-maintainers`
+  - `/docs`
+    - `/docs/quickstart`
+    - `/docs/cli-reference`
+  - `/blog`
+  - `/examples`
+  - `/changelog`
+
 ### Conversion path
 Social post / search result -> Home or Use Case page -> Quickstart -> Repository stars/issues/discussions
 
@@ -62,12 +75,18 @@ Social post / search result -> Home or Use Case page -> Quickstart -> Repository
 - [ ] Add route/page stubs for `/use-cases`, `/examples`, and `/changelog`.
 - [ ] Define per-page metadata checklist (title, description, OG image, canonical).
 - [ ] Add measurement plan (click-through to quickstart, docs depth, returning visitors).
+- [ ] Add UTM governance doc for social and campaign links.
 
 ## Measurement Plan (v1)
 - **North-star conversion:** quickstart CTA click-through rate from home/use-cases pages.
 - **Activation proxy:** unique visitors reaching `/docs/quickstart` within same session.
 - **Retention proxy:** 7-day returning visitor ratio to docs/blog pages.
 - **Channel attribution:** UTM-tagged social links for post-level performance.
+
+## Implementation Guardrails
+- No SPA runtime requirement for v1 pages.
+- Every marketing page must include canonical URL + OG metadata.
+- New top-level pages require ADR update or ADR addendum.
 
 ## Owner Mapping
 - Marketing docs and calendars: `docs/marketing/*`

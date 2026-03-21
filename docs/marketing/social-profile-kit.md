@@ -1,7 +1,12 @@
-# Hype Social Profile Kit (Draft v1)
+# Hype Social Profile Kit (Draft v2)
 
 ## Brand Positioning (one-liner)
 Hype is a markdown-native publishing toolchain for docs and blogs with a low-ops deployment path.
+
+## Profile Handle Strategy
+- Preferred: `@hypemd`
+- Fallback 1: `@hypemddev`
+- Fallback 2: `@hypecli`
 
 ## Platform Bios
 
@@ -42,8 +47,16 @@ Start: https://hypemd.dev
 - "Tell us your docs pain point; we’ll build a walkthrough."
 
 ## Launch-Day Profile Setup Checklist (Concrete)
-1. Update X and LinkedIn bios to final copy above.
-2. Upload `assets/brand/twitter-avatar.png` and `assets/brand/twitter-header.png`.
-3. Publish pinned intro post and include quickstart URL.
-4. Add first two scheduled posts from `docs/marketing/content-calendar-2026-q2.md`.
-5. Verify profile links resolve to canonical `https://hypemd.dev`.
+1. Reserve final handle (`@hypemd` preferred) across X + LinkedIn.
+2. Update bios to final copy above.
+3. Upload `assets/brand/twitter-avatar.png` and `assets/brand/twitter-header.png`.
+4. Publish pinned intro post and include quickstart URL.
+5. Add first two scheduled posts from `docs/marketing/content-calendar-2026-q2.md`.
+6. Verify profile links resolve to canonical `https://hypemd.dev`.
+
+## Ready-to-copy Profile Fields
+- **Display name:** Hype
+- **Category:** Software / Developer Tools
+- **Location:** Remote
+- **Website:** https://hypemd.dev
+- **Contact:** hello@hypemd.dev (placeholder until team alias is finalized)

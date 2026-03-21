@@ -17,70 +17,69 @@
 4. **Community** — user showcases, tips, and contribution opportunities.
 
 ## Weekly Scaffold (first 4 weeks)
-| Week | Product Education | Workflow Integrations | Proof & Outcomes | Community |
+| Week (2026) | Product Education | Workflow Integrations | Proof & Outcomes | Community |
 |---|---|---|---|---|
-| W1 | "What is Hype" explainer post | GitHub Actions publish flow | Before/after docs quality comparison | Ask for examples from users |
-| W2 | Parser/CLI quick tips | Docs + blog in one repo | Build-time and error reporting walkthrough | Share template call for contributors |
-| W3 | Metadata + SEO support | Social card and OG automation | Traffic uplift case study format | Feature request spotlight |
-| W4 | Export/validation deep dive | Dokploy deployment guide | Reliability checklist post | Office-hours / AMA prompt |
+| W1 (Mar 23) | "What is Hype" explainer | GitHub Actions publish flow | Before/after docs quality comparison | Ask for examples from users |
+| W2 (Mar 30) | Parser/CLI quick tips | Docs + blog in one repo | Build-time and error reporting walkthrough | Share template call for contributors |
+| W3 (Apr 6) | Metadata + SEO support | Social card and OG automation | Traffic uplift case study format | Feature request spotlight |
+| W4 (Apr 13) | Export/validation deep dive | Dokploy deployment guide | Reliability checklist post | Office-hours / AMA prompt |
 
 ## Two Concrete Drafts (PR-ready)
 
-### Draft 01 — X + LinkedIn (Week 1, Tue)
+### Draft 01 — X + LinkedIn (Week 1, Tue Mar 24)
 - **Goal:** Introduce core problem/solution with a clear CTA.
-- **Primary CTA:** `https://hypemd.dev`
-- **Secondary CTA:** `https://github.com/gopherguides/hype`
+- **Primary CTA:** `https://hypemd.dev/?utm_source=social&utm_medium=x&utm_campaign=q2_w1_intro`
+- **Secondary CTA:** `https://github.com/gopherguides/hype?utm_source=social&utm_medium=linkedin&utm_campaign=q2_w1_intro`
+- **Asset:** quickstart screenshot (`assets/marketing/q2-w1-intro.png`)
 
 **X version (<=280 chars)**
-Most docs/blog stacks break at the seams: one pipeline for docs, another for content, glue scripts everywhere.
+Docs and blogs shouldn’t require 2+ pipelines and glue scripts.
 
-Hype keeps it markdown-native in one workflow:
-• docs + blog from the same repo
+Hype keeps publishing markdown-native in one workflow:
+• docs + blog from one repo
 • pre-deploy validation
 • cleaner SEO/social metadata
 
-Start: https://hypemd.dev
+Start: https://hypemd.dev/?utm_source=social&utm_medium=x&utm_campaign=q2_w1_intro
 
 **LinkedIn version**
-If your team maintains separate docs and blog pipelines, you’re paying a hidden tax in review overhead and deployment risk.
+Many teams pay a hidden tax by splitting docs and blog pipelines.
 
-Hype is built around one markdown-native workflow so teams can:
-- publish docs + blog from the same repo
+Hype keeps publishing markdown-native so teams can:
+- ship docs + blog from one repo
 - validate links/content before deployment
-- ship cleaner metadata for SEO and social cards
+- publish cleaner metadata for SEO and social cards
 
-If you already run on GitHub + CI, this fits naturally.
+Start: https://hypemd.dev/?utm_source=social&utm_medium=linkedin&utm_campaign=q2_w1_intro
+Repo: https://github.com/gopherguides/hype?utm_source=social&utm_medium=linkedin&utm_campaign=q2_w1_intro
 
-Start: https://hypemd.dev
-Repo: https://github.com/gopherguides/hype
-
-### Draft 02 — X + LinkedIn (Week 1, Thu)
+### Draft 02 — X + LinkedIn (Week 1, Thu Mar 26)
 - **Goal:** Position reliability + low-ops value for small teams.
-- **Primary CTA:** Ask an engagement question to drive replies.
+- **Primary CTA:** Drive replies via concrete question.
+- **Asset:** validation output screenshot (`assets/marketing/q2-w1-reliability.png`)
 
 **X version (<=280 chars)**
 Small docs teams don’t need more tooling—they need fewer failure points.
 
-Hype’s direction is intentionally boring:
+Hype focuses on boring reliability:
 • markdown-native authoring
 • deterministic build/export paths
-• lightweight deployment model
+• low-ops deployment patterns
 
 What would you automate first: validation, metadata, or deploy checks?
 
 **LinkedIn version**
-Most documentation incidents come from pipeline complexity, not writing quality.
+Most docs incidents come from pipeline complexity, not writing quality.
 
-Hype aims to remove operational drag with:
+Hype reduces operational drag with:
 - markdown-native authoring
 - deterministic export/build behavior
 - lightweight deployment patterns
 
-The outcome for small teams: fewer runtime surprises and faster iteration.
+For your docs workflow, what would you automate first: validation, metadata, or deploy checks?
 
-What would you automate first in your docs workflow: validation, metadata, or deploy checks?
-
-## Asset Dependencies
-- [ ] Attach one screenshot/GIF per draft (quickstart + generated output).
-- [ ] Add UTM tracking links for X and LinkedIn variants.
-- [ ] Draft first matching technical blog post for W1 proof link.
+## Publishing Ops Checklist
+- [ ] Create `assets/marketing/q2-w1-intro.png` and `assets/marketing/q2-w1-reliability.png`.
+- [ ] Add first-week posts to scheduler with local timezone (America/Chicago).
+- [ ] Create matching W1 technical blog draft with same UTM campaign tags.
+- [ ] Capture baseline metrics (profile visits, link clicks, repo stars) before publishing.
