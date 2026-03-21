@@ -65,6 +65,23 @@
   - link clicks
   - net new GitHub stars (daily delta)
 
+## Concrete production briefs for first two posts
+
+### Post 01 asset brief (Docs Drift)
+- Format: 1600x900 PNG
+- Frame A: stale snippet shown in docs page
+- Frame B: CI failure output from executable snippet validation
+- Overlay text: "Catch docs drift in CI"
+- Alt text owner: marketing maintainer
+- Done definition: image committed at `marketing/assets/post-01-docs-drift.png`
+
+### Post 02 asset brief (Include Reuse)
+- Format: 1600x900 PNG
+- Diagram: one canonical snippet -> README + docs + tutorial
+- Overlay text: "Write once, reuse everywhere"
+- Alt text owner: marketing maintainer
+- Done definition: image committed at `marketing/assets/post-02-include-reuse.png`
+
 ## Suggested issue mapping
 - Positioning + narrative thread: https://github.com/gopherguides/hype/issues/82
 - Social execution thread: https://github.com/gopherguides/hype/issues/85

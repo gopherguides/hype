@@ -59,3 +59,20 @@ Use this summary in issue/PR updates:
 ### Suggested issue mapping
 - Primary update target: https://github.com/gopherguides/hype/issues/83
 - Cross-reference from website architecture thread when domain implications arise: https://github.com/gopherguides/hype/issues/84
+
+## Single-comment issue update template (de-duplicated)
+Use this exact block for the next issue update to avoid correction-spam:
+
+```md
+Domain workstream update:
+- Canonical domain remains `hypemd.dev` (weighted score: 4.80/5)
+- Defensive registrations remain deferred by trigger policy (abuse/confusion only)
+- Next checkpoint: end of Q2 2026 (or immediately on impersonation/traffic leakage)
+
+Artifact:
+- `marketing/domain-shortlist-validation.md`
+```
+
+## Anti-spam update rule
+- Post **at most one** domain update comment per 24h unless there is a material decision change.
+- If formatting breaks in a comment, edit locally first and only repost once with a "supersedes" note.

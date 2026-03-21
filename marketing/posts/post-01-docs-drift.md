@@ -33,5 +33,11 @@ Repo: https://github.com/gopherguides/hype
 If you want to test this quickly, run `hype export` in CI on one docs folder and fail on broken examples.
 
 ## Media notes
+- Asset file: `marketing/assets/post-01-docs-drift.png`
 - Suggested asset: side-by-side screenshot (stale docs output vs CI failure from executable docs check).
 - Alt text: “Comparison of a stale code example in static docs versus a failing CI check using executable Markdown validation.”
+
+## Publishing metadata
+- Scheduled slot (CT): 2026-03-23 09:00
+- Owner: Hype maintainer
+- Status: copy ready, awaiting image export

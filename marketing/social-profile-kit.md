@@ -86,6 +86,14 @@ Repo: https://github.com/gopherguides/hype
 - Twice weekly: capture FAQ patterns and convert one into post/comment copy.
 - Friday: update pinned reply with latest docs/quickstart link if changed.
 
+## Day-1 profile setup checklist (execution order)
+1. Update display name and bio (Option A default).
+2. Set profile URL to `https://hypemd.dev`.
+3. Upload avatar + header and verify mobile crop.
+4. Publish pinned post from template in this doc.
+5. Reply to pinned post with quickstart link (`https://hypemd.dev/docs`).
+6. Capture profile screenshot for changelog/archive.
+
 ## Suggested issue mapping
 - Primary update target: https://github.com/gopherguides/hype/issues/85
 - Cross-reference content cadence decisions: https://github.com/gopherguides/hype/issues/82

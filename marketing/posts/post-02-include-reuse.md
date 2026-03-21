@@ -29,5 +29,11 @@ Repo: https://github.com/gopherguides/hype
 Audit your top 10 duplicated snippets and convert one to a shared include this week.
 
 ## Media notes
+- Asset file: `marketing/assets/post-02-include-reuse.png`
 - Suggested asset: mini diagram (one source snippet -> README + docs + tutorial outputs).
 - Alt text: “Diagram showing one canonical snippet reused across multiple documentation pages using include references.”
+
+## Publishing metadata
+- Scheduled slot (CT): 2026-03-25 11:30
+- Owner: Hype maintainer
+- Status: copy ready, awaiting image export

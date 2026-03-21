@@ -89,3 +89,19 @@ Adopt **Option A**: Hype-generated unified static site deployed to DigitalOcean 
 - Week 2: migrate key docs/quickstart pages to unified nav.
 - Week 3: connect analytics + publish content cadence from marketing calendar.
 - Week 4: review metrics and backlog improvements.
+
+## v1 information architecture (concrete)
+- `/` Home (value proposition + primary CTA to quickstart)
+- `/docs` Documentation hub
+- `/docs/quickstart` First successful run path
+- `/examples` Executable examples gallery
+- `/blog` Narrative + release posts
+- `/changelog` Product updates and release notes
+
+## Measurement baseline (must-implement)
+| Event | Trigger | Why it matters |
+|---|---|---|
+| `cta_quickstart_click` | Click from `/` to `/docs/quickstart` | Measures marketing -> docs conversion |
+| `quickstart_copy_command` | Copy action on first command block | Measures trial intent |
+| `repo_click` | Click to GitHub repo | Measures OSS contribution funnel |
+| `docs_search_used` | First search interaction (when enabled) | Signals docs discoverability gaps |
