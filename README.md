@@ -1726,9 +1726,6 @@ Here is the current structure that we are using to create this readme:
 $ tree ./docs
 
 ./docs
-├── adr
-│   ├── 0001-website-architecture.md
-│   └── 0002-marketing-site-information-architecture.md
 ├── badges.md
 ├── blog
 │   ├── README.md
@@ -1748,11 +1745,6 @@ $ tree ./docs
 ├── installation.md
 ├── license.md
 ├── marked.md
-├── marketing
-│   ├── README.md
-│   ├── content-calendar-2026-q2.md
-│   ├── domain-shortlist-validation.md
-│   └── social-profile-kit.md
 ├── mermaid.md
 ├── preview.md
 ├── quick-reference.md
@@ -1766,7 +1758,7 @@ $ tree ./docs
 │           └── main.go
 └── slides.md
 
-10 directories, 30 files
+8 directories, 24 files
 ```
 ---
 
