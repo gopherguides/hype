@@ -28,49 +28,21 @@ Or via Homebrew: `brew install gopherguides/hype/hype-md`
 
 | Command | Description |
 | ------- | ----------- |
-| 
-`hype export -format=markdown -f doc.md`
- | Export to markdown (stdout) |
-| 
-`hype export -format=html -f doc.md -o doc.html`
- | Export to HTML file |
-| 
-`hype preview -f doc.md -open`
- | Live preview with hot reload |
-| 
-`hype validate -f doc.md`
- | Validate document structure |
+| `hype export -format=markdown -f doc.md`  | Export to markdown (stdout) |
+| `hype export -format=html -f doc.md -o doc.html` | Export to HTML file |
+| `hype preview -f doc.md -open` | Live preview with hot reload |
+| `hype validate -f doc.md` | Validate document structure |
 
 
 ### Key Tags
 
 | Tag | Purpose | Example |
 | --- | ------- | ------- |
-| 
-`<include>`
- | Include another file | 
-`<include src=&#34;other.md&#34;>`
- |
-| 
-`<code>`
- | Show file contents | 
-`<code src=&#34;main.go&#34;>`
- |
-| 
-`<go>`
- | Run Go code, show output | 
-`<go run=&#34;main.go&#34;>`
- |
-| 
-`<cmd>`
- | Run shell command | 
-`<cmd exec=&#34;ls -la&#34;>`
- |
-| 
-`<img>`
- | Include image | 
-`<img src=&#34;diagram.png&#34;>`
- |
+| `<include>` | Include another file | `<include src=&#34;other.md&#34;>` |
+| `<code>` | Show file contents | `<code src=&#34;main.go&#34;>` |
+| `<go>` | Run Go code, show output | `<go run=&#34;main.go&#34;>` |
+| `<cmd>` | Run shell command | `<cmd exec=&#34;ls -la&#34;>` |
+| `<img>` | Include image | `<img src=&#34;diagram.png&#34;>` |
 
 
 ### AI Assistants
@@ -325,27 +297,13 @@ Hype includes 7 built-in themes:
 
 | Theme | Description |
 | ----- | ----------- |
-| 
-`github`
- | **Default**. Auto light/dark based on system preference |
-| 
-`github-dark`
- | GitHub dark mode only |
-| 
-`solarized-light`
- | Warm light tones |
-| 
-`solarized-dark`
- | Solarized dark variant |
-| 
-`swiss`
- | Minimalist Swiss typography |
-| 
-`air`
- | Clean, centered layout |
-| 
-`retro`
- | Nostalgic/vintage style |
+| `github` | **Default**. Auto light/dark based on system preference |
+| `github-dark` | GitHub dark mode only |
+| `solarized-light` | Warm light tones |
+| `solarized-dark` | Solarized dark variant |
+| `swiss` | Minimalist Swiss typography |
+| `air` | Clean, centered layout |
+| `retro` | Nostalgic/vintage style |
 
 
 ### List Available Themes
@@ -386,24 +344,12 @@ hype export -format html -no-css -f hype.md
 
 | Flag | Description |
 | ---- | ----------- |
-| 
-`-format html`
- | Export as HTML |
-| 
-`-theme <name>`
- | Select a built-in theme (default: `github`) |
-| 
-`-css <path>`
- | Use a custom CSS file |
-| 
-`-no-css`
- | Output raw HTML without styling |
-| 
-`-themes`
- | List available themes and exit |
-| 
-`-o <path>`
- | Write output to file instead of stdout |
+| `-format html` | Export as HTML |
+| `-theme <name>` | Select a built-in theme (default: `github`) |
+| `-css <path>` | Use a custom CSS file |
+| `-no-css` | Output raw HTML without styling |
+| `-themes` | List available themes and exit |
+| `-o <path>` | Write output to file instead of stdout |
 
 
 ---
@@ -521,71 +467,19 @@ hype preview -f hype.md -v
 
 | Flag | Alias | Default | Description |
 | ---- | ----- | ------- | ----------- |
-| 
-`-f`
- |  | 
-`hype.md`
- | Source markdown file to preview |
-| 
-`-port`
- |  | 
-`3000`
- | Server port |
-| 
-`-w`
- | 
-`-watch`
- |  | Directories to watch (repeatable) |
-| 
-`-e`
- | 
-`-ext`
- |  | File extensions to watch (comma-separated) |
-| 
-`-i`
- | 
-`-include`
- |  | Glob patterns to include (repeatable) |
-| 
-`-x`
- | 
-`-exclude`
- |  | Glob patterns to exclude (repeatable) |
-| 
-`-d`
- | 
-`-debounce`
- | 
-`300ms`
- | Debounce delay before rebuild |
-| 
-`-v`
- | 
-`-verbose`
- | 
-`false`
- | Verbose output (log file changes) |
-| 
-`-open`
- |  | 
-`false`
- | Auto-open browser on start |
-| 
-`-theme`
- |  | 
-`github`
- | Preview theme name |
-| 
-`-css`
- |  |  | Path to custom CSS file (overrides -theme) |
-| 
-`-themes`
- |  |  | List available themes and exit |
-| 
-`-timeout`
- |  | 
-`0`
- | Execution timeout (0 = no timeout) |
+| `-f` |  | `hype.md` | Source markdown file to preview |
+| `-port` |  | `3000` | Server port |
+| `-w` | `-watch` |  | Directories to watch (repeatable) |
+| `-e` | `-ext` |  | File extensions to watch (comma-separated) |
+| `-i` | `-include` |  | Glob patterns to include (repeatable) |
+| `-x` | `-exclude` |  | Glob patterns to exclude (repeatable) |
+| `-d` | `-debounce` | `300ms` | Debounce delay before rebuild |
+| `-v` | `-verbose` | `false` | Verbose output (log file changes) |
+| `-open` |  | `false` | Auto-open browser on start |
+| `-theme` |  | `github` | Preview theme name |
+| `-css` |  |  | Path to custom CSS file (overrides -theme) |
+| `-themes` |  |  | List available themes and exit |
+| `-timeout` |  | `0` | Execution timeout (0 = no timeout) |
 
 
 ## How It Works
@@ -743,44 +637,20 @@ hype marked -f hype.md
 
 | Flag | Default | Description |
 | ---- | ------- | ----------- |
-| 
-`-f`
- |  | File to process (if not provided, reads from stdin) |
-| 
-`-p`
- | 
-`false`
- | Parse only mode - parse the file but don't execute commands |
-| 
-`-timeout`
- | 
-`30s`
- | Timeout for command execution |
-| 
-`-context`
- |  | A folder containing all chapters of a book, for example |
-| 
-`-section`
- | 
-`0`
- | Target section number |
-| 
-`-v`
- | 
-`false`
- | Enable verbose output for debugging |
+| `-f` |  | File to process (if not provided, reads from stdin) |
+| `-p` | `false` | Parse only mode - parse the file but don't execute commands |
+| `-timeout` | `30s` | Timeout for command execution |
+| `-context` |  | A folder containing all chapters of a book, for example |
+| `-section` | `0` | Target section number |
+| `-v` | `false` | Enable verbose output for debugging |
 
 
 ## Environment Variables
 
 | Variable | Description |
 | -------- | ----------- |
-| 
-`MARKED_PATH`
- | Set by Marked 2 - used for file context and relative path resolution |
-| 
-`MARKED_ORIGIN`
- | Set by Marked 2 - the directory of the file being previewed |
+| `MARKED_PATH` | Set by Marked 2 - used for file context and relative path resolution |
+| `MARKED_ORIGIN` | Set by Marked 2 - the directory of the file being previewed |
 
 
 ## How It Works
@@ -880,11 +750,7 @@ Welcome to my presentation!
 
 | Flag | Default | Description |
 | ---- | ------- | ----------- |
-| 
-`-port`
- | 
-`3000`
- | Port for the slides server |
+| `-port` | `3000` | Port for the slides server |
 
 
 ## Tips
@@ -906,21 +772,11 @@ Hype provides several commands for working with dynamic markdown documents.
 
 | Command | Description |
 | ------- | ----------- |
-| 
-`export`
- | Export documents to different formats (markdown, HTML) |
-| 
-`preview`
- | Start a live preview server with auto-reload |
-| 
-`marked`
- | Integration with Marked 2 app |
-| 
-`slides`
- | Web-based presentation server |
-| 
-`blog`
- | Static blog generator |
+| `export` | Export documents to different formats (markdown, HTML) |
+| `preview` | Start a live preview server with auto-reload |
+| `marked` | Integration with Marked 2 app |
+| `slides` | Web-based presentation server |
+| `blog` | Static blog generator |
 
 
 ---
@@ -938,45 +794,15 @@ hype export [options]
 
 | Flag | Default | Description |
 | ---- | ------- | ----------- |
-| 
-`-f`
- | 
-`hype.md`
- | Input file to process |
-| 
-`-format`
- | 
-`markdown`
- | Output format: `markdown` or `html` |
-| 
-`-o`
- | stdout | Output file path |
-| 
-`-theme`
- | 
-`github`
- | Theme for HTML export |
-| 
-`-css`
- |  | Path to custom CSS file |
-| 
-`-no-css`
- | 
-`false`
- | Output raw HTML without styling |
-| 
-`-themes`
- |  | List available themes and exit |
-| 
-`-timeout`
- | 
-`30s`
- | Execution timeout |
-| 
-`-v`
- | 
-`false`
- | Verbose output |
+| `-f` | `hype.md` | Input file to process |
+| `-format` | `markdown` | Output format: `markdown` or `html` |
+| `-o` | stdout | Output file path |
+| `-theme` | `github` | Theme for HTML export |
+| `-css` |  | Path to custom CSS file |
+| `-no-css` | `false` | Output raw HTML without styling |
+| `-themes` |  | List available themes and exit |
+| `-timeout` | `30s` | Execution timeout |
+| `-v` | `false` | Verbose output |
 
 
 ### Examples
@@ -1020,71 +846,19 @@ hype preview [options]
 
 | Flag | Alias | Default | Description |
 | ---- | ----- | ------- | ----------- |
-| 
-`-f`
- |  | 
-`hype.md`
- | Source file to preview |
-| 
-`-port`
- |  | 
-`3000`
- | Server port |
-| 
-`-w`
- | 
-`-watch`
- |  | Additional directories to watch (repeatable) |
-| 
-`-e`
- | 
-`-ext`
- |  | File extensions to watch (comma-separated) |
-| 
-`-i`
- | 
-`-include`
- |  | Glob patterns to include (repeatable) |
-| 
-`-x`
- | 
-`-exclude`
- |  | Glob patterns to exclude (repeatable) |
-| 
-`-d`
- | 
-`-debounce`
- | 
-`300ms`
- | Debounce delay before rebuild |
-| 
-`-v`
- | 
-`-verbose`
- | 
-`false`
- | Verbose output |
-| 
-`-open`
- |  | 
-`false`
- | Auto-open browser on start |
-| 
-`-theme`
- |  | 
-`github`
- | Preview theme |
-| 
-`-css`
- |  |  | Custom CSS file path |
-| 
-`-themes`
- |  |  | List available themes |
-| 
-`-timeout`
- |  | 
-`0`
- | Execution timeout |
+| `-f` |  | `hype.md` | Source file to preview |
+| `-port` |  | `3000` | Server port |
+| `-w` | `-watch` |  | Additional directories to watch (repeatable) |
+| `-e` | `-ext` |  | File extensions to watch (comma-separated) |
+| `-i` | `-include` |  | Glob patterns to include (repeatable) |
+| `-x` | `-exclude` |  | Glob patterns to exclude (repeatable) |
+| `-d` | `-debounce` | `300ms` | Debounce delay before rebuild |
+| `-v` | `-verbose` | `false` | Verbose output |
+| `-open` |  | `false` | Auto-open browser on start |
+| `-theme` |  | `github` | Preview theme |
+| `-css` |  |  | Custom CSS file path |
+| `-themes` |  |  | List available themes |
+| `-timeout` |  | `0` | Execution timeout |
 
 
 ### Examples
@@ -1122,32 +896,12 @@ hype marked [options]
 
 | Flag | Default | Description |
 | ---- | ------- | ----------- |
-| 
-`-f`
- |  | Input file (uses `MARKED_PATH` if not set) |
-| 
-`-p`
- | 
-`false`
- | Parse only (no execution) |
-| 
-`-timeout`
- | 
-`5s`
- | Execution timeout |
-| 
-`-context`
- |  | Context folder path |
-| 
-`-section`
- | 
-`0`
- | Target section number |
-| 
-`-v`
- | 
-`false`
- | Verbose output |
+| `-f` |  | Input file (uses `MARKED_PATH` if not set) |
+| `-p` | `false` | Parse only (no execution) |
+| `-timeout` | `5s` | Execution timeout |
+| `-context` |  | Context folder path |
+| `-section` | `0` | Target section number |
+| `-v` | `false` | Verbose output |
 
 
 ### Environment Variables
@@ -1172,11 +926,7 @@ hype slides [options] [file]
 
 | Flag | Default | Description |
 | ---- | ------- | ----------- |
-| 
-`-port`
- | 
-`3000`
- | Server port |
+| `-port` | `3000` | Server port |
 
 
 ### Examples
@@ -1205,37 +955,19 @@ hype blog <command> [options]
 
 | Command | Description |
 | ------- | ----------- |
-| 
-`init <name>`
- | Create a new blog project |
-| 
-`build`
- | Build static site to `public/` |
-| 
-`serve`
- | Start local preview server |
-| 
-`new <slug>`
- | Create a new article |
-| 
-`theme`
- | Manage themes (add, list, remove) |
+| `init <name>` | Create a new blog project |
+| `build` | Build static site to `public/` |
+| `serve` | Start local preview server |
+| `new <slug>` | Create a new article |
+| `theme` | Manage themes (add, list, remove) |
 
 
 ### Options
 
 | Flag | Default | Description |
 | ---- | ------- | ----------- |
-| 
-`-timeout`
- | 
-`30s`
- | Execution timeout |
-| 
-`-v`
- | 
-`false`
- | Verbose output |
+| `-timeout` | `30s` | Execution timeout |
+| `-v` | `false` | Verbose output |
 
 
 ### Examples
@@ -1272,15 +1004,9 @@ These options are available across most commands:
 
 | Flag | Description |
 | ---- | ----------- |
-| 
-`-f`
- | Input file path |
-| 
-`-timeout`
- | Execution timeout for code blocks |
-| 
-`-v`
- | Enable verbose/debug output |
+| `-f` | Input file path |
+| `-timeout` | Execution timeout for code blocks |
+| `-v` | Enable verbose/debug output |
 
 
 ---
@@ -1289,12 +1015,8 @@ These options are available across most commands:
 
 | Code | Meaning |
 | ---- | ------- |
-| 
-`0`
- | Success |
-| 
-`1`
- | General error |
+| `0` | Success |
+| `1` | General error |
 
 
 ---
@@ -1876,27 +1598,13 @@ Your site is now live at `http://localhost:3000`.
 
 | Command | Description |
 | ------- | ----------- |
-| 
-`hype blog init <name>`
- | Create a new blog project |
-| 
-`hype blog new <slug>`
- | Create a new article |
-| 
-`hype blog build`
- | Build the static site |
-| 
-`hype blog serve`
- | Start local preview server |
-| 
-`hype blog serve –watch`
- | Preview with live reload |
-| 
-`hype blog theme list`
- | List available themes |
-| 
-`hype blog theme add <name>`
- | Add a theme to your project |
+| `hype blog init <name>` | Create a new blog project |
+| `hype blog new <slug>` | Create a new article |
+| `hype blog build` | Build the static site |
+| `hype blog serve` | Start local preview server |
+| `hype blog serve –watch` | Preview with live reload |
+| `hype blog theme list` | List available themes |
+| `hype blog theme add <name>` | Add a theme to your project |
 
 
 ## Themes
