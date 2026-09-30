@@ -124,6 +124,10 @@ go install ./cmd/hype
 
 ```
 
+### Documentation Build Prerequisites
+
+To preview or export this repository's documentation, install Go 1.25 or newer and `tree`, and make both available on `PATH`.
+
 ### Verify Installation
 
 ```bash
@@ -1305,7 +1309,24 @@ For more examples, see the [hype repo](https://www.github.com/gopherguides/hype)
 
 # Arbitrary Commands
 
-You can also use the `cmd` tag and the `exec` attribute to run arbitrary commands and include them in your documentation. Here is the command to run the `tree` command and include it in our documentation:
+You can also use the `cmd` tag and the `exec` attribute to run arbitrary commands and include their output in your documentation. A simple example prints a greeting:
+
+```html
+<cmd exec="echo Hello from Hype"></cmd>
+
+```
+
+Here is the output:
+
+```shell
+$ echo Hello from Hype
+
+Hello from Hype
+```
+
+## Advanced Example
+
+Commands run by `cmd` must be installed on the machine building the docs; this example requires `tree`.
 
 ```html
 <cmd exec="tree" src="."></cmd>
@@ -1440,9 +1461,11 @@ The following code will parse the code/code.md and sourceable/sourceable.md docu
 
 # README Source
 
-You can view the source for this entire readme in the [.hype](https://github.com/gopherguides/corp/tree/main/.hype) directory.
+You can view the source for this README in [hype.md](https://github.com/gopherguides/hype/blob/main/hype.md). Included documentation lives in the [docs](https://github.com/gopherguides/hype/tree/main/docs) directory.
 
-Here is the current structure that we are using to create this readme:
+Here is the current structure that we are using to create this README:
+
+Commands run by `cmd` must be installed on the machine building the docs; this example requires `tree`.
 
 ```shell
 $ tree ./docs

@@ -6,6 +6,7 @@ import (
 	"net/http"
 	"net/http/httptest"
 	"os"
+	"os/exec"
 	"path/filepath"
 	"strings"
 	"testing"
@@ -236,6 +237,7 @@ func TestServer_shouldWatch(t *testing.T) {
 
 func TestServer_Build(t *testing.T) {
 	r := require.New(t)
+	t.Setenv("PATH", t.TempDir())
 
 	tmpDir := t.TempDir()
 	mdFile := filepath.Join(tmpDir, "test.md")
@@ -254,6 +256,20 @@ func TestServer_Build(t *testing.T) {
 	r.Contains(srv.currentHTML, "Hello World")
 	r.Contains(srv.currentHTML, "This is a test")
 	r.Contains(srv.currentHTML, "<!DOCTYPE html>")
+}
+
+func TestServer_Build_MissingCommand(t *testing.T) {
+	r := require.New(t)
+
+	rootDir := t.TempDir()
+	r.NoError(os.WriteFile(filepath.Join(rootDir, "hype.md"), []byte("<cmd exec=\"tree\"></cmd>"), 0644))
+	t.Setenv("PATH", t.TempDir())
+
+	srv := New(DefaultConfig(), nil)
+	err := srv.build(context.Background(), rootDir)
+	r.ErrorIs(err, exec.ErrNotFound)
+	r.Contains(err.Error(), "cmd: $ tree")
+	r.Contains(err.Error(), "executable file not found in $PATH")
 }
 
 func TestServer_SetOutput(t *testing.T) {

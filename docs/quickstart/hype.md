@@ -134,7 +134,19 @@ For more examples, see the [hype repo](https://www.github.com/gopherguides/hype)
 
 # Arbitrary Commands
 
-You can also use the `cmd` tag and the `exec` attribute to run arbitrary commands and include them in your documentation. Here is the command to run the `tree` command and include it in our documentation:
+You can also use the `cmd` tag and the `exec` attribute to run arbitrary commands and include their output in your documentation. A simple example prints a greeting:
+
+```html
+<cmd exec="echo Hello from Hype"></cmd>
+```
+
+Here is the output:
+
+<cmd exec="echo Hello from Hype"></cmd>
+
+## Advanced Example
+
+Commands run by `cmd` must be installed on the machine building the docs; this example requires `tree`.
 
 ```html
 <cmd exec="tree" src="."></cmd>

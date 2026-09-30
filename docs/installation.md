@@ -48,6 +48,10 @@ cd hype
 go install ./cmd/hype
 ```
 
+### Documentation Build Prerequisites
+
+To preview or export this repository's documentation, install Go 1.25 or newer and `tree`, and make both available on `PATH`.
+
 ### Verify Installation
 
 ```bash
