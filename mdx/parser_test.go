@@ -88,3 +88,78 @@ func Test_Parser_Parse(t *testing.T) {
 	// fmt.Println(act)
 	r.Equal(exp, act)
 }
+
+func Test_Parser_Parse_PageBreakInsideFence(t *testing.T) {
+	t.Parallel()
+	r := require.New(t)
+
+	src := "# Title\n\n```shell\n$ go run .\n\nHello World\n\n--------\nGo Version: go1.25.0\n\n```\n\n## Next\n\n~~~\n<include src=\"x.md\"></include>\n~~~\n\n---\n\n# Second"
+
+	p := New()
+	out, err := p.Parse([]byte(src))
+	r.NoError(err)
+
+	act := string(out)
+	r.Equal(2, strings.Count(act, "<page>"))
+	r.Contains(act, "--------\nGo Version: go1.25.0\n\n</code></pre>")
+	r.Contains(act, "<h2>Next</h2>")
+	r.Contains(act, "&lt;include src=&quot;x.md&quot;&gt;&lt;/include&gt;")
+	r.Contains(act, "<h1>Second</h1>")
+}
+
+func Test_Parser_Parse_InlineCodeIsNotFence(t *testing.T) {
+	t.Parallel()
+	r := require.New(t)
+
+	src := "# Title\n\n``` use ``code`` ```\n\n---\n\n# Second"
+
+	p := New()
+	out, err := p.Parse([]byte(src))
+	r.NoError(err)
+
+	r.Equal(2, strings.Count(string(out), "<page>"))
+}
+
+func Test_Parser_Parse_FenceInsideHTMLBlock(t *testing.T) {
+	t.Parallel()
+	r := require.New(t)
+
+	src := "# Title\n\n<pre>\n```\n</pre>\n\n---\n\n# Second\n\n```go\nx := 1\n```\n"
+
+	p := New()
+	out, err := p.Parse([]byte(src))
+	r.NoError(err)
+
+	act := string(out)
+	r.Equal(2, strings.Count(act, "<page>"))
+	r.Contains(act, "<h1>Second</h1>")
+}
+
+func Test_Parser_Parse_FenceCloseMustMatchExactly(t *testing.T) {
+	t.Parallel()
+
+	tcs := []struct {
+		name  string
+		close string
+	}{
+		{name: "longer marker", close: "````"},
+		{name: "trailing spaces", close: "```  "},
+	}
+
+	for _, tc := range tcs {
+		t.Run(tc.name, func(t *testing.T) {
+			t.Parallel()
+			r := require.New(t)
+
+			src := "# Title\n\n```\nbefore\n" + tc.close + "\n---\nafter\n```\n"
+
+			p := New()
+			out, err := p.Parse([]byte(src))
+			r.NoError(err)
+
+			act := string(out)
+			r.Equal(1, strings.Count(act, "<page>"))
+			r.Contains(act, "---\nafter\n</code></pre>")
+		})
+	}
+}
