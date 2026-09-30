@@ -53,8 +53,21 @@ func (p *Parser) parse(lines []string) ([]byte, error) {
 	var after string
 
 	var ind int
+	var fence string
 	for _, line := range lines {
 		ind++
+		if marker := fenceMarker(line); len(marker) > 0 {
+			switch {
+			case len(fence) == 0:
+				fence = marker
+			case marker[0] == fence[0] && len(marker) >= len(fence) && strings.TrimSpace(line) == marker:
+				fence = ""
+			}
+		}
+		if len(fence) > 0 {
+			chunk = append(chunk, line)
+			continue
+		}
 		if strings.HasPrefix(line, "<include") {
 			after = line
 			break
@@ -103,6 +116,25 @@ func (p *Parser) parse(lines []string) ([]byte, error) {
 
 	act := []byte(strings.Join(lines, "\n"))
 	return act, nil
+}
+
+func fenceMarker(line string) string {
+	trimmed := strings.TrimLeft(line, " ")
+	if len(line)-len(trimmed) > 3 || len(trimmed) < 3 {
+		return ""
+	}
+
+	c := trimmed[0]
+	if c != '`' && c != '~' {
+		return ""
+	}
+
+	n := len(trimmed) - len(strings.TrimLeft(trimmed, string(c)))
+	if n < 3 {
+		return ""
+	}
+
+	return trimmed[:n]
 }
 
 // Parse parses the Markdown and returns the HTML.

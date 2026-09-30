@@ -88,3 +88,21 @@ func Test_Parser_Parse(t *testing.T) {
 	// fmt.Println(act)
 	r.Equal(exp, act)
 }
+
+func Test_Parser_Parse_PageBreakInsideFence(t *testing.T) {
+	t.Parallel()
+	r := require.New(t)
+
+	src := "# Title\n\n```shell\n$ go run .\n\nHello World\n\n--------\nGo Version: go1.25.0\n\n```\n\n## Next\n\n~~~\n<include src=\"x.md\"></include>\n~~~\n\n---\n\n# Second"
+
+	p := New()
+	out, err := p.Parse([]byte(src))
+	r.NoError(err)
+
+	act := string(out)
+	r.Equal(2, strings.Count(act, "<page>"))
+	r.Contains(act, "--------\nGo Version: go1.25.0\n\n</code></pre>")
+	r.Contains(act, "<h2>Next</h2>")
+	r.Contains(act, "&lt;include src=&quot;x.md&quot;&gt;&lt;/include&gt;")
+	r.Contains(act, "<h1>Second</h1>")
+}
