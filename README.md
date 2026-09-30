@@ -28,7 +28,7 @@ Or via Homebrew: `brew install gopherguides/hype/hype-md`
 
 | Command | Description |
 | ------- | ----------- |
-| `hype export -format=markdown -f doc.md`  | Export to markdown (stdout) |
+| `hype export -format=markdown -f doc.md` | Export to markdown (stdout) |
 | `hype export -format=html -f doc.md -o doc.html` | Export to HTML file |
 | `hype preview -f doc.md -open` | Live preview with hot reload |
 | `hype validate -f doc.md` | Validate document structure |
@@ -38,11 +38,11 @@ Or via Homebrew: `brew install gopherguides/hype/hype-md`
 
 | Tag | Purpose | Example |
 | --- | ------- | ------- |
-| `<include>` | Include another file | `<include src=&#34;other.md&#34;>` |
-| `<code>` | Show file contents | `<code src=&#34;main.go&#34;>` |
-| `<go>` | Run Go code, show output | `<go run=&#34;main.go&#34;>` |
-| `<cmd>` | Run shell command | `<cmd exec=&#34;ls -la&#34;>` |
-| `<img>` | Include image | `<img src=&#34;diagram.png&#34;>` |
+| `<include>` | Include another file | `<include src="other.md">` |
+| `<code>` | Show file contents | `<code src="main.go">` |
+| `<go>` | Run Go code, show output | `<go run="main.go">` |
+| `<cmd>` | Run shell command | `<cmd exec="ls -la">` |
+| `<img>` | Include image | `<img src="diagram.png">` |
 
 
 ### AI Assistants
@@ -666,7 +666,7 @@ hype marked -f hype.md
 
 ## Page Breaks
 
-Hype inserts page break comments between pages (`&lt;!--BREAK--&gt;`), which Marked 2 can use for pagination in exported documents.
+Hype inserts page break comments between pages (`<!--BREAK-->`), which Marked 2 can use for pagination in exported documents.
 
 ## Troubleshooting
 
@@ -1533,9 +1533,9 @@ jobs:
         uses: actions/setup-go@v4
         with:
           go-version-file: 'go.mod'
-          cache-dependency-path: subdir/go.sum
+          cache-dependency-path: go.sum
       - name: Install hype
-        run: go install github.com/gopherguides/hype/cmd/hype@latest
+        run: go install ./cmd/hype
       - name: Run hype
         run: hype export -format=markdown -f hype.md -o README.md
       - name: Check for changes

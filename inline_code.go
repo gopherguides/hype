@@ -52,7 +52,7 @@ func (code *InlineCode) MD() string {
 		return ""
 	}
 
-	content := code.Nodes.String()
+	content := html.UnescapeString(code.Nodes.String())
 
 	// Content with backticks needs more backticks to escape
 	if strings.Contains(content, "`") {
