@@ -119,3 +119,47 @@ func Test_Parser_Parse_InlineCodeIsNotFence(t *testing.T) {
 
 	r.Equal(2, strings.Count(string(out), "<page>"))
 }
+
+func Test_Parser_Parse_FenceInsideHTMLBlock(t *testing.T) {
+	t.Parallel()
+	r := require.New(t)
+
+	src := "# Title\n\n<pre>\n```\n</pre>\n\n---\n\n# Second\n\n```go\nx := 1\n```\n"
+
+	p := New()
+	out, err := p.Parse([]byte(src))
+	r.NoError(err)
+
+	act := string(out)
+	r.Equal(2, strings.Count(act, "<page>"))
+	r.Contains(act, "<h1>Second</h1>")
+}
+
+func Test_Parser_Parse_FenceCloseMustMatchExactly(t *testing.T) {
+	t.Parallel()
+
+	tcs := []struct {
+		name  string
+		close string
+	}{
+		{name: "longer marker", close: "````"},
+		{name: "trailing spaces", close: "```  "},
+	}
+
+	for _, tc := range tcs {
+		t.Run(tc.name, func(t *testing.T) {
+			t.Parallel()
+			r := require.New(t)
+
+			src := "# Title\n\n```\nbefore\n" + tc.close + "\n---\nafter\n```\n"
+
+			p := New()
+			out, err := p.Parse([]byte(src))
+			r.NoError(err)
+
+			act := string(out)
+			r.Equal(1, strings.Count(act, "<page>"))
+			r.Contains(act, "---\nafter\n</code></pre>")
+		})
+	}
+}
