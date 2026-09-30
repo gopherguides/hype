@@ -49,7 +49,7 @@ func (cmd *VSCode) Flags() (*flag.FlagSet, error) {
 	return cmd.flags, nil
 }
 
-func (cmd *VSCode) Main(ctx context.Context, pwd string, args []string) error {
+func (cmd *VSCode) Main(ctx context.Context, _ string, args []string) error {
 	if err := cmd.validate(); err != nil {
 		return err
 	}
@@ -77,14 +77,14 @@ func (cmd *VSCode) Main(ctx context.Context, pwd string, args []string) error {
 
 	path := args[0]
 
-	pwd = filepath.Dir(path)
+	dir := filepath.Dir(path)
 	name := filepath.Base(path)
 
-	cmd.FS = os.DirFS(pwd)
+	cmd.FS = os.DirFS(dir)
 
 	err = WithTimeout(ctx, cmd.Timeout, func(ctx context.Context) error {
-		return WithinDir(pwd, func() error {
-			return cmd.execute(ctx, pwd, name)
+		return WithinDir(dir, func() error {
+			return cmd.execute(ctx, dir, name)
 		})
 	})
 
