@@ -159,9 +159,11 @@ You can also use a [github action](#using-github-actions-to-update-your-readme) 
 
 # README Source
 
-You can view the source for this entire readme in the [.hype](https://github.com/gopherguides/corp/tree/main/.hype) directory.
+You can view the source for this README in [hype.md](https://github.com/gopherguides/hype/blob/main/hype.md). Included documentation lives in the [docs](https://github.com/gopherguides/hype/tree/main/docs) directory.
 
-Here is the current structure that we are using to create this readme:
+Here is the current structure that we are using to create this README:
+
+Commands run by `cmd` must be installed on the machine building the docs; this example requires `tree`.
 
 <cmd exec="tree ./docs" src=".">
 
