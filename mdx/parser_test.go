@@ -106,3 +106,16 @@ func Test_Parser_Parse_PageBreakInsideFence(t *testing.T) {
 	r.Contains(act, "&lt;include src=&quot;x.md&quot;&gt;&lt;/include&gt;")
 	r.Contains(act, "<h1>Second</h1>")
 }
+
+func Test_Parser_Parse_InlineCodeIsNotFence(t *testing.T) {
+	t.Parallel()
+	r := require.New(t)
+
+	src := "# Title\n\n``` use ``code`` ```\n\n---\n\n# Second"
+
+	p := New()
+	out, err := p.Parse([]byte(src))
+	r.NoError(err)
+
+	r.Equal(2, strings.Count(string(out), "<page>"))
+}

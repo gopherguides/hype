@@ -134,6 +134,10 @@ func fenceMarker(line string) string {
 		return ""
 	}
 
+	if c == '`' && strings.ContainsRune(trimmed[n:], '`') {
+		return ""
+	}
+
 	return trimmed[:n]
 }
 
