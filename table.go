@@ -149,7 +149,7 @@ func (tab *Table) MD() string {
 	cols := make([]string, 0, len(heads))
 	if len(heads) > 0 {
 		for _, h := range heads {
-			c := h.Children().MD()
+			c := tableCellMD(h)
 			cols = append(cols, c)
 			fmt.Fprintf(bb, "| %s ", c)
 		}
@@ -171,10 +171,16 @@ func (tab *Table) MD() string {
 		}
 
 		for _, td := range tds {
-			fmt.Fprintf(bb, "| %s ", td.Children().MD())
+			fmt.Fprintf(bb, "| %s ", tableCellMD(td))
 		}
 		bb.WriteString("|\n")
 	}
 
 	return bb.String()
+}
+
+func tableCellMD(cell Node) string {
+	md := cell.Children().MD()
+	md = strings.NewReplacer("\r\n", " ", "\r", " ", "\n", " ").Replace(md)
+	return strings.TrimSpace(md)
 }

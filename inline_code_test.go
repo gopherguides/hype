@@ -55,6 +55,26 @@ func Test_InlineCode_MD(t *testing.T) {
 			expected: "`` end` ``",
 		},
 		{
+			name:     "numeric character references",
+			content:  "<include src=&#34;other.md&#34;>",
+			expected: "`<include src=\"other.md\">`",
+		},
+		{
+			name:     "named character references",
+			content:  "&lt;img src=&quot;image.png&quot;&gt;",
+			expected: "`<img src=\"image.png\">`",
+		},
+		{
+			name:     "decode references once",
+			content:  "&amp;#34;",
+			expected: "`&#34;`",
+		},
+		{
+			name:     "encoded backticks",
+			content:  "&#x60;code&#x60;",
+			expected: "`` `code` ``",
+		},
+		{
 			name:     "empty content",
 			content:  "",
 			expected: "``",
