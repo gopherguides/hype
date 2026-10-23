@@ -8,6 +8,10 @@ on:
       - 'hype.md'
   workflow_dispatch:
 
+concurrency:
+  group: sync-docs-hypemd
+  cancel-in-progress: true
+
 jobs:
   sync:
     runs-on: ubuntu-latest
