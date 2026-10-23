@@ -8,6 +8,10 @@ on:
       - 'hype.md'
   workflow_dispatch:
 
+concurrency:
+  group: sync-docs-hypemd
+  cancel-in-progress: true
+
 jobs:
   sync:
     runs-on: ubuntu-latest
@@ -41,7 +45,9 @@ jobs:
             cp -r "$dir" "/tmp/hypemd-site/content/${dirname}"
           done
 
-      - name: Commit and push to hypemd.dev
+      - name: Open auto-merging PR on hypemd.dev
+        env:
+          GH_TOKEN: ${{ secrets.HYPEMD_PAT }}
         run: |
           cd /tmp/hypemd-site
           git config user.name "github-actions[bot]"
@@ -49,9 +55,16 @@ jobs:
           git add content/
           if git diff --cached --quiet; then
             echo "No changes to commit"
-          else
-            git commit -m "docs: sync documentation from hype repo
+            exit 0
+          fi
+          git checkout -b docs-sync
+          git commit -m "docs: sync documentation from hype repo
 
           Automated sync triggered by gopherguides/hype@${{ github.sha }}"
-            git push
+          git push --force origin docs-sync
+          if ! gh pr view docs-sync --repo gopherguides/hypemd.dev --json state -q .state 2>/dev/null | grep -q OPEN; then
+            gh pr create --repo gopherguides/hypemd.dev --base main --head docs-sync \
+              --title "docs: sync documentation from hype repo" \
+              --body "Automated sync triggered by gopherguides/hype@${{ github.sha }}"
           fi
+          gh pr merge docs-sync --repo gopherguides/hypemd.dev --auto --merge --delete-branch
