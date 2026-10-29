@@ -1,11 +1,6 @@
 name: Sync Docs to hypemd.dev
 
 on:
-  push:
-    branches: [main]
-    paths:
-      - 'docs/**'
-      - 'hype.md'
   workflow_dispatch:
 
 concurrency:
